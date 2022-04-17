@@ -1,0 +1,39 @@
+# secret
+secret*
+.env
+.envrc
+
+# scratch
+scratch/*
+scratch.*
+
+# data
+data/*.db
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+
+# scratches
+scratch.ipynb
+Untitled.ipynb
+labbooks/*
+
+# caches
+cache-directory/*
+*.swp
+__pycache__/
+*.py[cod]
+*$py.class
+.mypy_cache
+.hypothesis
+.pytest_cache
+
+# core dumps
+core.*
+
+# Mac debris
+.DS_Store
+*.sublime-workspace
+*.sublime-project
+todo*.txt
