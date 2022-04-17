@@ -22,6 +22,10 @@ pip3 install -r requirements.txt
 ## Setting up Dash testing 
 - Used example from https://stackoverflow.com/q/69255703
 - https://dash.plotly.com/testing
+ 
+ 
+The following may be useful for the CI/CD step
+- https://blog.streamlit.io/testing-streamlit-apps-using-seleniumbase/
 
 
 ```shell
