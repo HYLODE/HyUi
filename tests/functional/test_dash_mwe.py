@@ -19,8 +19,7 @@ from selenium.webdriver.support import expected_conditions
 
 
 def test_example(dash_duo):
-    app = import_app(
-        app_file='app')
+    app = import_app(app_file='src.app')
     dash_duo.start_server(app)
     WebDriverWait(dash_duo.driver, 10).until(
         expected_conditions.visibility_of_element_located(
