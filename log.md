@@ -1,5 +1,11 @@
 # Running notes log
 
+## 2022-04-17t22:30
+
+working on multipage example from
+https://github.com/plotly/dash-labs/blob/main/docs/08-MultiPageDashApp.md
+
+
 ## 2022-04-17t15:14:57
 seleniumbase as an alternative 
 https://blog.streamlit.io/testing-streamlit-apps-using-seleniumbase/

@@ -26,7 +26,7 @@ pip3 install -r requirements.txt
 - [X] pytest
 - [X] mwe dash in docker
 - [ ] mwe dash in docker tested on GAE
-- [ ] CI/CD
+- [X] GitHub Actions
 
 ## Setting up Dash testing 
 - Used example from https://stackoverflow.com/q/69255703

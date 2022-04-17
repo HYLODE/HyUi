@@ -1,41 +1,78 @@
-from dash import Dash, dcc, html, Input, Output
-import plotly.express as px
+import dash
+from dash import dcc, html, Output, Input, State
+import dash_labs as dl
+import dash_bootstrap_components as dbc
 
-import pandas as pd
 
-df = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/gapminderDataFiveYear.csv')
+app = dash.Dash(
+    __name__,
+    plugins=[dl.plugins.pages],
+    external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.FONT_AWESOME],
+)
 
-app = Dash(__name__)
 
-app.layout = html.Div([
-    html.H1(id="h1-title", children=['Gapminder example with callbacks']),
-    dcc.Graph(id='graph-with-slider'),
-    dcc.Slider(
-        df['year'].min(),
-        df['year'].max(),
-        step=None,
-        value=df['year'].min(),
-        marks={str(year): str(year) for year in df['year'].unique()},
-        id='year-slider'
-    )
-])
+navbar = dbc.NavbarSimple(
+    dbc.DropdownMenu(
+        [
+            dbc.DropdownMenuItem(page["name"], href=page["path"])
+            for page in dash.page_registry.values()
+            if not page["path"].startswith("/chapter")
+        ],
+        nav=True,
+        label="More Pages",
+    ),
+    brand="Multi Page App Plugin Demo",
+    color="primary",
+    dark=True,
+    className="mb-2",
+)
+
+sidebar_button = dbc.Button(html.I(className="fa fa-bars"), id="sidebar-btn")
+sidebar = dbc.Offcanvas(
+    dbc.Nav(
+        [html.H3("Chapters")]
+        + [
+            dbc.NavLink(
+                [
+                    html.I(className=page["icon"]),
+                    html.Span(page["name"], className="ms-2"),
+                ],
+                href=page["path"],
+                active="exact",
+            )
+            for page in dash.page_registry.values()
+            if page["path"].startswith("/chapter")
+        ],
+        vertical=True,
+        pills=True,
+    ),
+    id="offcanvas",
+)
+
+app.layout = dbc.Container(
+    [
+        navbar,
+        dbc.Row(
+            [
+                dbc.Col([sidebar_button], width=1),
+                dbc.Col([sidebar, dl.plugins.page_container]),
+            ]
+        ),
+    ],
+    fluid=True,
+)
 
 
 @app.callback(
-    Output('graph-with-slider', 'figure'),
-    Input('year-slider', 'value'))
-def update_figure(selected_year):
-    filtered_df = df[df.year == selected_year]
-
-    # noinspection SpellCheckingInspection
-    fig = px.scatter(filtered_df, x="gdpPercap", y="lifeExp",
-                     size="pop", color="continent", hover_name="country",
-                     log_x=True, size_max=55)
-
-    fig.update_layout(transition_duration=500)
-
-    return fig
+    Output("offcanvas", "is_open"),
+    Input("sidebar-btn", "n_clicks"),
+    State("offcanvas", "is_open"),
+)
+def toggle_theme_offcanvas(n1, is_open):
+    if n1:
+        return not is_open
+    return is_open
 
 
-if __name__ == '__main__':
-    app.run_server(debug=True, port=8050, host='0.0.0.0')
+if __name__ == "__main__":
+    app.run_server(debug=True)
