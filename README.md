@@ -1,5 +1,14 @@
 ## Developer set-up
 
+### Secrets and environment variables
+
+Navigate to project root and make a `.env` file then add environment vars into this. This is excluded from version control.
+
+```shell
+cd hyui
+touch .env
+```
+
 ### Setting up environment for PyCharm on Mac M1
 
 Using conda and miniforge on mac m1 else problems with scipy etc. 
@@ -15,7 +24,7 @@ pip3 install -r requirements.txt
 - [X] prepare a separate `requirements.txt` for docker
 - [X] mwe dash app locally
 - [X] pytest
-- [ ] mwe dash in docker
+- [X] mwe dash in docker
 - [ ] mwe dash in docker tested on GAE
 - [ ] CI/CD
 

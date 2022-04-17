@@ -37,3 +37,10 @@ app-run:
 app-down:
 	docker-compose down
 
+## app-test         : Run tests
+.PHONY: app-test
+app-test:
+	docker build --tag hyui .
+	docker run hyui
+
+
