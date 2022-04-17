@@ -27,6 +27,7 @@ app.layout = html.Div([
 def update_figure(selected_year):
     filtered_df = df[df.year == selected_year]
 
+    # noinspection SpellCheckingInspection
     fig = px.scatter(filtered_df, x="gdpPercap", y="lifeExp",
                      size="pop", color="continent", hover_name="country",
                      log_x=True, size_max=55)
