@@ -1,12 +1,11 @@
 # this is the layout page; but the file name defines the page name
 # via https://dash.plotly.com/basic-callbacks#dash-app-layout-with-figure-and-slider
+from .callbacks import df
+from dash import dcc, html
 import dash
 
-dash.register_page(__name__, path='/gapminder', title='gapminder', name='gapminder')
-
-from dash import dcc, html
-from .callbacks import df
-
+dash.register_page(__name__, path='/gapminder',
+                   title='gapminder', name='gapminder')
 
 
 layout = html.Div([
@@ -21,5 +20,3 @@ layout = html.Div([
         id='year-slider'
     )
 ])
-
-

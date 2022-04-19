@@ -1,7 +1,9 @@
 import dash
-from dash import dcc, html, Output, Input, State
-import dash_labs as dl
+from dash import html, Output, Input, State
 import dash_bootstrap_components as dbc
+# pages feature from dash labs requires app to be at project level
+# for testing to work
+import dash_labs as dl 
 
 
 app = dash.Dash(

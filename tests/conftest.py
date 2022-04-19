@@ -1,5 +1,8 @@
 # tests/conftest.py
+import dash
+import dash_labs
 from selenium.webdriver.chrome.options import Options
+
 
 def pytest_setup_options():
     chrome_options = Options()

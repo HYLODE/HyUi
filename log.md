@@ -1,9 +1,16 @@
 # Running notes log
 
+## 2022-04-18t22:59:50
+Trying to set-up pytest but not running for mutlipage apps 
+when the app is nested within src
+
+        
+
 ## 2022-04-17t22:30
 
 working on multipage example from
 https://github.com/plotly/dash-labs/blob/main/docs/08-MultiPageDashApp.md
+mwe complete
 
 
 ## 2022-04-17t15:14:57
