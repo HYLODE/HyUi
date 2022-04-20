@@ -3,7 +3,7 @@ from dash import html, Output, Input, State
 import dash_bootstrap_components as dbc
 # pages feature from dash labs requires app to be at project level
 # for testing to work
-import dash_labs as dl 
+import dash_labs as dl
 
 
 app = dash.Dash(
