@@ -1,0 +1,36 @@
+{
+    "folders": [
+        {
+            "path": ".",
+            "folder_exclude_patterns": [
+                "__pycache__",
+                ".pytest_cache",
+            ],
+        }
+    ],
+    "settings": {
+        "PyTest": {
+            "mode": "manual",
+        },
+        "LSP": {
+            "LSP-pylsp": {
+                "settings": {
+                    "pylsp.plugins.jedi.environment": "/opt/homebrew/Caskroom/miniforge/base/envs/hyui",
+                },
+            },
+        },
+    },
+    "build_systems": [
+        {
+            "name": "HyUi",
+                "cmd": [
+                            "/opt/homebrew/Caskroom/miniforge/base/envs/hyui/bin/python",
+                            "-u",
+                            "$file"
+                        ],
+                        "file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
+                        "selector": "source.python"
+                    }
+    ],
+    "debugger_configurations": [],
+}

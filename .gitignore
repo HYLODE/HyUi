@@ -35,5 +35,4 @@ core.*
 # Mac debris
 .DS_Store
 *.sublime-workspace
-*.sublime-project
 todo*.txt
