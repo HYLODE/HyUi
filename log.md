@@ -1,8 +1,36 @@
 # Running notes log
 
+## 2022-04-25 22:12:32
+
+Picking this up after a week
+Need to practice writing tests
+
+https://github.com/theskumar/python-dotenv
+installed python-dotenv
+```bash
+pip install python-dotenv
+```
+
+and https://direnv.net 
+
+```bash
+brew install direnv
+touch .envrc
+direnv allow .
+```
+
+add the following to .zshrc
+```bash
+eval "$(direnv hook zsh)"
+```
+
+
+
+
 ## 2022-04-18t22:59:50
 Trying to set-up pytest but not running for mutlipage apps 
 when the app is nested within src
+pages feature from dash labs requires app to be at project level for testing to work
 
         
 

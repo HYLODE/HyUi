@@ -16,6 +16,13 @@ export $(shell sed 's/=.*//' .env)
 help : Makefile
 	@sed -n 's/^##//p' $<
 
+## app-package      : Package the app ready to push to git
+.PHONY: app-package
+app-package:
+	pip list --format=freeze > requirements.txt	
+	@echo "*** HyUI packaging complete"
+
+
 ## app-build        : Build the app locally (docker-compose build)
 .PHONY: app-build
 app-build:

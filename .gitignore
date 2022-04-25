@@ -1,7 +1,7 @@
 # secret
 secret*
-.env
-.envrc
+.env*
+.envrc*
 
 # scratch
 scratch/*

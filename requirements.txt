@@ -16,9 +16,12 @@ commonmark==0.9.1
 cryptography==36.0.2
 cssselect==1.1.0
 dash==2.3.1
+dash-bootstrap-components==1.1.0
 dash-core-components==2.0.0
 dash-html-components==2.0.0
+dash-labs==1.0.3
 dash-table==5.0.0
+dataclasses==0.8
 decorator==5.1.1
 execnet==1.9.0
 fasteners==0.17.3
@@ -81,6 +84,7 @@ pytest-ordering==0.6
 pytest-rerunfailures==10.2
 pytest-xdist==2.5.0
 python-dateutil==2.8.2
+python-dotenv==0.20.0
 pytz==2022.1
 PyYAML==6.0
 requests==2.27.1
