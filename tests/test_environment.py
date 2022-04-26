@@ -2,12 +2,15 @@
 import pytest
 from dotenv import find_dotenv
 
+
 def f():
     raise SystemExit(1)
+
 
 def test_mytest():
     with pytest.raises(SystemExit):
         f()
+
 
 def test_dev_environment():
     """
@@ -15,5 +18,4 @@ def test_dev_environment():
     WHEN you check the environment
     THEN you find a .env file and settings
     """
-    assert find_dotenv() != ''
-
+    assert find_dotenv() != ""
