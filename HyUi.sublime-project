@@ -23,14 +23,24 @@
     "build_systems": [
         {
             "name": "HyUi",
-                "cmd": [
-                            "/opt/homebrew/Caskroom/miniforge/base/envs/hyui/bin/python",
-                            "-u",
-                            "$file"
-                        ],
-                        "file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
-                        "selector": "source.python"
-                    }
+            "cmd": [
+                "/opt/homebrew/Caskroom/miniforge/base/envs/hyui/bin/python",
+                "-u",
+                "$file"
+            ],
+            "file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
+            "selector": "source.python"
+        }
     ],
-    "debugger_configurations": [],
+    // https://github.com/daveleroy/sublime_debugger
+    "debugger_configurations": [
+        {
+            "name": "Debug python: Current File",
+            "type": "python",
+            "program": "${file}",
+            "request": "launch",
+            "console": "externalTerminal",
+            "python": "/opt/homebrew/Caskroom/miniforge/base/envs/hyui/bin/python"
+        },
+    ],
 }
