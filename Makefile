@@ -1,53 +1,82 @@
-# Default set up for working with docker on the GAE
-UID := $(shell id -u)
-GID := $(shell id -g)
-# These two lines make local environment variables available to Make
-include .env
-export $(shell sed 's/=.*//' .env)
+.PHONY:
+	coverage
+	coverage_html
+	coverage_xml
+	docs
+	docs_check_external_links
+	help
+	prepare_docs_folder
+	requirements
 
-# Self-documenting help; any comment line starting ## will be printed
-# https://swcarpentry.github.io/make-novice/08-self-doc/index.html
-## 
-## Sitrep application 
-## HYLODE team 2021
-## 
-## help             : call this help function
-.PHONY: help
-help : Makefile
-	@sed -n 's/^##//p' $<
+.DEFAULT_GOAL := help
 
-## app-package      : Package the app ready to push to git
-.PHONY: app-package
-app-package:
-	pip list --format=freeze > requirements.txt	
-	@echo "*** HyUI packaging complete"
+## Install the Python requirements for contributors, and install pre-commit hooks
+requirements:
+	python -m pip install -U pip setuptools
+	python -m pip install -r requirements.txt
+	pre-commit install
 
+## Create a `docs/_build` folder, if it does not exist. Otherwise delete any sub-folders and their contents within it
+prepare_docs_folder:
+	if [ ! -d "./docs/_build" ]; then mkdir ./docs/_build; fi
+	find ./docs/_build -mindepth 1 -maxdepth 1 -type d -exec rm -rf {} \;
 
-## app-build        : Build the app locally (docker-compose build)
-.PHONY: app-build
-app-build:
-	docker-compose build \
-		 --build-arg http_proxy \
-		 --build-arg https_proxy \
-		 --build-arg HTTP_PROXY \
-		 --build-arg HTTPS_PROXY 
-	@echo "*** HyUI build complete"
+## Compile the Sphinx documentation in HTML format in the docs/_build folder from a clean build
+docs: prepare_docs_folder requirements
+	sphinx-build -b html ./docs ./docs/_build
 
-## app-run          : Run the app locally
-.PHONY: app-run
-app-run:
-	docker-compose up -d
-	docker-compose logs -f
+## Check external links in the Sphinx documentation using linkcheck in the docs/_build folder from a clean build
+docs_check_external_links: prepare_docs_folder requirements
+	sphinx-build -b linkcheck ./docs ./docs/_build
 
-## app-down         : Stop the app
-.PHONY: app-down
-app-down:
-	docker-compose down
+## Run code coverage
+coverage: requirements
+	coverage run -m pytest
 
-## app-test         : Run tests
-.PHONY: app-test
-app-test:
-	docker build --tag hyui .
-	docker run hyui
+## Run code coverage, and produce a HTML output
+coverage_html: coverage
+	coverage html
 
+## Run code coverage, and produce an XML output
+coverage_xml: coverage
+	coverage xml
 
+## Get help on all make commands; referenced from https://github.com/drivendata/cookiecutter-data-science
+help:
+	@echo "$$(tput bold)Available rules:$$(tput sgr0)"
+	@echo
+	@sed -n -e "/^## / { \
+		h; \
+		s/.*//; \
+		:doc" \
+		-e "H; \
+		n; \
+		s/^## //; \
+		t doc" \
+		-e "s/:.*//; \
+		G; \
+		s/\\n## /---/; \
+		s/\\n/ /g; \
+		p; \
+	}" ${MAKEFILE_LIST} \
+	| LC_ALL='C' sort --ignore-case \
+	| awk -F '---' \
+		-v ncol=$$(tput cols) \
+		-v indent=25 \
+		-v col_on="$$(tput setaf 6)" \
+		-v col_off="$$(tput sgr0)" \
+	'{ \
+		printf "%s%*s%s ", col_on, -indent, $$1, col_off; \
+		n = split($$2, words, " "); \
+		line_length = ncol - indent; \
+		for (i = 1; i <= n; i++) { \
+			line_length -= length(words[i]) + 1; \
+			if (line_length <= 0) { \
+				line_length = ncol - indent - length(words[i]) - 1; \
+				printf "\n%*s ", -indent, " "; \
+			} \
+			printf "%s ", words[i]; \
+		} \
+		printf "\n"; \
+	}' \
+	| more $(shell test $(shell uname) = Darwin && echo '--no-init --raw-control-chars')
