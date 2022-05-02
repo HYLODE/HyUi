@@ -21,6 +21,19 @@ make requirements
 ```
 
 got the pre-commit hooks working (I think)
+added in cruft (which I think keeps things cleaner)
+
+```sh
+pip install cruft
+cruft link https://github.com/best-practice-and-impact/govcookiecutter
+```
+
+next steps
+build a MWE dash app
+then use the dash cookiecutter to get a similar and decent structure
+merge the two
+then write tests for MWE app
+remember to use `conda` for installs (and avoid pip if poss)
 
 
 
