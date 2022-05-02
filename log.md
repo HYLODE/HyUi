@@ -36,6 +36,13 @@ then write tests for MWE app
 remember to use `conda` for installs (and avoid pip if poss)
 
 
+add the following to .envrc (assuming you have direnv set up)
+```sh
+# Activate conda environment
+# as per https://linuxtut.com/en/909f9619bc8c4330d523/
+eval "$(conda shell.bash hook)"
+conda activate hyuiv2
+```
 
 ## 2022-04-26 23:17:35
 played with pytest
