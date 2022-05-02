@@ -18,3 +18,13 @@ class CensusDict:
     bay_code: str
     bay_type: str
     ward_code: str
+
+
+class Census:
+    """
+    manages EMAP census data
+    """
+
+    def __init__(self, ward: str, dev: bool = False):
+        self.ward = ward
+        self.dev = dev

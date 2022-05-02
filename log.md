@@ -1,5 +1,21 @@
 # Running notes log
 
+## 2022-05-02 22:15:09 
+just got the python debugger to work
+and re-installed packages for sublimetext without the pytest package which had a broken dependency
+
+next step is to get back to writing some tests
+TODO: you want to mock up some data as if you're hitting a real API
+TODO: you also want to sort out your testing structure
+for python relative imports you really want all your app in the src directory 
+with modules beneath that
+
+
+## 2022-04-26 23:17:35
+played with pytest
+built simple notebook on hymind lab
+aim is to create a requests fixture and then some helper functions that do the appropriate data conversion
+
 ## 2022-04-25 22:12:32
 
 Picking this up after a week
