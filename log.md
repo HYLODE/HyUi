@@ -20,6 +20,9 @@ conda activate hyuiv2
 make requirements
 ```
 
+got the pre-commit hooks working (I think)
+
+
 
 ## 2022-04-26 23:17:35
 played with pytest

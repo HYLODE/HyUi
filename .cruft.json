@@ -1,0 +1,23 @@
+{
+  "template": "https://github.com/best-practice-and-impact/govcookiecutter",
+  "commit": "7352897db57bc1620e7873febcf7baee1eda2099",
+  "context": {
+    "cookiecutter": {
+      "_extensions": [
+        "jinja2_time.TimeExtension"
+      ],
+      "organisation_name": "UCL-HAL",
+      "repository_hosting_platform": "GitHub",
+      "organisation_handle": "HYLODE",
+      "contact_email": "doc@steveharris.me",
+      "organisational_framework": "N/A",
+      "project_name": "hyui",
+      "repo_name": "hyui",
+      "overview": "hyui",
+      "project_version": "0.0.1",
+      "using_R": "No",
+      "_template": "https://github.com/best-practice-and-impact/govcookiecutter"
+    }
+  },
+  "directory": null
+}
