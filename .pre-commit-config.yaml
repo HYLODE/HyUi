@@ -17,7 +17,7 @@ repos:
         args: [ "--maxkb=5120" ]
       - id: end-of-file-fixer
         name: Check for a blank line at the end of scripts (auto-fixes)
-        exclude: '\.Rd'
+        exclude: \.Rd|.*\.sublime-project
       - id: trailing-whitespace
         name: Check for trailing whitespaces (auto-fixes)
   - repo: https://github.com/pycqa/isort

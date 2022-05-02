@@ -15,16 +15,16 @@
         "LSP": {
             "LSP-pylsp": {
                 "settings": {
-                    "pylsp.plugins.jedi.environment": "/opt/homebrew/Caskroom/miniforge/base/envs/hyui",
+                    "pylsp.plugins.jedi.environment": "/opt/homebrew/Caskroom/miniforge/base/envs/hyuiv2",
                 },
             },
         },
     },
     "build_systems": [
         {
-            "name": "HyUi",
+            "name": "HyUiv2",
             "cmd": [
-                "/opt/homebrew/Caskroom/miniforge/base/envs/hyui/bin/python",
+                "/opt/homebrew/Caskroom/miniforge/base/envs/hyuiv2/bin/python",
                 "-u",
                 "$file"
             ],
@@ -40,7 +40,7 @@
             "program": "${file}",
             "request": "launch",
             "console": "externalTerminal",
-            "python": "/opt/homebrew/Caskroom/miniforge/base/envs/hyui/bin/python"
+            "python": "/opt/homebrew/Caskroom/miniforge/base/envs/hyuiv2/bin/python"
         },
     ],
 }
