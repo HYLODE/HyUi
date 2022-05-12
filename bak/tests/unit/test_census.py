@@ -1,5 +1,6 @@
 import pytest
 
+
 def test_keys_in_icu_census():
 
     census_fields = [
@@ -29,4 +30,3 @@ def test_keys_in_icu_census():
         "avg_resp_rate_1_24h",
         "wim_1",
     ]
-
