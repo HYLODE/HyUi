@@ -1,13 +1,30 @@
 # Running notes log
 
+
+
 ## 2022-05-12t18:16:12
 https://yeray.dev/python/setting-up-sublime-text-4-for-python#manual-setup
 finally got pylsp to work by following manual install as above
+
+got pre-commit hooks to work for black by updating the tag for black in .pre-commit-config.yaml
+```yaml
+    rev: 22.3.0 # Replace by any tag/version: https://github.com/psf/black/tags
+```
 
 ## 2022-05-12t17:29:11
 https://towardsdatascience.com/fastapi-cloud-database-loading-with-python-1f531f1d438a
 working out how to use fastapi
 run through the example above and managed to get the data loaded into the database
+https://github.com/edkrueger/sars-fastapi
+and then it all works
+
+```sh
+# first you need to build the database
+cd tuts/fastapi_v1
+python load.py
+# then run the server
+uvicorn app.main:app
+```
 
 
 ## 2022-05-02 22:15:09
