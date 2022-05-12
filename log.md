@@ -1,5 +1,10 @@
 # Running notes log
 
+## 2022-05-12t23:26:38
+working through fastapi docs
+getting the testing sorted out
+also fixed mypy and relative imports
+and activated plugin for mypy for sqlalchemy
 
 
 ## 2022-05-12t18:16:12
@@ -25,6 +30,7 @@ python load.py
 # then run the server
 uvicorn app.main:app
 ```
+then naviagte to http://127.0.0.1:8000/docs#/default/show_records_records__get
 
 
 ## 2022-05-02 22:15:09
