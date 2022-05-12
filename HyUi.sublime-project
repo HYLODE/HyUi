@@ -13,34 +13,43 @@
             "mode": "manual",
         },
         "LSP": {
-            "LSP-pylsp": {
-                "settings": {
-                    "pylsp.plugins.jedi.environment": "/opt/homebrew/Caskroom/miniforge/base/envs/hyuiv2",
+            // "LSP-pylsp": {
+            //     "settings": {
+            //         "pylsp.plugins.jedi.environment": "/opt/homebrew/Caskroom/miniforge/base/envs/hyuiv2",
+            //     },
+            // },
+                "pylsp": {
+                    "enabled": true,
+                    "command": [
+                        "/opt/homebrew/Caskroom/miniforge/base/envs/hyuiv2/bin/pylsp",
+                    ],
+                    "settings": {
+                        "pylsp.plugins.flake8.executable": "/opt/homebrew/Caskroom/miniforge/base/envs/hyuiv2/bin/flake8",
+                    },
                 },
+            }
+        },
+        "build_systems": [
+            {
+                "name": "HyUiv2",
+                "cmd": [
+                    "/opt/homebrew/Caskroom/miniforge/base/envs/hyuiv2/bin/python",
+                    "-u",
+                    "$file"
+                ],
+                "file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
+                "selector": "source.python",
+            }
+        ],
+        // https://github.com/daveleroy/sublime_debugger
+        "debugger_configurations": [
+            {
+                "name": "Debug python: Current File",
+                "type": "python",
+                "program": "${file}",
+                "request": "launch",
+                "console": "externalTerminal",
+                "python": "/opt/homebrew/Caskroom/miniforge/base/envs/hyuiv2/bin/python",
             },
-        },
-    },
-    "build_systems": [
-        {
-            "name": "HyUiv2",
-            "cmd": [
-                "/opt/homebrew/Caskroom/miniforge/base/envs/hyuiv2/bin/python",
-                "-u",
-                "$file"
-            ],
-            "file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
-            "selector": "source.python"
-        }
-    ],
-    // https://github.com/daveleroy/sublime_debugger
-    "debugger_configurations": [
-        {
-            "name": "Debug python: Current File",
-            "type": "python",
-            "program": "${file}",
-            "request": "launch",
-            "console": "externalTerminal",
-            "python": "/opt/homebrew/Caskroom/miniforge/base/envs/hyuiv2/bin/python"
-        },
-    ],
-}
+        ],
+    }

@@ -1,5 +1,15 @@
 # Running notes log
 
+## 2022-05-12t18:16:12
+https://yeray.dev/python/setting-up-sublime-text-4-for-python#manual-setup
+finally got pylsp to work by following manual install as above
+
+## 2022-05-12t17:29:11
+https://towardsdatascience.com/fastapi-cloud-database-loading-with-python-1f531f1d438a
+working out how to use fastapi
+run through the example above and managed to get the data loaded into the database
+
+
 ## 2022-05-02 22:15:09
 just got the python debugger to work
 and re-installed packages for sublimetext without the pytest package which had a broken dependency
