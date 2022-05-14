@@ -1,5 +1,5 @@
 from typing import Optional
-from sqlmodel import Field, Session, SQLModel, create_engine, select, MetaData
+from sqlmodel import Field, Session, SQLModel, create_engine, select
 from datetime import datetime
 from pydantic import BaseSettings
 import arrow
@@ -33,7 +33,9 @@ class Consultation_Request(SQLModel, table=True):
     # TODO: better way to pass schema into foreign key?
     consultation_type_id: int
     # consultation_type_id: Optional[int] = Field(default=None, foreign_key="star.consultation_type.consultation_type_id")
+    # consultation_type_id: List['Consultation_type'] = Relationship(back_populates="consultation_request")
     #hospital_visit_id: int
+    
     
     
 settings = Settings()
@@ -55,10 +57,10 @@ def select_ConsultationRequests():
     # by .datetime method so compatible with type definition
     start_ts = arrow.utcnow().to('Europe/London').shift(hours=-24).datetime
     with Session(engine) as session:
-        statement = select(Consultation_Request, Consultation_Type
-                        ).where(Consultation_Type.consultation_type_id == Consultation_Request.consultation_type_id
-                        ).where(Consultation_Request.valid_from >= start_ts
-                        ).limit(1)
+        statement = (select(Consultation_Request, Consultation_Type)
+            .where(Consultation_Type.consultation_type_id == Consultation_Request.consultation_type_id)
+            .where(Consultation_Request.valid_from >= start_ts)
+            .limit(1))
         results = session.exec(statement)
         for res in results:
             print(res)
