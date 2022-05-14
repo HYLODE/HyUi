@@ -10,8 +10,8 @@ class Settings(BaseSettings):
 
 
 class Consultation_Type(SQLModel, table=True):
-    #__table_args__ = {'schema': 'star'}
-    metadata = MetaData(schema="star")
+    __table_args__ = {'schema': 'star'}
+    # metadata = MetaData(schema="star")
     consultation_type_id: Optional[int] = Field(default=None, primary_key=True)
     #stored_from: datetime
     #valid_from: datetime
@@ -21,8 +21,8 @@ class Consultation_Type(SQLModel, table=True):
     
     
 class Consultation_Request(SQLModel, table=True):
-    #__table_args__ = {'schema': 'star'}
-    metadata = MetaData(schema="star")
+    __table_args__ = {'schema': 'star'}
+    # metadata = MetaData(schema="star")
     consultation_request_id: Optional[int] = Field(default=None, primary_key=True)
     #stored_from: datetime
     valid_from: datetime
@@ -31,7 +31,8 @@ class Consultation_Request(SQLModel, table=True):
     #scheduled_datetime: datetime
     #status_change_datetime: datetime
     # TODO: better way to pass schema into foreign key?
-    consultation_type_id: Optional[int] = Field(default=None, foreign_key="consultation_type.consultation_type_id")
+    consultation_type_id: int
+    # consultation_type_id: Optional[int] = Field(default=None, foreign_key="star.consultation_type.consultation_type_id")
     #hospital_visit_id: int
     
     
@@ -52,20 +53,20 @@ def select_ConsultationType():
 def select_ConsultationRequests():
     # use arrow but convert back to datetime 
     # by .datetime method so compatible with type definition
-    start_ts = arrow.utcnow().to('Europe/London').shift(hours=-1).datetime
+    start_ts = arrow.utcnow().to('Europe/London').shift(hours=-24).datetime
     with Session(engine) as session:
         statement = select(Consultation_Request, Consultation_Type
-                          ).join(Consultation_Type
-                           ).where(
-            Consultation_Request.valid_from >= start_ts)
+                        ).where(Consultation_Type.consultation_type_id == Consultation_Request.consultation_type_id
+                        ).where(Consultation_Request.valid_from >= start_ts
+                        ).limit(1)
         results = session.exec(statement)
         for res in results:
             print(res)
         
             
 def main():
-    select_ConsultationType()
-    # select_ConsultationRequests()
+    # select_ConsultationType()
+    select_ConsultationRequests()
     
 if __name__ == "__main__":
     main()
