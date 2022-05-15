@@ -13,7 +13,6 @@ class Settings(BaseSettings):
 
     
 class Consultation_Type_Base(SQLModel):
-    #stored_from: datetime
     valid_from: datetime
     code: str
     name: Optional[str] = Field(default="")
@@ -57,16 +56,9 @@ def read_consultation_types(
 ):
     statement = select(Consultation_Type).limit(3)
     print(f"*** STATEMENT: {statement}")
-    results = session.exec(statement)
-    print(f"*** RESULTS: {results.all()}")
-    # # return [r for r in results]
-    # return [Consultation_Type_Read(
-    #     consultation_type_id=r.consultation_type_id,
-    #     code=r.code,
-    #     name=r.name,
-    #     valid_from=r.valid_from
-    # ) for r in results.all()]
-    return results.all()
+    results = session.exec(statement).all()
+    print(f"*** RESULTS: {results}")
+    return results
 
 
 @app.get("/consultation_types/{id}", response_model=Consultation_Type_Read)
