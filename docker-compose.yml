@@ -3,7 +3,7 @@ version: '3.8'
 
 services:
 
-  web:
+  api:
     build: 
       context: .
       dockerfile: Dockerfile.app
@@ -18,7 +18,6 @@ services:
     ports:
       - 8004:8000
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/foo
       - http_proxy
       - https_proxy
       - HTTP_PROXY
@@ -26,14 +25,26 @@ services:
     env_file:
       - .env
       - .secrets
-    depends_on:
-      - db
 
-  db:
-    image: postgres:13.4
-    expose:
-      - 5432
+  dash:
+    build:
+      context: .
+      dockerfile: Dockerfile.dash  
+      args:
+        - http_proxy
+        - https_proxy
+        - HTTP_PROXY
+        - HTTPS_PROXY
+    command: python index.py
+    volumes:
+      - ./src/dash:/usr/src/app
+    ports:
+      - 8005:8050
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=foo
+      - http_proxy
+      - https_proxy
+      - HTTP_PROXY
+      - HTTPS_PROXY
+    env_file:
+      - .env
+      - .secrets

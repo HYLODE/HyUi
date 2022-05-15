@@ -63,24 +63,6 @@ def read_consultation_type(
     return consultation_type
 
 
-# @app.get("/consultations/{hours}", response_model=List[Consultation_Request_Read])
-# def read_consultation_type(
-#     *,
-#     session: Session = Depends(get_session),
-#     hours: int,
-# ):
-#     """
-#     return consultations for last x hours
-#     """
-#     start_ts = arrow.utcnow().to('Europe/London').shift(hours=-1*hours).datetime
-#     statement = (select(Consultation_Request, Consultation_Type)
-#         .where(Consultation_Type.consultation_type_id == Consultation_Request.consultation_type_id)
-#         .where(Consultation_Request.valid_from >= start_ts)
-#         .limit(3)
-#     )
-#     results = session.exec(statement).all()
-#     return results
-
 
 @app.get("/consultations_ed/", response_model=List[ConsultsED])
 def read_consults_ed(
