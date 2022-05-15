@@ -1,6 +1,16 @@
 # Running notes log
 
-## 2022-05-15
+## 2022-05-15 11:16
+load .secrets and .env via docker-compose
+confirm that this works by
+```bash
+docker-compose run web bash
+# wait for the service to start
+env
+```
+
+
+## 2022-05-15 9am
 setting up work on UCLH machine
 can't get DS desktop to behave so on windows
 done a portable install of vscode insiders to local roaming dir (offered default)

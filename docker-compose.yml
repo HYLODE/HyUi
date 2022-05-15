@@ -23,6 +23,9 @@ services:
       - https_proxy
       - HTTP_PROXY
       - HTTPS_PROXY
+    env_file:
+      - .env
+      - .secrets
     depends_on:
       - db
 
