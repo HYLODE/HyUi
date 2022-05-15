@@ -5,3 +5,6 @@ pre-commit
 pytest
 Sphinx
 toml
+fastapi
+sqlmodel
+uvicorn
