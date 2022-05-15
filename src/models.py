@@ -1,19 +1,23 @@
 # src/models.py 
 from typing import List, Optional
 from sqlmodel import Field, SQLModel
-from datetime import datetime
+from datetime import datetime, date
 
 
 class ConsultsED(SQLModel):
+    firstname: str
+    lastname: str
+    date_of_birth: date
+    mrn: str
+    nhs_number: Optional[int]
     valid_from: datetime
     cancelled: bool
     closed_due_to_discharge: bool
     scheduled_datetime: datetime
     status_change_time: datetime
     comments: Optional[str]
-    code: str
     name: str
-    hospital_visit_id: int
+    dept_name: str
 
 
 class Consultation_Request_Base(SQLModel):
