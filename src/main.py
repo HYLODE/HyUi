@@ -5,9 +5,12 @@ from sqlmodel import Session, create_engine, select
 from datetime import datetime
 from pydantic import BaseSettings
 import arrow
+from pathlib import Path
+from collections import namedtuple
 
 from models import Consultation_Type, Consultation_Type_Read
 from models import Consultation_Request, Consultation_Request_Read
+from models import ConsultsED
 
 class Settings(BaseSettings):
     UDS_HOST: str
@@ -60,23 +63,42 @@ def read_consultation_type(
     return consultation_type
 
 
-@app.get("/consultations/{hours}", response_model=List[Consultation_Request_Read])
-def read_consultation_type(
+# @app.get("/consultations/{hours}", response_model=List[Consultation_Request_Read])
+# def read_consultation_type(
+#     *,
+#     session: Session = Depends(get_session),
+#     hours: int,
+# ):
+#     """
+#     return consultations for last x hours
+#     """
+#     start_ts = arrow.utcnow().to('Europe/London').shift(hours=-1*hours).datetime
+#     statement = (select(Consultation_Request, Consultation_Type)
+#         .where(Consultation_Type.consultation_type_id == Consultation_Request.consultation_type_id)
+#         .where(Consultation_Request.valid_from >= start_ts)
+#         .limit(3)
+#     )
+#     results = session.exec(statement).all()
+#     return results
+
+
+@app.get("/consultations_ed/", response_model=List[ConsultsED])
+def read_consults_ed(
     *,
     session: Session = Depends(get_session),
-    hours: int,
 ):
     """
-    return consultations for last x hours
+    return consultations for last 36 hours from ED
     """
-    start_ts = arrow.utcnow().to('Europe/London').shift(hours=-1*hours).datetime
-    statement = (select(Consultation_Request, Consultation_Type)
-        .where(Consultation_Type.consultation_type_id == Consultation_Request.consultation_type_id)
-        .where(Consultation_Request.valid_from >= start_ts)
-        .limit(3)
-    )
-    results = session.exec(statement).all()
-    return results
+    q = Path(f"query.sql").read_text()
+    results = session.execute(q)
+    print(results.keys())
+    # print(results.fetchall())
+    Record = namedtuple('Record', results.keys())
+    records = [Record(*r) for r in results.fetchall()]
+    print(records)
+    return records
+    
 
 
 

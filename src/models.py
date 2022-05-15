@@ -3,6 +3,19 @@ from typing import List, Optional
 from sqlmodel import Field, SQLModel
 from datetime import datetime
 
+
+class ConsultsED(SQLModel):
+    valid_from: datetime
+    cancelled: bool
+    closed_due_to_discharge: bool
+    scheduled_datetime: datetime
+    status_change_time: datetime
+    comments: Optional[str]
+    code: str
+    name: str
+    hospital_visit_id: int
+
+
 class Consultation_Request_Base(SQLModel):
     valid_from: Optional[datetime]
     cancelled: Optional[bool]
