@@ -88,7 +88,9 @@ def read_consults_ed(
     session: Session = Depends(get_session),
 ):
     """
-    return consultations for last 36 hours from ED
+    Returns consults for patients in ED 
+    alongside the most recent ED location for that patient
+    where that ED location occupied in the last 24h 
     """
     q = Path(f"query.sql").read_text()
     results = session.execute(q)
