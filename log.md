@@ -1,5 +1,15 @@
 # Running notes log
 
+## 2022-05-15
+setting up work on UCLH machine
+can't get DS desktop to behave so on windows
+done a portable install of vscode insiders to local roaming dir (offered default)
+no git here but :shrug:
+then installed ssh-fs extension and set-up config to allow me to remote edit gae
+can't get that to work for hymind 
+but with mobaxterm open in one window then I now can log on and remote edit the files in vscode 
+
+
 ## 2022-05-12t23:26:38
 working through fastapi docs
 getting the testing sorted out
