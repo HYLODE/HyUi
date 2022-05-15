@@ -8,6 +8,9 @@ no git here but :shrug:
 then installed ssh-fs extension and set-up config to allow me to remote edit gae
 can't get that to work for hymind 
 but with mobaxterm open in one window then I now can log on and remote edit the files in vscode 
+actually, vscode provides a terminal and this works too
+BUT none of the python debug tools etc work b/c it can't see the remote environment
+
 
 
 ## 2022-05-12t23:26:38
