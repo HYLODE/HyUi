@@ -1,34 +1,21 @@
 # src/main.py 
 from typing import List, Optional
 from fastapi import Depends, FastAPI, HTTPException, Query
-from sqlmodel import Field, Session, SQLModel, create_engine, select
+from sqlmodel import Session, create_engine, select
 from datetime import datetime
 from pydantic import BaseSettings
 import arrow
+
+from models import Consultation_Type, Consultation_Type_Read
+from models import Consultation_Request, Consultation_Request_Read
 
 class Settings(BaseSettings):
     UDS_HOST: str
     UDS_USER: str
     UDS_PWD: str
 
-    
-class Consultation_Type_Base(SQLModel):
-    valid_from: datetime
-    code: str
-    name: Optional[str] = Field(default="")
-    
-
-class Consultation_Type(Consultation_Type_Base, table=True):
-    __table_args__ = {'schema': 'star'}
-    consultation_type_id: Optional[int] = Field(default=None, primary_key=True)
-    
-
-class Consultation_Type_Read(Consultation_Type_Base):
-    consultation_type_id: int
-
 
 settings = Settings()
-
 postgresql_url = f"postgresql://{settings.UDS_USER}:{settings.UDS_PWD}@{settings.UDS_HOST}:5432/uds"
 engine = create_engine(postgresql_url, echo=True)   
 
@@ -71,6 +58,27 @@ def read_consultation_type(
     if not consultation_type:
         raise HTTPException(status_code404, detail="Cons type id not found")
     return consultation_type
+
+
+@app.get("/consultations/{hours}", response_model=List[Consultation_Request_Read])
+def read_consultation_type(
+    *,
+    session: Session = Depends(get_session),
+    hours: int,
+):
+    """
+    return consultations for last x hours
+    """
+    start_ts = arrow.utcnow().to('Europe/London').shift(hours=-1*hours).datetime
+    statement = (select(Consultation_Request, Consultation_Type)
+        .where(Consultation_Type.consultation_type_id == Consultation_Request.consultation_type_id)
+        .where(Consultation_Request.valid_from >= start_ts)
+        .limit(3)
+    )
+    results = session.exec(statement).all()
+    return results
+
+
 
 
 @app.get("/ping")
