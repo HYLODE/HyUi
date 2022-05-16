@@ -1,3 +1,4 @@
+requests
 plotly 
 dash 
 pandas

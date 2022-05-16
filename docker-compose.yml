@@ -25,6 +25,7 @@ services:
       - https_proxy
       - HTTP_PROXY
       - HTTPS_PROXY
+      - PORT=8000
     env_file:
       - .env
       - .secrets
@@ -55,3 +56,5 @@ services:
     env_file:
       - .env
       - .secrets
+    depends_on:
+      - api
