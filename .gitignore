@@ -894,3 +894,4 @@ docs/_linkcheck/
 
 # Ignore sublime artifacts
 *.sublime-workspace
+*.code-workspace
