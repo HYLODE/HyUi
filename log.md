@@ -1,5 +1,9 @@
 # Running notes log
 
+## 2022-05-16t17:38:00
+working locally
+aim is to tidy this repo up so that it can be used to template up a local app
+
 ## 2022-05-15 11:16
 load .secrets and .env via docker-compose
 confirm that this works by
@@ -16,8 +20,8 @@ can't get DS desktop to behave so on windows
 done a portable install of vscode insiders to local roaming dir (offered default)
 no git here but :shrug:
 then installed ssh-fs extension and set-up config to allow me to remote edit gae
-can't get that to work for hymind 
-but with mobaxterm open in one window then I now can log on and remote edit the files in vscode 
+can't get that to work for hymind
+but with mobaxterm open in one window then I now can log on and remote edit the files in vscode
 actually, vscode provides a terminal and this works too
 BUT none of the python debug tools etc work b/c it can't see the remote environment
 

@@ -1,6 +1,61 @@
 # `hyui`
 
-user interface for hylode
+User interface for the HYLODE project[This project structure is based on the
+`govcookiecutter` template project][govcookiecutter] but is adapted to work
+with applications rather than just data science workflows. A template
+application would be split into a frontend and a backend with communication
+between the two via HTTP, and the project orchestrated by docker-compose.
+
+## Frontend vs Backend
+
+
+## Project structure
+
+```
+.
+|
+|-- readme.md           // this file and the project root
+|-- Makefile            // standard project commands to be run from the shell
+|-- config files        // e.g. requirements.txt, .gitignore
+|-- .secrets            // e.g. .secrets etc excluded from version control
+|-- secrets.example     // an example version of .secrets above
+|-- docker-compose.yml  // orchestrate front/backend
+|-- src
+    |-- frontend
+        |-- Dockerfile
+        |-- dash_app.py
+    |-- backend
+        |-- Dockerfile
+|-- tests
+|-- docs
+|-- data
+|-- outputs
+|-- notebooks           // jupyter notebooks etc
+|-- try                 // ideas playground
+
+
+```
+
+
+## Development workflow
+
+### Local machine
+
+Your own laptop etc. without access to personally identifiable information (PII) etc.
+You wish to be able to build and run applications with test data.
+
+
+### Live machine
+
+An NHS machine or similar within sensitive environment with access to PII.
+You wish to be able to deploy the actual application.
+
+
+
+
+
+
+
 
 ```{warning}
 Where this documentation refers to the root folder we mean where this README.md is
