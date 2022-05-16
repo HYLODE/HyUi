@@ -2,11 +2,13 @@
 version: '3.8'
 
 services:
-
+ 
+  # API docker image / reads and wrangles data
+  # returns data via fastapi to dash app
   api:
     build: 
       context: .
-      dockerfile: Dockerfile.app
+      dockerfile: Dockerfile.api
       args:
         - http_proxy
         - https_proxy
@@ -16,7 +18,7 @@ services:
     volumes:
       - ./src:/usr/src/app
     ports:
-      - 8004:8000
+      - 8094:8000
     environment:
       - http_proxy
       - https_proxy
@@ -26,6 +28,8 @@ services:
       - .env
       - .secrets
 
+  # Dash (Plotly) docker image / web app that visualises results
+  # reads data via requests from api app
   dash:
     build:
       context: .
@@ -35,11 +39,13 @@ services:
         - https_proxy
         - HTTP_PROXY
         - HTTPS_PROXY
+    # TODO: this entry point command will run the app in debug mode
+    #       should convert to uvicorn or similar server
     command: python index.py
     volumes:
       - ./src/dash:/usr/src/app
     ports:
-      - 8005:8050
+      - 8095:8050
     environment:
       - http_proxy
       - https_proxy
