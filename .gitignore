@@ -1,6 +1,12 @@
 # Created by https://www.toptal.com/developers/gitignore/api/vim,venv,pydev,linux,macos,flask,dotenv,django,direnv,python,windows,virtualenv,pycharm+all,visualstudio,jupyternotebooks,visualstudiocode
 # Edit at https://www.toptal.com/developers/gitignore?templates=vim,venv,pydev,linux,macos,flask,dotenv,django,direnv,python,windows,virtualenv,pycharm+all,visualstudio,jupyternotebooks,visualstudiocode
 
+### ssh keys etc ###
+*.ppk
+id_rsa*
+
+
+
 ### direnv ###
 .direnv
 #.envrc
@@ -875,8 +881,9 @@ data/processed/*
 # Ignore the `docs/reference/api` folder
 docs/reference/api/*
 
-# Ignore the `.secrets` file
+# Ignore the `.secrets` file anything with secret in the name
 .secrets
+*secret*
 
 # Ignore R artifacts
 *.Renviron
