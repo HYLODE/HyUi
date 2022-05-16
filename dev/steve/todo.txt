@@ -1,0 +1,3 @@
+- [x] rename and remove the environment.yml file; this comes from my local dev
+  machine and so is not part of your reproducible workflow
+- [ ] set up github workflow for automated testing

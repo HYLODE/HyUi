@@ -6,7 +6,21 @@ with applications rather than just data science workflows. A template
 application would be split into a frontend and a backend with communication
 between the two via HTTP, and the project orchestrated by docker-compose.
 
+
 ## Frontend vs Backend
+
+### Backend
+This is a Python FastApi server on port 8094
+
+### Frontend
+This is a Plotly Dash app served on port 8095.
+
+### Orchestrating front and back end
+
+```bash
+docker-compose down
+docker-compose up -d --build && docker-compose logs -f
+```
 
 
 ## Project structure

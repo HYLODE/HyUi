@@ -15,10 +15,10 @@ RUN apt-get update \
 
 # install python dependencies
 RUN pip install --upgrade pip
-COPY ./requirements.txt .
+COPY ./api/requirements.txt .
 RUN pip install -r requirements.txt
 
 # load environment variables into docker image
 
-# add app
-COPY src .
+# add app from local api directory to WORKDIR (above)
+COPY api .

@@ -5,8 +5,3 @@ pre-commit
 pytest
 Sphinx
 toml
-fastapi
-sqlmodel
-uvicorn
-psycopg2-binary
-arrow

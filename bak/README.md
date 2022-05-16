@@ -1,3 +1,10 @@
+<!-- ./bak/readme.md -->
+```{warning}
+the ./bak directory holds a copy of recent working setup
+kept here for easy reference
+should be deleted when you've got the new set-up fixed
+```
+
 ## Developer set-up
 
 ### Secrets and environment variables

@@ -15,10 +15,10 @@ RUN apt-get update \
 
 # install python dependencies
 RUN pip install --upgrade pip
-COPY ./requirements-dash.txt .
-RUN pip install -r requirements-dash.txt
+COPY ./dash/requirements.txt .
+RUN pip install -r requirements.txt
 
 # load environment variables into docker image
 
-# add app
-COPY src/dash .
+# add app from local dash directory to WORKDIR (above)
+COPY dash .

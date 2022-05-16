@@ -7,16 +7,17 @@ services:
   # returns data via fastapi to dash app
   api:
     build: 
-      context: .
+      context: ./src
       dockerfile: Dockerfile.api
       args:
         - http_proxy
         - https_proxy
         - HTTP_PROXY
         - HTTPS_PROXY
+    # NOTE: the --reload flag means that edits are automtically redeployed
     command: uvicorn main:app --reload --workers 1 --host 0.0.0.0 --port 8000
     volumes:
-      - ./src:/usr/src/app
+      - ./src/api:/usr/src/app
     ports:
       - 8094:8000
     environment:
@@ -32,7 +33,7 @@ services:
   # reads data via requests from api app
   dash:
     build:
-      context: .
+      context: ./src
       dockerfile: Dockerfile.dash  
       args:
         - http_proxy

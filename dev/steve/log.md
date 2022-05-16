@@ -3,6 +3,8 @@
 ## 2022-05-16t17:38:00
 working locally
 aim is to tidy this repo up so that it can be used to template up a local app
+general tidying up and readme added at each folder level
+requirements split into separate files for each component
 
 ## 2022-05-15 11:16
 load .secrets and .env via docker-compose
