@@ -1,26 +1,22 @@
 # Run this app with `python app.py` and
 # visit http://127.0.0.1:8050/ in your web browser.
 
-from dash import dash_table as dt
-from dash import dcc, html
+import pandas as pd
+import plotly.express as px
 import requests
 import sys
 
-
-
 from dash import Dash, html, dcc
-import plotly.express as px
+from dash import dash_table as dt
 
-# API_URL = "http://uclvlddpragae07:8094/consultations_ed/"
+# Path is defined by the service name and the port in ../../docker-compose.yml
 API_URL = "http://api:8000/consultations_ed/"
-# API_URL = "http://172.16.149.202:8094/consultations_ed/"
 
 def request_data(url: str) -> list:
     """
     requests.json() should return a list of dicts
     """
     try:
-        # import pdb; pdb.set_trace()
         response = requests.get(url)
         response.raise_for_status() # raises HTTP errors
     except requests.exceptions.HTTPError as e:
@@ -35,9 +31,21 @@ def request_data(url: str) -> list:
     return response.json()
 
 
+def consults_over_time(data):
+    df = pd.DataFrame.from_records(data)
+    df['scheduled_datetime'] = pd.to_datetime(df['scheduled_datetime'], infer_datetime_format=True)
+    df = df[['scheduled_datetime', 'dept_name']]
+    df.set_index('scheduled_datetime', inplace=True)
+    df = df.resample('30T').agg({'dept_name':'size'})
+
+    fig = px.bar(df, x=df.index, y="dept_name")
+    # fig = px.line(df, x=df.index, y="dept_name")
+    return fig
+
+
 api_json = request_data(API_URL)
 
-debug = html.Div([
+basic_table = html.Div([
     html.P('Printing a simple table from the API'),
     dt.DataTable(
         id='api_table',
@@ -50,11 +58,15 @@ debug = html.Div([
 ])
 
 
+fig = consults_over_time(api_json)
+
+
 app = Dash(__name__)
 
 app.layout = html.Div(
     children=[
-        debug
+        # basic_table
+        dcc.Graph(figure=fig)
     ]
 )
 
