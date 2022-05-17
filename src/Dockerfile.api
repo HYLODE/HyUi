@@ -18,6 +18,7 @@ RUN pip install --upgrade pip
 COPY ./api/requirements.txt .
 RUN pip install -r requirements.txt
 
+EXPOSE 8000
 # load environment variables into docker image
 
 # add app from local api directory to WORKDIR (above)

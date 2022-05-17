@@ -4,18 +4,23 @@
 from dash import dash_table as dt
 from dash import dcc, html
 import requests
+import sys
+
+
 
 from dash import Dash, html, dcc
 import plotly.express as px
 
 # API_URL = "http://uclvlddpragae07:8094/consultations_ed/"
-API_URL = "http://api:8000/consultations_ed/"
+# API_URL = "http://api:8000/consultations_ed/"
+API_URL = "http://172.16.149.202:8094/consultations_ed/"
 
 def request_data(url: str) -> list:
     """
     requests.json() should return a list of dicts
     """
     try:
+        # import pdb; pdb.set_trace()
         response = requests.get(url)
         response.raise_for_status() # raises HTTP errors
     except requests.exceptions.HTTPError as e:
@@ -54,4 +59,10 @@ app.layout = html.Div(
 )
 
 if __name__ == "__main__":
+    # try:
+    #     foo = requests.get('https://catfact.ninja/fact')
+    #     assert foo.status_code == 200
+    #     print(foo.text)
+    # except Exception as e:
+    #     sys.exit(e)
     app.run_server(debug=True, host='0.0.0.0' )
