@@ -12,8 +12,8 @@ from dash import Dash, html, dcc
 import plotly.express as px
 
 # API_URL = "http://uclvlddpragae07:8094/consultations_ed/"
-# API_URL = "http://api:8000/consultations_ed/"
-API_URL = "http://172.16.149.202:8094/consultations_ed/"
+API_URL = "http://api:8000/consultations_ed/"
+# API_URL = "http://172.16.149.202:8094/consultations_ed/"
 
 def request_data(url: str) -> list:
     """
