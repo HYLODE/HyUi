@@ -1,0 +1,28 @@
+name: hyuiv4
+channels:
+  - conda-forge
+dependencies:
+  - python=3.9.9
+  - python-lsp-server[all]=1.4.1
+  - python-lsp-black=1.2.1
+  - pyls-isort=0.2.2
+  - pylsp-mypy=0.5.7
+  - flake8
+  - requests
+  - plotly
+  - dash
+  - pandas
+  - numpy
+  - fastapi
+  - sqlmodel
+  - uvicorn
+  - psycopg2-binary
+  - arrow
+  - coverage
+  - myst-parser
+  - pre-commit
+  - pytest
+  - Sphinx
+  - toml
+  - sdv # this is massive! has a tonne of dependencies
+prefix: /opt/homebrew/Caskroom/miniforge/base/envs/hyuiv4

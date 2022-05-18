@@ -1,0 +1,3 @@
+# just those packages that conda can't handle
+# try hard not to run pip until you've done all you can with conda
+detect-secrets==1.0.3

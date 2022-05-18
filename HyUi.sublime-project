@@ -15,16 +15,16 @@
         "LSP": {
             // "LSP-pylsp": {
             //     "settings": {
-            //         "pylsp.plugins.jedi.environment": "/opt/homebrew/Caskroom/miniforge/base/envs/hyuiv2",
+            //         "pylsp.plugins.jedi.environment": "/opt/homebrew/Caskroom/miniforge/base/envs/hyuiv4",
             //     },
             // },
                 "pylsp": {
                     "enabled": true,
                     "command": [
-                        "/opt/homebrew/Caskroom/miniforge/base/envs/hyuiv2/bin/pylsp",
+                        "/opt/homebrew/Caskroom/miniforge/base/envs/hyuiv4/bin/pylsp",
                     ],
                     "settings": {
-                        "pylsp.plugins.flake8.executable": "/opt/homebrew/Caskroom/miniforge/base/envs/hyuiv2/bin/flake8",
+                        "pylsp.plugins.flake8.executable": "/opt/homebrew/Caskroom/miniforge/base/envs/hyuiv4/bin/flake8",
                     },
                 },
             }
@@ -33,7 +33,7 @@
             {
                 "name": "HyUiv2",
                 "cmd": [
-                    "/opt/homebrew/Caskroom/miniforge/base/envs/hyuiv2/bin/python",
+                    "/opt/homebrew/Caskroom/miniforge/base/envs/hyuiv4/bin/python",
                     "-u",
                     "$file"
                 ],
@@ -49,7 +49,7 @@
                 "program": "${file}",
                 "request": "launch",
                 "console": "externalTerminal",
-                "python": "/opt/homebrew/Caskroom/miniforge/base/envs/hyuiv2/bin/python",
+                "python": "/opt/homebrew/Caskroom/miniforge/base/envs/hyuiv4/bin/python",
             },
         ],
     }
