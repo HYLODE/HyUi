@@ -1,0 +1,25 @@
+
+version: '3.8'
+
+services:
+ 
+  lab:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - http_proxy
+        - https_proxy
+        - HTTP_PROXY
+        - HTTPS_PROXY
+    volumes:
+      - ./:/home/jovyan/work
+    ports:
+      - 8091:8888
+    environment:
+      - http_proxy
+      - https_proxy
+      - HTTP_PROXY
+      - HTTPS_PROXY
+    # https://jupyter-docker-stacks.readthedocs.io/en/latest/using/recipes.html#run-jupyter-notebook-lab-inside-an-already-secured-environment-i-e-with-no-token
+    entrypoint: start.sh jupyter lab --LabApp.token=''
