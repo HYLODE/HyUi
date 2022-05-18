@@ -1,4 +1,4 @@
-# src/models.py 
+# src/models.py
 from typing import List, Optional
 from sqlmodel import Field, SQLModel
 from datetime import datetime, date
@@ -30,25 +30,27 @@ class Consultation_Request_Base(SQLModel):
     consultation_type_id: Optional[int]
     hospital_visit_id: Optional[int]
 
+
 class Consultation_Request(Consultation_Request_Base, table=True):
-    __table_args__ = {'schema': 'star'}
+    __table_args__ = {"schema": "star"}
     consultation_request_id: Optional[int] = Field(default=None, primary_key=True)
+
 
 class Consultation_Request_Read(Consultation_Request_Base):
     consultation_request_id: Optional[int]
 
 
 class Consultation_Type_Base(SQLModel):
-    #stored_from: datetime
+    # stored_from: datetime
     valid_from: datetime
     code: str
     name: Optional[str] = Field(default="")
-    
+
 
 class Consultation_Type(Consultation_Type_Base, table=True):
-    __table_args__ = {'schema': 'star'}
+    __table_args__ = {"schema": "star"}
     consultation_type_id: Optional[int] = Field(default=None, primary_key=True)
-    
+
 
 class Consultation_Type_Read(Consultation_Type_Base):
     consultation_type_id: int

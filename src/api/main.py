@@ -1,4 +1,4 @@
-# src/main.py 
+# src/main.py
 from typing import List, Optional
 from fastapi import Depends, FastAPI, HTTPException, Query
 from sqlmodel import Session, create_engine, select
@@ -12,6 +12,7 @@ from models import Consultation_Type, Consultation_Type_Read
 from models import Consultation_Request, Consultation_Request_Read
 from models import ConsultsED
 
+
 class Settings(BaseSettings):
     UDS_HOST: str
     UDS_USER: str
@@ -19,8 +20,11 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
-postgresql_url = f"postgresql://{settings.UDS_USER}:{settings.UDS_PWD}@{settings.UDS_HOST}:5432/uds"
-engine = create_engine(postgresql_url, echo=True)   
+postgresql_url = (
+    f"postgresql://{settings.UDS_USER}:{settings.UDS_PWD}@{settings.UDS_HOST}:5432/uds"
+)
+engine = create_engine(postgresql_url, echo=True)
+
 
 def select_ConsultationType():
     with Session(engine) as session:
@@ -28,7 +32,8 @@ def select_ConsultationType():
         results = session.exec(statement)
         for res in results:
             print(res)
-            
+
+
 def get_session():
     with Session(engine) as session:
         yield session
@@ -63,28 +68,24 @@ def read_consultation_type(
     return consultation_type
 
 
-
 @app.get("/consultations_ed/", response_model=List[ConsultsED])
 def read_consults_ed(
     *,
     session: Session = Depends(get_session),
 ):
     """
-    Returns consults for patients in ED 
+    Returns consults for patients in ED
     alongside the most recent ED location for that patient
-    where that ED location occupied in the last 24h 
+    where that ED location occupied in the last 24h
     """
     q = Path(f"query.sql").read_text()
     results = session.execute(q)
     print(results.keys())
     # print(results.fetchall())
-    Record = namedtuple('Record', results.keys())
+    Record = namedtuple("Record", results.keys())
     records = [Record(*r) for r in results.fetchall()]
     print(records)
     return records
-    
-
-
 
 
 @app.get("/ping")

@@ -7,6 +7,7 @@ dependencies:
   - python-lsp-black=1.2.1
   - pyls-isort=0.2.2
   - pylsp-mypy=0.5.7
+  - nbqa
   - flake8
   - requests
   - plotly
@@ -25,4 +26,6 @@ dependencies:
   - Sphinx
   - toml
   - sdv # this is massive! has a tonne of dependencies
+  - jupyter
+  - jupyterlab
 prefix: /opt/homebrew/Caskroom/miniforge/base/envs/hyuiv4

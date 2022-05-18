@@ -12,31 +12,34 @@ from dash import dash_table as dt
 # Path is defined by the service name and the port in ../../docker-compose.yml
 API_URL = "http://api:8000/consultations_ed/"
 
+
 def request_data(url: str) -> list:
     """
     requests.json() should return a list of dicts
     """
     try:
         response = requests.get(url)
-        response.raise_for_status() # raises HTTP errors
+        response.raise_for_status()  # raises HTTP errors
     except requests.exceptions.HTTPError as e:
         print("!!! HTTP Error", e)
     except requests.exceptions.RequestException as e:
         print("!!! Catch-all Error", e)
 
     try:
-        assert response.headers['Content-Type'] == 'application/json'
+        assert response.headers["Content-Type"] == "application/json"
     except:
-        raise ValueError('response is not JSON')
+        raise ValueError("response is not JSON")
     return response.json()
 
 
 def consults_over_time(data):
     df = pd.DataFrame.from_records(data)
-    df['scheduled_datetime'] = pd.to_datetime(df['scheduled_datetime'], infer_datetime_format=True)
-    df = df[['scheduled_datetime', 'dept_name']]
-    df.set_index('scheduled_datetime', inplace=True)
-    df = df.resample('30T').agg({'dept_name':'size'})
+    df["scheduled_datetime"] = pd.to_datetime(
+        df["scheduled_datetime"], infer_datetime_format=True
+    )
+    df = df[["scheduled_datetime", "dept_name"]]
+    df.set_index("scheduled_datetime", inplace=True)
+    df = df.resample("30T").agg({"dept_name": "size"})
 
     fig = px.bar(df, x=df.index, y="dept_name")
     # fig = px.line(df, x=df.index, y="dept_name")
@@ -45,17 +48,18 @@ def consults_over_time(data):
 
 api_json = request_data(API_URL)
 
-basic_table = html.Div([
-    html.P('Printing a simple table from the API'),
-    dt.DataTable(
-        id='api_table',
-        columns = [{"name": i, "id": i} for i in api_json[0].keys()],
-        data=api_json,
-        filter_action="native",
-        sort_action="native"
-
-        )
-])
+basic_table = html.Div(
+    [
+        html.P("Printing a simple table from the API"),
+        dt.DataTable(
+            id="api_table",
+            columns=[{"name": i, "id": i} for i in api_json[0].keys()],
+            data=api_json,
+            filter_action="native",
+            sort_action="native",
+        ),
+    ]
+)
 
 
 fig = consults_over_time(api_json)
@@ -77,4 +81,4 @@ if __name__ == "__main__":
     #     print(foo.text)
     # except Exception as e:
     #     sys.exit(e)
-    app.run_server(debug=True, host='0.0.0.0' )
+    app.run_server(debug=True, host="0.0.0.0")
