@@ -1,5 +1,11 @@
 # Running notes log
 
+## 2022-05-19 13:39:25
+spent the morning getting sdv to work
+seems to be good with some fiddling
+done lots of re-organising and written some docs
+
+
 ## 2022-05-18t18:25:53
 giving up on pip etc.
 back to conda

@@ -7,6 +7,7 @@
 	help
 	prepare_docs_folder
 	requirements
+	jupyterlab
 
 .DEFAULT_GOAL := help
 
@@ -40,6 +41,12 @@ coverage_html: coverage
 ## Run code coverage, and produce an XML output
 coverage_xml: coverage
 	coverage xml
+
+## Run a JupyterLab instance for local interactive work
+## this will come with the same packages as the full environment
+## NB: Use the Jupyter docker image specified in ./synth for sdv
+jupyterlab:
+	jupyter lab --port 8092 --ip 0.0.0.0 --LabApp.token=''
 
 ## Get help on all make commands; referenced from https://github.com/drivendata/cookiecutter-data-science
 help:
