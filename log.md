@@ -3,7 +3,10 @@
 ## 2022-05-19 19:46:07
 
 
+Nice! Command that updates/syncs your conda environment to the yaml file
 https://stackoverflow.com/questions/42352841/how-to-update-an-existing-conda-environment-with-a-yml-file
+
+
 ```sh
 conda env update --file dev/steve/environment-short.yml --prune
 ```
