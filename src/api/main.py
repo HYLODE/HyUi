@@ -1,6 +1,6 @@
 # src/main.py
 from typing import List, Optional
-from fastapi import Depends, FastAPI, HTTPException, Query
+from fastapi import Depends, FastAPI, HTTPException, Query, status
 from sqlmodel import Session, create_engine, select
 from datetime import datetime
 from pydantic import BaseSettings
@@ -8,9 +8,9 @@ import arrow
 from pathlib import Path
 from collections import namedtuple
 
-from models import Consultation_Type, Consultation_Type_Read
-from models import Consultation_Request, Consultation_Request_Read
-from models import ConsultsED
+from .models import Consultation_Type, Consultation_Type_Read
+from .models import Consultation_Request, Consultation_Request_Read
+from .models import ConsultsED
 
 
 class Settings(BaseSettings):
@@ -64,7 +64,7 @@ def read_consultation_type(
 ):
     consultation_type = session.get(Consultation_Type, id)
     if not consultation_type:
-        raise HTTPException(status_code404, detail="Cons type id not found")
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Cons type id not found")
     return consultation_type
 
 
