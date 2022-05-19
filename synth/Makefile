@@ -14,9 +14,10 @@ include ../.secrets
 	dkbuild
 	dkrun
 	dkstop
+	help
 
 ## Build docker image (uses Dockerfile)
-build:
+dkbuild:
 	docker build \
 		--build-arg HTTP_PROXY \
 		--build-arg HTTPS_PROXY \
@@ -25,7 +26,7 @@ build:
 		-t jupyter-hyui .
 
 ## Run docker image and make the API SQL query available
-run:
+dkrun:
 	@echo "*** JupyterLab will run on port 8091"
 	@echo "*** The SQL query that runs the API is copied into hyui/work "
 	cp ../src/api/query.sql ./work/
@@ -49,7 +50,7 @@ run:
 
 ## Stop that docker image and copies synth data to ./data/raw
 ## Beware that this will stop all containers on this machine derived from this image
-stop:
+dkstop:
 	@echo "*** Stopping all docker containers derived from jupyter-hyui"
 	cp ./work/sdv_model.pkl ../data/raw/
 	docker ps --filter ancestor=jupyter-hyui -aq | xargs docker stop
