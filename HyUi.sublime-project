@@ -31,7 +31,7 @@
         },
         "build_systems": [
             {
-                "name": "HyUiv2",
+                "name": "HyUiv4",
                 "cmd": [
                     "/opt/homebrew/Caskroom/miniforge/base/envs/hyuiv4/bin/python",
                     "-u",

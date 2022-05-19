@@ -895,3 +895,6 @@ docs/_linkcheck/
 # Ignore sublime artifacts
 *.sublime-workspace
 *.code-workspace
+
+# Temp and scratch
+*scratch*
