@@ -1,5 +1,13 @@
 # Running notes log
 
+## 2022-05-19 19:46:07
+
+
+https://stackoverflow.com/questions/42352841/how-to-update-an-existing-conda-environment-with-a-yml-file
+```sh
+conda env update --file dev/steve/environment-short.yml --prune
+```
+
 ## 2022-05-19 13:39:25
 spent the morning getting sdv to work
 seems to be good with some fiddling
