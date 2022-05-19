@@ -1,0 +1,24 @@
+{
+    "tables": {
+        "tabpid": {
+            "fields": {
+                "valid_from": {
+                    "type": "datetime64"
+                },
+                "date_of_birth": {
+                    "type": "datetime",
+                    "format": "%Y-%m-%d"
+                },
+                "firstname": {
+                    "type": "categorical"
+                },
+                "lastname": {
+                    "type": "categorical"
+                },
+                "mrn": {
+                    "type": "categorical"
+                }
+            }
+        }
+    }
+}

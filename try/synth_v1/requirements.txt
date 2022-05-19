@@ -1,1 +1,2 @@
 sdv
+psycopg2-binary
