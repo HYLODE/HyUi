@@ -15,6 +15,9 @@ profile = "black"
 
 # `pytest` configurations
 [tool.pytest.ini_options]
+pythonpath = [
+    "src"
+]
 addopts = [
     "-vv",
     "--doctest-modules"
