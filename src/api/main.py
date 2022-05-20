@@ -18,6 +18,8 @@ from models import (
 print(settings.DB_URL)
 engine = create_engine(settings.DB_URL, echo=True)
 
+# TODO: use an environment var to config the query and keep both queries as
+# separate files in the same folder
 def prepare_query(env=settings.ENV) -> str:
     if env=="prod":
         return Path("query.sql").read_text()

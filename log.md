@@ -1,5 +1,30 @@
 # Running notes log
 
+## 2022-05-20t19:18:53
+TODO: add a postgres docker service and load with test data
+then will need an environment variable to indicate in docker
+?moving toward a triple set-up prod/docker/local dev
+simpler to just move your mock data within src
+done!
+works!
+
+## 2022-05-20t12:20:22 
+reconfigured imports and updated python path for pytest so that works in both docker and pytest
+
+## 2022-05-19t22:51:46
+
+working on testing
+https://sqlmodel.tiangolo.com/tutorial/fastapi/tests/
+aim is to be able to use the synth data to mock for tests and development
+
+pyproject files stand in for pip etc.
+see https://stackoverflow.com/a/65162874/992999
+
+```sh
+python -m pip install . # would use pyproject 
+````
+
+
 ## 2022-05-19 19:46:07
 
 

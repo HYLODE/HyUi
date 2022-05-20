@@ -10,7 +10,7 @@ between the two via HTTP, and the project orchestrated by docker-compose.
 ## Frontend vs Backend
 
 ### Backend
-This is a Python FastApi server on port 8094
+This is a Python FastApi server that is exposed on port 8094 when running `docker-compose up -d` from the project root, or `uvicorn main:app` when running from `src/api/` locally.
 
 ### Frontend
 This is a Plotly Dash app served on port 8095.
