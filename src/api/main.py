@@ -18,6 +18,12 @@ from models import (
 print(settings.DB_URL)
 engine = create_engine(settings.DB_URL, echo=True)
 
+def prepare_query(env=settings.ENV) -> str:
+    if env=="prod":
+        return Path("query.sql").read_text()
+    else:
+        return "SELECT * FROM consults;"
+
 
 def select_ConsultationType():
     with Session(engine) as session:
@@ -72,7 +78,7 @@ def read_consults_ed(
     alongside the most recent ED location for that patient
     where that ED location occupied in the last 24h
     """
-    q = Path("query.sql").read_text()
+    q = prepare_query()
     results = session.execute(q)
     print(results.keys())
     # print(results.fetchall())

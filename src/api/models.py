@@ -2,6 +2,9 @@
 from typing import Optional
 from sqlmodel import Field, SQLModel
 from datetime import datetime, date
+from pydantic import validator
+import arrow
+
 
 
 class ConsultsED(SQLModel):
@@ -18,6 +21,16 @@ class ConsultsED(SQLModel):
     comments: Optional[str]
     name: str
     dept_name: str
+
+    @validator("date_of_birth", pre=True)
+    def convert_datetime_to_date(cls, v):
+        if isinstance(v, str):
+            try:
+                return arrow.get(v).date()
+            except Exception as e:
+                print("Unable to convert date_of_birth to date")
+                print(e)
+        return v
 
 
 class Consultation_Request_Base(SQLModel):
