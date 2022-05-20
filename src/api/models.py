@@ -1,5 +1,5 @@
 # src/models.py
-from typing import List, Optional
+from typing import Optional
 from sqlmodel import Field, SQLModel
 from datetime import datetime, date
 

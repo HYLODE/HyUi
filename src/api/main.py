@@ -1,16 +1,17 @@
 # src/main.py
-from typing import List, Optional
-from fastapi import Depends, FastAPI, HTTPException, Query, status
-from sqlmodel import Session, create_engine, select
-from datetime import datetime
-from pydantic import BaseSettings
-import arrow
-from pathlib import Path
 from collections import namedtuple
+from pathlib import Path
+from typing import List
 
-from .models import Consultation_Type, Consultation_Type_Read
-from .models import Consultation_Request, Consultation_Request_Read
-from .models import ConsultsED
+from fastapi import Depends, FastAPI, HTTPException, status
+from pydantic import BaseSettings
+from sqlmodel import Session, create_engine, select
+
+from .models import (
+    Consultation_Type,
+    Consultation_Type_Read,
+    ConsultsED,
+)
 
 
 class Settings(BaseSettings):
@@ -78,7 +79,7 @@ def read_consults_ed(
     alongside the most recent ED location for that patient
     where that ED location occupied in the last 24h
     """
-    q = Path(f"query.sql").read_text()
+    q = Path("query.sql").read_text()
     results = session.execute(q)
     print(results.keys())
     # print(results.fetchall())
