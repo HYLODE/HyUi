@@ -7,7 +7,7 @@ from fastapi import Depends, FastAPI, HTTPException, status
 from pydantic import BaseSettings
 from sqlmodel import Session, create_engine, select
 
-from .models import (
+from models import (
     Consultation_Type,
     Consultation_Type_Read,
     ConsultsED,
