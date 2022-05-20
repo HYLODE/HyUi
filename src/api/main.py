@@ -4,8 +4,9 @@ from pathlib import Path
 from typing import List
 
 from fastapi import Depends, FastAPI, HTTPException, status
-from pydantic import BaseSettings
 from sqlmodel import Session, create_engine, select
+
+from settings import settings
 
 from models import (
     Consultation_Type,
@@ -14,17 +15,8 @@ from models import (
 )
 
 
-class Settings(BaseSettings):
-    UDS_HOST: str
-    UDS_USER: str
-    UDS_PWD: str
-
-
-settings = Settings()
-postgresql_url = (
-    f"postgresql://{settings.UDS_USER}:{settings.UDS_PWD}@{settings.UDS_HOST}:5432/uds"
-)
-engine = create_engine(postgresql_url, echo=True)
+print(settings.DB_URL)
+engine = create_engine(settings.DB_URL, echo=True)
 
 
 def select_ConsultationType():
@@ -35,6 +27,7 @@ def select_ConsultationType():
             print(res)
 
 
+# TODO: this needs to be context dependent 
 def get_session():
     with Session(engine) as session:
         yield session

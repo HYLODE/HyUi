@@ -12,6 +12,8 @@ The sub-folders should be used as follows:
 - `processed`: any raw or interim data that has been fully processed into its final
   state.
 
+- `mock`: synthetic data for testing
+
 The paths for these directories are loaded as environment variables by the
 `.envrc` file. To load them in Python, use any or all of the following code:
 
@@ -24,6 +26,7 @@ DIR_DATA_EXTERNAL = os.getenv("DIR_DATA_EXTERNAL")
 DIR_DATA_RAW = os.getenv("DIR_DATA_RAW")
 DIR_DATA_INTERIM = os.getenv("DIR_DATA_INTERIM")
 DIR_DATA_PROCESSED = os.getenv("DIR_DATA_PROCESSED")
+DIR_DATA_MOCK = os.getenv("DIR_DATA_MOCK")
 ```
 
 [docs-envrc]: ../docs/structure/README.md#envrc
