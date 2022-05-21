@@ -6,6 +6,71 @@ with applications rather than just data science workflows. A template
 application would be split into a frontend and a backend with communication
 between the two via HTTP, and the project orchestrated by docker-compose.
 
+This file (`./readme.md`) is at the root of the project, but the application
+code including the backend is in `./src/api`, and the application itself is
+kept in `./src/app`. An annotated figure of the directory structure is shown
+below.
+
+## First run
+
+### Installation
+
+You will need to do this twice:
+
+- on your local development machine
+- on the UCLH generic application environment
+
+Regardless, open the terminal and **git clone**.
+
+```sh
+git clonehttps://github.com/HYLODE/HyUi.git
+cd HyUi
+```
+
+### Development (Local)
+
+We assume that the majority of the development work will be on your own machine. You will therefore need to set-up your own dev environment. I have been using [conda miniforge](https://github.com/conda-forge/miniforge) because this has the best compatibility with the ARM processor on the Mac. I think it should also work on other machines but I have not tested this.
+
+From within the HyUi directory
+
+```sh
+conda env create --file=./dev/steve/environment-short.yml
+conda activate hyuiv4
+```
+
+Then confirm your set-up is OK
+
+```sh
+pytest tests/smoke
+```
+
+### Development (Hospital)
+
+There are two tasks that _must_ happen within the hospital environment: (1) preparing realistic mock data (2) deployment. The installation steps differ because here we do not have **sudo** (root) access (admin privileges). This means work must be performed using a combination of the default command line tools and docker.
+
+### Preparing mock (synthetic) data
+
+We will use the tooling provided by the [Synthetic Data Lab](https://sdv.dev) from a JupyterLab in a browser on a hospital machine. You will need access to the GAE to run this.
+
+#### Scenario 1 (data via SQL)
+
+Ensure that your database credentials are stored in the `./.secrets` file.
+From the GAE commandline, navigate to the `synth` directory (`cd ./synth`), then use the Makefile commands as follows
+
+1. `make mock1build` to build a docker image with JupyterLab and sdv pre-installed.
+2. `make mock2run` to spin up JupyterLab (e.g. Working from GAE07 this will be at [](http://UCLVLDDPRAGAE07:8091) but the URL server will depend on the GAE).
+3. `make mock3copyin` This will copy the example notebook `synth_test_data.ipynb` into the `./synth/portal` directory that is attached to the JupyterNotebook. Now open the example notebook `synth_test_data.ipynb` using JupyterLab and work through the steps. Create your SQL query and save as `query_live.sql` file must return a *SELECT* statement. Save just the synthesised mock data to `mock.h5`, and the query (`query_live.sql`).
+4. `make mock4copyout` to copy just the query and the synthetic data. Do not copy the notebook out of the `portal` directory unless you are sure you have stripped all personally identifiable data (i.e. clear all cells before saving).
+5. `make mock5stop` to stop the JupyterLab instance and clear up
+
+#### Scenario 2 (data via an http `get` request)
+
+This is similar to the steps above but does not depend on the query or database credentials. You are likely to need to use the Python requests library to get the data that will be used by [sdv](https://sdv.dev).
+
+
+
+
+
 
 ## Frontend vs Backend
 

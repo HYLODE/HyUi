@@ -883,7 +883,8 @@ docs/reference/api/*
 
 # Ignore the `.secrets` file anything with secret in the name
 .secrets
-*secret*
+# Ignore files within portal to avoid accidentally leaking anything
+synth/portal/*
 
 # Ignore R artifacts
 *.Renviron

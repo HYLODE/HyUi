@@ -11,13 +11,15 @@ export NB_GID
 include ../.secrets
 
 .PHONY:
-	dkbuild
-	dkrun
-	dkstop
+	mock1build
+	mock2copyin
+	mock3run
+	mock4copyout
+	mock5stop
 	help
 
 ## Build docker image (uses Dockerfile)
-dkbuild:
+mock1build:
 	docker build \
 		--build-arg HTTP_PROXY \
 		--build-arg HTTPS_PROXY \
@@ -25,12 +27,15 @@ dkbuild:
 		--build-arg https_proxy \
 		-t jupyter-hyui .
 
-## Run docker image and make the API SQL query available
-dkrun:
-	@echo "*** JupyterLab will run on port 8091"
-	@echo "*** The SQL query that runs the API is copied into hyui/work "
-	cp ../src/api/query.sql ./work/
+## Copy the example synthetic data pipeline into the portal
+mock2copyin:
+	cp ./synthesise_data.ipynb ./portal/
 
+## Run docker image and make the API SQL query available
+mock3run:
+	@echo "*** JupyterLab will run on port 8091"
+	@echo "*** Working directory (portal) is exluded from version control"
+	@echo "*** You must manually copy files in and out as needed"
 	docker run -it --rm \
 		--detach \
 		-p 8091:8888 \
@@ -44,15 +49,20 @@ dkrun:
 		-e UDS_PWD \
 		-e UDS_HOST \
 		-w "/home/${NB_USER}" \
-		-v ${PWD}/work:/home/hyui/work \
+		-v ${PWD}/portal:/home/hyui/portal \
 		jupyter-hyui:latest \
 		start.sh jupyter lab --LabApp.token=''
 
-## Stop that docker image and copies synth data to ./data/raw
+## Copy the synthetic data and the query from the portal
+mock4copyout:
+	cp ./portal/mock.h5 ./
+	cp ./portal/query_live.h5 ./
+
+
+## Stop that docker image
 ## Beware that this will stop all containers on this machine derived from this image
-dkstop:
+mock5stop:
 	@echo "*** Stopping all docker containers derived from jupyter-hyui"
-	cp ./work/sdv_model.pkl ../data/raw/
 	docker ps --filter ancestor=jupyter-hyui -aq | xargs docker stop
 
 
