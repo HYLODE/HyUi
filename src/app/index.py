@@ -4,13 +4,13 @@
 import pandas as pd
 import plotly.express as px
 import requests
-import sys
 
 from dash import Dash, html, dcc
 from dash import dash_table as dt
 
-# Path is defined by the service name and the port in ../../docker-compose.yml
-API_URL = "http://api:8000/consultations_ed/"
+from config.settings import settings
+
+API_URL = settings.BACKEND_URL
 
 
 def request_data(url: str) -> list:
@@ -75,10 +75,4 @@ app.layout = html.Div(
 )
 
 if __name__ == "__main__":
-    # try:
-    #     foo = requests.get('https://catfact.ninja/fact')
-    #     assert foo.status_code == 200
-    #     print(foo.text)
-    # except Exception as e:
-    #     sys.exit(e)
-    app.run_server(debug=True, host="0.0.0.0")
+    app.run_server(debug=True, host="0.0.0.0", port=8095)

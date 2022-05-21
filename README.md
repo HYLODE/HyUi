@@ -44,6 +44,26 @@ Then confirm your set-up is OK
 pytest tests/smoke
 ```
 
+#### Local development without docker
+
+Backend
+
+```sh
+cd ./src
+uvicorn api.main:app --reload --workers 1 --host 0.0.0.0 --port 8094
+```
+
+Frontend
+
+```sh
+cd ./src
+python app/index.py
+```
+
+
+#### Local development with docker
+
+
 ### Development (Hospital)
 
 There are two tasks that _must_ happen within the hospital environment: (1) preparing realistic mock data (2) deployment. The installation steps differ because here we do not have **sudo** (root) access (admin privileges). This means work must be performed using a combination of the default command line tools and docker.

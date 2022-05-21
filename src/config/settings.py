@@ -7,12 +7,14 @@ from pydantic import BaseSettings, PostgresDsn, validator
 
 class Settings(BaseSettings):
     ENV: str
+    DOCKERNETWORK = 0
     UDS_HOST: str
     UDS_USER: str
     UDS_PWD: str
     UDS_DB: str
 
     DB_URL: Optional[str]
+    BACKEND_URL: Optional[str]
 
     @validator("ENV", pre=True)
     def environment_choice_is_valid(cls, v):
@@ -35,6 +37,18 @@ class Settings(BaseSettings):
             host=values.get("UDS_HOST"),
             path=f"/{values.get('UDS_DB') or ''}",
         )
+
+    @validator("BACKEND_URL")
+    def assemble_api_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
+        """
+        Defines API URL based on whether working in conda environment, or
+        from within the docker-compose network
+        """
+        if values.get("DOCKERNETWORK") == 1:
+            api_url = "http://api:8094/consultations_ed/"
+        else:
+            api_url = "http://localhost:8094/consultations_ed/"
+        return api_url
 
     class Config:
         case_sensitive = True

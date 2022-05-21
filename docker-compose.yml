@@ -60,6 +60,7 @@ services:
       - HTTPS_PROXY
       - NO_PROXY=api
       - no_proxy=api
+      - DOCKERNETWORK=1
     env_file:
       - .env
       - .secrets
