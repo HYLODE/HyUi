@@ -6,33 +6,25 @@ from typing import List
 from fastapi import Depends, FastAPI, HTTPException, status
 from sqlmodel import Session, create_engine, select
 
-from settings import settings
+from config.settings import settings
 
-from models import (
+from api.models import (
     Consultation_Type,
     Consultation_Type_Read,
     ConsultsED,
 )
 
 
+print(settings.ENV)
 print(settings.DB_URL)
 engine = create_engine(settings.DB_URL, echo=True)
 
-# TODO: use an environment var to config the query and keep both queries as
-# separate files in the same folder
 def prepare_query(env=settings.ENV) -> str:
     if env=="prod":
-        return Path("query.sql").read_text()
+        q = "api/query-live.sql"
     else:
-        return "SELECT * FROM consults;"
-
-
-def select_ConsultationType():
-    with Session(engine) as session:
-        statement = select(Consultation_Type).limit(3)
-        results = session.exec(statement)
-        for res in results:
-            print(res)
+        q = "api/query-mock.sql"
+    return Path(q).read_text()
 
 
 # TODO: this needs to be context dependent 
@@ -42,32 +34,6 @@ def get_session():
 
 
 app = FastAPI()
-# prove that connection works
-# select_ConsultationType()
-
-
-@app.get("/consultation_types/", response_model=List[Consultation_Type_Read])
-def read_consultation_types(
-    *,
-    session: Session = Depends(get_session),
-):
-    statement = select(Consultation_Type).limit(3)
-    print(f"*** STATEMENT: {statement}")
-    results = session.exec(statement).all()
-    print(f"*** RESULTS: {results}")
-    return results
-
-
-@app.get("/consultation_types/{id}", response_model=Consultation_Type_Read)
-def read_consultation_type(
-    *,
-    session: Session = Depends(get_session),
-    id: str,
-):
-    consultation_type = session.get(Consultation_Type, id)
-    if not consultation_type:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Cons type id not found")
-    return consultation_type
 
 
 @app.get("/consultations_ed/", response_model=List[ConsultsED])
@@ -90,6 +56,7 @@ def read_consults_ed(
     return records
 
 
+# smoke
 @app.get("/ping")
 async def pong():
     return {"ping": "hyui pong!"}

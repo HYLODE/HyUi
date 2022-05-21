@@ -2,7 +2,7 @@
 FROM python:3.9-slim-buster
 
 # set working directory
-WORKDIR /usr/src/app
+WORKDIR /usr/src
 
 # set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -22,4 +22,12 @@ RUN pip install -r requirements.txt
 # is managed at the docker-compose level 
 
 # add app from local api directory to WORKDIR (above)
-COPY api .
+
+
+# COPYING means directories are created at build time
+# UNCOMMENT if you want a standalone dockerfile
+# COPY api api
+
+# BUT the PREFERRED default is to add as mount volumes via docker-compose
+# AND THEN run using docker-compose
+# docker-compose up --build api

@@ -1,5 +1,0 @@
-requests
-plotly 
-dash 
-pandas
-numpy

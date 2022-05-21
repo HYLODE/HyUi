@@ -15,13 +15,13 @@ services:
         - HTTP_PROXY
         - HTTPS_PROXY
     # NOTE: the --reload flag means that edits are automtically redeployed
-    command: uvicorn main:app --reload --workers 1 --host 0.0.0.0 --port 8000
+    command: uvicorn api.main:app --reload --workers 1 --host 0.0.0.0 --port 8000
     volumes:
-      - ./src/api:/usr/src/app
+      - ./src/api:/usr/src/api
+      - ./src/config:/usr/src/config
+      - ./src/data:/usr/src/data
     ports:
       - 8094:8000
-    expose:
-      - 8000
     environment:
       - http_proxy
       - https_proxy
@@ -35,10 +35,10 @@ services:
 
   # Dash (Plotly) docker image / web app that visualises results
   # reads data via requests from api app
-  dash:
+  app:
     build:
       context: ./src
-      dockerfile: Dockerfile.dash  
+      dockerfile: Dockerfile.app
       args:
         - http_proxy
         - https_proxy
@@ -46,9 +46,11 @@ services:
         - HTTPS_PROXY
     # TODO: this entry point command will run the app in debug mode
     #       should convert to uvicorn or similar server
-    command: python index.py
+    command: python app/index.py
     volumes:
-      - ./src/dash:/usr/src/app
+      - ./src/app:/usr/src/app
+      - ./src/config:/usr/src/config
+      - ./src/data:/usr/src/data
     ports:
       - 8095:8050
     environment:

@@ -1,18 +1,18 @@
 # ./src/api/settings_src.py
 # project wide settings are loaded via ./.envrc and ./.secrets
 from typing import Any, Dict, Optional
-
+from pathlib import Path
 from pydantic import BaseSettings, PostgresDsn, validator
 
 
 class Settings(BaseSettings):
-    ENV = "dev"
+    ENV: str
     UDS_HOST: str
     UDS_USER: str
     UDS_PWD: str
     UDS_DB: str
 
-    DB_URL: str
+    DB_URL: Optional[str]
 
     @validator("ENV", pre=True)
     def environment_choice_is_valid(cls, v):
@@ -24,8 +24,10 @@ class Settings(BaseSettings):
 
     @validator("DB_URL")
     def assemble_db_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
-        if values.get("ENV") == "dev" or isinstance(v, str):
-            return v
+        if values.get("ENV") == "dev":
+            db_path = Path(__file__).resolve().parents[1].absolute() / "data" / "mock"
+            db_url = f"sqlite:///{db_path.as_posix()}/mock.db"
+            return db_url
         return PostgresDsn.build(
             scheme="postgresql",
             user=values.get("UDS_USER"),
@@ -39,4 +41,4 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
-print(settings.dict())
+# print(settings.dict())
