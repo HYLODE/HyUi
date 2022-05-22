@@ -2,11 +2,11 @@
 version: '3.8'
 
 services:
- 
+
   # API docker image / reads and wrangles data
   # returns data via fastapi to dash app
   api:
-    build: 
+    build:
       context: ./src
       dockerfile: Dockerfile.api
       args:
