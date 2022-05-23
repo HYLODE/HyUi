@@ -149,4 +149,4 @@ project][govcookiecutter].
 [govcookiecutter]: https://github.com/best-practice-and-impact/govcookiecutter
 [docs-loading-environment-variables]: ./docs/user_guide/loading_environment_variables.md
 [docs-loading-environment-variables-secrets]: ./docs/user_guide/loading_environment_variables.md#storing-secrets-and-credentials
-[provisioning]: .docs/notes/provisioning_data.md
+[provisioning]: ./docs/notes/provisioning_data.md
