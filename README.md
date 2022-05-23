@@ -87,6 +87,17 @@ From the GAE commandline, navigate to the `synth` directory (`cd ./synth`), then
 
 This is similar to the steps above but does not depend on the query or database credentials. You are likely to need to use the Python requests library to get the data that will be used by [sdv](https://sdv.dev).
 
+### Deployment
+
+Set the environment variable to *prod*, then run *docker-compose*.
+
+```sh
+export ENV=prod
+pytest
+docker-compose up -d --build && docker-compose logs -f
+```
+
+You will need create a local `./.secrets` file with database credentials so preferably set the *ENV* to `prod` there.
 
 
 

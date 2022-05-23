@@ -13,3 +13,8 @@ def test_read_ping():
     response = client.get("/ping")
     assert response.status_code == 200
     assert response.json() == {"ping": "hyui pong!"}
+
+
+@pytest.mark.smoke
+def test_consultations_ed(mock_api_records):
+    assert isinstance(mock_api_records, list)

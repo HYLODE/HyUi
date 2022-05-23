@@ -15,19 +15,17 @@ from api.models import (
 )
 
 
-print(settings.ENV)
-print(settings.DB_URL)
 engine = create_engine(settings.DB_URL, echo=True)
 
+
 def prepare_query(env=settings.ENV) -> str:
-    if env=="prod":
+    if env == "prod":
         q = "api/query-live.sql"
     else:
         q = "api/query-mock.sql"
     return Path(q).read_text()
 
 
-# TODO: this needs to be context dependent 
 def get_session():
     with Session(engine) as session:
         yield session
@@ -48,11 +46,8 @@ def read_consults_ed(
     """
     q = prepare_query()
     results = session.execute(q)
-    print(results.keys())
-    # print(results.fetchall())
     Record = namedtuple("Record", results.keys())
     records = [Record(*r) for r in results.fetchall()]
-    print(records)
     return records
 
 

@@ -32,8 +32,14 @@
         "build_systems": [
             {
                 "name": "HyUiv4",
+                "env": {
+                   "SUBLIME_FOO" : "SUBLIME_BAR",
+                },
                 "cmd": [
-                    "/opt/homebrew/Caskroom/miniforge/base/envs/hyuiv4/bin/python",
+                    // adding src to PYTHONPATH for the build systems
+                    // this mirrors the config for pytest in pyproject.toml
+                    // b/c we expect all files to be run from either ./ or ./src
+                    "\"PYTHONPATH=src:${PYTHONPATH}\" /opt/homebrew/Caskroom/miniforge/base/envs/hyuiv4/bin/python",
                     "-u",
                     "$file"
                 ],

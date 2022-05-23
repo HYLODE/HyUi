@@ -3,6 +3,7 @@
 from typing import Any, Dict, Optional
 from pathlib import Path
 from pydantic import BaseSettings, PostgresDsn, validator
+from mock.mock import make_mock_df
 
 
 class Settings(BaseSettings):

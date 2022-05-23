@@ -1,5 +1,17 @@
 # Running notes log
 
+## 2022-05-22 15:11:08
+basic pytest work
+added smoke markers
+now need to work out how to insert mock data or ?use the dev environment variable to load the mock data??
+the latter might be more appropriate for running integreation tests in the production environment??
+that is have some tests tha check bits of code and need fake data
+and some tests that check the app is working properly
+
+
+for data pipeline tests then maybe better provide a fixture that serves the same data that your API will do
+then those functions can start with that?
+
 ## 2022-05-20t19:18:53
 TODO: add a postgres docker service and load with test data
 then will need an environment variable to indicate in docker
@@ -8,7 +20,7 @@ simpler to just move your mock data within src
 done!
 works!
 
-## 2022-05-20t12:20:22 
+## 2022-05-20t12:20:22
 reconfigured imports and updated python path for pytest so that works in both docker and pytest
 
 ## 2022-05-19t22:51:46
@@ -21,7 +33,7 @@ pyproject files stand in for pip etc.
 see https://stackoverflow.com/a/65162874/992999
 
 ```sh
-python -m pip install . # would use pyproject 
+python -m pip install . # would use pyproject
 ````
 
 

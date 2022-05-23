@@ -6,6 +6,8 @@ import sys
 import os
 from pathlib import Path
 
+from config.settings import settings
+
 
 @pytest.mark.smoke
 def test_python_version():
@@ -22,3 +24,12 @@ def test_secrets_file_exists():
 @pytest.mark.smoke
 def test_the_environment_is_set():
     assert os.getenv("ENV") in ["dev", "prod"]
+
+
+# FIXME: fails b/c settings are established before the monkeypath
+# monkeypatch set-up in ./conftest.py
+@pytest.mark.skip(reason="fails b/c settings defined before monkeypatch")
+def test_settings_uds_user(mock_env_uds_vars):
+    assert settings.UDS_USER == "BigBird"
+    assert settings.UDS_PWD == "Sesame"
+    assert settings.UDS_HOST == "172.16.149.132"

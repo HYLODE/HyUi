@@ -9,18 +9,6 @@ from api.models import Consultation_Request
 client = TestClient(app)
 
 
-def test_ping():
-    response = client.get("/ping")
-    assert response.status_code == 200
-    assert response.json() == {"ping": "hyui pong!"}
-
-
-def test_settings_uds_user(mock_env_uds_vars):
-    assert settings.UDS_USER == "BigBird"
-    assert settings.UDS_PWD == "Sesame"
-    assert settings.UDS_HOST == "172.16.149.132"
-
-
 def test_consultation_request_class():
     consult = Consultation_Request(
         consulation_request_id=1,
@@ -35,8 +23,8 @@ def test_consultation_request_class():
 
     # Below fails b/c only generated when table instantiated?
     # assert consult.consultation_request_id == 1
-    assert consult.cancelled == False
-    assert consult.closed_due_to_discharge == False
+    assert consult.cancelled is False
+    assert consult.closed_due_to_discharge is False
     assert consult.comments == "foo bar"
     assert consult.consultation_type_id == 42
     assert consult.hospital_visit_id == 1234
