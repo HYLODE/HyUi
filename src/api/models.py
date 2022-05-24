@@ -1,4 +1,8 @@
 # src/models.py
+"""
+The developer should specifc the data models here
+Both the ResultsBase and the Results classes will need editing
+"""
 from datetime import date, datetime
 from typing import Optional
 
@@ -9,7 +13,14 @@ from config.settings import settings
 
 
 # define the data model that you're expecting from your query
-class ConsultsED_Base(SQLModel):
+class ResultsBase(SQLModel):
+    """
+    Generic results class to hold data returned from
+    the SQL query or the API
+    This particular example holds list of patients in the ED
+    with pending inpatient consults
+    """
+
     firstname: str
     lastname: str
     date_of_birth: date
@@ -35,49 +46,13 @@ class ConsultsED_Base(SQLModel):
         return v
 
 
-class ConsultsED(ConsultsED_Base, table=True):
+class Results(ResultsBase, table=True):
+    """
+    The table version of the pydantic class
+    Used for creating tables via SQLModel
+    """
+
     # only set schema if in postgres
-    if 'postgres' in settings.DB_URL:
+    if "postgres" in settings.DB_URL:
         __table_args__ = {"schema": settings.DB_POSTGRES_SCHEMA}
     consultation_request_id: Optional[int] = Field(default=None, primary_key=True)
-
-
-
-
-class Consultation_Request_Base(SQLModel):
-    valid_from: Optional[datetime]
-    cancelled: Optional[bool]
-    closed_due_to_discharge: Optional[bool]
-    scheduled_datetime: Optional[datetime]
-    status_change_time: Optional[datetime]
-    comments: Optional[str]
-    consultation_type_id: Optional[int]
-    hospital_visit_id: Optional[int]
-
-
-class Consultation_Request(Consultation_Request_Base, table=True):
-    # only set schema if in postgres
-    if 'postgres' in settings.DB_URL:
-        __table_args__ = {"schema": settings.DB_POSTGRES_SCHEMA}
-    consultation_request_id: Optional[int] = Field(default=None, primary_key=True)
-
-
-class Consultation_Request_Read(Consultation_Request_Base):
-    consultation_request_id: Optional[int]
-
-
-class Consultation_Type_Base(SQLModel):
-    # stored_from: datetime
-    valid_from: datetime
-    code: str
-    name: Optional[str] = Field(default="")
-
-
-class Consultation_Type(Consultation_Type_Base, table=True):
-    if 'postgres' in settings.DB_URL:
-        __table_args__ = {"schema": settings.DB_POSTGRES_SCHEMA}
-    consultation_type_id: Optional[int] = Field(default=None, primary_key=True)
-
-
-class Consultation_Type_Read(Consultation_Type_Base):
-    consultation_type_id: int
