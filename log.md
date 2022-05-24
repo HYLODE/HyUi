@@ -1,5 +1,9 @@
 # Running notes log
 
+## 2022-05-24 22:41:01
+Suite of tools to make mock data now all in one file
+Changed the name of the SQLModel to the generic Results
+
 ## 2022-05-22 15:11:08
 basic pytest work
 added smoke markers
