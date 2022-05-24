@@ -91,7 +91,17 @@ From the GAE commandline, navigate to the `synth` directory (`cd ./synth`), then
 This is similar to the steps above but does not depend on the query or database credentials. You are likely to need to use the Python requests library to get the data that will be used by [sdv](https://sdv.dev).
 
 **YOU MUST NOW PREPARE YOUR DATA MODEL IN `./src/api/models.py`**
+let's generalise the naming so that query is matched to results which has rows
+and results is a pydantic / sqlmodel class
 by hand, specify as per ... https://sqlmodel.tiangolo.com/tutorial/create-db-and-table/
+
+- [ ] explain how to define your data model
+
+Imagine inspecting the dataframe that you were working with 
+then `df.dtypes` should define those fields
+and now you need to specify a python version of that
+this is for quality control
+
 
 ### Deployment
 
