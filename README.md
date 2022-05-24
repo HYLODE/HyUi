@@ -53,6 +53,9 @@ cd ./src
 uvicorn api.main:app --reload --workers 1 --host 0.0.0.0 --port 8094
 ```
 
+then navigate to [http://localhost:8094/docs]() to view the API documentation
+
+
 Frontend
 
 ```sh
@@ -86,6 +89,9 @@ From the GAE commandline, navigate to the `synth` directory (`cd ./synth`), then
 #### Scenario 2 (data via an http `get` request)
 
 This is similar to the steps above but does not depend on the query or database credentials. You are likely to need to use the Python requests library to get the data that will be used by [sdv](https://sdv.dev).
+
+**YOU MUST NOW PREPARE YOUR DATA MODEL IN `./src/api/models.py`**
+by hand, specify as per ... https://sqlmodel.tiangolo.com/tutorial/create-db-and-table/
 
 ### Deployment
 

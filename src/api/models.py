@@ -1,13 +1,15 @@
 # src/models.py
+from datetime import date, datetime
 from typing import Optional
-from sqlmodel import Field, SQLModel
-from datetime import datetime, date
-from pydantic import validator
+
 import arrow
+from pydantic import validator
+from sqlmodel import Field, SQLModel
+from config.settings import settings
 
 
-
-class ConsultsED(SQLModel):
+# define the data model that you're expecting from your query
+class ConsultsED_Base(SQLModel):
     firstname: str
     lastname: str
     date_of_birth: date
@@ -33,6 +35,15 @@ class ConsultsED(SQLModel):
         return v
 
 
+class ConsultsED(ConsultsED_Base, table=True):
+    # only set schema if in postgres
+    if 'postgres' in settings.DB_URL:
+        __table_args__ = {"schema": settings.DB_POSTGRES_SCHEMA}
+    consultation_request_id: Optional[int] = Field(default=None, primary_key=True)
+
+
+
+
 class Consultation_Request_Base(SQLModel):
     valid_from: Optional[datetime]
     cancelled: Optional[bool]
@@ -45,7 +56,9 @@ class Consultation_Request_Base(SQLModel):
 
 
 class Consultation_Request(Consultation_Request_Base, table=True):
-    __table_args__ = {"schema": "star"}
+    # only set schema if in postgres
+    if 'postgres' in settings.DB_URL:
+        __table_args__ = {"schema": settings.DB_POSTGRES_SCHEMA}
     consultation_request_id: Optional[int] = Field(default=None, primary_key=True)
 
 
@@ -61,7 +74,8 @@ class Consultation_Type_Base(SQLModel):
 
 
 class Consultation_Type(Consultation_Type_Base, table=True):
-    __table_args__ = {"schema": "star"}
+    if 'postgres' in settings.DB_URL:
+        __table_args__ = {"schema": settings.DB_POSTGRES_SCHEMA}
     consultation_type_id: Optional[int] = Field(default=None, primary_key=True)
 
 

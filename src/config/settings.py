@@ -1,9 +1,9 @@
 # ./src/api/settings_src.py
 # project wide settings are loaded via ./.envrc and ./.secrets
-from typing import Any, Dict, Optional
 from pathlib import Path
+from typing import Any, Dict, Optional
+
 from pydantic import BaseSettings, PostgresDsn, validator
-from mock.mock import make_mock_df
 
 
 class Settings(BaseSettings):
@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     UDS_DB: str
 
     DB_URL: Optional[str]
+    DB_POSTGRES_SCHEMA = "star"
     BACKEND_URL: Optional[str]
 
     @validator("ENV", pre=True)
@@ -28,11 +29,11 @@ class Settings(BaseSettings):
     @validator("DB_URL")
     def assemble_db_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
         if values.get("ENV") == "dev":
-            db_path = Path(__file__).resolve().parents[1].absolute() / "data" / "mock"
+            db_path = Path(__file__).resolve().parents[1].absolute() / "mock"
             db_url = f"sqlite:///{db_path.as_posix()}/mock.db"
             return db_url
         return PostgresDsn.build(
-            scheme="postgresql",
+            scheme="postgresql+psycopg2",
             user=values.get("UDS_USER"),
             password=values.get("UDS_PWD"),
             host=values.get("UDS_HOST"),
@@ -56,4 +57,3 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
-# print(settings.dict())

@@ -23,7 +23,7 @@ def test_secrets_file_exists():
 
 @pytest.mark.smoke
 def test_the_environment_is_set():
-    assert os.getenv("ENV") in ["dev", "prod"]
+    assert settings.ENV in ["dev", "prod"]
 
 
 # FIXME: fails b/c settings are established before the monkeypath
