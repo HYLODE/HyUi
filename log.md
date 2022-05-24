@@ -3,6 +3,8 @@
 ## 2022-05-24 22:41:01
 Suite of tools to make mock data now all in one file
 Changed the name of the SQLModel to the generic Results
+Next step
+- use these mock functions in conftest.py to help build the fixtures for testing
 
 ## 2022-05-22 15:11:08
 basic pytest work
