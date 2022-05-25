@@ -1,11 +1,8 @@
 import pytest
-from fastapi import FastAPI
 from fastapi.testclient import TestClient
+from sqlmodel import Session
 
 from api.main import app
-from config.settings import settings
-
-client = TestClient(app)
 
 
 @pytest.mark.smoke
@@ -16,5 +13,14 @@ def test_read_ping():
 
 
 @pytest.mark.smoke
-def test_consultations_ed(mock_api_records):
-    assert isinstance(mock_api_records, list)
+def test_get_results(session: Session, client: TestClient):
+    """
+    Prove that the test session/client relationship works
+    and that there are data in the database
+    """
+    # https://sqlmodel.tiangolo.com/tutorial/fastapi/tests/#pytest-fixtures
+    response = client.get("/results/")
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data) > 0
+    print(data[0])

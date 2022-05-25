@@ -5,11 +5,11 @@ import pytest
 # from pathlib import Path
 # from collections import namedtuple
 from fastapi.testclient import TestClient
-from sqlmodel import Session, create_engine, SQLModel
-from sqlmodel.pool import StaticPool
+from sqlmodel import Session
 
 # this next step in turn runs api.models as an import
 from api.main import app, get_session
+from mock.mock import make_mock_db_in_memory
 
 
 # https://sqlmodel.tiangolo.com/tutorial/fastapi/tests
@@ -17,12 +17,8 @@ from api.main import app, get_session
 # refers to the db session not the pytest session
 @pytest.fixture(name="session")
 def session_fixture():
-    # create an in memory database for the session
-    engine = create_engine(
-        "sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool
-    )
-    SQLModel.metadata.create_all(engine)
-    # call function here to populate the database for testing
+    # NOTE: use the same mock functions for testing as we do for development
+    engine = make_mock_db_in_memory()
     with Session(engine) as session:
         yield session
 

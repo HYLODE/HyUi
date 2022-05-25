@@ -1,4 +1,10 @@
 # Running notes log
+
+## 2022-05-25 18:40:44
+made generic the names of the functions in main.py
+this works better for a standalone app that serves 'result'
+the only thing that changes then is the content of the query
+
 ## 2022-05-25 07:50:50
 played with great expectations
 the command line interface and the jupyter notebook style is nice

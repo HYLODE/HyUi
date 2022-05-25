@@ -7,6 +7,7 @@ import pandas as pd
 import sqlalchemy as sa
 from pathlib import Path
 from sqlmodel import Session, SQLModel, create_engine
+from sqlmodel.pool import StaticPool
 
 # this next step forces the metadata to generate
 from api.models import Results
@@ -19,8 +20,8 @@ SYNTH_SQLITE_MEM = "sqlite://"
 ECHO = False
 
 
-def make_engine(path=SYNTH_SQLITE_URL):
-    engine = create_engine(path, echo=ECHO)
+def make_engine(path=SYNTH_SQLITE_URL, **kwargs):
+    engine = create_engine(path, **kwargs)
     return engine
 
 
@@ -62,8 +63,20 @@ def insert_into_mock_table(engine, df: pd.DataFrame, model: SQLModel):
         session.commit()
 
 
+def make_mock_db_in_memory():
+    engine = make_engine(
+        path=SYNTH_SQLITE_MEM,
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+    )
+    df = make_mock_df(SYNTH_HDF_PATH)
+    create_mock_table(engine, Results)
+    insert_into_mock_table(engine, df, Results)
+    return engine
+
+
 if __name__ == "__main__":
     df = make_mock_df(SYNTH_HDF_PATH)
-    engine = make_engine()
+    engine = make_engine(echo=True)
     create_mock_table(engine, Results, drop=True)
     insert_into_mock_table(engine, df, Results)
