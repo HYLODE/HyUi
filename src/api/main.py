@@ -3,26 +3,26 @@ from collections import namedtuple
 from pathlib import Path
 from typing import List
 
-from fastapi import Depends, FastAPI, HTTPException, status
-from sqlmodel import Session, create_engine, select
+from fastapi import Depends, FastAPI
+from sqlmodel import Session, create_engine
 
 from config.settings import settings
 
-from api.models import (
-    Consultation_Type,
-    Consultation_Type_Read,
-    ConsultsED,
-)
+from api.models import ResultsRead
 
+QUERY_LIVE_PATH = Path(__file__).resolve().parent / "query-live.sql"
+QUERY_MOCK_PATH = Path(__file__).resolve().parent / "query-mock.sql"
 
 engine = create_engine(settings.DB_URL, echo=True)
 
 
 def prepare_query(env=settings.ENV) -> str:
     if env == "prod":
-        q = "api/query-live.sql"
+        q = QUERY_LIVE_PATH
+        print("--- INFO: running LIVE query")
     else:
-        q = "api/query-mock.sql"
+        q = QUERY_MOCK_PATH
+        print("--- INFO: running MOCK query")
     return Path(q).read_text()
 
 
@@ -34,15 +34,12 @@ def get_session():
 app = FastAPI()
 
 
-@app.get("/consultations_ed/", response_model=List[ConsultsED])
-def read_consults_ed(
-    *,
-    session: Session = Depends(get_session),
-):
+@app.get("/results/", response_model=List[ResultsRead])
+def read_results(session: Session = Depends(get_session)):
     """
-    Returns consults for patients in ED
-    alongside the most recent ED location for that patient
-    where that ED location occupied in the last 24h
+    Returns Results data class populated by query-live/mock
+    query preparation depends on the environment so will return
+    mock data in dev and live data in prod
     """
     q = prepare_query()
     results = session.execute(q)

@@ -56,3 +56,11 @@ class Results(ResultsBase, table=True):
     if "postgres" in settings.DB_URL:
         __table_args__ = {"schema": settings.DB_POSTGRES_SCHEMA}
     consultation_request_id: Optional[int] = Field(default=None, primary_key=True)
+
+
+class ResultsRead(ResultsBase):
+    """
+    Read version that includes the key column
+    """
+
+    consultation_request_id: Optional[int]

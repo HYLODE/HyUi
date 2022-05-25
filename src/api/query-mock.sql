@@ -1,3 +1,3 @@
 SELECT
 *
-FROM consults;
+FROM results;
