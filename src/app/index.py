@@ -10,7 +10,10 @@ from dash import dash_table as dt
 
 from config.settings import settings
 
+# settings = Settings()
+
 API_URL = settings.BACKEND_URL
+# print(API_URL)
 
 
 def request_data(url: str) -> list:
@@ -19,6 +22,7 @@ def request_data(url: str) -> list:
     """
     try:
         response = requests.get(url)
+        print(response.status_code)
         response.raise_for_status()  # raises HTTP errors
     except requests.exceptions.HTTPError as e:
         print("!!! HTTP Error", e)

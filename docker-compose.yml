@@ -31,6 +31,7 @@ services:
       - HTTPS_PROXY
       - NO_PROXY=dash
       - no_proxy=dash
+      - SERVICES=DOCKER
     env_file:
       - .env
       - .secrets
@@ -52,9 +53,9 @@ services:
     volumes:
       - ./src/app:/usr/src/app
       - ./src/config:/usr/src/config
-      - ./src/data:/usr/src/mock
+      - ./src/mock:/usr/src/mock
     ports:
-      - 8095:8050
+      - "8095:8095"
     environment:
       - http_proxy
       - https_proxy
@@ -62,7 +63,7 @@ services:
       - HTTPS_PROXY
       - NO_PROXY=api
       - no_proxy=api
-      - DOCKERNETWORK=1
+      - SERVICES=DOCKER
     env_file:
       - .env
       - .secrets

@@ -2,16 +2,17 @@
 # project wide settings are loaded via ./.envrc and ./.secrets
 from pathlib import Path
 from typing import Any, Dict, Optional
+import warnings
 
 from pydantic import BaseSettings, PostgresDsn, validator
 
-URL_DOCKER_TRUE = "http://api:8094/results/"
+URL_DOCKER_TRUE = "http://api:8000/results/"
 URL_DOCKER_FALSE = "http://localhost:8094/results/"
 
 
 class Settings(BaseSettings):
     ENV: str
-    DOCKERNETWORK = 0
+    SERVICES = "LOCAL_DEV"
     UDS_HOST: str
     UDS_USER: str
     UDS_PWD: str
@@ -49,10 +50,17 @@ class Settings(BaseSettings):
         Defines API URL based on whether working in conda environment, or
         from within the docker-compose network
         """
-        if values.get("DOCKERNETWORK") == 1:
+        # print(f"SERVICES = {values.get('SERVICES')}")
+        if values.get("SERVICES") == "DOCKER":
+            api_url = URL_DOCKER_TRUE
+        elif values.get("SERVICES") == "LOCAL_DEV":
+            api_url = URL_DOCKER_FALSE
+        elif values.get("SERVICES") is None:
+            warnings.warn(f"!!! SERVICES is None so assumes in Docker")
             api_url = URL_DOCKER_TRUE
         else:
-            api_url = URL_DOCKER_FALSE
+            raise ValueError("!!! Env var 'SERVICES' not a recognised choice")
+        # print(f"API_URL = {api_url}")
         return api_url
 
     class Config:
@@ -60,3 +68,4 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+print(settings.SERVICES)

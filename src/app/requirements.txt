@@ -1,5 +1,6 @@
+pydantic
 requests
-plotly 
-dash 
+plotly
+dash
 pandas
 numpy
