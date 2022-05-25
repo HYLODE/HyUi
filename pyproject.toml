@@ -17,9 +17,6 @@ profile = "black"
 [tool.pytest.ini_options]
 pythonpath = [
     "./src",
-    # direct paths added since docker files start from these dirs
-    # "./src/api",
-    # "./src/dash",
 ]
 addopts = [
     "-vv",
