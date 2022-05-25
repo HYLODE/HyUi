@@ -5,6 +5,9 @@ from typing import Any, Dict, Optional
 
 from pydantic import BaseSettings, PostgresDsn, validator
 
+URL_DOCKER_TRUE = "http://api:8094/results/"
+URL_DOCKER_FALSE = "http://localhost:8094/results/"
+
 
 class Settings(BaseSettings):
     ENV: str
@@ -47,9 +50,9 @@ class Settings(BaseSettings):
         from within the docker-compose network
         """
         if values.get("DOCKERNETWORK") == 1:
-            api_url = "http://api:8094/consultations_ed/"
+            api_url = URL_DOCKER_TRUE
         else:
-            api_url = "http://localhost:8094/consultations_ed/"
+            api_url = URL_DOCKER_FALSE
         return api_url
 
     class Config:
