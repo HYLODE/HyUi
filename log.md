@@ -1,4 +1,11 @@
 # Running notes log
+## 2022-05-25 07:50:50
+played with great expectations
+the command line interface and the jupyter notebook style is nice
+going to leave this on try/ branch for now and come back later
+expecations are more mature for pandas than for sqlalchemy
+and this is likely to be important when dealing with data types in sqlite (e.g. dob is text)
+also need to work out how to manage relative imports when specifying the data source
 
 ## 2022-05-24 22:41:01
 Suite of tools to make mock data now all in one file
