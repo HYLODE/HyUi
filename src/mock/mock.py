@@ -63,6 +63,7 @@ def insert_into_mock_table(engine, df: pd.DataFrame, model: SQLModel):
         for row in rows:
             session.add(model(**row))
         session.commit()
+    return 0
 
 
 def make_mock_db_in_memory():
