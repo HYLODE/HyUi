@@ -1,3 +1,5 @@
+# run this file from project root
+# conda env update --file dev/steve/environment-short.yml --prune
 name: hyuiv4
 channels:
   - conda-forge
@@ -29,4 +31,8 @@ dependencies:
   - jupyter
   - jupyterlab
   - pytables
+  # - microsoft::playwright # not available for macm1
+  - pip
+  - pip:
+      - playwright
 prefix: /opt/homebrew/Caskroom/miniforge/base/envs/hyuiv4

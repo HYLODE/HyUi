@@ -1,5 +1,11 @@
 # Running notes log
 
+## 2022-05-26t10:23:37
+setting up for integration tests with playwright
+no conda builder for arm64 architecture so using pip within environment.yml
+suboptimal but :shrug:
+
+
 ## 2022-05-25 18:40:44
 made generic the names of the functions in main.py
 this works better for a standalone app that serves 'result'
