@@ -150,6 +150,8 @@ This is a Plotly Dash app served on port 8095.
 
 ### Orchestrating front and back end
 
+**IMPORTANT**: ensure you have created a ./.secrets file with at least the same info as the ./.secrets.example version
+
 ```bash
 docker-compose down
 docker-compose up -d --build && docker-compose logs -f
