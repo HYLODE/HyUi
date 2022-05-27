@@ -3,8 +3,7 @@ from datetime import datetime
 from fastapi.testclient import TestClient
 
 from api.main import app
-from config.settings import settings
-from api.models import Consultation_Request
+from api.models import ResultsRead as Consultation_Request
 
 client = TestClient(app)
 
