@@ -23,10 +23,11 @@ app = Dash(__name__)
     )
 def consults_over_time(n_intervals):
     df = df_from_url(API_URL)
-    df = df[["scheduled_datetime", "dept_name"]]
-    df.set_index("scheduled_datetime", inplace=True)
-    df = df.resample("30T").agg({"dept_name": "size"})
-    fig = px.bar(df, x=df.index, y="dept_name")
+
+    df = df.groupby("name").resample("60T", on="scheduled_datetime").agg({"dept_name": "size"})
+    df.reset_index(inplace=True)
+    fig = px.bar(df, x="scheduled_datetime", y="dept_name", color="name")
+
     return dcc.Graph(figure=fig)
 
 
