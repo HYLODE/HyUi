@@ -1,5 +1,5 @@
 # Run this app with `python app.py` and
-# visit http://127.0.0.1:8050/ in your web browser.
+# visit http://127.0.0.1:8095/ in your web browser.
 
 import pandas as pd
 import plotly.express as px
@@ -10,10 +10,7 @@ from dash import dash_table as dt
 
 from config.settings import settings
 
-# settings = Settings()
-
 API_URL = settings.BACKEND_URL
-# print(API_URL)
 
 
 def request_data(url: str) -> list:
