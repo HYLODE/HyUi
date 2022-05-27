@@ -28,3 +28,14 @@ def df_from_models(model_list: list[SQLModel]) -> pd.DataFrame:
     list_dicts = [model_list[i].dict() for i, val in enumerate(model_list)]
     df = pd.DataFrame(list_dicts)
     return df
+
+
+def df_from_url(url: str, model: SQLModel = ResultsRead) -> pd.DataFrame:
+    """
+    Generate a Pandas DataFrame for a URL
+    A convenience function that wraps the separate steps above
+    """
+    resp = get_results_response(url)
+    model_instances = validate_json(resp, model)
+    df = df_from_models(model_instances)
+    return df

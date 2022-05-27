@@ -54,6 +54,7 @@ services:
       - ./src/app:/usr/src/app
       - ./src/config:/usr/src/config
       - ./src/mock:/usr/src/mock
+      - ./src/api:/usr/src/api
     ports:
       - "8095:8095"
     environment:
