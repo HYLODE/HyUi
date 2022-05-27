@@ -1,5 +1,14 @@
 # Running notes log
 
+## 2022-05-27t23:30:00
+Tidied plot
+added table
+single callback to load data that then feeds both table and plot
+
+## 2022-05-27t11:03:10 
+set up validation of the JSON data
+https://python.plainenglish.io/data-validation-building-data-validating-classes-with-pydantic-8ee4a023f26d
+
 ## 2022-05-26t10:23:37
 setting up for integration tests with playwright
 no conda builder for arm64 architecture so using pip within environment.yml

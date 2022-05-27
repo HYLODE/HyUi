@@ -12,7 +12,7 @@ URL_DOCKER_FALSE = "http://localhost:8094/results/"
 
 class Settings(BaseSettings):
     ENV: str
-    SERVICES = "LOCAL_DEV"
+    SERVICES: str = "LOCAL_DEV"
     UDS_HOST: str
     UDS_USER: str
     UDS_PWD: str
@@ -44,12 +44,13 @@ class Settings(BaseSettings):
             path=f"/{values.get('UDS_DB') or ''}",
         )
 
-    @validator("BACKEND_URL")
+    @validator("BACKEND_URL", pre=True)
     def assemble_api_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
         """
         Defines API URL based on whether working in conda environment, or
         from within the docker-compose network
         """
+        # print(values)
         # print(f"SERVICES = {values.get('SERVICES')}")
         if values.get("SERVICES") == "DOCKER":
             api_url = URL_DOCKER_TRUE
@@ -68,4 +69,4 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
-print(settings.SERVICES)
+# print(settings.SERVICES)

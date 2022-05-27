@@ -39,3 +39,14 @@ def df_from_url(url: str, model: SQLModel = ResultsRead) -> pd.DataFrame:
     model_instances = validate_json(resp, model)
     df = df_from_models(model_instances)
     return df
+
+
+def df_from_store(data: dict, model: SQLModel = ResultsRead) -> pd.DataFrame:
+    """
+    Generate a Pandas DataFrame for dictionary 
+    Necessary when using dcc.Store from Plotly Dash
+    A convenience function that wraps the separate steps above
+    """
+    model_instances = validate_json(data, model)
+    df = df_from_models(model_instances)
+    return df
