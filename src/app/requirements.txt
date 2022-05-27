@@ -1,6 +1,8 @@
-pydantic
+sqlmodel
+arrow
 requests
 plotly
 dash
 pandas
 numpy
+

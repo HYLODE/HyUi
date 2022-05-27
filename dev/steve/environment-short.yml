@@ -15,6 +15,7 @@ dependencies:
   - plotly
   - dash
   - pandas
+  - pandas-stubs
   - numpy
   - fastapi
   - sqlmodel
