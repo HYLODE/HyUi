@@ -5,51 +5,59 @@ import pandas as pd
 import plotly.express as px
 import requests
 
-from dash import Dash, html, dcc
+from dash import Dash, html, dcc, Input, Output
 from dash import dash_table as dt
 
 from config.settings import settings
 from utils import df_from_url
 
+REFRESH_INTERVAL = 5*60*1000 # milliseconds
 API_URL = settings.BACKEND_URL
+app = Dash(__name__)
 
 
 
-def consults_over_time(df):
+@app.callback(
+    Output("fig_consults", "children"),
+    Input("query-interval", "n_intervals"),
+    )
+def consults_over_time(n_intervals):
+    df = df_from_url(API_URL)
     df = df[["scheduled_datetime", "dept_name"]]
     df.set_index("scheduled_datetime", inplace=True)
     df = df.resample("30T").agg({"dept_name": "size"})
     fig = px.bar(df, x=df.index, y="dept_name")
-    return fig
+    return dcc.Graph(figure=fig)
 
 
-df = df_from_url(API_URL)
 
-basic_table = html.Div(
-    [
-        html.P("Printing a simple table from the API"),
-        dt.DataTable(
-            id="api_table",
-            columns=[{"name": i, "id": i} for i in df.columns],
-            data=df.to_json(orient="records"),
-            filter_action="native",
-            sort_action="native",
-        ),
-    ]
+# basic_table = html.Div(
+#     [
+#         html.P("Printing a simple table from the API"),
+#         dt.DataTable(
+#             id="api_table",
+#             columns=[{"name": i, "id": i} for i in df.columns],
+#             data=df.to_json(orient="records"),
+#             filter_action="native",
+#             sort_action="native",
+#         ),
+#     ]
+# )
+
+
+dash_only = html.Div(
+    dcc.Interval(id="query-interval", interval=REFRESH_INTERVAL, n_intervals=0)
 )
 
 
-fig = consults_over_time(df)
-
-
-app = Dash(__name__)
 
 app.layout = html.Div(
     children=[
-        # basic_table
-        dcc.Graph(figure=fig)
+        html.Div(id="fig_consults"),
+        dash_only,
     ]
 )
+
 
 if __name__ == "__main__":
     app.run_server(debug=True, host="0.0.0.0", port=8095)
