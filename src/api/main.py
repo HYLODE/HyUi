@@ -8,7 +8,14 @@ from sqlmodel import Session, create_engine
 
 from config.settings import settings
 
-from api.models import ResultsRead
+# TODO: how to dynamically import a python module
+# from api.models import ResultsRead
+import importlib
+module_name = "api.consults.models"
+consults = importlib.import_module(module_name)
+print(consults.__doc__)
+
+
 
 QUERY_LIVE_PATH = Path(__file__).resolve().parent / "query-live.sql"
 QUERY_MOCK_PATH = Path(__file__).resolve().parent / "query-mock.sql"
@@ -34,7 +41,7 @@ def get_session():
 app = FastAPI()
 
 
-@app.get("/results/", response_model=List[ResultsRead])
+@app.get("/results/", response_model=List[consults.ResultsRead])
 def read_results(session: Session = Depends(get_session)):
     """
     Returns Results data class populated by query-live/mock
