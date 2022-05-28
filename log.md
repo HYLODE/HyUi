@@ -1,5 +1,13 @@
 # Running notes log
 
+## 2022-05-29t00:30:49
+
+started to set up multipage app framework
+separate modules for each possible api that will be exposed
+prob next step it to build a landing page that redirects to the necessary module
+and then build a genuinely distinct app
+
+
 ## 2022-05-27t23:30:00
 Tidied plot
 added table

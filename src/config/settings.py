@@ -6,8 +6,8 @@ import warnings
 
 from pydantic import BaseSettings, PostgresDsn, validator
 
-URL_DOCKER_TRUE = "http://api:8000/results/"
-URL_DOCKER_FALSE = "http://localhost:8094/results/"
+URL_DOCKER_TRUE = "http://api:8000/results"
+URL_DOCKER_FALSE = "http://localhost:8094/results"
 
 
 class Settings(BaseSettings):

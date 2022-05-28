@@ -1,7 +1,7 @@
 import requests
 import pandas as pd
 from sqlmodel import SQLModel
-from api.models import ResultsRead
+from api.consults import ConsultsRead
 
 
 def get_results_response(url: str) -> list[dict[str, str]]:
@@ -29,7 +29,7 @@ def df_from_models(model_list: list[SQLModel]) -> pd.DataFrame:
     return df
 
 
-def df_from_url(url: str, model: SQLModel = ResultsRead) -> pd.DataFrame:
+def df_from_url(url: str, model: SQLModel = ConsultsRead) -> pd.DataFrame:
     """
     Generate a Pandas DataFrame for a URL
     A convenience function that wraps the separate steps above
@@ -40,7 +40,7 @@ def df_from_url(url: str, model: SQLModel = ResultsRead) -> pd.DataFrame:
     return df
 
 
-def df_from_store(data: dict, model: SQLModel = ResultsRead) -> pd.DataFrame:
+def df_from_store(data: dict, model: SQLModel = ConsultsRead) -> pd.DataFrame:
     """
     Generate a Pandas DataFrame for dictionary
     Necessary when using dcc.Store from Plotly Dash

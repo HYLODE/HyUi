@@ -11,7 +11,7 @@ from config.settings import settings
 from utils import get_results_response, df_from_store
 
 REFRESH_INTERVAL = 5 * 60 * 1000  # milliseconds
-API_URL = settings.BACKEND_URL
+API_URL = f"{settings.BACKEND_URL}/consults/"
 
 app = Dash(
     __name__,
