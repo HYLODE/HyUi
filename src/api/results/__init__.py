@@ -1,4 +1,4 @@
-# src/api/consults/__init__.py
+# src/api/__init__.py
 """
 EMAP consults wrapped with patient demographics
 The developer should specify the data models here
@@ -19,9 +19,9 @@ QUERY_LIVE_PATH = Path(__file__).resolve().parent / "live.sql"
 QUERY_MOCK_PATH = Path(__file__).resolve().parent / "mock.sql"
 
 # define the data model that you're expecting from your query
-class ConsultsBase(SQLModel):
+class ResultsBase(SQLModel):
     """
-    Consults class to hold data returned from
+    Generic results class to hold data returned from
     the SQL query or the API
     This particular example holds list of patients in the ED
     with pending inpatient consults
@@ -52,7 +52,7 @@ class ConsultsBase(SQLModel):
         return v
 
 
-class Consults(ConsultsBase, table=True):
+class Results(ResultsBase, table=True):
     """
     The table version of the pydantic class
     Used for creating tables via SQLModel
@@ -64,7 +64,7 @@ class Consults(ConsultsBase, table=True):
     consultation_request_id: Optional[int] = Field(default=None, primary_key=True)
 
 
-class ConsultsRead(ConsultsBase):
+class ResultsRead(ResultsBase):
     """
     Read version that includes the key column
     """
