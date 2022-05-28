@@ -1,8 +1,9 @@
 # src/api/__init__.py
 """
 EMAP consults wrapped with patient demographics
-The developer should specifc the data models here
-Both the ResultsBase and the Results classes will need editing
+The developer should specify the data models here
+and follow the **same** naming convention such that
+the module.classname can be reliably used for access
 """
 
 from datetime import date, datetime

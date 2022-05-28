@@ -1,4 +1,7 @@
 # src/main.py
+# TODO: how to dynamically import a python module
+# from api.models import ResultsRead
+import importlib
 from collections import namedtuple
 from pathlib import Path
 from typing import List
@@ -8,28 +11,18 @@ from sqlmodel import Session, create_engine
 
 from config.settings import settings
 
-# TODO: how to dynamically import a python module
-# from api.models import ResultsRead
-import importlib
-module_name = "api.consults"
-consults = importlib.import_module(module_name)
-print(consults.__doc__)
-print(consults.QUERY_LIVE_PATH)
+MODULE_ROOT = "api"
+module_name = "consults"
 
 
+def gen_module_path(name: str, root: str = MODULE_ROOT) -> str:
+    return f"{MODULE_ROOT}.{module_name}"
 
+
+consults = importlib.import_module(gen_module_path(module_name))
 
 engine = create_engine(settings.DB_URL, echo=True)
-
-
-def prepare_query(env=settings.ENV) -> str:
-    if env == "prod":
-        q = consults.QUERY_LIVE_PATH
-        print("--- INFO: running LIVE query")
-    else:
-        q = consults.QUERY_MOCK_PATH
-        print("--- INFO: running MOCK query")
-    return Path(q).read_text()
+app = FastAPI()
 
 
 def get_session():
@@ -37,9 +30,16 @@ def get_session():
         yield session
 
 
-app = FastAPI()
+def prepare_query(module: str, env: str = settings.ENV) -> str:
+    choice = {"prod": "LIVE", "dev": "MOCK"}
+    module_path = gen_module_path(module)
+    query_name = f"QUERY_{choice[env]}_PATH"
+    q = getattr(importlib.import_module(module_path), query_name)
+    print(f"--- INFO: running {choice[env]} query")
+    return Path(q).read_text()
 
 
+# TODO dynamically create the route
 @app.get("/results/", response_model=List[consults.ResultsRead])
 def read_results(session: Session = Depends(get_session)):
     """
@@ -47,7 +47,7 @@ def read_results(session: Session = Depends(get_session)):
     query preparation depends on the environment so will return
     mock data in dev and live data in prod
     """
-    q = prepare_query()
+    q = prepare_query(module_name)
     results = session.execute(q)
     Record = namedtuple("Record", results.keys())
     records = [Record(*r) for r in results.fetchall()]
