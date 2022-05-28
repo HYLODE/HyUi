@@ -1,9 +1,7 @@
-import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import Session
 import pandas as pd
 
-from api.main import app
 from api.models import ResultsRead
 import app.utils as utils
 
@@ -28,4 +26,3 @@ def test_df_from_models(session: Session, client: TestClient):
     df = utils.df_from_models(model_instances)
     assert isinstance(df, pd.DataFrame)
     assert df.empty is False
-

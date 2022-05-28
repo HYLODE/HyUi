@@ -3,6 +3,6 @@ arrow
 requests
 plotly
 dash
+dash_bootstrap_components
 pandas
 numpy
-

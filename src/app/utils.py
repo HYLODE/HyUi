@@ -4,20 +4,19 @@ from sqlmodel import SQLModel
 from api.models import ResultsRead
 
 
-
 def get_results_response(url: str) -> list[dict[str, str]]:
     """
     Given a URL return JSON
     """
     request_response = requests.get(url)
-    return request_response.json() # type: ignore
+    return request_response.json()  # type: ignore
 
 
 def validate_json(json_list: list[dict[str, str]], model: SQLModel) -> list[SQLModel]:
     """
     Validate list of json formatted strings
     """
-    model_instances = [model(**i)for i in json_list]
+    model_instances = [model(**i) for i in json_list]
     return model_instances
 
 
@@ -43,7 +42,7 @@ def df_from_url(url: str, model: SQLModel = ResultsRead) -> pd.DataFrame:
 
 def df_from_store(data: dict, model: SQLModel = ResultsRead) -> pd.DataFrame:
     """
-    Generate a Pandas DataFrame for dictionary 
+    Generate a Pandas DataFrame for dictionary
     Necessary when using dcc.Store from Plotly Dash
     A convenience function that wraps the separate steps above
     """

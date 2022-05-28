@@ -14,6 +14,7 @@ dependencies:
   - requests
   - plotly
   - dash
+  - dash-bootstrap-components
   - pandas
   - pandas-stubs
   - numpy
