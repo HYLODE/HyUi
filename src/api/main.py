@@ -11,24 +11,23 @@ from config.settings import settings
 # TODO: how to dynamically import a python module
 # from api.models import ResultsRead
 import importlib
-module_name = "api.consults.models"
+module_name = "api.consults"
 consults = importlib.import_module(module_name)
 print(consults.__doc__)
+print(consults.QUERY_LIVE_PATH)
 
 
 
-QUERY_LIVE_PATH = Path(__file__).resolve().parent / "query-live.sql"
-QUERY_MOCK_PATH = Path(__file__).resolve().parent / "query-mock.sql"
 
 engine = create_engine(settings.DB_URL, echo=True)
 
 
 def prepare_query(env=settings.ENV) -> str:
     if env == "prod":
-        q = QUERY_LIVE_PATH
+        q = consults.QUERY_LIVE_PATH
         print("--- INFO: running LIVE query")
     else:
-        q = QUERY_MOCK_PATH
+        q = consults.QUERY_MOCK_PATH
         print("--- INFO: running MOCK query")
     return Path(q).read_text()
 
