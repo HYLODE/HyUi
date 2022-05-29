@@ -26,7 +26,7 @@ class Settings(BaseSettings):
 
     class ModuleName(str, Enum):
         consults = "consults"
-        results = "results"
+        # results = "results"
 
     MODULE_ROOT: str = "api"
     routes = ModuleName._member_names_

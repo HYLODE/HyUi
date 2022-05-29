@@ -8,6 +8,7 @@ from dash import dash_table as dt
 import dash_bootstrap_components as dbc
 
 from config.settings import settings
+from api.consults import ConsultsRead
 from utils.dash import get_results_response, df_from_store
 
 REFRESH_INTERVAL = 5 * 60 * 1000  # milliseconds
@@ -36,21 +37,36 @@ def store_data(n_intervals: int) -> dict:
     data = get_results_response(API_URL)
     return data
 
+@app.callback(
+    Output("filtered_data", "data"),
+    Input("department_picker", "value"),
+    State("request_data", "data"),
+)
+def filter_data(val: str, data: dict) -> dict:
+    """
+    Update data based on picker
+    """
+    if val:
+        print(val)
+        return [row for row in data if row["dept_name"] == val  ]
+    else: 
+        return data
+
 
 @app.callback(
     Output("fig_consults", "children"),
-    Input("request_data", "modified_timestamp"),
-    State("request_data", "data"),
+    Input("filtered_data", "modified_timestamp"),
+    State("filtered_data", "data"),
     prevent_initial_call=True,
 )
 def gen_consults_over_time(n_intervals: int, data: dict):
     """
     Plot stacked bar
     """
-    df = df_from_store(data)
+    df = df_from_store(data, ConsultsRead)
     df = (
         df.groupby("name")
-        .resample("12H", on="scheduled_datetime")
+        .resample("6H", on="scheduled_datetime")
         .agg({"dept_name": "size"})
     )
     df.reset_index(inplace=True)
@@ -60,27 +76,14 @@ def gen_consults_over_time(n_intervals: int, data: dict):
 
 @app.callback(
     Output("table_consults", "children"),
-    Input("request_data", "modified_timestamp"),
-    Input("consults_fig", "restyleData"),
-    State("consults_fig", "figure"),
-    State("request_data", "data"),
+    Input("filtered_data", "modified_timestamp"),
+    State("filtered_data", "data"),
     prevent_initial_call=True,
 )
-def gen_table_consults(modified: int, restyleData: list, figure: dict, data: dict):
-
-    fig_data = figure["data"]
-
-    # NOTE: only works for double click event where just one legend type is
-    # selected; if the user instead clicks 'off' legend items one by one then
-    # this has no effect
-    if restyleData is not None:
-        visible_list = []
-        for i, visible in enumerate(restyleData[0]["visible"]):
-            if visible is True:
-                visible_list.append(fig_data[i]["name"])
-        data = [row for row in data if row["name"] in visible_list]
+def gen_table_consults(modified: int, data: dict):
 
     cols = dict(
+        dept_name="Ward/Department",
         firstname="First name",
         lastname="Last name",
         date_of_birth="DoB",
@@ -98,12 +101,25 @@ def gen_table_consults(modified: int, restyleData: list, figure: dict, data: dic
         )
     ]
 
+@app.callback(
+    Output("department_picker", "options"),
+    Input("request_data", "data"),
+    )
+def update_dept_dropdown(data: dict) -> list:
+    df = df_from_store(data, ConsultsRead)
+    return sorted(df['dept_name'].unique()) 
+
 
 card_fig = dbc.Card(
     [
         dbc.CardHeader(html.H6("Real time consults over the last 72")),
         dbc.CardBody(
             [
+                html.Div(
+                    dcc.Dropdown(
+                        id="department_picker",
+                        )
+                    ),
                 html.Div([html.P("Updates every 5 mins")]),
                 html.Div(id="fig_consults"),
             ]
@@ -127,6 +143,7 @@ dash_only = html.Div(
     [
         dcc.Interval(id="query-interval", interval=REFRESH_INTERVAL, n_intervals=0),
         dcc.Store(id="request_data"),
+        dcc.Store(id="filtered_data"),
     ]
 )
 
