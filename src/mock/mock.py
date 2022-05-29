@@ -3,14 +3,17 @@
 Generates sqlite database with a table holding modelled as per
 api.models.Results and then loads the data from the local HDF file
 """
+
 import pandas as pd
 import sqlalchemy as sa
 from pathlib import Path
 from sqlmodel import Session, SQLModel, create_engine
 from sqlmodel.pool import StaticPool
 
+# TODO: generalise for different models
+# you will need to store the mock data per API and then run this conversion for each model
 # this next step forces the metadata to generate
-from api.models import Results
+from api.consults import Consults as Results
 
 SYNTH_HDF_FILE = Path(__file__).parent / "mock.h5"
 # you can use this function in testing but swap in an in memory version

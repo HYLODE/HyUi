@@ -33,13 +33,12 @@ class ConsultsBase(SQLModel):
     mrn: str
     nhs_number: Optional[int]
     valid_from: datetime
-    cancelled: bool
-    closed_due_to_discharge: bool
     scheduled_datetime: datetime
     status_change_time: datetime
     comments: Optional[str]
     name: str
     dept_name: str
+    location_string: str
 
     @validator("date_of_birth", pre=True)
     def convert_datetime_to_date(cls, v):
