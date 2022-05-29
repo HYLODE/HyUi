@@ -18,6 +18,8 @@ include ../.secrets
 	mock5stop
 	help
 
+.DEFAULT_GOAL := help
+
 ## Build docker image (uses Dockerfile)
 mock1build:
 	docker build \
@@ -29,7 +31,7 @@ mock1build:
 
 ## Copy the example synthetic data pipeline into the portal
 mock2copyin:
-	cp ./synthesise_data.ipynb ./portal/
+	cp ./synth_data.ipynb ./portal/
 
 ## Run docker image and make the API SQL query available
 mock3run:
@@ -56,7 +58,8 @@ mock3run:
 ## Copy the synthetic data and the query from the portal
 mock4copyout:
 	cp ./portal/mock.h5 ./
-	cp ./portal/query_live.h5 ./
+	cp ./portal/query.sql ./
+	@echo "*** Now move these files to the corresponding API folder"
 
 
 ## Stop that docker image

@@ -53,6 +53,8 @@ WHERE
 	cr.closed_due_to_discharge = false
 	AND
 	cr.cancelled = false
+	AND
+	cr.scheduled_datetime > NOW() - INTERVAL '7 DAYS'
 ORDER BY 
 cr.consultation_request_id
 ),
@@ -84,6 +86,6 @@ SELECT
 ,loc_now.dept_name
 ,loc_now.location_string
 FROM loc_now
-WHERE loc_i = 1
-ORDER BY loc_now.mrn ASC
-;
+WHERE loc_i = 1 
+ORDER BY loc_now.scheduled_datetime ASC
+ ;

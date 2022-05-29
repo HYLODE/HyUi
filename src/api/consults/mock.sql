@@ -4,5 +4,4 @@
 SELECT
 *
 FROM consults
-LIMIT 300
 ;
