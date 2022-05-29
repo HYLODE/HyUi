@@ -1,8 +1,9 @@
 # ./src/api/settings_src.py
 # project wide settings are loaded via ./.envrc and ./.secrets
+import warnings
+from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, Optional
-import warnings
 
 from pydantic import BaseSettings, PostgresDsn, validator
 
@@ -21,6 +22,14 @@ class Settings(BaseSettings):
     DB_URL: Optional[str]
     DB_POSTGRES_SCHEMA = "star"
     BACKEND_URL: Optional[str]
+
+
+    class ModuleName(str, Enum):
+        consults = "consults"
+        results = "results"
+
+    MODULE_ROOT: str = "api"
+    routes = ModuleName._member_names_
 
     @validator("ENV", pre=True)
     def environment_choice_is_valid(cls, v):
@@ -57,7 +66,7 @@ class Settings(BaseSettings):
         elif values.get("SERVICES") == "LOCAL_DEV":
             api_url = URL_DOCKER_FALSE
         elif values.get("SERVICES") is None:
-            warnings.warn(f"!!! SERVICES is None so assumes in Docker")
+            warnings.warn("!!! SERVICES is None so assumes in Docker")
             api_url = URL_DOCKER_TRUE
         else:
             raise ValueError("!!! Env var 'SERVICES' not a recognised choice")

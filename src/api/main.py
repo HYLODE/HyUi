@@ -3,7 +3,6 @@
 # from api.models import ResultsRead
 import importlib
 from collections import namedtuple
-from enum import Enum
 from pathlib import Path
 from typing import List
 
@@ -11,24 +10,15 @@ from fastapi import Depends, FastAPI
 from sqlmodel import Session, create_engine
 
 from config.settings import settings
+from utils import gen_module_path
 
-
-class ModuleName(str, Enum):
-    consults = "consults"
-    results = "results"
-
-
-MODULE_ROOT = "api"
-routes = ModuleName._member_names_
+MODULE_ROOT = settings.MODULE_ROOT
+routes = settings.routes
 
 
 def get_session():
     with Session(engine) as session:
         yield session
-
-
-def gen_module_path(name: str, root: str = MODULE_ROOT) -> str:
-    return f"{root}.{name}"
 
 
 def prepare_query(module: str, env: str = settings.ENV) -> str:
@@ -59,7 +49,9 @@ def read_factory(module: str):
         raise AttributeError
 
     @app.get(f"/results/{{module}}", response_model=List[ResultsRead])
-    def read_results(module: ModuleName, session: Session = Depends(get_session)):
+    def read_results(
+        module: settings.ModuleName, session: Session = Depends(get_session)
+    ):
         """
         Returns Results data class populated by query-live/mock
         query preparation depends on the environment so will return
