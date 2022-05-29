@@ -1,5 +1,10 @@
 # Running notes log
 
+## 2022-05-29t23:20:32
+
+mock.py not generates mock data for each API module
+stores it all in the same sqlite database though
+
 ## 2022-05-29t00:30:49
 
 started to set up multipage app framework

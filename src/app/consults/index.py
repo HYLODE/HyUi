@@ -8,7 +8,7 @@ from dash import dash_table as dt
 import dash_bootstrap_components as dbc
 
 from config.settings import settings
-from utils import get_results_response, df_from_store
+from utils.dash import get_results_response, df_from_store
 
 REFRESH_INTERVAL = 5 * 60 * 1000  # milliseconds
 API_URL = f"{settings.BACKEND_URL}/consults/"
