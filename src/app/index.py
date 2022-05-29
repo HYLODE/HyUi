@@ -50,7 +50,7 @@ def gen_consults_over_time(n_intervals: int, data: dict):
     df = df_from_store(data)
     df = (
         df.groupby("name")
-        .resample("60T", on="scheduled_datetime")
+        .resample("1M", on="scheduled_datetime")
         .agg({"dept_name": "size"})
     )
     df.reset_index(inplace=True)
