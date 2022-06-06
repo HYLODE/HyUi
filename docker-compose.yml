@@ -19,6 +19,7 @@ services:
     volumes:
       - ./src/api:/usr/src/api
       - ./src/config:/usr/src/config
+      - ./src/utils:/usr/src/utils
       - ./src/mock:/usr/src/mock
     ports:
       - "8094:8000"
@@ -49,10 +50,11 @@ services:
         - HTTPS_PROXY
     # TODO: this entry point command will run the app in debug mode
     #       should convert to uvicorn or similar server
-    command: python app/index.py
+    command: python app/consults/index.py
     volumes:
       - ./src/app:/usr/src/app
       - ./src/config:/usr/src/config
+      - ./src/utils:/usr/src/utils
       - ./src/mock:/usr/src/mock
       - ./src/api:/usr/src/api
     ports:
