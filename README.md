@@ -82,7 +82,7 @@ From the GAE commandline, navigate to the `synth` directory (`cd ./synth`), then
 
 1. `make mock1build` to build a docker image with JupyterLab and sdv pre-installed.
 2. `make mock2run` to spin up JupyterLab (e.g. Working from GAE07 this will be at [](http://UCLVLDDPRAGAE07:8091) but the URL server will depend on the GAE).
-3. `make mock3copyin` This will copy the example notebook `synth_test_data.ipynb` into the `./synth/portal` directory that is attached to the JupyterNotebook. Now open the example notebook `synth_test_data.ipynb` using JupyterLab and work through the steps. Create your SQL query and save as `query_live.sql` file must return a *SELECT* statement. Save just the synthesised mock data to `mock.h5`, and the query (`query_live.sql`).
+3. `make mock3copyin` This will copy the example notebook `synth_test_data.ipynb` into the `./synth/portal` directory that is attached to the JupyterNotebook. Now open the example notebook `synth_test_data.ipynb` using JupyterLab and work through the steps. Create your SQL query and save as `query_live.sql` file must return a *SELECT* statement. Save just the synthesised mock data to `mock.h5`, and the query (`query_live.sql`). Be **careful** and ensure that you specify 'fakers' for all direct identifiers. We recommend the four eyes approach wherein a second person reviews your work before an export.
 4. `make mock4copyout` to copy just the query and the synthetic data. Do not copy the notebook out of the `portal` directory unless you are sure you have stripped all personally identifiable data (i.e. clear all cells before saving).
 5. `make mock5stop` to stop the JupyterLab instance and clear up
 

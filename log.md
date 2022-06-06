@@ -1,5 +1,13 @@
 # Running notes log
 
+## 2022-06-06t23:29:29 
+produced fake data as per sitrep
+been back through the SDV documentation and worked out how to force 'faking' for PII
+
+Notes in the exemplar notebooks
+
+Define fields that contain PII and need faking (see the sketchy documentation [here](https://sdv.dev/SDV/developer_guides/sdv/metadata.html?highlight=pii#categorical-fields-data-anonymization) and the [Faker Documentation](https://faker.readthedocs.io/en/master/providers.html) for a full list of providers. Here is a brief example that specifies Fakers for [name](https://faker.readthedocs.io/en/master/providers/faker.providers.person.html#faker.providers.person.Provider.name) and [date of birth](https://faker.readthedocs.io/en/master/providers/faker.providers.date_time.html#faker.providers.date_time.Provider.date_of_birth). Note that you must pass arguments to a faker as a list. NB: sdv also doesn't always recognise the columns correctly. Here we specify data_of_birth explicitly as a date whilst working on the larger task of defining columns that contain PII. See [field details](https://sdv.dev/SDV/developer_guides/sdv/metadata.html#field-details)
+
 ## 2022-05-29t23:20:32
 
 mock.py not generates mock data for each API module
