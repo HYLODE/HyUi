@@ -5,7 +5,6 @@ api.models.Results and then loads the data from the local HDF file
 """
 
 import sys
-import importlib
 import pandas as pd
 import sqlalchemy as sa
 from pathlib import Path
@@ -13,7 +12,7 @@ from sqlmodel import Session, SQLModel, create_engine
 from sqlmodel.pool import StaticPool
 
 from config.settings import settings  # type: ignore
-from utils import gen_module_path  # type: ignore
+from utils import get_model_from_route  # type: ignore
 
 # you can use this function in testing but swap in an in memory version
 SYNTH_SQLITE_FILE = Path(__file__).parent / "mock.db"
@@ -30,13 +29,6 @@ def path_to_hdf_file(route: str):
 def make_engine(path=SYNTH_SQLITE_URL, **kwargs):
     engine = create_engine(path, **kwargs)
     return engine
-
-
-def get_model_from_route(route: str):
-    route_title_case = route.title()
-    route_path = gen_module_path(route)
-    model = getattr(importlib.import_module(route_path), route_title_case)  # noqa
-    return model
 
 
 def make_mock_df(f: Path) -> pd.DataFrame:

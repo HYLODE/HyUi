@@ -5,6 +5,7 @@ import pandas as pd
 from typing import Optional
 from sqlmodel import Field, SQLModel, create_engine, Session, select
 from mock import mock
+from utils import get_model_from_route
 
 
 @pytest.mark.smoke
@@ -69,7 +70,7 @@ def test_insert_into_mock_table():
 
 def test_make_mock_db_in_memory(route: str = "sitrep"):
     engine = mock.make_mock_db_in_memory(route)
-    model = mock.get_model_from_route(route)
+    model = get_model_from_route(route)
     with Session(engine) as session:
         results = session.exec(select(model))
         result = results.first()
