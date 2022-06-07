@@ -896,6 +896,7 @@ docs/_linkcheck/
 # Ignore sublime artifacts
 *.sublime-workspace
 *.code-workspace
+./sftp-config.json
 
 # Temp and scratch
 *scratch*

@@ -1,9 +1,9 @@
 -- src/api/consults/live.sql
-WITH 
+WITH
 consults AS (
 -- get all details on consultation requests
 -- regardless of where the patient is now
-SELECT 
+SELECT
 
  cd.firstname
 ,cd.lastname
@@ -30,9 +30,9 @@ FROM star.consultation_request cr
 LEFT JOIN star.consultation_type ct ON cr.consultation_type_id = ct.consultation_type_id
 
 INNER JOIN (
-	SELECT 
+	SELECT
 	*
-	FROM 
+	FROM
 	star.location_visit lv
 	LEFT JOIN star.location lo ON lv.location_id = lo.location_id
 	LEFT JOIN star.department de ON lo.department_id = de.department_id
@@ -41,21 +41,21 @@ INNER JOIN (
 ) loc ON cr.hospital_visit_id = loc.hospital_visit_id
 
 
-LEFT JOIN star.hospital_visit hv ON cr.hospital_visit_id = hv.hospital_visit_id 
+LEFT JOIN star.hospital_visit hv ON cr.hospital_visit_id = hv.hospital_visit_id
 LEFT JOIN star.core_demographic cd ON hv.mrn_id = cd.mrn_id
 LEFT JOIN star.mrn ON cd.mrn_id = mrn.mrn_id
 
-WHERE 
+WHERE
 --	loc.speciality = 'Accident & Emergency'
---	AND 
-	hv.patient_class IN ('INPATIENT', 'EMERGENCY') 
+--	AND
+	hv.patient_class IN ('INPATIENT', 'EMERGENCY')
 	AND
 	cr.closed_due_to_discharge = false
 	AND
 	cr.cancelled = false
 	AND
 	cr.scheduled_datetime > NOW() - INTERVAL '7 DAYS'
-ORDER BY 
+ORDER BY
 cr.consultation_request_id
 ),
 loc_now AS (
@@ -63,11 +63,11 @@ loc_now AS (
 -- so '1' represents the current location of that patient
 SELECT
  *
-,row_number() over (partition BY consults.hospital_visit_id ORDER BY consults.admission_time DESC) loc_i 
+,row_number() over (partition BY consults.hospital_visit_id ORDER BY consults.admission_time DESC) loc_i
 FROM consults
 )
 -- now return the consult and the most recent location
-SELECT 
+SELECT
 -- select only those fields you wish to model and validate
  loc_now.firstname
 ,loc_now.lastname
@@ -86,6 +86,6 @@ SELECT
 ,loc_now.dept_name
 ,loc_now.location_string
 FROM loc_now
-WHERE loc_i = 1 
+WHERE loc_i = 1
 ORDER BY loc_now.scheduled_datetime ASC
  ;

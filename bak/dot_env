@@ -1,7 +1,7 @@
 # EXAMPLE .env file
 # RENAME to FROM `dot_env` to `.env`
 # AND create similar .env.shared and .env.secret files if necessary
-# FORMATTING as perhttps://github.com/theskumar/python-dotenv 
+# FORMATTING as perhttps://github.com/theskumar/python-dotenv
 
 USERNAME=FOO
 PASSWORD=BAR

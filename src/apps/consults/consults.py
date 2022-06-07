@@ -19,7 +19,6 @@ REFRESH_INTERVAL = 5 * 60 * 1000  # milliseconds
 API_URL = f"{settings.BACKEND_URL}/consults/"
 
 
-
 @callback(
     Output("request_data", "data"),
     Input("query-interval", "n_intervals"),
@@ -30,6 +29,7 @@ def store_data(n_intervals: int) -> dict:
     """
     data = get_results_response(API_URL)
     return data
+
 
 @callback(
     Output("filtered_data", "data"),
@@ -42,8 +42,8 @@ def filter_data(val: str, data: dict) -> dict:
     """
     if val:
         print(val)
-        return [row for row in data if row["dept_name"] == val  ]
-    else: 
+        return [row for row in data if row["dept_name"] == val]
+    else:
         return data
 
 
@@ -95,13 +95,14 @@ def gen_table_consults(modified: int, data: dict):
         )
     ]
 
+
 @callback(
     Output("department_picker", "options"),
     Input("request_data", "data"),
-    )
+)
 def update_dept_dropdown(data: dict) -> list:
     df = df_from_store(data, ConsultsRead)
-    return sorted(df['dept_name'].unique()) 
+    return sorted(df["dept_name"].unique())
 
 
 card_fig = dbc.Card(
@@ -112,8 +113,8 @@ card_fig = dbc.Card(
                 html.Div(
                     dcc.Dropdown(
                         id="department_picker",
-                        )
-                    ),
+                    )
+                ),
                 html.Div([html.P("Updates every 5 mins")]),
                 html.Div(id="fig_consults"),
             ]
@@ -133,10 +134,12 @@ card_table = dbc.Card(
     ]
 )
 
-main = html.Div([
-    card_fig,
-    card_table,
-    ])
+main = html.Div(
+    [
+        card_fig,
+        card_table,
+    ]
+)
 
 
 dash_only = html.Div(
@@ -155,4 +158,3 @@ consults = dbc.Container(
         dash_only,
     ],
 )
-

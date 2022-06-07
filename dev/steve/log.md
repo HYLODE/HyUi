@@ -1,10 +1,208 @@
 # Running notes log
 
+## 2022-06-07t18:00:44
+pinned requirements files
+updated docker to bullseye
+now need to work on CI
+
+see advice on best docker builds for python here
+https://pythonspeed.com/articles/alpine-docker-python/
+
+## 2022-06-07t10:52:57
+trying to setup multipage app
+but layout not built correctly _unless_ you start the app directly
+e.g.
+python index.py is OK
+but
+python apps/index.py is not OK
+so perhaps something is missing from the pythonpath
+and this means that your whole structure will fall apart since you assume that you're working from ./src
+but now you have to work from ./src/apps
+but this is odd b/c it worked ok for dashRep
+@RESUME: https://stackoverflow.com/questions/59903698/multi-page-dash-app-callbacks-not-registering
+fixed by using the @callback decorator? fr dash 2.0
+
+## 2022-06-06t23:29:29
+produced fake data as per sitrep
+been back through the SDV documentation and worked out how to force 'faking' for PII
+
+Notes in the exemplar notebooks
+
+Define fields that contain PII and need faking (see the sketchy documentation [here](https://sdv.dev/SDV/developer_guides/sdv/metadata.html?highlight=pii#categorical-fields-data-anonymization) and the [Faker Documentation](https://faker.readthedocs.io/en/master/providers.html) for a full list of providers. Here is a brief example that specifies Fakers for [name](https://faker.readthedocs.io/en/master/providers/faker.providers.person.html#faker.providers.person.Provider.name) and [date of birth](https://faker.readthedocs.io/en/master/providers/faker.providers.date_time.html#faker.providers.date_time.Provider.date_of_birth). Note that you must pass arguments to a faker as a list. NB: sdv also doesn't always recognise the columns correctly. Here we specify data_of_birth explicitly as a date whilst working on the larger task of defining columns that contain PII. See [field details](https://sdv.dev/SDV/developer_guides/sdv/metadata.html#field-details)
+
+## 2022-05-29t23:20:32
+
+mock.py not generates mock data for each API module
+stores it all in the same sqlite database though
+
+## 2022-05-29t00:30:49
+
+started to set up multipage app framework
+separate modules for each possible api that will be exposed
+prob next step it to build a landing page that redirects to the necessary module
+and then build a genuinely distinct app
+
+
+## 2022-05-27t23:30:00
+Tidied plot
+added table
+single callback to load data that then feeds both table and plot
+
+## 2022-05-27t11:03:10
+set up validation of the JSON data
+https://python.plainenglish.io/data-validation-building-data-validating-classes-with-pydantic-8ee4a023f26d
+
+## 2022-05-26t10:23:37
+setting up for integration tests with playwright
+no conda builder for arm64 architecture so using pip within environment.yml
+suboptimal but :shrug:
+
+
+## 2022-05-25 18:40:44
+made generic the names of the functions in main.py
+this works better for a standalone app that serves 'result'
+the only thing that changes then is the content of the query
+
+## 2022-05-25 07:50:50
+played with great expectations
+the command line interface and the jupyter notebook style is nice
+going to leave this on try/ branch for now and come back later
+expecations are more mature for pandas than for sqlalchemy
+and this is likely to be important when dealing with data types in sqlite (e.g. dob is text)
+also need to work out how to manage relative imports when specifying the data source
+
+## 2022-05-24 22:41:01
+Suite of tools to make mock data now all in one file
+Changed the name of the SQLModel to the generic Results
+Next step
+- use these mock functions in conftest.py to help build the fixtures for testing
+
+## 2022-05-22 15:11:08
+basic pytest work
+added smoke markers
+now need to work out how to insert mock data or ?use the dev environment variable to load the mock data??
+the latter might be more appropriate for running integreation tests in the production environment??
+that is have some tests tha check bits of code and need fake data
+and some tests that check the app is working properly
+
+
+for data pipeline tests then maybe better provide a fixture that serves the same data that your API will do
+then those functions can start with that?
+
+## 2022-05-20t19:18:53
+TODO: add a postgres docker service and load with test data
+then will need an environment variable to indicate in docker
+?moving toward a triple set-up prod/docker/local dev
+simpler to just move your mock data within src
+done!
+works!
+
+## 2022-05-20t12:20:22
+reconfigured imports and updated python path for pytest so that works in both docker and pytest
+
+## 2022-05-19t22:51:46
+
+working on testing
+https://sqlmodel.tiangolo.com/tutorial/fastapi/tests/
+aim is to be able to use the synth data to mock for tests and development
+
+pyproject files stand in for pip etc.
+see https://stackoverflow.com/a/65162874/992999
+
+```sh
+python -m pip install . # would use pyproject
+````
+
+
+## 2022-05-19 19:46:07
+
+
+Nice! Command that updates/syncs your conda environment to the yaml file
+https://stackoverflow.com/questions/42352841/how-to-update-an-existing-conda-environment-with-a-yml-file
+
+
+```sh
+conda env update --file dev/steve/environment-short.yml --prune
+```
+
+## 2022-05-19 13:39:25
+spent the morning getting sdv to work
+seems to be good with some fiddling
+done lots of re-organising and written some docs
+
+
+## 2022-05-18t18:25:53
+giving up on pip etc.
+back to conda
+working on a clean conda file
+
+initial install
+```sh
+conda env create --file=./HyUi/dev/steve/environment-short.yml
+```
+
+updating
+```sh
+conda env update --file dev/steve/environment-short.yml
+```
+
+## 2022-05-18t17:01:05
+
+1. Make synthetic version of the data
+2. Work on my own machine rather than the disaster that is the DS desktop
+3. Write some tests and quality control
+4. Update the plot to run live
+5. Allow inspection over the last months
+6. Split by specialty
+
+Problems with conda environment so rebuilt from yaml
+Redoing conda environment
+Don't forget to fix the sublime project file references
+Don't forget to update `.envrc` as that will activate hyuiv2
+Requirements files found in `./`, `./src/api`, `./src/dash`, and `.dev/steve`
+
+
+```sh
+conda create --name hyuiv3 python=3.9
+pip install -r requirements.txt
+pip install -r src/api/requirements.txt
+pip install -r src/dash/requirements.txt
+pip install -r dev/steve/requirements.txt
+```
+
+didn't use conda install this time, didn't seem to want to behave?
+tried to use just pip but choked as usual on scipy
+tried this suggestion https://github.com/scipy/scipy/issues/13409#issuecomment-1021057368
+```sh
+brew install openblas
+export OPENBLAS=$(/opt/homebrew/bin/brew --prefix openblas)
+export CFLAGS="-falign-functions=8 ${CFLAGS}"
+pip3 install scipy
+```
+It worked! Until we hit problems with llvmlite
+then https://stackoverflow.com/a/71249307
+which took forever ...
+and made me wonder whether I should have just stayed with conda
+I think the command below forces an upgrade / install of the entire brew environment
+```sh
+arch -arm64 brew install llvm@11
+LLVM_CONFIG="/opt/homebrew/Cellar/llvm@11/11.1.0_4/bin/llvm-config" arch -arm64 pip install llvmlite
+```
+
+
+
+
+
+
+
+
+## 2022-05-17t23:20:31
+docker network now behaves b/c inserted NO_PROXY env variable
+
+
 ## 2022-05-16t17:38:00
 working locally
 aim is to tidy this repo up so that it can be used to template up a local app
-general tidying up and readme added at each folder level
-requirements split into separate files for each component
 
 ## 2022-05-15 11:16
 load .secrets and .env via docker-compose

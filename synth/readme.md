@@ -23,7 +23,7 @@ fields = {
         'format': '%Y-%m-%d',
         'pii': True,
         # the 'pii_category' key defines the Faker function name (method)
-        'pii_category': "date_of_birth", 
+        'pii_category': "date_of_birth",
     },
     'admission_age_years': {
         'type': 'numerical',

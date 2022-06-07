@@ -14,7 +14,7 @@ include .secrets
 	build
 
 ## build docker image (uses Dockerfile)
-build: 
+build:
 	docker build \
 		--build-arg HTTP_PROXY \
 		--build-arg HTTPS_PROXY \

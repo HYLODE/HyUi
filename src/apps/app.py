@@ -25,9 +25,8 @@ app.layout = html.Div(
     [dcc.Location(id="url", refresh=False), html.Div(id="page-content")]
 )
 
-@callback(
-    Output("page-content", "children"),
-    Input("url", "pathname"))
+
+@callback(Output("page-content", "children"), Input("url", "pathname"))
 def display_page(pathname):
     if pathname == "/":
         return landing
@@ -36,8 +35,6 @@ def display_page(pathname):
     else:
         # TODO proper 404  route
         return "404"
-
-
 
 
 if __name__ == "__main__":

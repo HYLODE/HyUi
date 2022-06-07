@@ -44,7 +44,7 @@ def make_mock_df(f: Path) -> pd.DataFrame:
     return df
 
 
-def create_mock_table(engine, model: SQLModel , drop=False):
+def create_mock_table(engine, model: SQLModel, drop=False):
     # metadata is defined when you run the import statement above
     table = model.__table__
     if drop:
@@ -83,11 +83,15 @@ if __name__ == "__main__":
     engine = make_engine(echo=True)
     for route in settings.routes:
         try:
-            Results = getattr(importlib.import_module(gen_module_path(route)), route.title())
+            Results = getattr(
+                importlib.import_module(gen_module_path(route)), route.title()
+            )
             SYNTH_HDF_FILE = Path(__file__).parents[1] / "api" / route / "mock.h5"
             df = make_mock_df(SYNTH_HDF_FILE)
             create_mock_table(engine, Results, drop=True)
             insert_into_mock_table(engine, df, Results)
         except Exception as e:
             print(e)
-            import sys; sys.exit(1)
+            import sys
+
+            sys.exit(1)

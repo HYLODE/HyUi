@@ -19,7 +19,7 @@ COPY ./api/requirements.txt .
 RUN pip install --no-cache -r requirements.txt
 
 # loading environment variables into docker image
-# is managed at the docker-compose level 
+# is managed at the docker-compose level
 
 # add app from local api directory to WORKDIR (above)
 

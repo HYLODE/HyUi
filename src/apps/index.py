@@ -8,7 +8,7 @@ import dash_bootstrap_components as dbc
 REFRESH_INTERVAL = 5 * 60 * 1000  # milliseconds
 
 landing_notes = dcc.Markdown(
-"""
+    """
 ### Welcome to the UCLH critical care sitrep and bed management tool
 
 Here's what we're working on!
@@ -75,5 +75,3 @@ home_page = dbc.Container(
         # dash_stores,
     ],
 )
-
-

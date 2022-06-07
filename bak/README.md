@@ -18,10 +18,10 @@ touch .env
 
 ### Setting up environment for PyCharm on Mac M1
 
-Using conda and miniforge on mac m1 else problems with scipy etc. 
+Using conda and miniforge on mac m1 else problems with scipy etc.
 
 ```shell
-conda create --name hyui python=3.10 
+conda create --name hyui python=3.10
 conda activate hyui
 conda install pyscopg2 # pip fails b/c of c compiler
 conda install scipy # pip fails b/c of c compiler
@@ -35,11 +35,11 @@ pip3 install -r requirements.txt
 - [ ] mwe dash in docker tested on GAE
 - [X] GitHub Actions
 
-## Setting up Dash testing 
+## Setting up Dash testing
 - Used example from https://stackoverflow.com/q/69255703
 - https://dash.plotly.com/testing
- 
- 
+
+
 The following may be useful for the CI/CD step
 - https://blog.streamlit.io/testing-streamlit-apps-using-seleniumbase/
 

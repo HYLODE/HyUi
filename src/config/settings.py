@@ -23,7 +23,6 @@ class Settings(BaseSettings):
     DB_POSTGRES_SCHEMA = "star"
     BACKEND_URL: Optional[str]
 
-
     class ModuleName(str, Enum):
         consults = "consults"
         # results = "results"
