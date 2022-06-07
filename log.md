@@ -1,5 +1,19 @@
 # Running notes log
 
+
+## 2022-06-07t10:52:57 
+trying to setup multipage app
+but layout not built correctly _unless_ you start the app directly
+e.g.
+python index.py is OK
+but
+python apps/index.py is not OK
+so perhaps something is missing from the pythonpath
+and this means that your whole structure will fall apart since you assume that you're working from ./src
+but now you have to work from ./src/apps
+but this is odd b/c it worked ok for dashRep
+@RESUME: https://stackoverflow.com/questions/59903698/multi-page-dash-app-callbacks-not-registering
+
 ## 2022-06-06t23:29:29 
 produced fake data as per sitrep
 been back through the SDV documentation and worked out how to force 'faking' for PII

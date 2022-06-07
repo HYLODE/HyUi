@@ -18,6 +18,32 @@ Here's what we're working on!
 """
 )
 
+header = dbc.Container(
+    dbc.Row(
+        [
+            # dbc.Col([
+            #             html.I(className="fa fa-lungs-virus"),
+            #             ], md=1),
+            dbc.Col(
+                [
+                    dbc.NavbarSimple(
+                        children=[
+                            dbc.NavItem(dbc.NavLink("CONSULTS", href="/consults")),
+                        ],
+                        brand="UCLH Critical Care Sitrep",
+                        brand_href="/",
+                        brand_external_link=True,
+                        color="primary",
+                        dark=True,
+                        sticky=True,
+                    ),
+                ]
+            ),
+        ]
+    ),
+    fluid=True,
+)
+
 
 main = dbc.Container(
     [
@@ -41,24 +67,25 @@ main = dbc.Container(
 )
 
 # use this to store dash components that you don't need to 'see'
-dash_stores = html.Div(
-    [
-        # update and refresh
-        dcc.Interval(
-            id="landing-interval-data", interval=REFRESH_INTERVAL, n_intervals=0
-        ),
-        # use this to source-data
-        dcc.Store(id="landing-source-data"),
-    ]
-)
+# dash_stores = html.Div(
+#     [
+#         # update and refresh
+#         dcc.Interval(
+#             id="landing-interval-data", interval=REFRESH_INTERVAL, n_intervals=0
+#         ),
+#         # use this to source-data
+#         dcc.Store(id="landing-source-data"),
+#     ]
+# )
 
 # """Principal layout for landing page"""
 landing = dbc.Container(
     fluid=True,
     className="dbc",
     children=[
+        header,
         main,
-        dash_stores,
+        # dash_stores,
     ],
 )
 
