@@ -1,5 +1,5 @@
 # pull official base image
-FROM python:3.9-slim-buster
+FROM python:3.9.9-slim-bullseye
 
 # set working directory
 WORKDIR /usr/src
@@ -16,7 +16,7 @@ RUN apt-get update \
 # install python dependencies
 RUN pip install --upgrade pip
 COPY ./apps/requirements.txt .
-RUN pip install -r requirements.txt
+RUN pip install --no-cache -r requirements.txt
 
 # loading environment variables into docker image
 # is managed at the docker-compose level 
