@@ -1,5 +1,7 @@
-# Run this app with `python app.py` and
-# visit http://127.0.0.1:8095/ in your web browser.
+# src/apps/consults/consults.py
+"""
+sub-application for consults
+"""
 
 import plotly.express as px
 
@@ -11,19 +13,11 @@ from config.settings import settings
 from api.consults import ConsultsRead
 from utils.dash import get_results_response, df_from_store
 
+from apps.app import app
+
 REFRESH_INTERVAL = 5 * 60 * 1000  # milliseconds
 API_URL = f"{settings.BACKEND_URL}/consults/"
 
-app = Dash(
-    __name__,
-    title="HyUi",
-    update_title=None,
-    external_stylesheets=[
-        dbc.themes.FLATLY,
-        dbc.icons.FONT_AWESOME,
-    ],
-    suppress_callback_exceptions=True,
-)
 
 
 @app.callback(
@@ -57,7 +51,7 @@ def filter_data(val: str, data: dict) -> dict:
     Output("fig_consults", "children"),
     Input("filtered_data", "modified_timestamp"),
     State("filtered_data", "data"),
-    prevent_initial_call=True,
+    # prevent_initial_call=True,
 )
 def gen_consults_over_time(n_intervals: int, data: dict):
     """
@@ -139,6 +133,12 @@ card_table = dbc.Card(
     ]
 )
 
+main = html.Div([
+    card_fig,
+    card_table,
+    ])
+
+
 dash_only = html.Div(
     [
         dcc.Interval(id="query-interval", interval=REFRESH_INTERVAL, n_intervals=0),
@@ -147,15 +147,12 @@ dash_only = html.Div(
     ]
 )
 
-
-app.layout = dbc.Container(
+consults = dbc.Container(
     fluid=True,
+    className="dbc",
     children=[
-        card_fig,
-        card_table,
+        main,
         dash_only,
     ],
 )
 
-if __name__ == "__main__":
-    app.run_server(debug=True, host="0.0.0.0", port=8095)
