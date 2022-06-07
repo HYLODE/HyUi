@@ -9,11 +9,11 @@ from typing import List
 from fastapi import Depends, FastAPI
 from sqlmodel import Session, create_engine
 
-from config.settings import settings
-from utils import gen_module_path
+from config.settings import settings  # type: ignore
+from utils import gen_module_path  # type: ignore
 
 MODULE_ROOT = settings.MODULE_ROOT
-routes = settings.routes
+ROUTES = settings.ROUTES
 
 
 def get_session():
@@ -37,6 +37,11 @@ def prepare_query(module: str, env: str = settings.ENV) -> str:
 
 
 def read_factory(module: str):
+    """
+    Each path returns data as per the Pydantic/SQLModel specificaton in the submodule
+    This function generates that path automatically from the names of the modules
+    i.e. assumes that the path 'consults' will be served from the ./src/api/consults module
+    """
     module_path = gen_module_path(module)
     ModuleRead = f"{module.title()}Read"
     try:
@@ -75,6 +80,6 @@ async def pong():
     return {"ping": "hyui pong!"}
 
 
-# Dynamically generate routes based on modules
-for route in routes:
+# Dynamically generate ROUTES based on modules
+for route in ROUTES:
     read_factory(route)

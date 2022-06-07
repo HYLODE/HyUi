@@ -4,6 +4,7 @@ Generates sqlite database with a table holding modelled as per
 api.models.Results and then loads the data from the local HDF file
 """
 
+import sys
 import importlib
 import pandas as pd
 import sqlalchemy as sa
@@ -11,8 +12,8 @@ from pathlib import Path
 from sqlmodel import Session, SQLModel, create_engine
 from sqlmodel.pool import StaticPool
 
-from config.settings import settings
-from utils import gen_module_path
+from config.settings import settings  # type: ignore
+from utils import gen_module_path  # type: ignore
 
 # you can use this function in testing but swap in an in memory version
 SYNTH_SQLITE_FILE = Path(__file__).parent / "mock.db"
@@ -41,12 +42,12 @@ def make_mock_df(f: Path) -> pd.DataFrame:
         raise AssertionError(e)
 
     df = pd.read_hdf(f)
-    return df
+    return df  # type: ignore
 
 
 def create_mock_table(engine, model: SQLModel, drop=False):
     # metadata is defined when you run the import statement above
-    table = model.__table__
+    table = model.__table__  # type: ignore
     if drop:
         SQLModel.metadata.drop_all(engine, tables=[table])
     # force it fail if drop not issued
@@ -62,36 +63,41 @@ def insert_into_mock_table(engine, df: pd.DataFrame, model: SQLModel):
     rows = df.to_dict(orient="records")
     with Session(engine) as session:
         for row in rows:
-            session.add(model(**row))
+            session.add(model(**row))  # type: ignore
         session.commit()
     return 0
 
 
-def make_mock_db_in_memory():
+def make_mock_db_in_memory(model: SQLModel, f: Path, df: pd.DataFrame):
+    """
+    Use SQLModel to create a temporary db in memory for testing etc
+    Convenience function that wraps others
+    """
     engine = make_engine(
         path=SYNTH_SQLITE_MEM,
         connect_args={"check_same_thread": False},
         poolclass=StaticPool,
     )
-    df = make_mock_df(SYNTH_HDF_FILE)
-    create_mock_table(engine, Results)
-    insert_into_mock_table(engine, df, Results)
+    df = make_mock_df(f)
+    create_mock_table(engine, model)
+    insert_into_mock_table(engine, df, model)
     return engine
+
+
+def path_to_hdf_file(route: str):
+    """Prep path to file based on route"""
+    return Path(__file__).parents[1] / "api" / route / "mock.h5"
 
 
 if __name__ == "__main__":
     engine = make_engine(echo=True)
-    for route in settings.routes:
+    for route in settings.ROUTES:
         try:
-            Results = getattr(
-                importlib.import_module(gen_module_path(route)), route.title()
-            )
-            SYNTH_HDF_FILE = Path(__file__).parents[1] / "api" / route / "mock.h5"
-            df = make_mock_df(SYNTH_HDF_FILE)
-            create_mock_table(engine, Results, drop=True)
-            insert_into_mock_table(engine, df, Results)
+            model = getattr(importlib.import_module(gen_module_path(route)), route.title())  # noqa
+            hdf_file = path_to_hdf_file(route)
+            df = make_mock_df(hdf_file)
+            create_mock_table(engine, model, drop=True)
+            insert_into_mock_table(engine, df, model)
         except Exception as e:
             print(e)
-            import sys
-
             sys.exit(1)

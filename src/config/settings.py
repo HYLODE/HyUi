@@ -24,11 +24,16 @@ class Settings(BaseSettings):
     BACKEND_URL: Optional[str]
 
     class ModuleName(str, Enum):
+        """
+        Class that defines routes
+        """
+
         consults = "consults"
+        sitrep = "sitrep"
         # results = "results"
 
     MODULE_ROOT: str = "api"
-    routes = ModuleName._member_names_
+    ROUTES = ModuleName._member_names_
 
     @validator("ENV", pre=True)
     def environment_choice_is_valid(cls, v):
