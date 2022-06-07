@@ -6,7 +6,10 @@
                 "__pycache__",
                 ".pytest_cache",
             ],
-        }
+        },
+        {
+			"path": ".git"
+		},
     ],
     "settings": {
         "PyTest": {
@@ -22,12 +25,12 @@
                     "enabled": true,
                     "command": [
                         "/opt/homebrew/Caskroom/miniforge/base/envs/hyuiv4/bin/pylsp",
-                    ],
+                ],
                     "settings": {
                         "pylsp.plugins.flake8.executable": "/opt/homebrew/Caskroom/miniforge/base/envs/hyuiv4/bin/flake8",
                     },
                 },
-            }
+            },
         },
         "build_systems": [
             {
@@ -42,11 +45,11 @@
                     "\"PYTHONPATH=src:${PYTHONPATH}\" /opt/homebrew/Caskroom/miniforge/base/envs/hyuiv4/bin/python",
                     "-u",
                     "$file"
-                ],
+            ],
                 "file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
                 "selector": "source.python",
             }
-        ],
+    ],
         // https://github.com/daveleroy/sublime_debugger
         "debugger_configurations": [
             {
@@ -57,5 +60,5 @@
                 "console": "externalTerminal",
                 "python": "/opt/homebrew/Caskroom/miniforge/base/envs/hyuiv4/bin/python",
             },
-        ],
+    ],
     }

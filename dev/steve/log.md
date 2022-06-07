@@ -8,6 +8,19 @@ now need to work on CI
 see advice on best docker builds for python here
 https://pythonspeed.com/articles/alpine-docker-python/
 
+
+why aren't my pre-commit checks working
+https://pre-commit.com
+but this works
+```
+pre-commit run --all-files
+```
+
+You need to install the pre-commit file
+```sh
+pre-commit install
+```
+
 ## 2022-06-07t10:52:57
 trying to setup multipage app
 but layout not built correctly _unless_ you start the app directly
