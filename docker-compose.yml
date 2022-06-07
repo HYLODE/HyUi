@@ -51,9 +51,9 @@ services:
     # TODO: this entry point command will run the app in debug mode
     #       should convert to uvicorn or similar server
     # TODO: convert to single landing page for all apps
-    command: python apps/consults/index.py
+    command: python apps/app.py
     volumes:
-      - ./src/apps:/usr/src/dash
+      - ./src/apps:/usr/src/apps
       - ./src/config:/usr/src/config
       - ./src/utils:/usr/src/utils
       - ./src/mock:/usr/src/mock

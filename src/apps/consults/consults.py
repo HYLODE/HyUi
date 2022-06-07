@@ -6,6 +6,7 @@ sub-application for consults
 import plotly.express as px
 
 from dash import Dash, html, dcc, Input, Output, State
+from dash import callback
 from dash import dash_table as dt
 import dash_bootstrap_components as dbc
 
@@ -13,14 +14,13 @@ from config.settings import settings
 from api.consults import ConsultsRead
 from utils.dash import get_results_response, df_from_store
 
-from apps.app import app
 
 REFRESH_INTERVAL = 5 * 60 * 1000  # milliseconds
 API_URL = f"{settings.BACKEND_URL}/consults/"
 
 
 
-@app.callback(
+@callback(
     Output("request_data", "data"),
     Input("query-interval", "n_intervals"),
 )
@@ -31,7 +31,7 @@ def store_data(n_intervals: int) -> dict:
     data = get_results_response(API_URL)
     return data
 
-@app.callback(
+@callback(
     Output("filtered_data", "data"),
     Input("department_picker", "value"),
     State("request_data", "data"),
@@ -47,7 +47,7 @@ def filter_data(val: str, data: dict) -> dict:
         return data
 
 
-@app.callback(
+@callback(
     Output("fig_consults", "children"),
     Input("filtered_data", "modified_timestamp"),
     State("filtered_data", "data"),
@@ -68,7 +68,7 @@ def gen_consults_over_time(n_intervals: int, data: dict):
     return dcc.Graph(id="consults_fig", figure=fig)
 
 
-@app.callback(
+@callback(
     Output("table_consults", "children"),
     Input("filtered_data", "modified_timestamp"),
     State("filtered_data", "data"),
@@ -95,7 +95,7 @@ def gen_table_consults(modified: int, data: dict):
         )
     ]
 
-@app.callback(
+@callback(
     Output("department_picker", "options"),
     Input("request_data", "data"),
     )

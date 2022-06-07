@@ -1,29 +1,79 @@
 """
-Principle application file
-https://dash.plotly.com/urls
+Menu and landing page
 """
-from dash import Input, Output, dcc, html
+from dash import dcc, html
+import dash_bootstrap_components as dbc
 
-from landing import landing
-from consults.consults import consults
 
-from app import app
+REFRESH_INTERVAL = 5 * 60 * 1000  # milliseconds
 
-app.layout = html.Div(
-    [dcc.Location(id="url", refresh=False), html.Div(id="page-content")]
+landing_notes = dcc.Markdown(
+"""
+### Welcome to the UCLH critical care sitrep and bed management tool
+
+Here's what we're working on!
+
+"""
+)
+
+header = dbc.Container(
+    dbc.Row(
+        [
+            # dbc.Col([
+            #             html.I(className="fa fa-lungs-virus"),
+            #             ], md=1),
+            dbc.Col(
+                [
+                    dbc.NavbarSimple(
+                        children=[
+                            dbc.NavItem(dbc.NavLink("CONSULTS", href="/consults")),
+                        ],
+                        brand="UCLH Critical Care Sitrep",
+                        brand_href="/",
+                        brand_external_link=True,
+                        color="primary",
+                        dark=True,
+                        sticky=True,
+                    ),
+                ]
+            ),
+        ]
+    ),
+    fluid=True,
 )
 
 
-@app.callback(Output("page-content", "children"), Input("url", "pathname"))
-def display_page(pathname):
-    if pathname == "/":
-        return landing
-    elif pathname == "/consults":
-        return consults
-    else:
-        # TODO proper 404  route
-        return "404"
+main = dbc.Container(
+    [
+        # All content here organised as per bootstrap
+        dbc.Row(
+            dbc.Col(
+                dbc.Card(
+                    [
+                        dbc.CardHeader(html.H6("HyperLocal Bed Demand Forecasts")),
+                        dbc.CardBody(html.Div([landing_notes])),
+                    ],
+                ),
+                md=12,
+            ),
+        ),
+        # dbc.Row([
+        #     html.Img(src=app.get_asset_url('hylode-project-plan.png'))
+        #     ]),
+    ],
+    fluid=True,
+)
 
 
-if __name__ == "__main__":
-    app.run_server(host="0.0.0.0", port=8095, debug=True)
+# """Principal layout for landing page"""
+home_page = dbc.Container(
+    fluid=True,
+    className="dbc",
+    children=[
+        header,
+        main,
+        # dash_stores,
+    ],
+)
+
+
