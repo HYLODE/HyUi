@@ -30,8 +30,8 @@ services:
       - https_proxy
       - HTTP_PROXY
       - HTTPS_PROXY
-      - NO_PROXY=dash
-      - no_proxy=dash
+      - NO_PROXY=apps
+      - no_proxy=apps
       - SERVICES=DOCKER
     env_file:
       - .env
@@ -39,10 +39,10 @@ services:
 
   # Dash (Plotly) docker image / web app that visualises results
   # reads data via requests from api app
-  app:
+  apps:
     build:
       context: ./src
-      dockerfile: Dockerfile.app
+      dockerfile: Dockerfile.apps
       args:
         - http_proxy
         - https_proxy
@@ -50,9 +50,10 @@ services:
         - HTTPS_PROXY
     # TODO: this entry point command will run the app in debug mode
     #       should convert to uvicorn or similar server
-    command: python app/consults/index.py
+    # TODO: convert to single landing page for all apps
+    command: python apps/consults/index.py
     volumes:
-      - ./src/app:/usr/src/app
+      - ./src/apps:/usr/src/dash
       - ./src/config:/usr/src/config
       - ./src/utils:/usr/src/utils
       - ./src/mock:/usr/src/mock

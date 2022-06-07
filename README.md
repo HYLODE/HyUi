@@ -1,14 +1,15 @@
 # `hyui`
 
-User interface for the HYLODE project[This project structure is based on the
-`govcookiecutter` template project][govcookiecutter] but is adapted to work
-with applications rather than just data science workflows. A template
-application would be split into a frontend and a backend with communication
-between the two via HTTP, and the project orchestrated by docker-compose.
+User interface for the HYLODE project Much of the project structure is based
+on the[`govcookiecutter` template project][govcookiecutter] but is adapted
+for the development of Plotly Dash apps within a hospital environment. A
+template application would be split into a frontend and a backend with
+communication between the two via HTTP, and the project orchestrated by
+docker-compose.
 
 This file (`./readme.md`) is at the root of the project, but the application
-code including the backend is in `./src/api`, and the application itself is
-kept in `./src/app`. An annotated figure of the directory structure is shown
+code including the backend is in `./src/api/app1`, and the application itself is
+kept in `./src/apps/app1`. An annotated figure of the directory structure is shown
 below.
 
 ## First run
@@ -46,7 +47,7 @@ pytest tests/smoke
 
 #### Local development without docker
 
-Backend
+Backend (all routes)
 
 ```sh
 cd ./src
@@ -55,12 +56,14 @@ uvicorn api.main:app --reload --workers 1 --host 0.0.0.0 --port 8094
 
 then navigate to [http://localhost:8094/docs]() to view the API documentation
 
+... `app/main.py` hosts the various routes for the different apps
 
-Frontend
+
+Frontend (per app)
 
 ```sh
 cd ./src
-python app/index.py
+python apps/app1/index.py
 ```
 
 

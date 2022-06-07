@@ -15,7 +15,7 @@ RUN apt-get update \
 
 # install python dependencies
 RUN pip install --upgrade pip
-COPY ./app/requirements.txt .
+COPY ./apps/requirements.txt .
 RUN pip install -r requirements.txt
 
 # loading environment variables into docker image
