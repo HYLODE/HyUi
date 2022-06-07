@@ -7,16 +7,18 @@ the module.classname can be reliably used for access
 """
 
 from datetime import date, datetime
-from typing import Optional
 from pathlib import Path
+from typing import Optional
+
+import arrow
 from pydantic import validator
 from sqlmodel import Field, SQLModel
-import arrow
 
-from config.settings import settings
+from config.settings import settings  # type: ignore
 
 QUERY_LIVE_PATH = Path(__file__).resolve().parent / "live.sql"
 QUERY_MOCK_PATH = Path(__file__).resolve().parent / "mock.sql"
+
 
 # define the data model that you're expecting from your query
 class ConsultsBase(SQLModel):

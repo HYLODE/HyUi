@@ -5,7 +5,7 @@ import pandas as pd
 from typing import Optional
 from sqlmodel import Field, SQLModel, create_engine, Session, select
 from mock import mock
-from api.models import Results
+from api.consults import Consults
 
 
 @pytest.mark.smoke
@@ -31,7 +31,7 @@ def test_mock_constants():
 
 
 def test_make_mock_df():
-    df = mock.make_mock_df()
+    df = mock.make_mock_df(mock.SYNTH_HDF_FILE)
     assert isinstance(df, pd.DataFrame)
     assert df.empty is False
 
