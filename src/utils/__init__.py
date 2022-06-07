@@ -17,6 +17,6 @@ def get_model_from_route(route: str, subclass: str = None):
     if subclass:
         subclass = subclass.title()
         route_title_case = f"{route_title_case}{subclass}"
-    route_path = gen_module_path(route.lower())
-    model = getattr(import_module(route_path), route_title_case)  # noqa
+    model_path = gen_module_path(route.lower()) + ".model"
+    model = getattr(import_module(model_path), route_title_case)  # noqa
     return model

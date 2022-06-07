@@ -1,5 +1,16 @@
 # Running notes log
 
+## 2022-06-08t00:12:22
+more than one route now works with different models
+not checked this before as only ever had one model
+not sure why the factory approach didn't work
+
+found this when looking for fastapi factory
+no good for problem above but the structure here looks useful
+https://github.com/rednafi/fastapi-nano
+and this
+https://github.com/gaganpreet/fastapi-starter
+
 ## 2022-06-07t18:00:44
 pinned requirements files
 updated docker to bullseye
