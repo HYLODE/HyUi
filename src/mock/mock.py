@@ -22,9 +22,21 @@ SYNTH_SQLITE_MEM = "sqlite://"
 ECHO = False
 
 
+def path_to_hdf_file(route: str):
+    """Prep path to file based on route"""
+    return Path(__file__).parents[1] / "api" / route / "mock.h5"
+
+
 def make_engine(path=SYNTH_SQLITE_URL, **kwargs):
     engine = create_engine(path, **kwargs)
     return engine
+
+
+def get_model_from_route(route: str):
+    route_title_case = route.title()
+    route_path = gen_module_path(route)
+    model = getattr(importlib.import_module(route_path), route_title_case)  # noqa
+    return model
 
 
 def make_mock_df(f: Path) -> pd.DataFrame:
@@ -68,32 +80,30 @@ def insert_into_mock_table(engine, df: pd.DataFrame, model: SQLModel):
     return 0
 
 
-def make_mock_db_in_memory(model: SQLModel, f: Path, df: pd.DataFrame):
+def make_mock_db_in_memory(route: str):
     """
     Use SQLModel to create a temporary db in memory for testing etc
     Convenience function that wraps others
+    Uses route to define the HDF data file and the SQL model
     """
     engine = make_engine(
         path=SYNTH_SQLITE_MEM,
         connect_args={"check_same_thread": False},
         poolclass=StaticPool,
     )
-    df = make_mock_df(f)
-    create_mock_table(engine, model)
+    model = get_model_from_route(route)
+    hdf_file = path_to_hdf_file(route)
+    df = make_mock_df(hdf_file)
+    create_mock_table(engine, model, drop=True)
     insert_into_mock_table(engine, df, model)
     return engine
-
-
-def path_to_hdf_file(route: str):
-    """Prep path to file based on route"""
-    return Path(__file__).parents[1] / "api" / route / "mock.h5"
 
 
 if __name__ == "__main__":
     engine = make_engine(echo=True)
     for route in settings.ROUTES:
         try:
-            model = getattr(importlib.import_module(gen_module_path(route)), route.title())  # noqa
+            model = get_model_from_route(route)
             hdf_file = path_to_hdf_file(route)
             df = make_mock_df(hdf_file)
             create_mock_table(engine, model, drop=True)

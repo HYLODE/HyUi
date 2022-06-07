@@ -5,22 +5,17 @@ import pandas as pd
 from typing import Optional
 from sqlmodel import Field, SQLModel, create_engine, Session, select
 from mock import mock
-from api.consults import Consults
 
 
 @pytest.mark.smoke
 def test_mock_data_exists():
-    """Confirm HDF file with mock data exists"""
-    f = Path(os.getenv("DIR_SRC")) / "mock" / "mock.h5"
+    """Confirm SQLite DB file with mock data exists"""
+    f = Path(os.getenv("DIR_SRC")) / "mock" / "mock.db"
     assert f.is_file()
 
 
 def test_mock_constants():
     """Confirm global constants built"""
-
-    assert mock.SYNTH_HDF_FILE is not None
-    assert isinstance(mock.SYNTH_HDF_FILE, Path)
-    assert mock.SYNTH_HDF_FILE.is_file()
 
     assert mock.SYNTH_SQLITE_FILE is not None
     assert isinstance(mock.SYNTH_SQLITE_FILE, Path)
@@ -28,12 +23,6 @@ def test_mock_constants():
 
     assert isinstance(mock.SYNTH_SQLITE_URL, str)
     assert isinstance(mock.SYNTH_SQLITE_MEM, str)
-
-
-def test_make_mock_df():
-    df = mock.make_mock_df(mock.SYNTH_HDF_FILE)
-    assert isinstance(df, pd.DataFrame)
-    assert df.empty is False
 
 
 def test_make_mock_df_nofile():
@@ -68,19 +57,20 @@ def test_insert_into_mock_table():
         )
     )
 
-    class Foo(SQLModel, table=True):
+    class FooBar(SQLModel, table=True):
         id: Optional[int] = Field(default=None, primary_key=True)
         spam: str
         eggs: int
 
     SQLModel.metadata.create_all(engine)
-    status = mock.insert_into_mock_table(engine, df, Foo)
+    status = mock.insert_into_mock_table(engine, df, FooBar)
     assert status == 0
 
 
-def test_make_mock_db_in_memory():
-    engine = mock.make_mock_db_in_memory()
+def test_make_mock_db_in_memory(route: str = "sitrep"):
+    engine = mock.make_mock_db_in_memory(route)
+    model = mock.get_model_from_route(route)
     with Session(engine) as session:
-        results = session.exec(select(Results))
+        results = session.exec(select(model))
         result = results.first()
     assert isinstance(result, SQLModel)

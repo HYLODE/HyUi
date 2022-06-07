@@ -2,8 +2,7 @@
 # for sharing fixtures between files
 import pytest
 
-# from pathlib import Path
-# from collections import namedtuple
+import pandas as pd
 from fastapi.testclient import TestClient
 from sqlmodel import Session
 
@@ -41,3 +40,14 @@ def mock_env_uds_vars(monkeypatch):
     monkeypatch.setenv("UDS_USER", "BigBird")
     monkeypatch.setenv("UDS_PWD", "Sesame")
     monkeypatch.setenv("UDS_HOST", "172.16.149.132")
+
+
+@pytest.fixture(scope="session")
+def mock_minimal_df():
+    data = dict(
+        id=[1, 2, 3],
+        age=[21, 31, 41],
+        initials=["JJ", "KK", "LL"],
+    )
+    df = pd.DataFrame(data)
+    return df
