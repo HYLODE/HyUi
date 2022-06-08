@@ -8,7 +8,7 @@ from sqlmodel import Session
 
 # this next step in turn runs api.models as an import
 from api.main import app, get_session
-from mock.mock import make_mock_db_in_memory
+from mock.mock import make_mock_db_in_memory, make_mock_df, path_to_hdf_file
 
 
 # https://sqlmodel.tiangolo.com/tutorial/fastapi/tests
@@ -17,7 +17,8 @@ from mock.mock import make_mock_db_in_memory
 @pytest.fixture(name="session")
 def session_fixture():
     # NOTE: use the same mock functions for testing as we do for development
-    engine = make_mock_db_in_memory()
+    # NOTE: using sitrep route as the simplest
+    engine = make_mock_db_in_memory("sitrep")
     with Session(engine) as session:
         yield session
 
@@ -50,4 +51,13 @@ def mock_minimal_df():
         initials=["JJ", "KK", "LL"],
     )
     df = pd.DataFrame(data)
+    return df
+
+
+@pytest.fixture(scope="session")
+def mock_df_sitrep():
+    """
+    Use sitrep data as baseline exemplar for testing
+    """
+    df = make_mock_df(path_to_hdf_file("sitrep"))
     return df
