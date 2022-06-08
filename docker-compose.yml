@@ -48,16 +48,13 @@ services:
         - https_proxy
         - HTTP_PROXY
         - HTTPS_PROXY
-    # TODO: this entry point command will run the app in debug mode
-    #       should convert to uvicorn or similar server
-    # TODO: convert to single landing page for all apps
-    command: python apps/app.py
+    command: gunicorn -w 4 --bind 0.0.0.0:8095 apps.app:server
     volumes:
-      - ./src/apps:/usr/src/apps
-      - ./src/config:/usr/src/config
-      - ./src/utils:/usr/src/utils
-      - ./src/mock:/usr/src/mock
-      - ./src/api:/usr/src/api
+      - ./src/apps:/home/hyui/apps
+      - ./src/config:/home/hyui/config
+      - ./src/utils:/home/hyui/utils
+      - ./src/mock:/home/hyui/mock
+      - ./src/api:/home/hyui/api
     ports:
       - "8095:8095"
     environment:
