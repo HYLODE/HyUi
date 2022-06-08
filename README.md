@@ -12,6 +12,21 @@ code including the backend is in `./src/api/app1`, and the application itself is
 kept in `./src/apps/app1`. An annotated figure of the directory structure is shown
 below.
 
+## Quick start (deployment not development)
+
+```sh
+git clone https://github.com/HYLODE/HyUi.git
+cd HyUi
+cp .secrets.example .secrets
+# Now hand edit the .secrets file with usernames/passwords
+pytest # OPTIONAL
+docker-compose up -d --build && docker-composes logs -f
+```
+
+Go to [](http://my-host-name:8094/docs) for the API
+Go to [](http://my-host-name:8095) for the dashboard landing page
+
+
 ## First run
 
 ### Installation

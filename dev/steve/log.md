@@ -1,5 +1,10 @@
 # Running notes log
 
+## 2022-06-08t23:29:33#
+switched to using gunicorn for serving production
+so docker-compose is production only
+and make now provides short cuts to dev versions
+
 ## 2022-06-08t16:50:41
 trying to get github actions to work
 some progress but local development would be preferable

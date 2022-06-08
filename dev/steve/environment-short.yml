@@ -37,4 +37,5 @@ dependencies:
   - uvicorn=0.17.6
   - pip:
       - playwright # microsoft::playwright # not available for macm1
+      - pytest-playwright
 prefix: /opt/homebrew/Caskroom/miniforge/base/envs/hyuiv4
