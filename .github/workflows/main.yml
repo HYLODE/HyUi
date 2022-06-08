@@ -75,6 +75,7 @@ jobs:
           python -m pytest tests/mock
           python -m pytest tests/api
         env:
+          GITHUB_ACTIONS: True
           ENV: dev
           UDS_DB: uds
           UDS_USER: testuser

@@ -900,3 +900,8 @@ docs/_linkcheck/
 
 # Temp and scratch
 *scratch*
+
+
+# managing github actions
+# https://github.com/nektos/act
+.actrc

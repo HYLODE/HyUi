@@ -1,10 +1,11 @@
 # tests/test_smoke_base.py
 # this file should NOT contain any imports from src
 # we are just trying to check the environment is set-up correctly
-import pytest
-import sys
 import os
+import sys
 from pathlib import Path
+
+import pytest
 
 from config.settings import settings
 
@@ -16,6 +17,10 @@ def test_python_version():
 
 
 @pytest.mark.smoke
+@pytest.mark.skipif(
+    os.getenv("GITHUB_ACTIONS", "False") == "True",
+    reason="Skipping test that should not be run by GitHub Actions",
+)
 def test_secrets_file_exists():
     p = Path("./.secrets")
     assert p.is_file()

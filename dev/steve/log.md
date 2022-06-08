@@ -1,5 +1,25 @@
 # Running notes log
 
+## 2022-06-08t16:50:41
+trying to get github actions to work
+some progress but local development would be preferable
+trying this
+https://github.com/nektos/act
+```sh
+cd ./ # project root
+brew install act # first run only
+act -j lint_etc --container-architecture linux/amd64
+```
+- first run choose the medium size config image
+- set up .actrc file to manage local architecture (in .gitignore to avoid it misbehaving on different machines with different architectures)
+
+```sh
+# sample .actrc file at ./.actrc
+--container-architecture linux/amd64
+````
+
+
+
 ## 2022-06-08t00:12:22
 more than one route now works with different models
 not checked this before as only ever had one model
