@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 import pytest
 import pandas as pd
@@ -11,7 +10,7 @@ from utils import get_model_from_route
 @pytest.mark.smoke
 def test_mock_data_exists():
     """Confirm SQLite DB file with mock data exists"""
-    f = Path(os.getenv("DIR_SRC")) / "mock" / "mock.db"
+    f = Path.cwd() / "src" / "mock" / "mock.db"
     assert f.is_file()
 
 
