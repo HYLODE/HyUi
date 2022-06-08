@@ -1,9 +1,9 @@
-fastapi==0.78.0
-sqlmodel==0.0.6
-uvicorn==0.17.6
-tables==3.7.0
-psycopg2-binary==2.9.3
 arrow==1.2.2
-requests==2.27.1
-pandas>=1.1.4
+fastapi==0.78.0
 numpy>=1.22.4
+pandas>=1.1.4
+psycopg2-binary==2.9.3
+requests==2.27.1
+sqlmodel==0.0.6
+tables==3.7.0
+uvicorn==0.17.6

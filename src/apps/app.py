@@ -5,8 +5,8 @@ The application itself
 from dash import Dash, Input, Output, dcc, html, callback
 import dash_bootstrap_components as dbc
 
-from index import home_page
-from consults.consults import consults
+from apps.index import home_page
+from apps.consults.consults import consults
 
 app = Dash(
     __name__,
@@ -18,7 +18,6 @@ app = Dash(
     ],
     suppress_callback_exceptions=True,
 )
-server = app.server
 
 
 app.layout = html.Div(
@@ -37,5 +36,15 @@ def display_page(pathname):
         return "404"
 
 
+# standalone apps : please use ports fastapi 8092 and dash 8093
+# this is the callable object run by gunicorn
+# cd ./src/
+# gunicorn -w 4 --bind 0.0.0.0:8093 apps.app:server
+server = app.server
+
+
+# this is the application run in development
+# cd ./src/
+# python apps/app.py
 if __name__ == "__main__":
     app.run_server(host="0.0.0.0", port=8095, debug=True)

@@ -42,11 +42,21 @@ coverage_html: coverage
 coverage_xml: coverage
 	coverage xml
 
+## Run the local development version of fastapi
+fastapi:
+	cd src
+	uvicorn api.main:app --reload --workers 4 --host 0.0.0.0 --port 8092
+
+## Run the local development version of Plotly Dash
+dash:
+	cd src
+	gunicorn -w 4 --bind 0.0.0.0:8093 apps.app:server
+
 ## Run a JupyterLab instance for local interactive work
 ## this will come with the same packages as the full environment
 ## NB: Use the Jupyter docker image specified in ./synth for sdv
 jupyterlab:
-	jupyter lab --port 8092 --ip 0.0.0.0 --LabApp.token=''
+	jupyter lab --port 8091 --ip 0.0.0.0 --LabApp.token=''
 
 ## Get help on all make commands; referenced from https://github.com/drivendata/cookiecutter-data-science
 help:
