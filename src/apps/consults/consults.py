@@ -3,17 +3,15 @@
 sub-application for consults
 """
 
-import plotly.express as px
-
-from dash import Dash, html, dcc, Input, Output, State
-from dash import callback
-from dash import dash_table as dt
 import dash_bootstrap_components as dbc
+import plotly.express as px
+from dash import Input, Output, State, callback
+from dash import dash_table as dt
+from dash import dcc, html
 
+from api.consults.model import ConsultsRead
 from config.settings import settings
-from api.consults import ConsultsRead
-from utils.dash import get_results_response, df_from_store
-
+from utils.dash import df_from_store, get_results_response
 
 REFRESH_INTERVAL = 5 * 60 * 1000  # milliseconds
 API_URL = f"{settings.BACKEND_URL}/consults/"
@@ -28,7 +26,7 @@ def store_data(n_intervals: int) -> dict:
     Read data from API then store as JSON
     """
     data = get_results_response(API_URL)
-    return data
+    return data  # type: ignore
 
 
 @callback(
@@ -42,7 +40,7 @@ def filter_data(val: str, data: dict) -> dict:
     """
     if val:
         print(val)
-        return [row for row in data if row["dept_name"] == val]
+        return [row for row in data if row["dept_name"] == val]  # type: ignore
     else:
         return data
 
