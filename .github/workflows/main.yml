@@ -71,6 +71,7 @@ jobs:
       # Pytest
       - name: Run pytest
         run: |
+          export GITHUB_ACTIONS=True
           python -m pytest -m smoke
           python -m pytest tests/mock
           python -m pytest tests/api
