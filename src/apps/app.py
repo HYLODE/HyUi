@@ -29,7 +29,7 @@ app.layout = html.Div(
 @callback(Output("page-content", "children"), Input("url", "pathname"))
 def display_page(pathname):
     if pathname == "/":
-        return landing
+        return home_page
     elif pathname == "/consults":
         return consults
     else:
