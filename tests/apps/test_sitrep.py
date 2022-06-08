@@ -2,27 +2,29 @@ from fastapi.testclient import TestClient
 from sqlmodel import Session
 import pandas as pd
 
-from api.models import ResultsRead
-import app.utils as utils
+from src.utils import get_model_from_route
+from src.utils.dash import validate_json, df_from_models
 
 
 def test_request_json_data(session: Session, client: TestClient):
     """
     Checks that the data from the mock API matches the model
     """
-    resp = client.get("/results/")
+    resp = client.get("/results/sitrep")
     assert resp.status_code == 200
-    model_instances = utils.validate_json(resp.json(), ResultsRead)
-    assert isinstance(model_instances[0], ResultsRead)
+    model = get_model_from_route("sitrep", "read")
+    model_instances = validate_json(resp.json(), model)
+    assert isinstance(model_instances[0], model)
 
 
 def test_df_from_models(session: Session, client: TestClient):
     """
     Checks we can generate a Pandas data frame from the requests JSON
     """
-    resp = client.get("/results/")
+    resp = client.get("/results/sitrep")
     assert resp.status_code == 200
-    model_instances = utils.validate_json(resp.json(), ResultsRead)
-    df = utils.df_from_models(model_instances)
+    model = get_model_from_route("sitrep", "read")
+    model_instances = validate_json(resp.json(), model)
+    df = df_from_models(model_instances)
     assert isinstance(df, pd.DataFrame)
     assert df.empty is False

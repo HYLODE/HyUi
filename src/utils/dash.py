@@ -15,7 +15,7 @@ def validate_json(json_list: list[dict[str, str]], model: SQLModel) -> list[SQLM
     """
     Validate list of json formatted strings
     """
-    model_instances = [model(**i) for i in json_list]
+    model_instances = [model(**i) for i in json_list]  # type: ignore
     return model_instances
 
 
@@ -45,6 +45,6 @@ def df_from_store(data: dict, model: SQLModel) -> pd.DataFrame:
     Necessary when using dcc.Store from Plotly Dash
     A convenience function that wraps the separate steps above
     """
-    model_instances = validate_json(data, model)
+    model_instances = validate_json(data, model)  # type: ignore
     df = df_from_models(model_instances)
     return df

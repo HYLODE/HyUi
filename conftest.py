@@ -7,8 +7,12 @@ from fastapi.testclient import TestClient
 from sqlmodel import Session
 
 # this next step in turn runs api.models as an import
-from api.main import app, get_session
-from mock.mock import make_mock_db_in_memory, make_mock_df, path_to_hdf_file
+from api.main import app, get_session  # type: ignore
+from mock.mock import (  # type: ignore
+    make_mock_db_in_memory,
+    make_mock_df,
+    path_to_hdf_file,
+)
 
 
 # https://sqlmodel.tiangolo.com/tutorial/fastapi/tests
