@@ -19,6 +19,7 @@ jobs:
   lint_etc:
     # The type of runner that the job will run on
     runs-on: ubuntu-20.04
+    timeout-minutes: 5
     strategy:
       matrix:
         python-version: [3.9.9]
@@ -73,3 +74,9 @@ jobs:
           python -m pytest -m smoke
           python -m pytest tests/mock
           python -m pytest tests/api
+        env:
+          ENV: dev
+          UDS_DB: uds
+          UDS_USER: testuser
+          UDS_PWD: testpwd
+          UDS_HOST: 123.456.789.000
