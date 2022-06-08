@@ -48,7 +48,7 @@ services:
         - https_proxy
         - HTTP_PROXY
         - HTTPS_PROXY
-    command: gunicorn -w 4 --bind 0.0.0.0:8095 apps.app:server
+    command: gunicorn --bind 0.0.0.0:8095 -w 4 -k gevent --worker-tmp-dir /dev/shm apps.app:server
     volumes:
       - ./src/apps:/home/hyui/apps
       - ./src/config:/home/hyui/config
