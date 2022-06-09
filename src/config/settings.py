@@ -52,6 +52,7 @@ class Settings(BaseSettings):
 
     BASE_URL: Optional[str]
     API_URL: Optional[str]
+    APP_URL: Optional[str]
 
     MODULE_ROOT: str = "api"  # for building paths to modules e.g. ./src/api
     ROUTES = ModuleNames = ModuleNames._member_names_
@@ -109,6 +110,21 @@ class Settings(BaseSettings):
                 return f"{BASE_URL_DOCKER_API}:{PORT_DOCKER_API}"
             else:
                 return f"{BASE_URL_DEV}:{PORT_COMMANDLINE_API}"
+
+    @validator("APP_URL")
+    def assemble_app_url(cls, v: Optional[str], values: Dict[str, Any]) -> str:
+        """
+        :returns:   Base URL for the APP (esp for testing)
+        :rtype:     str
+        """
+        if values.get("ENV") == "prod":
+            return f"{BASE_URL_GAE}:{PORT_DOCKER_APP}"
+
+        if values.get("ENV") == "dev":
+            if values.get("DOCKER") is True:
+                return f"{BASE_URL_DEV}:{PORT_DOCKER_APP}"
+            else:
+                return f"{BASE_URL_DEV}:{PORT_COMMANDLINE_APP}"
 
     class Config:
         case_sensitive = True
