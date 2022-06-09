@@ -23,7 +23,7 @@ def test_get_results_sitrep(session: Session, client: TestClient):
     and that there are data in the database
     """
     # https://sqlmodel.tiangolo.com/tutorial/fastapi/tests/#pytest-fixtures
-    response = client.get("/results/sitrep")
+    response = client.get("/sitrep")
     assert response.status_code == 200
     data = response.json()
     assert len(data) > 0
@@ -38,7 +38,7 @@ def test_get_results_exemplar(session: Session, client: TestClient):
     Uses sitrep only as an example so doesn't check contents just function
     """
     # https://sqlmodel.tiangolo.com/tutorial/fastapi/tests/#pytest-fixtures
-    response = client.get("/results/sitrep")
+    response = client.get("/sitrep")
     assert response.status_code == 200
     data = response.json()
     assert len(data) > 0
@@ -53,7 +53,7 @@ def test_get_results_sitrep_content_match(
     Will need duplicating and re-writing for each endpoint
     """
     # https://sqlmodel.tiangolo.com/tutorial/fastapi/tests/#pytest-fixtures
-    response = client.get("/results/sitrep")
+    response = client.get("/sitrep")
     assert response.status_code == 200
     data = response.json()
     assert len(data) > 0
@@ -81,7 +81,7 @@ def test_get_results_sitrep_content_mismatch(
     Will need re-writing for each query
     but provided here as an example
     """
-    response = client.get("/results/sitrep")
+    response = client.get("/sitrep")
     data = response.json()
     # DELIBERATELY MISMATCH
     re0 = data[0]

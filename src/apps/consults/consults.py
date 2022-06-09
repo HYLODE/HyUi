@@ -13,8 +13,24 @@ from api.consults.model import ConsultsRead
 from config.settings import settings
 from utils.dash import df_from_store, get_results_response
 
+# APP to define URL
+# maybe run by HyUi API backend or maybe external
+# e.g
+#
+# HyUi API backend ...
+# API_URL = f"{settings.API_URL}/consults/"
+#
+# External (HySys) backend ..
+# API_URL = http://172.16.149.205:5006/icu/live/{ward}/ui
+#
+# External (gov.uk) backend ...
+# API_URL = f"https://coronavirus.data.gov.uk/api/v2/data?areaType=nhsTrust&release={YESTERDAY}&metric=hospitalCases&format=json"
+#
+# the latter two are defined as constants here
+
+API_URL = f"{settings.API_URL}/consults/"
+
 REFRESH_INTERVAL = 5 * 60 * 1000  # milliseconds
-API_URL = f"{settings.BACKEND_URL}/consults/"
 
 
 @callback(

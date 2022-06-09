@@ -47,10 +47,9 @@ fastapi:
 	cd src
 	uvicorn api.main:app --reload --workers 4 --host 0.0.0.0 --port 8092
 
-## Run the local development version of Plotly Dash
+## Run the local development version of Plotly Dash in debug mode
 dash:
-	cd src
-	gunicorn -w 4 --bind 0.0.0.0:8093 apps.app:server
+	cd src && ENV=dev DOCKER=False python apps/app.py
 
 ## Run a JupyterLab instance for local interactive work
 ## this will come with the same packages as the full environment

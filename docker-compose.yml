@@ -15,14 +15,14 @@ services:
         - HTTP_PROXY
         - HTTPS_PROXY
     # NOTE: the --reload flag means that edits are automtically redeployed
-    command: uvicorn api.main:app --reload --workers 1 --host 0.0.0.0 --port 8000
+    command: uvicorn api.main:app --reload --workers 1 --host 0.0.0.0 --port 8094
     volumes:
       - ./src/api:/usr/src/api
       - ./src/config:/usr/src/config
       - ./src/utils:/usr/src/utils
       - ./src/mock:/usr/src/mock
     ports:
-      - "8094:8000"
+      - "8094:8094"
     expose:
       - "8000"
     environment:
@@ -32,7 +32,7 @@ services:
       - HTTPS_PROXY
       - NO_PROXY=apps
       - no_proxy=apps
-      - SERVICES=DOCKER
+      - DOCKER=True
     env_file:
       - .env
       - .secrets
@@ -64,7 +64,7 @@ services:
       - HTTPS_PROXY
       - NO_PROXY=api
       - no_proxy=api
-      - SERVICES=DOCKER
+      - DOCKER=True
     env_file:
       - .env
       - .secrets

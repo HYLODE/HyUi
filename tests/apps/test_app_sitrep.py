@@ -10,7 +10,7 @@ def test_request_json_data(session: Session, client: TestClient):
     """
     Checks that the data from the mock API matches the model
     """
-    resp = client.get("/results/sitrep")
+    resp = client.get("/sitrep")
     assert resp.status_code == 200
     model = get_model_from_route("sitrep", "read")
     model_instances = validate_json(resp.json(), model)
@@ -21,7 +21,7 @@ def test_df_from_models(session: Session, client: TestClient):
     """
     Checks we can generate a Pandas data frame from the requests JSON
     """
-    resp = client.get("/results/sitrep")
+    resp = client.get("/sitrep")
     assert resp.status_code == 200
     model = get_model_from_route("sitrep", "read")
     model_instances = validate_json(resp.json(), model)

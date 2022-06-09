@@ -5,6 +5,7 @@ The application itself
 from dash import Dash, Input, Output, dcc, html, callback
 import dash_bootstrap_components as dbc
 
+from config import settings
 from apps.index import home_page
 from apps.consults.consults import consults
 
@@ -47,4 +48,4 @@ server = app.server
 # cd ./src/
 # python apps/app.py
 if __name__ == "__main__":
-    app.run_server(host="0.0.0.0", port=8095, debug=True)
+    app.run_server(host="0.0.0.0", port=settings.PORT_COMMANDLINE_APP, debug=True)

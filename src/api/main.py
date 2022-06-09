@@ -53,7 +53,7 @@ async def pong():
 ConsultsRead = get_model_from_route("Consults", "Read")
 
 
-@app.get("/results/consults", response_model=List[ConsultsRead])  # type: ignore
+@app.get("/consults", response_model=List[ConsultsRead])  # type: ignore
 def read_consults(session: Session = Depends(get_session)):
     """
     Returns Consults data class populated by query-live/mock
@@ -70,7 +70,7 @@ def read_consults(session: Session = Depends(get_session)):
 SitrepRead = get_model_from_route("Sitrep", "Read")
 
 
-@app.get("/results/sitrep", response_model=List[SitrepRead])  # type: ignore
+@app.get("/sitrep", response_model=List[SitrepRead])  # type: ignore
 def read_sitrep(session: Session = Depends(get_session)):
     """
     Returns Sitrep data class populated by query-live/mock
