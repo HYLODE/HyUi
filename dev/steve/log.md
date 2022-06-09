@@ -1,5 +1,13 @@
 # Running notes log
 
+
+## 2022-06-09t00:39:45#
+working on playwright testing
+try to read these ...
+https://headlesstesting.com/blog/playwright-pytest
+https://github.com/AutomationPanda/playwright-python-tutorial
+https://blog.testproject.io/2019/07/16/behavior-driven-python-tests-using-pytest-bdd/
+
 ## 2022-06-08t23:29:33#
 switched to using gunicorn for serving production
 so docker-compose is production only

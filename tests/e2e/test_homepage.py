@@ -1,5 +1,5 @@
 import pytest
-from playwright.sync_api import Page
+from playwright.sync_api import Page, expect
 
 
 def test_app_exists(page):
@@ -25,3 +25,6 @@ def test_app_exists(page):
         page.locator(".navbar :text('Sitrep')").inner_text(timeout=1000)
         == "UCLH Critical Care Sitrep"
     )
+
+    page.locator('a:has-text("UCLH Critical Care Sitrep")').click()
+    expect(page).to_have_url("http://127.0.0.1:8093_XXX/")
