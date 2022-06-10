@@ -18,7 +18,7 @@ def test_python_version():
 
 @pytest.mark.smoke
 @pytest.mark.skipif(
-    os.getenv("GITHUB_ACTIONS", "False") == "True",
+    os.getenv("NO_SECRETS_FILE", "False") == "True",
     reason="Skipping test that should not be run by GitHub Actions",
 )
 def test_secrets_file_exists():

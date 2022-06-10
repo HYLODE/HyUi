@@ -92,3 +92,5 @@ services:
     depends_on:
       - api
       - apps
+    profiles:
+      - testing

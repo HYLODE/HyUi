@@ -12,6 +12,6 @@ CONSULTS_URL = f"{settings.APP_URL}/consults"
 
 @pytest.mark.smoke
 def test_consults_page_loads(page: Page):
-    page.goto(CONSULTS_URL)
-    expect(page).to_have_title("HyUi")
-    expect(page).to_have_url(CONSULTS_URL)
+    page.goto(CONSULTS_URL, timeout=5000)
+    expect(page).to_have_title("HyUi", timeout=5000)
+    expect(page).to_have_url(CONSULTS_URL, timeout=5000)

@@ -43,10 +43,10 @@ class Settings(BaseSettings):
     ENV: Environments = Environments.dev
     DOCKER: bool = False
 
-    UDS_HOST: str
-    UDS_USER: str
-    UDS_PWD: str
-    UDS_DB: str
+    UDS_HOST: Optional[str]
+    UDS_USER: Optional[str]
+    UDS_PWD: Optional[str]
+    UDS_DB: Optional[str]
 
     DB_URL: Optional[str]
     DB_POSTGRES_SCHEMA = "star"

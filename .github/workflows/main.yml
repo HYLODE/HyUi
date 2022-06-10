@@ -13,6 +13,11 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+env:
+  DOCKER: True
+  NO_SECRETS_FILE: True
+  ENV: dev
+
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This is the lint_etc job
@@ -20,19 +25,15 @@ jobs:
     # The type of runner that the job will run on
     runs-on: ubuntu-20.04
     timeout-minutes: 5
-    strategy:
-      matrix:
-        python-version: [3.9.9]
-
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python
         uses: actions/setup-python@v3
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: 3.9.9
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -46,39 +47,34 @@ jobs:
           # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
-  test_api:
+  test_unit:
     # The type of runner that the job will run on
     runs-on: ubuntu-20.04
-    strategy:
-      matrix:
-        python-version: [3.9.9]
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+      - name: Set-up docker network
+        run: |
+          touch .env
+          touch .secrets
+          docker compose up -d
+      # Pytest
+      - name: Run pytest
+        run: |
+          docker compose exec -e NO_SECRETS_FILE=True apps python -m pytest hyui/src/tests/smoke
 
+  test_e2e:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-20.04
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v3
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install dependencies
+      - name: Set-up docker network
         run: |
-          python -m pip install --upgrade pip
-          pip install flake8 pytest
-          pip install --no-cache -r src/api/requirements.txt
-
-      # Pytest
-      - name: Run pytest
-        run: |
-          export GITHUB_ACTIONS=True
-          python -m pytest -m smoke
-          python -m pytest tests/mock
-          python -m pytest tests/api
-        env:
-          GITHUB_ACTIONS: True
-          ENV: dev
-          UDS_DB: uds
-          UDS_USER: testuser
-          UDS_PWD: testpwd
-          UDS_HOST: 123.456.789.000
+          touch .env
+          touch .secrets
+          docker compose up -d
+          docker compose run playwright
