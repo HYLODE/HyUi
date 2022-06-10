@@ -22,9 +22,12 @@ RUN apt-get update && \
 RUN python3.9 -m venv /home/hyui/venv
 ENV PATH="/home/hyui/venv/bin:$PATH"
 
-# install requirements
+# install shared requirements
+COPY ./requirements.txt .
+RUN pip3 install --no-cache-dir -r requirements.txt
+
+# install requirements for apps
 COPY ./apps/requirements.txt .
-RUN pip3 install --no-cache-dir wheel
 RUN pip3 install --no-cache-dir -r requirements.txt
 
 FROM ubuntu:20.04 AS runner-image

@@ -905,3 +905,6 @@ docs/_linkcheck/
 # managing github actions
 # https://github.com/nektos/act
 .actrc
+
+# Docker cruft
+.bash_history

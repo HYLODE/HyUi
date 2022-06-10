@@ -6,6 +6,7 @@ from playwright.sync_api import Page, expect
 
 from config.settings import settings
 
+# import pdb; pdb.set_trace()
 CONSULTS_URL = f"{settings.APP_URL}/consults"
 
 

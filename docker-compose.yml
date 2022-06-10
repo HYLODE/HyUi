@@ -15,12 +15,9 @@ services:
         - HTTP_PROXY
         - HTTPS_PROXY
     # NOTE: the --reload flag means that edits are automtically redeployed
-    command: uvicorn api.main:app --reload --workers 1 --host 0.0.0.0 --port 8094
+    command: uvicorn api.main:app --reload --workers 1 --host 0.0.0.0 --port 8094 --app-dir hyui/src
     volumes:
-      - ./src/api:/usr/src/api
-      - ./src/config:/usr/src/config
-      - ./src/utils:/usr/src/utils
-      - ./src/mock:/usr/src/mock
+      - ./:/home/hyui/hyui
     ports:
       - "8094:8094"
     expose:
@@ -48,13 +45,9 @@ services:
         - https_proxy
         - HTTP_PROXY
         - HTTPS_PROXY
-    command: gunicorn --bind 0.0.0.0:8095 -w 4 -k gevent --worker-tmp-dir /dev/shm apps.app:server
+    command: gunicorn --chdir hyui/src --bind 0.0.0.0:8095 -w 4 -k gevent --worker-tmp-dir /dev/shm apps.app:server
     volumes:
-      - ./src/apps:/home/hyui/apps
-      - ./src/config:/home/hyui/config
-      - ./src/utils:/home/hyui/utils
-      - ./src/mock:/home/hyui/mock
-      - ./src/api:/home/hyui/api
+      - ./:/home/hyui/hyui
     ports:
       - "8095:8095"
     environment:
@@ -70,3 +63,32 @@ services:
       - .secrets
     depends_on:
       - api
+
+  playwright:
+    build:
+      context: ./src
+      dockerfile: Dockerfile.playwright
+      args:
+        - http_proxy
+        - https_proxy
+        - HTTP_PROXY
+        - HTTPS_PROXY
+    command: pytest hyui/src/tests/e2e --noconftest -m smoke
+    volumes:
+      - ./:/hyui
+    environment:
+      - http_proxy
+      - https_proxy
+      - HTTP_PROXY
+      - HTTPS_PROXY
+      - NO_PROXY=api
+      - no_proxy=api
+      - NO_PROXY=app
+      - no_proxy=app
+      - DOCKER=True
+    env_file:
+      - .env
+      - .secrets
+    depends_on:
+      - api
+      - apps

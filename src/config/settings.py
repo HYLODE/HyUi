@@ -16,6 +16,7 @@ PORT_DOCKER_APP = "8095"
 
 BASE_URL_DEV = "http://127.0.0.1"
 BASE_URL_GAE = "http://172.16.149.202"  # UCLVLDDPRAGAE07
+BASE_URL_DOCKER_APP = "http://apps"
 BASE_URL_DOCKER_API = "http://api"
 
 
@@ -122,7 +123,7 @@ class Settings(BaseSettings):
 
         if values.get("ENV") == "dev":
             if values.get("DOCKER") is True:
-                return f"{BASE_URL_DEV}:{PORT_DOCKER_APP}"
+                return f"{BASE_URL_DOCKER_APP}:{PORT_DOCKER_APP}"
             else:
                 return f"{BASE_URL_DEV}:{PORT_COMMANDLINE_APP}"
 
