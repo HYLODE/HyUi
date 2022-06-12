@@ -43,10 +43,10 @@ class Settings(BaseSettings):
     ENV: Environments = Environments.dev
     DOCKER: bool = False
 
-    UDS_HOST: Optional[str]
-    UDS_USER: Optional[str]
-    UDS_PWD: Optional[str]
-    UDS_DB: Optional[str]
+    EMAP_DB_HOST: Optional[str]
+    EMAP_DB_USER: Optional[str]
+    EMAP_DB_PWD: Optional[str]
+    EMAP_DB_NAME: Optional[str]
 
     DB_URL: Optional[str]
     DB_POSTGRES_SCHEMA = "star"
@@ -73,10 +73,10 @@ class Settings(BaseSettings):
             return PostgresDsn.build(
                 # TODO: refactor postgres dependency
                 scheme="postgresql+psycopg2",
-                user=values.get("UDS_USER"),
-                password=values.get("UDS_PWD"),
-                host=values.get("UDS_HOST"),
-                path=f"/{values.get('UDS_DB') or ''}",
+                user=values.get("EMAP_DB_USER"),
+                password=values.get("EMAP_DB_PWD"),
+                host=values.get("EMAP_DB_HOST"),
+                path=f"/{values.get('EMAP_DB_NAME') or ''}",
             )
 
     @validator("BASE_URL")

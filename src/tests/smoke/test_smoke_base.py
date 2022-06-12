@@ -21,8 +21,9 @@ def test_python_version():
     os.getenv("NO_SECRETS_FILE", "False") == "True",
     reason="Skipping test that should not be run by GitHub Actions",
 )
-def test_secrets_file_exists():
-    p = Path("./.secrets")
+def test_env_file_exists():
+    """Secrets should be kept in .env"""
+    p = Path("./.env")
     assert p.is_file()
 
 
@@ -35,6 +36,6 @@ def test_the_environment_is_set():
 # monkeypatch set-up in ./conftest.py
 @pytest.mark.skip(reason="fails b/c settings defined before monkeypatch")
 def test_settings_uds_user(mock_env_uds_vars):
-    assert settings.UDS_USER == "BigBird"
-    assert settings.UDS_PWD == "Sesame"
-    assert settings.UDS_HOST == "172.16.149.132"
+    assert settings.EMAP_DB_USER == "BigBird"
+    assert settings.EMAP_DB_PWD == "Sesame"
+    assert settings.EMAP_DB_HOST == "172.16.149.132"
