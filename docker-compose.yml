@@ -72,7 +72,7 @@ services:
       dockerfile: Dockerfile.apps
       args:
         <<: *build-args-common
-    command: gunicorn --chdir hyui/src --bind 0.0.0.0:8095 -w 4 -k gevent --worker-tmp-dir /dev/shm apps.app:server
+    command: gunicorn --bind 0.0.0.0:8095 -w 4 -k gevent --worker-tmp-dir /dev/shm apps.app:server
     volumes:
       - ./:/home/hyui/hyui
     ports:
