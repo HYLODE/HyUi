@@ -1,5 +1,41 @@
-
 version: '3.8'
+
+# Common vars
+x-http-proxy: &http-proxy ${HTTP_PROXY}
+x-https-proxy: &https-proxy ${HTTPS_PROXY}
+x-no-proxy: &no-proxy localhost,127.0.0.1,uclvlddpragae07,uclvlddpragae08,api,apps
+x-proxy-common: &proxy-common
+  HTTP_PROXY: *http-proxy
+  http_proxy: *http-proxy
+  HTTPS_PROXY: *https-proxy
+  https_proxy: *https-proxy
+  NO_PROXY: *no-proxy
+  no_proxy: *no-proxy
+
+x-hyui-common-env: &hyui-common-env
+  DOCKER: "True"
+
+x-build-args-common: &build-args-common
+  <<: *proxy-common
+  HYUI_UID: ${HYUI_UID}
+
+x-remote-data-stores: &remote-data-stores
+  USE_EMAP_DB: ${USE_EMAP_DB}
+  EMAP_DB_HOST: ${EMAP_DB_HOST}
+  EMAP_DB_PORT: ${EMAP_DB_PORT}
+  EMAP_DB_NAME: ${EMAP_DB_NAME}
+  USE_CABOODLE_DB:  ${USE_CABOODLE_DB}
+  CABOODLE_DB_HOST: ${CABOODLE_DB_HOST}
+  CABOODLE_DB_PORT: ${CABOODLE_DB_PORT}
+  CABOODLE_DB_NAME: ${CABOODLE_DB_NAME}
+
+x-emap-credentials: &emap-credentials
+  EMAP_DB_USER: ${EMAP_DB_USER}
+  EMAP_DB_PASSWORD: ${EMAP_DB_PASSWORD}
+
+x-caboodle-credentials: &caboodle-credentials
+  CABOODLE_DB_USER: ${CABOODLE_DB_USER}
+  CABOODLE_DB_PASSWORD: ${CABOODLE_DB_PASSWORD}
 
 services:
 
@@ -10,10 +46,7 @@ services:
       context: ./src
       dockerfile: Dockerfile.api
       args:
-        - http_proxy
-        - https_proxy
-        - HTTP_PROXY
-        - HTTPS_PROXY
+        <<: *build-args-common
     # NOTE: the --reload flag means that edits are automtically redeployed
     command: uvicorn api.main:app --reload --workers 1 --host 0.0.0.0 --port 8094 --app-dir hyui/src
     volumes:
@@ -23,13 +56,11 @@ services:
     expose:
       - "8000"
     environment:
-      - http_proxy
-      - https_proxy
-      - HTTP_PROXY
-      - HTTPS_PROXY
-      - NO_PROXY=apps
-      - no_proxy=apps
-      - DOCKER=True
+      <<: *proxy-common
+      <<: *remote-data-stores
+      <<: *emap-credentials
+      <<: *caboodle-credentials
+      <<: *hyui-common-env
     env_file:
       - .env
       - .secrets
@@ -41,23 +72,15 @@ services:
       context: ./src
       dockerfile: Dockerfile.apps
       args:
-        - http_proxy
-        - https_proxy
-        - HTTP_PROXY
-        - HTTPS_PROXY
+        <<: *build-args-common
     command: gunicorn --chdir hyui/src --bind 0.0.0.0:8095 -w 4 -k gevent --worker-tmp-dir /dev/shm apps.app:server
     volumes:
       - ./:/home/hyui/hyui
     ports:
       - "8095:8095"
     environment:
-      - http_proxy
-      - https_proxy
-      - HTTP_PROXY
-      - HTTPS_PROXY
-      - NO_PROXY=api
-      - no_proxy=api
-      - DOCKER=True
+      <<: *proxy-common
+      <<: *hyui-common-env
     env_file:
       - .env
       - .secrets
@@ -69,23 +92,13 @@ services:
       context: ./src
       dockerfile: Dockerfile.playwright
       args:
-        - http_proxy
-        - https_proxy
-        - HTTP_PROXY
-        - HTTPS_PROXY
+        <<: *build-args-common
     command: pytest hyui/src/tests/e2e --noconftest -m smoke
     volumes:
       - ./:/hyui
     environment:
-      - http_proxy
-      - https_proxy
-      - HTTP_PROXY
-      - HTTPS_PROXY
-      - NO_PROXY=api
-      - no_proxy=api
-      - NO_PROXY=app
-      - no_proxy=app
-      - DOCKER=True
+      <<: *proxy-common
+      <<: *hyui-common-env
     env_file:
       - .env
       - .secrets
