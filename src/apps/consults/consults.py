@@ -116,7 +116,7 @@ def gen_table_consults(modified: int, data: dict):
 )
 def update_dept_dropdown(data: dict) -> list:
     df = df_from_store(data, ConsultsRead)
-    return sorted(df["dept_name"].unique())
+    return df["dept_name"].sort_values().unique()
 
 
 card_fig = dbc.Card(
