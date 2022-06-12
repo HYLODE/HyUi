@@ -1,61 +1,75 @@
+# ./src/Dockerfile.api
+
+# references
+# ./src/Dockerfile.api
+
+# Notes and references
+# https://github.com/HYLODE/HySys/blob/dev/hylode/docker/hyflow/api/Dockerfile
 # https://luis-sena.medium.com/creating-the-perfect-python-dockerfile-51bdec41f1c8
-# using ubuntu LTS version
-FROM ubuntu:20.04 AS builder-image
-ARG DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && \
-    apt-get install --no-install-recommends -y \
-        python3.9 \
-        python3.9-dev \
-        python3.9-venv \
-        python3-pip \
-        python3-wheel \
-        netcat \
-        libpq-dev \
-        gcc \
-        postgresql \
-        build-essential && \
-   apt-get clean && rm -rf /var/lib/apt/lists/*
+# see https://github.com/MicrosoftDocs/sql-docs/issues/6494#issuecomment-905434817
+# for the justification for the --platform=linux/amd64 flag
+FROM --platform=linux/amd64 python:3.9.9-slim-buster
+SHELL ["/bin/bash", "-o", "pipefail", "-e", "-u", "-x", "-c"]
 
-# create and activate virtual environment
-# using final folder name to avoid path issues with packages
-RUN python3.9 -m venv /home/hyui/venv
-ENV PATH="/home/hyui/venv/bin:$PATH"
+# OS setup
+# --------
+RUN export DEBIAN_FRONTEND=noninteractive && \
+    apt-get update && \
+    apt-get install --no-install-recommends --yes \
+        netcat libpq-dev gcc postgresql \
+        procps ca-certificates \
+        iproute2 git curl libpq-dev curl gnupg g++ locales \
+        build-essential
+RUN sed -i '/en_GB.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
 
-# install shared requirements
+# MS SQL Server requirements
+RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
+RUN curl https://packages.microsoft.com/config/debian/10/prod.list > /etc/apt/sources.list.d/mssql-release.list
+
+RUN export DEBIAN_FRONTEND=noninteractive && \
+    export ACCEPT_EULA=Y && \
+    apt-get update && \
+    apt-get install --yes --no-install-recommends unixodbc-dev msodbcsql17 mssql-tools
+
+# clean up
+RUN  apt-get autoremove && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Python set-up with shared requirements
+# --------------------------------------
 COPY ./requirements.txt .
 RUN pip3 install --no-cache-dir -r requirements.txt
 
-# install requirements for API
-COPY ./api/requirements.txt .
+# User setup
+ARG HYUI_UID
+RUN useradd -u $HYUI_UID -g 0 hyui
+
+# Directories setup
+RUN mkdir /app && chown -R $HYUI_UID:0 /app
+
+
+WORKDIR /app
+USER hyui
+
+ENV VIRTUAL_ENV=/app/venv
+RUN python3 -m venv $VIRTUAL_ENV
+ENV PATH="$VIRTUAL_ENV/bin:$PATH:/opt/mssql-tools/bin"
+
+# Python set-up with API specific requirements
+# --------------------------------------
+COPY --chown=hyui:root ./api/requirements.txt .
 RUN pip3 install --no-cache-dir -r requirements.txt
 
-FROM ubuntu:20.04 AS runner-image
-RUN apt-get update && apt-get install --no-install-recommends -y python3.9 python3-venv && \
-  apt-get clean && rm -rf /var/lib/apt/lists/*
-
-RUN useradd --create-home hyui
-COPY --from=builder-image /home/hyui/venv /home/hyui/venv
-
-USER hyui
-WORKDIR /home/hyui
-# add local dash directory to WORKDIR (above)
-# COPYING means directories are created at build time
-# UNCOMMENT if you want a standalone dockerfile
-# COPY . .
-
-# BUT the PREFERRED default is to add as mount volumes via docker-compose
-# AND THEN run using docker-compose
-# docker-compose up --build api
+# NOTE: Copying full ./src dir for now so tests etc come too
+COPY --chown=hyui:root . .
 
 EXPOSE 8094
 
-# make sure all messages always reach console
-ENV PYTHONUNBUFFERED=1
-ENV PYTHONDONTWRITEBYTECODE 1
 
-# activate virtual environment
-ENV VIRTUAL_ENV=/home/hyui/venv
-ENV PATH="/home/hyui/venv/bin:$PATH"
-
-CMD ["python"]
+# command: uvicorn api.main:app --reload --workers 1 --host 0.0.0.0 --port 8094
+CMD ["uvicorn", "api.main:app", \
+    "--reload", \
+    "--workers", "1", \
+    "--host", "0.0.0.0", \
+    "--port", "8094", \
+]

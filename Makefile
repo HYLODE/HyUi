@@ -56,7 +56,13 @@ app: app
 	cd src
 	ENV=dev DOCKER=False python app/app.py
 
-## Run unit tests
+## Run tests within docker
+testdocker: testdocker
+	docker-compose down
+	docker-compose build
+	docker-compose run api pytest tests/unit/api
+
+## Run unit tests locally
 testunit: testunit
 	pytest -m smoke src/tests/unit
 	pytest src/tests/unit
