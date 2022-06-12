@@ -31,14 +31,15 @@ from utils.dash import df_from_store, get_results_response
 
 
 WARD = "T03"  # initial definition
-API_URL = f"http://172.16.149.205:5006/icu/live/{WARD}/ui"
+# API_URL = f"http://172.16.149.205:5006/icu/live/{WARD}/ui"
+API_URL = f"http://uclvlddpragae07:5006/live/icu/{WARD}/ui"
 
 REFRESH_INTERVAL = 30 * 60 * 1000  # milliseconds
 
 
 @callback(
-    Output("request_data", "data"),
-    Input("query-interval", "n_intervals"),
+    Output("sitrep_request_data", "data"),
+    Input("sitrep_query-interval", "n_intervals"),
 )
 def store_data(n_intervals: int) -> list:
     """
@@ -51,16 +52,17 @@ def store_data(n_intervals: int) -> list:
 
 @callback(
     Output("simple_table", "children"),
-    Input("request_data", "data"),
-    prevent_initial_call=True,
+    Input("sitrep_request_data", "data"),
+    # prevent_initial_call=True,
 )
 def gen_simple_table(data: dict):
     df = df_from_store(data, SitrepRead)
+    # limit columns here
     return [
         dt.DataTable(
-            id="simple_table",
+            id="sitrep_simple_table_contents",
             columns=[{"name": i, "id": i} for i in df.columns],
-            data=data,
+            data=df.to_dict("records"),
             filter_action="native",
             sort_action="native",
         )
@@ -72,7 +74,11 @@ card_table = dbc.Card(
         dbc.CardHeader(html.H6("Sitrep details")),
         dbc.CardBody(
             [
-                html.Div(id="simple_table"),
+                dcc.Loading(
+                    id="loading-1",
+                    type="default",
+                    children=html.Div(id="simple_table"),
+                    )
             ]
         ),
     ]
@@ -87,8 +93,8 @@ main = html.Div(
 
 dash_only = html.Div(
     [
-        dcc.Interval(id="query-interval", interval=REFRESH_INTERVAL, n_intervals=0),
-        dcc.Store(id="request_data"),
+        dcc.Interval(id="sitrep_query-interval", interval=REFRESH_INTERVAL, n_intervals=0),
+        dcc.Store(id="sitrep_request_data"),
     ]
 )
 

@@ -27,6 +27,7 @@ header = dbc.Container(
                     dbc.NavbarSimple(
                         children=[
                             dbc.NavItem(dbc.NavLink("CONSULTS", href="/consults")),
+                            dbc.NavItem(dbc.NavLink("SITREP", href="/sitrep")),
                         ],
                         brand="UCLH Critical Care Sitrep",
                         brand_href="/",
