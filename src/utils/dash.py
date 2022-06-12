@@ -28,12 +28,16 @@ def df_from_models(model_list: list[SQLModel]) -> pd.DataFrame:
     return df
 
 
-def df_from_url(url: str, model: SQLModel) -> pd.DataFrame:
+def df_from_url(
+    url: str, model: SQLModel, request_response: bool = False
+) -> pd.DataFrame:
     """
     Generate a Pandas DataFrame for a URL
     A convenience function that wraps the separate steps above
     """
     resp = get_results_response(url)
+    if request_response:
+        resp = resp["data"]  # because packaged as dict via requests
     model_instances = validate_json(resp, model)
     df = df_from_models(model_instances)
     return df

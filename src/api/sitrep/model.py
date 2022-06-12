@@ -40,17 +40,17 @@ class SitrepBase(SQLModel):
     bay_code: str
     ward_code: str
     sex: str
-    is_proned_1_4h: bool
-    discharge_ready_1_4h: bool
-    is_agitated_1_8h: bool
-    n_inotropes_1_4h: int
-    had_nitric_1_8h: bool
-    had_rrt_1_4h: bool
-    had_trache_1_12h: bool
-    vent_type_1_4h: str
-    avg_heart_rate_1_24h: float
-    max_temp_1_12h: float
-    avg_resp_rate_1_24h: float
+    is_proned_1_4h: Optional[bool]
+    discharge_ready_1_4h: Optional[bool]
+    is_agitated_1_8h: Optional[bool]
+    n_inotropes_1_4h: Optional[int]
+    had_nitric_1_8h: Optional[bool]
+    had_rrt_1_4h: Optional[bool]
+    had_trache_1_12h: Optional[bool]
+    vent_type_1_4h: Optional[str]
+    avg_heart_rate_1_24h: Optional[float]
+    max_temp_1_12h: Optional[float]
+    avg_resp_rate_1_24h: Optional[float]
     wim_1: int
 
     @validator("dob", pre=True)

@@ -53,7 +53,6 @@ COPY --chown=hyui:root . .
 
 EXPOSE 8095
 
-RUN source aliases4docker
 # /dev/shm is mapped to shared memory and should be used for gunicorn heartbeat
 # this will improve performance and avoid random freezes
 CMD ["gunicorn", \
