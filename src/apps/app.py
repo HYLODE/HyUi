@@ -8,6 +8,7 @@ import dash_bootstrap_components as dbc
 from config import settings
 from apps.index import home_page
 from apps.consults.consults import consults
+from apps.sitrep.sitrep import sitrep
 
 app = Dash(
     __name__,
@@ -32,6 +33,8 @@ def display_page(pathname):
         return home_page
     elif pathname == "/consults":
         return consults
+    elif pathname == "/sitrep":
+        return sitrep
     else:
         # TODO proper 404  route
         return "404"

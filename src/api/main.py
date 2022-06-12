@@ -75,7 +75,7 @@ def read_sitrep(session: Session = Depends(get_session)):
     """
     Returns Sitrep data class populated by query-live/mock
     query preparation depends on the environment so will return
-    mock data in dev and live (from the API itself)
+    mock data in dev and live (from the API itself)\n\n
     TODO: live reads where an API already exists need to bypass the query
     """
     q = prepare_query("sitrep")

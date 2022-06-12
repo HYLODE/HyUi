@@ -1,0 +1,2 @@
+# should run the system ipython for debugging
+alias ipython='/usr/local/bin/ipython'
