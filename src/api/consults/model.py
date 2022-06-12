@@ -35,7 +35,7 @@ class ConsultsBase(SQLModel):
     # status_change_time: datetime
     # comments: Optional[str]
     name: str
-    dept_name: str
+    dept_name: Optional[str]
     location_string: str
 
     @validator("date_of_birth", pre=True)

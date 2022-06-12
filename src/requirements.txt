@@ -7,6 +7,7 @@ numpy>=1.22.4
 pandas>=1.1.4
 plotly==5.8.0
 requests==2.27.1
+sqlalchemy==1.4.36
 sqlmodel==0.0.6
 fastapi==0.78.0
 psycopg2-binary==2.9.3
