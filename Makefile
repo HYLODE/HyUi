@@ -8,6 +8,10 @@
 	prepare_docs_folder
 	requirements
 	jupyterlab
+	app
+	api
+	testunit
+	teste2e
 
 .DEFAULT_GOAL := help
 
@@ -43,13 +47,25 @@ coverage_xml: coverage
 	coverage xml
 
 ## Run the local development version of fastapi
-fastapi:
+api: api
 	cd src
 	uvicorn api.main:app --reload --workers 4 --host 0.0.0.0 --port 8092
 
 ## Run the local development version of Plotly Dash in debug mode
-dash:
-	cd src && ENV=dev DOCKER=False python apps/app.py
+app: app
+	cd src
+	ENV=dev DOCKER=False python app/app.py
+
+## Run unit tests
+testunit: testunit
+	pytest -m smoke src/tests/unit
+	pytest src/tests/unit
+
+## Run end-2-end tests (playwright)
+teste2e: teste2e
+	docker-compose down
+	docker-compose up -d --build
+	docker-compose run playwright
 
 ## Run a JupyterLab instance for local interactive work
 ## this will come with the same packages as the full environment

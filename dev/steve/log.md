@@ -1,5 +1,9 @@
 # Running notes log
 
+## 2022-06-12t12:33:47
+trying to reconfigure structure for better docker
+using tests to check progress
+
 
 ## 2022-06-09t00:39:45#
 working on playwright testing

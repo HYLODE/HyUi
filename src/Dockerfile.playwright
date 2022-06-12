@@ -29,4 +29,4 @@ ENV PYTHONDONTWRITEBYTECODE 1
 
 # this is only for running e2e tests and will fail on others where other python
 # dependencies exist and don't use conftest since this has other dependencies
-CMD ["pytest", "hyui/src/tests/e2e", "--noconftest", "-m", "smoke"]
+CMD ["pytest", "src/tests/e2e", "--noconftest", "-m", "smoke"]
