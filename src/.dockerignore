@@ -1,0 +1,4 @@
+# ./src/.dockerignore
+# ignores wrt to this build context i.e. ./src
+outputs/
+scratch*
