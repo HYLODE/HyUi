@@ -48,7 +48,7 @@ services:
       args:
         <<: *build-args-common
     # NOTE: the --reload flag means that edits are automtically redeployed
-    command: uvicorn api.main:app --reload --workers 1 --host 0.0.0.0 --port 8094
+    command: uvicorn api.main:app --workers 1 --host 0.0.0.0 --port 8094
     volumes:
       - ./:/home/hyui/hyui
     ports:

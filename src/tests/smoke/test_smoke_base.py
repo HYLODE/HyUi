@@ -22,8 +22,8 @@ def test_python_version():
     reason="Skipping test that should not be run by GitHub Actions",
 )
 def test_env_file_exists():
-    """Secrets should be kept in .env"""
-    p = Path("./.env")
+    """Secrets should be kept in .env at project root"""
+    p = Path(__file__).resolve().parents[3] / ".env"
     assert p.is_file()
 
 

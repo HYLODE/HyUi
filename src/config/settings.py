@@ -45,7 +45,7 @@ class Settings(BaseSettings):
 
     EMAP_DB_HOST: Optional[str]
     EMAP_DB_USER: Optional[str]
-    EMAP_DB_PWD: Optional[str]
+    EMAP_DB_PASSWORD: Optional[str]
     EMAP_DB_NAME: Optional[str]
 
     DB_URL: Optional[str]
@@ -74,7 +74,7 @@ class Settings(BaseSettings):
                 # TODO: refactor postgres dependency
                 scheme="postgresql+psycopg2",
                 user=values.get("EMAP_DB_USER"),
-                password=values.get("EMAP_DB_PWD"),
+                password=values.get("EMAP_DB_PASSWORD"),
                 host=values.get("EMAP_DB_HOST"),
                 path=f"/{values.get('EMAP_DB_NAME') or ''}",
             )
