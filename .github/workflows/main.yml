@@ -54,14 +54,9 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
-      - name: Set-up docker network
+      - name: unit tests within docker
         run: |
-          touch .env
-          docker compose up -d
-      # Pytest
-      - name: Run pytest
-        run: |
-          docker compose exec -e NO_SECRETS_FILE=True apps python -m pytest hyui/src/tests/smoke
+          make testdocker
 
   test_e2e:
     # The type of runner that the job will run on
