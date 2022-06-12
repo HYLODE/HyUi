@@ -1,2 +1,0 @@
-FLASK_APP=app.py # (or whatever you named it)
-FLASK_ENV=development # (or production)
