@@ -63,7 +63,6 @@ services:
       <<: *hyui-common-env
     env_file:
       - .env
-      - .secrets
 
   # Dash (Plotly) docker image / web app that visualises results
   # reads data via requests from api app
@@ -83,7 +82,6 @@ services:
       <<: *hyui-common-env
     env_file:
       - .env
-      - .secrets
     depends_on:
       - api
 
@@ -101,7 +99,6 @@ services:
       <<: *hyui-common-env
     env_file:
       - .env
-      - .secrets
     depends_on:
       - api
       - apps
