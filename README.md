@@ -1,3 +1,5 @@
+[![CI](https://github.com/HYLODE/HyUi/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/HYLODE/HyUi/actions/workflows/main.yml)
+
 # `hyui`
 
 User interface for the HYLODE project Much of the project structure is based

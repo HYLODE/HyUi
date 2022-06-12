@@ -57,6 +57,7 @@ jobs:
       - name: unit tests within docker
         run: |
           mv .env.github_actions .env
+          set -o allexport; source .env; set +o allexport
           make testdocker
 
   test_e2e:
@@ -70,5 +71,6 @@ jobs:
       - name: Set-up docker network
         run: |
           mv .env.github_actions .env
+          set -o allexport; source .env; set +o allexport
           docker compose up -d
           docker compose run playwright
