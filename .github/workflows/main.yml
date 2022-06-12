@@ -15,7 +15,6 @@ on:
 
 env:
   DOCKER: True
-  NO_SECRETS_FILE: True
   ENV: dev
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
@@ -54,8 +53,10 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
+      # make a dummy .env file else this will fail
       - name: unit tests within docker
         run: |
+          mv .env.github_actions .env
           make testdocker
 
   test_e2e:
@@ -68,6 +69,6 @@ jobs:
       - uses: actions/checkout@v3
       - name: Set-up docker network
         run: |
-          touch .env
+          mv .env.github_actions .env
           docker compose up -d
           docker compose run playwright
