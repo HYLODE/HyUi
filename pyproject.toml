@@ -12,20 +12,3 @@ exclude_lines = [
 # `isort` configurations
 [tool.isort]
 profile = "black"
-
-# `pytest` configurations
-[tool.pytest.ini_options]
-pythonpath = [
-    "./src",
-]
-addopts = [
-    "-vv",
-    "--doctest-modules"
-]
-doctest_optionflags = "NORMALIZE_WHITESPACE"
-testpaths = [
-    "./src/tests"
-]
-markers = [
-    "smoke: smoke tests to define basic functionality"
-]
