@@ -32,11 +32,6 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
 # clean up
 RUN  apt-get autoremove && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Python set-up with shared requirements
-# --------------------------------------
-COPY ./requirements.txt .
-RUN pip3 install --no-cache-dir -r requirements.txt
-
 # User setup
 ARG HYUI_UID
 RUN useradd -u $HYUI_UID -g 0 hyui
@@ -44,13 +39,20 @@ RUN useradd -u $HYUI_UID -g 0 hyui
 # Directories setup
 RUN mkdir /app && chown -R $HYUI_UID:0 /app
 
-
 WORKDIR /app
 USER hyui
 
+# set up virtual env and add to path (avoids needing activate)
+# ------------------------------------------------------------
+# https://pythonspeed.com/articles/activate-virtualenv-dockerfile/
 ENV VIRTUAL_ENV=/app/venv
 RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH:/opt/mssql-tools/bin"
+
+# Python set-up with shared requirements
+# --------------------------------------
+COPY --chown=hyui:root ./requirements.txt .
+RUN pip3 install --no-cache-dir -r requirements.txt
 
 # Python set-up with API specific requirements
 # --------------------------------------

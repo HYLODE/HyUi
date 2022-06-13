@@ -1,19 +1,69 @@
 .PHONY:
+	help
+	lint
+	testunit
+	teste2e
+	app
+	api
+	jupyterlab
 	coverage
 	coverage_html
 	coverage_xml
 	docs
 	docs_check_external_links
-	help
 	prepare_docs_folder
 	requirements
-	jupyterlab
-	app
-	api
-	testunit
-	teste2e
 
 .DEFAULT_GOAL := help
+
+# ---------------------------
+# hyui
+# ---------------------------
+## Linting etc
+lint:
+	mypy src/
+	flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+	flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+## Run the local development version of fastapi
+api:
+	cd src
+	uvicorn api.main:app --reload --workers 4 --host 0.0.0.0 --port 8092
+
+## Run the local development version of Plotly Dash in debug mode
+app:
+	cd src
+	ENV=dev DOCKER=False python app/app.py
+
+## Run tests within docker
+testdocker:
+	docker-compose down
+	docker-compose build
+	docker-compose run api pytest tests/unit/api
+	docker-compose run apps pytest tests/unit/apps
+
+## Run unit tests locally
+testunit:
+	@echo "Running just smoke tests"
+	pytest -m smoke src/tests/unit
+	@echo "Running unit including smoke tests"
+	pytest src/tests/unit
+
+## Run end-2-end tests (playwright)
+teste2e:
+	docker-compose down
+	docker-compose up -d --build
+	docker-compose run playwright
+
+## Run a JupyterLab instance for local interactive work
+## this will come with the same packages as the full environment
+## NB: Use the Jupyter docker image specified in ./synth for sdv
+jupyterlab:
+	jupyter lab --port 8091 --ip 0.0.0.0 --LabApp.token=''
+
+# ---------------------------
+# gov.uk cookiecutter content
+# ---------------------------
 
 ## Install the Python requirements for contributors, and install pre-commit hooks
 requirements:
@@ -46,38 +96,6 @@ coverage_html: coverage
 coverage_xml: coverage
 	coverage xml
 
-## Run the local development version of fastapi
-api: api
-	cd src
-	uvicorn api.main:app --reload --workers 4 --host 0.0.0.0 --port 8092
-
-## Run the local development version of Plotly Dash in debug mode
-app: app
-	cd src
-	ENV=dev DOCKER=False python app/app.py
-
-## Run tests within docker
-testdocker: testdocker
-	docker-compose down
-	docker-compose build
-	docker-compose run api pytest tests/unit/api
-
-## Run unit tests locally
-testunit: testunit
-	pytest -m smoke src/tests/unit
-	pytest src/tests/unit
-
-## Run end-2-end tests (playwright)
-teste2e: teste2e
-	docker-compose down
-	docker-compose up -d --build
-	docker-compose run playwright
-
-## Run a JupyterLab instance for local interactive work
-## this will come with the same packages as the full environment
-## NB: Use the Jupyter docker image specified in ./synth for sdv
-jupyterlab:
-	jupyter lab --port 8091 --ip 0.0.0.0 --LabApp.token=''
 
 ## Get help on all make commands; referenced from https://github.com/drivendata/cookiecutter-data-science
 help:

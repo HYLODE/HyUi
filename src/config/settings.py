@@ -104,13 +104,14 @@ class Settings(BaseSettings):
         :rtype:     str
         """
         if values.get("ENV") == "prod":
-            return f"{BASE_URL_DOCKER_API}:{PORT_DOCKER_API}"
-
-        if values.get("ENV") == "dev":
+            url = f"{BASE_URL_DOCKER_API}:{PORT_DOCKER_API}"
+        elif values.get("ENV") == "dev":
             if values.get("DOCKER") is True:
-                return f"{BASE_URL_DOCKER_API}:{PORT_DOCKER_API}"
+                url = f"{BASE_URL_DOCKER_API}:{PORT_DOCKER_API}"
             else:
-                return f"{BASE_URL_DEV}:{PORT_COMMANDLINE_API}"
+                url = f"{BASE_URL_DEV}:{PORT_COMMANDLINE_API}"
+
+        return url
 
     @validator("APP_URL")
     def assemble_app_url(cls, v: Optional[str], values: Dict[str, Any]) -> str:
@@ -123,9 +124,10 @@ class Settings(BaseSettings):
 
         if values.get("ENV") == "dev":
             if values.get("DOCKER") is True:
-                return f"{BASE_URL_DOCKER_APP}:{PORT_DOCKER_APP}"
+                url = f"{BASE_URL_DOCKER_APP}:{PORT_DOCKER_APP}"
             else:
-                return f"{BASE_URL_DEV}:{PORT_COMMANDLINE_APP}"
+                url = f"{BASE_URL_DEV}:{PORT_COMMANDLINE_APP}"
+        return url
 
     class Config:
         case_sensitive = True

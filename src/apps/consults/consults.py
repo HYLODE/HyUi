@@ -24,7 +24,7 @@ from utils.dash import df_from_store, get_results_response
 # API_URL = http://172.16.149.205:5006/icu/live/{ward}/ui
 #
 # External (gov.uk) backend ...
-# API_URL = f"https://coronavirus.data.gov.uk/api/v2/data?areaType=nhsTrust&release={YESTERDAY}&metric=hospitalCases&format=json"
+# API_URL = f"https://coronavirus.data.gov.uk/api/v2/data?areaType=nhsTrust ...
 #
 # the latter two are defined as constants here
 
@@ -114,7 +114,7 @@ def gen_table_consults(modified: int, data: dict):
     Output("department_picker", "options"),
     Input("request_data", "data"),
 )
-def update_dept_dropdown(data: dict) -> list:
+def update_dept_dropdown(data: dict):
     df = df_from_store(data, ConsultsRead)
     return df["dept_name"].sort_values().unique()
 

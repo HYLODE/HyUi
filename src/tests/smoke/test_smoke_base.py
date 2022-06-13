@@ -18,7 +18,8 @@ def test_python_version():
 
 @pytest.mark.smoke
 @pytest.mark.skipif(
-    os.getenv("NO_SECRETS_FILE", "False") == "True",
+    # .env exists outside docker and its contents are loaded by docker-compose
+    os.getenv("DOCKER", "False") == "True",
     reason="Skipping test that should not be run by GitHub Actions",
 )
 def test_env_file_exists():

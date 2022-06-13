@@ -2,8 +2,8 @@ from fastapi.testclient import TestClient
 from sqlmodel import Session
 import pandas as pd
 
-from src.utils import get_model_from_route
-from src.utils.dash import validate_json, df_from_models
+from utils import get_model_from_route
+from utils.dash import validate_json, df_from_models
 
 
 def test_request_json_data(session: Session, client: TestClient):
