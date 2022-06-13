@@ -25,6 +25,12 @@ lint:
 	flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
 	flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
+## GitHub Actions - pre-push testing
+testci:
+	act -j lint_etc
+	act -j test_unit
+
+
 ## Run the local development version of fastapi
 api:
 	cd src
@@ -46,8 +52,8 @@ testdocker:
 testunit:
 	@echo "Running just smoke tests"
 	pytest -m smoke src/tests/unit
-	@echo "Running unit including smoke tests"
-	pytest src/tests/unit
+	@echo "Running unit tests"
+	pytest -m "not smoke" src/tests/unit
 
 ## Run end-2-end tests (playwright)
 teste2e:

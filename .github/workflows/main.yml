@@ -55,13 +55,16 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
+      - name: checkout repo
+        uses: actions/checkout@v3
       # make a dummy .env file else this will fail
       - name: unit tests within docker
         run: |
           mv .env.github_actions .env
           set -o allexport; source .env; set +o allexport
-          make testdocker
+          docker compose up -d --build
+          docker compose exec api pytest tests/unit
+          docker compose exec apps pytest tests/unit
 
   # test_e2e:
   #   # The type of runner that the job will run on
