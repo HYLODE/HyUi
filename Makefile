@@ -38,8 +38,7 @@ api:
 
 ## Run the local development version of Plotly Dash in debug mode
 app:
-	cd src
-	ENV=dev DOCKER=False python app/app.py
+	ENV=dev DOCKER=False python src/apps/app.py
 
 ## Run tests within docker
 testdocker:
