@@ -67,17 +67,19 @@ jobs:
           docker compose exec api pytest tests/unit
           docker compose exec apps pytest tests/unit
 
-  # test_e2e:
-  #   # The type of runner that the job will run on
-  #   runs-on: ubuntu-20.04
+  test_e2e:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-20.04
 
-  #   # Steps represent a sequence of tasks that will be executed as part of the job
-  #   steps:
-  #     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-  #     - uses: actions/checkout@v3
-  #     - name: Set-up docker network
-  #       run: |
-  #         mv .env.github_actions .env
-  #         set -o allexport; source .env; set +o allexport
-  #         docker compose up -d
-  #         docker compose run playwright
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: checkout repo
+        uses: actions/checkout@v3
+      - name: Set-up docker network
+        run: |
+          mv .env.github_actions .env
+          set -o allexport; source .env; set +o allexport
+          export HYUI_UID=9998
+          docker compose up -d
+          docker compose run playwright
