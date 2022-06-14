@@ -46,7 +46,6 @@ def store_data(n_intervals: int) -> list:
     Read data from API then store as JSON
     """
     data = get_results_response(API_URL)
-    data = data["data"]
     return data  # type: ignore
 
 

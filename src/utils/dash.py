@@ -5,10 +5,17 @@ from sqlmodel import SQLModel
 
 def get_results_response(url: str) -> list[dict[str, str]]:
     """
-    Given a URL return JSON
+    Given a URL return JSON list of dictionaries
     """
     request_response = requests.get(url)
-    return request_response.json()  # type: ignore
+    try:
+        list_of_dicts = request_response.json()["data"]
+    except TypeError as e:
+        # likely in dev environment where data is returned directly
+        # so you have just tried to use a key to select from a list
+        list_of_dicts = request_response.json()
+    assert type(list_of_dicts) is list
+    return list_of_dicts  # type: ignore
 
 
 def validate_json(json_list: list[dict[str, str]], model: SQLModel) -> list[SQLModel]:
