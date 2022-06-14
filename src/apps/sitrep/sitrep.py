@@ -10,7 +10,7 @@ from dash import dcc, html
 
 from api.sitrep.model import SitrepRead
 
-# from config.settings import settings
+from config.settings import settings
 from utils.dash import df_from_store, get_results_response
 
 # APP to define URL
@@ -29,10 +29,11 @@ from utils.dash import df_from_store, get_results_response
 #
 # the latter two are defined as constants here
 
-
-WARD = "T03"  # initial definition
-# API_URL = f"http://172.16.149.205:5006/icu/live/{WARD}/ui"
-API_URL = f"http://uclvlddpragae07:5006/live/icu/{WARD}/ui"
+if settings.ENV == "prod":
+    WARD = "T03"  # initial definition
+    API_URL = f"{settings.BASE_URL}:5006/live/icu/{WARD}/ui"
+else:
+    API_URL = f"{settings.API_URL}/sitrep/"
 
 REFRESH_INTERVAL = 30 * 60 * 1000  # milliseconds
 
@@ -77,7 +78,7 @@ card_table = dbc.Card(
                     id="loading-1",
                     type="default",
                     children=html.Div(id="simple_table"),
-                    )
+                )
             ]
         ),
     ]
@@ -92,7 +93,9 @@ main = html.Div(
 
 dash_only = html.Div(
     [
-        dcc.Interval(id="sitrep_query-interval", interval=REFRESH_INTERVAL, n_intervals=0),
+        dcc.Interval(
+            id="sitrep_query-interval", interval=REFRESH_INTERVAL, n_intervals=0
+        ),
         dcc.Store(id="sitrep_request_data"),
     ]
 )
