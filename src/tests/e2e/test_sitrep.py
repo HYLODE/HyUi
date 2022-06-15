@@ -4,10 +4,11 @@ End-to-End testing for the Sitrep page
 import pytest
 from playwright.sync_api import Page, expect
 
-from config.settings import settings
+# from config.settings import settings
 
 # import pdb; pdb.set_trace()
-SITREP_URL = f"{settings.APP_URL}/sitrep"
+# SITREP_URL = f"{settings.APP_URL}/sitrep"
+SITREP_URL = f"http://apps:8095/sitrep"
 
 
 @pytest.mark.smoke
