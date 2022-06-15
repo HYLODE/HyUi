@@ -12,6 +12,7 @@ RUN apt-get update && \
         libpq-dev \
         gcc \
         postgresql \
+        wget \
         build-essential && \
    apt-get clean && rm -rf /var/lib/apt/lists/*
 
@@ -27,6 +28,13 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE 1
 
+# Install the following to ensure that playwright only runs once the app is available
+# https://github.com/Eficode/wait-for
+RUN wget https://github.com/eficode/wait-for/releases/download/v2.2.3/wait-for && chmod +x wait-for
+
 # this is only for running e2e tests and will fail on others where other python
 # dependencies exist and don't use conftest since this has other dependencies
-CMD ["pytest", "src/tests/e2e", "--noconftest", "-m", "smoke"]
+# command for 'within' docker network
+# command: ./wait-for http://apps:8095 -- pytest --noconftest -m smoke hyui/src/tests/e2e
+# command for standalone runs (`where docker-compose up -d` has already been run)
+CMD ["./wait-for", "http://localhost:8095", "--", "pytest", "src/tests/e2e", "--noconftest", "-m", "smoke"]

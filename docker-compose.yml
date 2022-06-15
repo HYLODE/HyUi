@@ -87,7 +87,7 @@ services:
       dockerfile: Dockerfile.playwright
       args:
         <<: *build-args-common
-    command: pytest hyui/src/tests/e2e --noconftest -m smoke
+    command: ./wait-for http://apps:8095 -- pytest --noconftest -m smoke hyui/src/tests/e2e
     volumes:
       - ./:/hyui
     environment:
@@ -95,6 +95,7 @@ services:
       <<: *hyui-common-env
     env_file:
       - .env
+    # depends on does not 'wait'
     depends_on:
       - api
       - apps
