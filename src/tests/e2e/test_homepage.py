@@ -1,7 +1,6 @@
 from playwright.sync_api import Page, expect
-from config.settings import settings
 
-HOMEPAGE_URL = f"{settings.APP_URL}/"
+HOMEPAGE_URL = f"http://apps:8095/"
 
 
 def test_app_exists(page: Page):

@@ -4,10 +4,11 @@ End-to-End testing for the Consults page
 import pytest
 from playwright.sync_api import Page, expect
 
-from config.settings import settings
+# from config.settings import settings
 
 # import pdb; pdb.set_trace()
-CONSULTS_URL = f"{settings.APP_URL}/consults"
+# CONSULTS_URL = f"{settings.APP_URL}/consults"
+CONSULTS_URL = f"http://apps:8095/consults"
 
 
 @pytest.mark.smoke
