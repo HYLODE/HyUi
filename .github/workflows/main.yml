@@ -81,5 +81,5 @@ jobs:
           mv .env.github_actions .env
           set -o allexport; source .env; set +o allexport
           export HYUI_UID=9998
-          docker compose up -d
+          docker compose up -d --build
           docker compose run playwright
