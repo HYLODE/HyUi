@@ -49,8 +49,6 @@ services:
         <<: *build-args-common
     # NOTE: the --reload flag means that edits are automtically redeployed
     command: uvicorn api.main:app --workers 1 --host 0.0.0.0 --port 8094
-    volumes:
-      - ./:/home/hyui/hyui
     ports:
       - "8094:8094"
     expose:
@@ -73,8 +71,6 @@ services:
       args:
         <<: *build-args-common
     command: gunicorn --bind 0.0.0.0:8095 -w 4 -k gevent --worker-tmp-dir /dev/shm apps.app:server
-    volumes:
-      - ./:/home/hyui/hyui
     ports:
       - "8095:8095"
     environment:
@@ -91,7 +87,7 @@ services:
       dockerfile: Dockerfile.playwright
       args:
         <<: *build-args-common
-    command: pytest hyui/src/tests/e2e --noconftest -m smoke
+    command: ./wait-for http://apps:8095 -- pytest --noconftest -m smoke hyui/src/tests/e2e
     volumes:
       - ./:/hyui
     environment:
@@ -99,6 +95,7 @@ services:
       <<: *hyui-common-env
     env_file:
       - .env
+    # depends on does not 'wait'
     depends_on:
       - api
       - apps
