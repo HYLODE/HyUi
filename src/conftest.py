@@ -65,3 +65,12 @@ def mock_df_sitrep():
     """
     df = make_mock_df(path_to_hdf_file("sitrep"))
     return df
+
+
+@pytest.fixture(scope="session")
+def mock_df_census():
+    """
+    Generate data frame from mock census data for testing
+    """
+    df = make_mock_df(path_to_hdf_file("census"))
+    return df

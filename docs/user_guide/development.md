@@ -32,3 +32,36 @@ cp .env.example .env
 5. Copy out your synthetic data
 
 See the [Synthetic Data Preparation](synthetic_data.md) docs.
+
+## Set-up local API
+
+make a local API module
+create the `__init__.py` with reference to routes
+the directory should contain
+
+```
+api/mymodule
+|
+|-- __init__.py         // define project wide variables
+|-- mock.h5             // synthetic data create above for mocking
+|-- mock.sql            // query to run against mock database
+|-- model.py            // pydantic (SQLmodel) to define data
+```
+
+add a new route to `config.settings.ModuleNames`
+
+```python
+class ModuleNames(str, Enum):
+    """
+    Class that defines routes for each module
+    """
+
+    consults = "consults"
+    sitrep = "sitrep"
+    mymodule = "mymodule"
+```
+
+then run mock.py (and this will insert the mock data into the local sqlite database)
+then either `make api` or `uvicorn api.main:app --reload --workers 4 --host 0.0.0.0 --port 8092`
+navigate to [http://localhost:8092/docs](<>) to check that it works
+better write a test
