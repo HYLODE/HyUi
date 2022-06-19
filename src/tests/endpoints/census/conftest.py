@@ -14,15 +14,19 @@ from mock.mock import (  # type: ignore
     path_to_hdf_file,
 )
 
+ROUTE_NAME = "census"
 
 # https://sqlmodel.tiangolo.com/tutorial/fastapi/tests
 # NB: session arg is the _name_ not the _scope_ here and
 # refers to the db session not the pytest session
 @pytest.fixture(name="session")
 def session_fixture():
+    """
+    Defaults to sitrep as the route as a simple route for most tests
+    """
     # NOTE: use the same mock functions for testing as we do for development
     # NOTE: using sitrep route as the simplest
-    engine = make_mock_db_in_memory("sitrep")
+    engine = make_mock_db_in_memory(ROUTE_NAME)
     with Session(engine) as session:
         yield session
 

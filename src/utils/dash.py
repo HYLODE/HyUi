@@ -44,7 +44,8 @@ def df_from_url(
     """
     resp = get_results_response(url)
     if request_response:
-        resp = resp["data"]  # because packaged as dict via requests
+        # because packaged as dict via requests
+        resp = resp["data"]  # type: ignore
     model_instances = validate_json(resp, model)
     df = df_from_models(model_instances)
     return df
