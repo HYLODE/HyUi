@@ -1,6 +1,8 @@
 import pytest
 from playwright.sync_api import Page, expect
 
+# Designed only to run effectively _within_ docker
+# will fail if run from the command line with pytest
 HOMEPAGE_URL = "http://apps:8095/"
 
 
