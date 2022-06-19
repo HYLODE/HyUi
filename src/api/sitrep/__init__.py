@@ -5,9 +5,6 @@ eg.
 
 http://172.16.149.205:5006/icu/live/{ward}/ui
 
-The developer should specify the data models here
-and follow the **same** naming convention such that
-the module.classname can be reliably used for access
 """
 from pathlib import Path
 
