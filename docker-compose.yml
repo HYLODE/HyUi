@@ -87,9 +87,9 @@ services:
       dockerfile: Dockerfile.playwright
       args:
         <<: *build-args-common
-    command: ./wait-for http://apps:8095 -- pytest --noconftest -m smoke hyui/src/tests/e2e
+    command: ./wait-for http://apps:8095 -- pytest --noconftest -m e2e src/tests
     volumes:
-      - ./:/hyui
+      - ./src:/src
     environment:
       <<: *proxy-common
       <<: *hyui-common-env
