@@ -61,12 +61,16 @@ class ModuleNames(str, Enum):
     mymodule = "mymodule"
 ```
 
+## Set-up local testing
+
 then run mock.py (and this will insert the mock data into the local sqlite database)
 then either `make api` or `uvicorn api.main:app --reload --workers 4 --host 0.0.0.0 --port 8092`
 navigate to [http://localhost:8092/docs](<>) to check that it works
 
 then create a module for testing (just duplicate an existing one and adapt)
 you will need a local conftest.py to set up the mockdata
+
+## Set-up local Dash app
 
 then create an app in **src/apps/mymodule**
 ideally import headers and other attributes (from **src/apps/index.py**) for consistent styling

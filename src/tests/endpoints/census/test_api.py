@@ -25,6 +25,7 @@ def test_get_results_census(session: Session, client: TestClient):
     assert len(data) > 0
 
 
+@pytest.mark.api
 def test_get_results_census_content_match(
     session: Session, client: TestClient, mock_df_census: pd.DataFrame
 ):

@@ -10,7 +10,7 @@ client = TestClient(app)
 
 
 @pytest.mark.smoke
-@pytest.mark.unit
+@pytest.mark.api
 def test_read_ping():
     response = client.get("/ping")
     assert response.status_code == 200
@@ -18,7 +18,7 @@ def test_read_ping():
 
 
 @pytest.mark.smoke
-@pytest.mark.unit
+@pytest.mark.api
 def test_get_results_sitrep(session: Session, client: TestClient):
     """
     Prove that the test session/client relationship works
@@ -32,7 +32,7 @@ def test_get_results_sitrep(session: Session, client: TestClient):
 
 
 @pytest.mark.smoke
-@pytest.mark.unit
+@pytest.mark.api
 def test_get_results_exemplar(session: Session, client: TestClient):
     """
     Prove that the test session/client relationship works
@@ -47,7 +47,7 @@ def test_get_results_exemplar(session: Session, client: TestClient):
     assert len(data) > 0
 
 
-@pytest.mark.unit
+@pytest.mark.api
 def test_get_results_sitrep_content_match(
     session: Session, client: TestClient, mock_df: pd.DataFrame
 ):
@@ -77,7 +77,7 @@ def test_get_results_sitrep_content_match(
     assert df0["is_proned_1_4h"] == res["is_proned_1_4h"]
 
 
-@pytest.mark.unit
+@pytest.mark.api
 def test_get_results_sitrep_content_mismatch(
     session: Session, client: TestClient, mock_df
 ):

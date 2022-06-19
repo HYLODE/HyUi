@@ -64,8 +64,8 @@ jobs:
           set -o allexport; source .env; set +o allexport
           export HYUI_UID=9998
           docker compose up -d --build
-          docker compose exec api pytest tests/unit
-          docker compose exec apps pytest tests/unit
+          docker compose exec api pytest -m api tests
+          docker compose exec apps pytest -m app tests
 
   test_e2e:
     # The type of runner that the job will run on

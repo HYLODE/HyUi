@@ -8,7 +8,7 @@ from utils import get_model_from_route
 from utils.dash import validate_json, df_from_models
 
 
-@pytest.mark.unit
+@pytest.mark.app
 def test_request_json_data(session: Session, client: TestClient):
     """
     Checks that the data from the mock API matches the model
@@ -20,7 +20,7 @@ def test_request_json_data(session: Session, client: TestClient):
     assert isinstance(model_instances[0], model)
 
 
-@pytest.mark.unit
+@pytest.mark.app
 def test_df_from_models(session: Session, client: TestClient):
     """
     Checks we can generate a Pandas data frame from the requests JSON

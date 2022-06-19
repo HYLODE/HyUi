@@ -1,9 +1,14 @@
+import os
 import pytest
 from playwright.sync_api import Page, expect
 
 # Designed only to run effectively _within_ docker
 # will fail if run from the command line with pytest
-HOMEPAGE_URL = "http://apps:8095/"
+if os.getenv("DOCKER", "False") == "True":
+    HOMEPAGE_URL = "http://apps:8095/"
+else:
+    # Assume no docker at all so using local dev
+    HOMEPAGE_URL = "http://localhost:8093/"
 
 
 @pytest.mark.e2e
@@ -17,12 +22,12 @@ def test_app_exists(page: Page):
     assert (
         page.locator(
             "#page-content > div > div:nth-child(1) > div > div > nav > div > a"
-        ).inner_text(timeout=1000)
+        ).inner_text(timeout=5000)
         == "UCLH Critical Care Sitrep"
     )
     # css selector
     assert (
-        page.locator(".navbar-brand").inner_text(timeout=1000)
+        page.locator(".navbar-brand").inner_text(timeout=5000)
         == "UCLH Critical Care Sitrep"
     )
     # css and text selector
