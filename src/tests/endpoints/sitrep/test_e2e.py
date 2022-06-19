@@ -12,7 +12,7 @@ else:
     SITREP_URL = "http://localhost:8093/sitrep"
 
 
-@pytest.mark.smoke
+@pytest.mark.e2e
 def test_sitrep_page_loads(page: Page):
     page.goto(SITREP_URL, timeout=5000)
     expect(page).to_have_title("HyUi", timeout=5000)

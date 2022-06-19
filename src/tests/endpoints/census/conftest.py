@@ -1,8 +1,7 @@
 # ./conftest.py
 # for sharing fixtures between files
-import pytest
-
 import pandas as pd
+import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import Session
 
@@ -15,6 +14,7 @@ from mock.mock import (  # type: ignore
 )
 
 ROUTE_NAME = "census"
+
 
 # https://sqlmodel.tiangolo.com/tutorial/fastapi/tests
 # NB: session arg is the _name_ not the _scope_ here and

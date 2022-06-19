@@ -1,8 +1,6 @@
 # ./conftest.py
 # for sharing fixtures between files
 import pytest
-
-import pandas as pd
 from fastapi.testclient import TestClient
 from sqlmodel import Session
 
@@ -15,6 +13,7 @@ from mock.mock import (  # type: ignore
 )
 
 ROUTE_NAME = "sitrep"
+
 
 # https://sqlmodel.tiangolo.com/tutorial/fastapi/tests
 # NB: session arg is the _name_ not the _scope_ here and
@@ -43,38 +42,10 @@ def client_fixture(session: Session):
     app.dependency_overrides.clear()
 
 
-@pytest.fixture
-def mock_env_uds_vars(monkeypatch):
-    # https://docs.pytest.org/en/latest/how-to/monkeypatch.html#monkeypatching-environment-variables
-    monkeypatch.setenv("UDS_USER", "BigBird")
-    monkeypatch.setenv("UDS_PWD", "Sesame")
-    monkeypatch.setenv("UDS_HOST", "172.16.149.132")
-
-
 @pytest.fixture(scope="session")
-def mock_minimal_df():
-    data = dict(
-        id=[1, 2, 3],
-        age=[21, 31, 41],
-        initials=["JJ", "KK", "LL"],
-    )
-    df = pd.DataFrame(data)
-    return df
-
-
-@pytest.fixture(scope="session")
-def mock_df_sitrep():
+def mock_df():
     """
     Use sitrep data as baseline exemplar for testing
     """
-    df = make_mock_df(path_to_hdf_file("sitrep"))
-    return df
-
-
-@pytest.fixture(scope="session")
-def mock_df_census():
-    """
-    Generate data frame from mock census data for testing
-    """
-    df = make_mock_df(path_to_hdf_file("census"))
+    df = make_mock_df(path_to_hdf_file(ROUTE_NAME))
     return df

@@ -1,8 +1,10 @@
+import pytest
 from playwright.sync_api import Page, expect
 
-HOMEPAGE_URL = f"http://apps:8095/"
+HOMEPAGE_URL = "http://apps:8095/"
 
 
+@pytest.mark.e2e
 def test_app_exists(page: Page):
     page.goto(HOMEPAGE_URL)
     assert page.title() == "HyUi"
