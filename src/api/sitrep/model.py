@@ -41,7 +41,7 @@ class SitrepBase(SQLModel):
     ward_code: str
     sex: str
     is_proned_1_4h: Optional[bool]
-    discharge_ready_1_4h: Optional[bool]
+    discharge_ready_1_4h: Optional[str]
     is_agitated_1_8h: Optional[bool]
     n_inotropes_1_4h: Optional[int]
     had_nitric_1_8h: Optional[bool]

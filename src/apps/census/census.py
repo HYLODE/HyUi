@@ -33,7 +33,7 @@ from utils.dash import df_from_store, get_results_response
 if settings.ENV == "prod":
     WARD = "T03"  # initial definition
     # http://uclvlddpragae07:5006/emap/icu/census/T03/
-    API_URL = f"{settings.BASE_URL}:5006/emap/icu/cenus/{WARD}"
+    API_URL = f"{settings.BASE_URL}:5006/emap/icu/census/{WARD}"
 else:
     API_URL = f"{settings.API_URL}/census/"
 

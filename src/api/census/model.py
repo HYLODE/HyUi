@@ -23,7 +23,7 @@ class CensusBase(SQLModel):
 
     name: str
     sex: str
-    admission_age_years: int
+    # admission_age_years: int
     dob: date
     mrn: str
     csn: int
