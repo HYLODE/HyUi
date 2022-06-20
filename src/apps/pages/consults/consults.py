@@ -3,17 +3,18 @@
 sub-application for consults
 """
 
+
 import dash_bootstrap_components as dbc
 import plotly.express as px
-from dash import Input, Output, State, callback
+from dash import Input, Output, State, callback, register_page
 from dash import dash_table as dt
 from dash import dcc, html
 
 from api.consults.model import ConsultsRead
-from ..index import header
-
 from config.settings import settings
 from utils.dash import df_from_store, get_results_response
+
+register_page(__name__)
 
 # APP to define URL
 # maybe run by HyUi API backend or maybe external
@@ -51,6 +52,7 @@ def store_data(n_intervals: int) -> dict:
     Output("filtered_data", "data"),
     Input("department_picker", "value"),
     State("request_data", "data"),
+    prevent_initial_call=True,
 )
 def filter_data(val: str, data: dict) -> dict:
     """
@@ -67,7 +69,7 @@ def filter_data(val: str, data: dict) -> dict:
     Output("fig_consults", "children"),
     Input("filtered_data", "modified_timestamp"),
     State("filtered_data", "data"),
-    # prevent_initial_call=True,
+    prevent_initial_call=True,
 )
 def gen_consults_over_time(n_intervals: int, data: dict):
     """
@@ -115,6 +117,7 @@ def gen_table_consults(modified: int, data: dict):
 @callback(
     Output("department_picker", "options"),
     Input("request_data", "data"),
+    prevent_initial_call=True,
 )
 def update_dept_dropdown(data: dict):
     df = df_from_store(data, ConsultsRead)
@@ -166,11 +169,8 @@ dash_only = html.Div(
     ]
 )
 
-consults = dbc.Container(
-    fluid=True,
-    className="dbc",
-    children=[
-        header,
+layout = html.Div(
+    [
         main,
         dash_only,
     ],
