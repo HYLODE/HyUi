@@ -87,7 +87,7 @@ services:
       dockerfile: Dockerfile.playwright
       args:
         <<: *build-args-common
-    command: ./wait-for http://apps:8095 -- pytest -m e2e src/tests
+    command: ./wait-for http://apps:8095 -- pytest -m e2e src/tests/playwright
     volumes:
       - ./src:/src
     environment:

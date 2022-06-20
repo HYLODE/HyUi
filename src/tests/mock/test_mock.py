@@ -10,7 +10,7 @@ from utils import get_model_from_route
 @pytest.mark.smoke
 def test_mock_data_exists():
     """Confirm SQLite DB file with mock data exists"""
-    f = Path.cwd() / "src" / "mock" / "mock.db"
+    f = Path(__file__).resolve().parents[2] / "mock" / "mock.db"
     assert f.is_file()
 
 
