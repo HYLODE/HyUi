@@ -1,9 +1,15 @@
 # Running notes log
 
+## 2022-06-20t22:36:16
+https://github.com/HYLODE/HyUi/issues/46
+updated dash to 2.5.1
+had to reinstall pandas and numpy by hand
+all tests passed so sofarsogood
+
+
 ## 2022-06-12t12:33:47
 trying to reconfigure structure for better docker
 using tests to check progress
-
 
 ## 2022-06-09t00:39:45#
 working on playwright testing
