@@ -83,3 +83,21 @@ def read_sitrep(session: Session = Depends(get_session)):
     Record = namedtuple("Record", results.keys())  # type: ignore
     records = [Record(*r) for r in results.fetchall()]
     return records
+
+
+CensusRead = get_model_from_route("Census", "Read")
+
+
+@app.get("/census", response_model=List[CensusRead])  # type: ignore
+def read_census(session: Session = Depends(get_session)):
+    """
+    Returns Census data class populated by query-live/mock
+    query preparation depends on the environment so will return
+    mock data in dev and live (from the API itself)\n\n
+    TODO: live reads where an API already exists need to bypass the query
+    """
+    q = prepare_query("census")
+    results = session.execute(q)  # type: ignore
+    Record = namedtuple("Record", results.keys())  # type: ignore
+    records = [Record(*r) for r in results.fetchall()]
+    return records

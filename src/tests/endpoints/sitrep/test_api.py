@@ -1,15 +1,16 @@
+import arrow
+import pandas as pd
 import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import Session
 
 from api.main import app  # type: ignore
-import arrow
-import pandas as pd
 
 client = TestClient(app)
 
 
 @pytest.mark.smoke
+@pytest.mark.api
 def test_read_ping():
     response = client.get("/ping")
     assert response.status_code == 200
@@ -17,6 +18,7 @@ def test_read_ping():
 
 
 @pytest.mark.smoke
+@pytest.mark.api
 def test_get_results_sitrep(session: Session, client: TestClient):
     """
     Prove that the test session/client relationship works
@@ -30,6 +32,7 @@ def test_get_results_sitrep(session: Session, client: TestClient):
 
 
 @pytest.mark.smoke
+@pytest.mark.api
 def test_get_results_exemplar(session: Session, client: TestClient):
     """
     Prove that the test session/client relationship works
@@ -44,8 +47,9 @@ def test_get_results_exemplar(session: Session, client: TestClient):
     assert len(data) > 0
 
 
+@pytest.mark.api
 def test_get_results_sitrep_content_match(
-    session: Session, client: TestClient, mock_df_sitrep: pd.DataFrame
+    session: Session, client: TestClient, mock_df: pd.DataFrame
 ):
     """
     Specific test for sitrep
@@ -65,7 +69,7 @@ def test_get_results_sitrep_content_match(
     assert isinstance(res["dob"], str)
     assert isinstance(res["is_proned_1_4h"], bool)
 
-    df0 = mock_df_sitrep.loc[0]
+    df0 = mock_df.loc[0]
 
     assert df0["name"] == res["name"]
     assert str(df0["mrn"]) == str(res["mrn"])
@@ -73,8 +77,9 @@ def test_get_results_sitrep_content_match(
     assert df0["is_proned_1_4h"] == res["is_proned_1_4h"]
 
 
+@pytest.mark.api
 def test_get_results_sitrep_content_mismatch(
-    session: Session, client: TestClient, mock_df_sitrep
+    session: Session, client: TestClient, mock_df
 ):
     """
     Specific test for sitrep query
@@ -85,7 +90,7 @@ def test_get_results_sitrep_content_mismatch(
     data = response.json()
     # DELIBERATELY MISMATCH
     re0 = data[0]
-    df1 = mock_df_sitrep.loc[1]
+    df1 = mock_df.loc[1]
 
     with pytest.raises(AssertionError):
         assert df1["dob"] == arrow.get(re0["dob"]).date()

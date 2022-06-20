@@ -12,7 +12,7 @@ else:
     CONSULTS_URL = "http://localhost:8093/consults"
 
 
-@pytest.mark.smoke
+@pytest.mark.e2e
 def test_consults_page_loads(page: Page):
     page.goto(CONSULTS_URL, timeout=30 * 1000)
     expect(page).to_have_title("HyUi", timeout=5000)

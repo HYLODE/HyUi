@@ -10,6 +10,8 @@ from dash import dash_table as dt
 from dash import dcc, html
 
 from api.consults.model import ConsultsRead
+from ..index import header
+
 from config.settings import settings
 from utils.dash import df_from_store, get_results_response
 
@@ -168,6 +170,7 @@ consults = dbc.Container(
     fluid=True,
     className="dbc",
     children=[
+        header,
         main,
         dash_only,
     ],
