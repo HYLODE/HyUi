@@ -9,6 +9,7 @@ from config import settings
 from apps.index import home_page
 from apps.consults.consults import consults
 from apps.sitrep.sitrep import sitrep
+from apps.census.census import census
 
 app = Dash(
     __name__,
@@ -35,6 +36,8 @@ def display_page(pathname):
         return consults
     elif pathname == "/sitrep":
         return sitrep
+    elif pathname == "/census":
+        return census
     else:
         # TODO proper 404  route
         return "404"

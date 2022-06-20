@@ -1,6 +1,6 @@
-# src/apps/consults/consults.py
+# src/apps/census/census.py
 """
-sub-application for consults
+sub-application for census
 """
 
 import dash_bootstrap_components as dbc
@@ -8,7 +8,7 @@ from dash import Input, Output, callback
 from dash import dash_table as dt
 from dash import dcc, html
 
-from api.sitrep.model import SitrepRead
+from api.census.model import CensusRead
 from ..index import header
 
 from config.settings import settings
@@ -19,7 +19,7 @@ from utils.dash import df_from_store, get_results_response
 # e.g
 #
 # HyUi API backend ...
-# API_URL = f"{settings.API_URL}/consults/"
+# API_URL = f"{settings.API_URL}/census/"
 #
 # External (HySys) backend ..
 # then define locally here within *this* app
@@ -32,16 +32,17 @@ from utils.dash import df_from_store, get_results_response
 
 if settings.ENV == "prod":
     WARD = "T03"  # initial definition
-    API_URL = f"{settings.BASE_URL}:5006/live/icu/{WARD}/ui"
+    # http://uclvlddpragae07:5006/emap/icu/census/T03/
+    API_URL = f"{settings.BASE_URL}:5006/emap/icu/census/{WARD}"
 else:
-    API_URL = f"{settings.API_URL}/sitrep/"
+    API_URL = f"{settings.API_URL}/census/"
 
 REFRESH_INTERVAL = 30 * 60 * 1000  # milliseconds
 
 
 @callback(
-    Output("sitrep_request_data", "data"),
-    Input("sitrep_query-interval", "n_intervals"),
+    Output("census_request_data", "data"),
+    Input("census_query-interval", "n_intervals"),
 )
 def store_data(n_intervals: int) -> list:
     """
@@ -52,16 +53,16 @@ def store_data(n_intervals: int) -> list:
 
 
 @callback(
-    Output("sitrep_simple_table", "children"),
-    Input("sitrep_request_data", "data"),
+    Output("census_simple_table", "children"),
+    Input("census_request_data", "data"),
     # prevent_initial_call=True,
 )
 def gen_simple_table(data: dict):
-    df = df_from_store(data, SitrepRead)
+    df = df_from_store(data, CensusRead)
     # limit columns here
     return [
         dt.DataTable(
-            id="sitrep_simple_table_contents",
+            id="census_simple_table_contents",
             columns=[{"name": i, "id": i} for i in df.columns],
             data=df.to_dict("records"),
             filter_action="native",
@@ -72,13 +73,13 @@ def gen_simple_table(data: dict):
 
 card_table = dbc.Card(
     [
-        dbc.CardHeader(html.H6("Sitrep details")),
+        dbc.CardHeader(html.H6("Census details")),
         dbc.CardBody(
             [
                 dcc.Loading(
                     id="loading-1",
                     type="default",
-                    children=html.Div(id="sitrep_simple_table"),
+                    children=html.Div(id="census_simple_table"),
                 )
             ]
         ),
@@ -95,13 +96,13 @@ main = html.Div(
 dash_only = html.Div(
     [
         dcc.Interval(
-            id="sitrep_query-interval", interval=REFRESH_INTERVAL, n_intervals=0
+            id="census_query-interval", interval=REFRESH_INTERVAL, n_intervals=0
         ),
-        dcc.Store(id="sitrep_request_data"),
+        dcc.Store(id="census_request_data"),
     ]
 )
 
-sitrep = dbc.Container(
+census = dbc.Container(
     fluid=True,
     className="dbc",
     children=[

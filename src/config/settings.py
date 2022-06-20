@@ -27,6 +27,7 @@ class ModuleNames(str, Enum):
 
     consults = "consults"
     sitrep = "sitrep"
+    census = "census"
 
 
 class Environments(str, Enum):
