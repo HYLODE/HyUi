@@ -1,5 +1,13 @@
 # Running notes log
 
+## 2022-06-21t22:21:25
+build electives model
+
+- [ ] then rebase multipage on this
+- [ ] then get this to run live (rewrite query function to cope with different DSN)
+
+
+
 ## 2022-06-12t12:33:47
 trying to reconfigure structure for better docker
 using tests to check progress
