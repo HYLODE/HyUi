@@ -28,37 +28,37 @@ class ElectivesBase(SQLModel):
     AgeInYears: int
     PlacedOnWaitingListDate: Optional[date]
     DecidedToAdmitDate: Optional[date]
-    AdmissionService: str
+    AdmissionService: Optional[str]
     ElectiveAdmissionType: Optional[str]
     IntendedManagement: Optional[str]
     Priority: Optional[str]
     RemovalReason: Optional[str]
-    Status: str
+    Status: Optional[str]
     Subgroup: Optional[str]
-    SurgicalService: str
+    SurgicalService: Optional[str]
     Type: Optional[str]
-    _LastUpdatedInstant: datetime
-    SurgeryDate: date
-    PrimaryService: str
-    Classification: str
-    SurgeryPatientClass: str
-    AdmissionPatientClass: str
-    PrimaryAnesthesiaType: str
+    LastUpdatedInstant: Optional[datetime]
+    SurgeryDate: Optional[date]
+    PrimaryService: Optional[str]
+    Classification: Optional[str]
+    SurgeryPatientClass: Optional[str]
+    AdmissionPatientClass: Optional[str]
+    PrimaryAnesthesiaType: Optional[str]
     ReasonNotPerformed: Optional[str]
-    Canceled: int
+    Canceled: Optional[int]
     SurgicalCaseUclhKey: int
     SurgicalCaseKey: int
-    CaseScheduleStatus: str
-    CaseCancelReason: str
-    CaseCancelReasonCode: str
+    CaseScheduleStatus: Optional[str]
+    CaseCancelReason: Optional[str]
+    CaseCancelReasonCode: Optional[str]
     CancelDate: Optional[date]
     PlannedOperationStartInstant: datetime
     PlannedOperationEndInstant: datetime
-    PostOperativeDestination: str
-    Name: str
-    PatientFriendlyName: str
-    RoomName: str
-    DepartmentName: str
+    PostOperativeDestination: Optional[str]
+    Name: Optional[str]
+    PatientFriendlyName: Optional[str]
+    RoomName: Optional[str]
+    DepartmentName: Optional[str]
 
 
 class Electives(ElectivesBase, table=True):
