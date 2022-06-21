@@ -8,7 +8,7 @@ export NB_GID
 
 # Load secrets so available to docker
 # Specifically the UDS credentials
-include ../.secrets
+# include ../.env
 
 .PHONY:
 	mock1build
@@ -27,6 +27,8 @@ mock1build:
 		--build-arg HTTPS_PROXY \
 		--build-arg http_proxy \
 		--build-arg https_proxy \
+		--build-arg NB_UID  \
+		--build-arg NB_GID  \
 		-t jupyter-hyui .
 
 ## Copy the example synthetic data pipeline into the portal
@@ -47,9 +49,7 @@ mock3run:
 		-e NB_GID="${NB_GID}"  \
 		-e CHOWN_HOME=yes \
 		-e CHOWN_HOME_OPTS="-R" \
-		-e UDS_USER \
-		-e UDS_PWD \
-		-e UDS_HOST \
+                --env-file ../.env \
 		-w "/home/${NB_USER}" \
 		-v ${PWD}/portal:/home/hyui/portal \
 		jupyter-hyui:latest \

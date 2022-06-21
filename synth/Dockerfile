@@ -5,14 +5,10 @@
 FROM jupyter/scipy-notebook:lab-3.4.0
 
 # Standalone pip install b/c sdv takes so much time
-RUN mamba install -c pytorch -c conda-forge sdv
-
-RUN apt-get update \
-  && apt-get -y install graphviz \
-  && apt-get clean
+RUN conda install -c pytorch -c conda-forge sdv
 
 # Install from requirements.txt file
 COPY --chown=${NB_UID}:${NB_GID} requirements.txt /tmp/
-RUN pip install --quiet --no-cache-dir --requirement /tmp/requirements.txt && \
+RUN conda install --yes --file /tmp/requirements.txt && \
     fix-permissions "${CONDA_DIR}" && \
     fix-permissions "/home/${NB_USER}"
