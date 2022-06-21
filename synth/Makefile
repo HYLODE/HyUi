@@ -6,17 +6,13 @@ NB_GID := $(shell id -g)
 export NB_UID
 export NB_GID
 
-# Load secrets so available to docker
-# Specifically the UDS credentials
-# include ../.env
-
 .PHONY:
+	help
 	mock1build
 	mock2copyin
 	mock3run
 	mock4copyout
 	mock5stop
-	help
 
 .DEFAULT_GOAL := help
 
@@ -51,8 +47,6 @@ mock3run:
 		--env-file ../.env \
 		jupyter-hyui jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --LabApp.token=''
 
-# docker run -it --rm \ --detach \ -p 8091:8888 \ --user root \ -e NB_USER=hyui \ -e NB_UID="${NB_UID}" \ -e NB_GID="${NB_GID}"  \ -e CHOWN_HOME=yes \ -e CHOWN_HOME_OPTS="-R" \ --env-file ../.env \ -w "/home/${NB_USER}" \ -v ${PWD}/portal:/home/hyui/portal \ jupyter-hyui:latest \
-
 ## Copy the synthetic data and the query from the portal
 mock4copyout:
 	cp ./portal/mock.h5 ./
@@ -60,8 +54,7 @@ mock4copyout:
 	@echo "*** Now move these files to the corresponding API folder"
 
 
-## Stop that docker image
-## Beware that this will stop all containers on this machine derived from this image
+## Stop that docker image; Beware that this will stop all containers on this machine derived from this image
 mock5stop:
 	@echo "*** Stopping all docker containers derived from jupyter-hyui"
 	docker ps --filter ancestor=jupyter-hyui -aq | xargs docker stop

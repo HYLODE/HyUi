@@ -53,6 +53,14 @@ class Settings(BaseSettings):
     DB_URL: Optional[str]
     DB_POSTGRES_SCHEMA = "star"
 
+    CABOODLE_DB_HOST: Optional[str]
+    CABOODLE_DB_USER: Optional[str]
+    CABOODLE_DB_PASSWORD: Optional[str]
+    CABOODLE_DB_NAME: Optional[str]
+    CABOODLE_DB_PORT: Optional[int]
+
+    CABOODLE_URL: Optional[str]
+
     BASE_URL: Optional[str]
     API_URL: Optional[str]
     APP_URL: Optional[str]
@@ -80,6 +88,23 @@ class Settings(BaseSettings):
                 host=values.get("EMAP_DB_HOST"),
                 path=f"/{values.get('EMAP_DB_NAME') or ''}",
             )
+
+    @validator("CABOODLE_URL")
+    def assemble_caboodle_connection(
+        cls, v: Optional[str], values: Dict[str, Any]
+    ) -> str:
+        if values.get("ENV") == "dev":
+            db_path = Path(__file__).resolve().parents[1].absolute() / "mock"
+            db_url = f"sqlite:///{db_path.as_posix()}/mock.db"
+        else:
+            # Construct the MSSQL connection
+            db_host = values.get("CABOODLE_DB_HOST")
+            db_user = values.get("CABOODLE_DB_USER")
+            db_password = values.get("CABOODLE_DB_PASSWORD")
+            db_port = values.get("CABOODLE_DB_PORT")
+            db_name = values.get("CABOODLE_DB_NAME")
+            db_url = f"mssql+pyodbc://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}?driver=ODBC+Driver+17+for+SQL+Server"
+        return db_url
 
     @validator("BASE_URL")
     def assemble_base_url(cls, v: Optional[str], values: Dict[str, Any]) -> str:
