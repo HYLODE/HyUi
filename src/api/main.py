@@ -16,6 +16,8 @@ MODULE_ROOT = settings.MODULE_ROOT
 ROUTES = settings.ROUTES
 
 
+# TODO: this feels clunky; specify session type (i.e. engine as arg?)
+#       since you're repeating yourself
 def get_emap_session():
     with Session(emap_engine) as emap_session:
         yield emap_session

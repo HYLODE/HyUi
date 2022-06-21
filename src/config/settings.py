@@ -57,7 +57,7 @@ class Settings(BaseSettings):
     CABOODLE_DB_USER: Optional[str]
     CABOODLE_DB_PASSWORD: Optional[str]
     CABOODLE_DB_NAME: Optional[str]
-    CABOODLE_DB_PORT: Optional[int]
+    CABOODLE_DB_PORT: Optional[str]
 
     CABOODLE_URL: Optional[str]
 
