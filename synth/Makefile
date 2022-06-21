@@ -40,20 +40,18 @@ mock3run:
 	@echo "*** JupyterLab will run on port 8091"
 	@echo "*** Working directory (portal) is exluded from version control"
 	@echo "*** You must manually copy files in and out as needed"
-	docker run -it --rm \
-		--detach \
+	docker run -u "${NB_UID}":"${NB_GID}" \
+		-v ${PWD}/portal:${PWD} \
+		-w ${PWD} \
+		-e HOME=${PWD}/.home \
+		-it \
+		--rm \
+		--init \
 		-p 8091:8888 \
-		--user root \
-		-e NB_USER=hyui \
-		-e NB_UID="${NB_UID}" \
-		-e NB_GID="${NB_GID}"  \
-		-e CHOWN_HOME=yes \
-		-e CHOWN_HOME_OPTS="-R" \
-                --env-file ../.env \
-		-w "/home/${NB_USER}" \
-		-v ${PWD}/portal:/home/hyui/portal \
-		jupyter-hyui:latest \
-		start.sh jupyter lab --LabApp.token=''
+		--env-file ../.env \
+		jupyter-hyui jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --LabApp.token=''
+
+# docker run -it --rm \ --detach \ -p 8091:8888 \ --user root \ -e NB_USER=hyui \ -e NB_UID="${NB_UID}" \ -e NB_GID="${NB_GID}"  \ -e CHOWN_HOME=yes \ -e CHOWN_HOME_OPTS="-R" \ --env-file ../.env \ -w "/home/${NB_USER}" \ -v ${PWD}/portal:/home/hyui/portal \ jupyter-hyui:latest \
 
 ## Copy the synthetic data and the query from the portal
 mock4copyout:
