@@ -6,14 +6,14 @@ import pytest
 from playwright.sync_api import Page, expect
 
 if os.getenv("DOCKER", "False") == "True":
-    CONSULTS_URL = "http://apps:8095/consults"
+    CONSULTS_URL = "http://apps:8095/consults/consults"
 else:
     # Assume no docker at all so using local dev
-    CONSULTS_URL = "http://localhost:8093/consults"
+    CONSULTS_URL = "http://localhost:8093/consults/consults"
 
 
 @pytest.mark.e2e
 def test_consults_page_loads(page: Page):
-    page.goto(CONSULTS_URL, timeout=30 * 1000)
-    expect(page).to_have_title("HyUi", timeout=5000)
+    page.goto(CONSULTS_URL, timeout=10 * 1000)
+    expect(page).to_have_title("Consults", timeout=5000)
     expect(page).to_have_url(CONSULTS_URL, timeout=5000)
