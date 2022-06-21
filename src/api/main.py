@@ -76,7 +76,6 @@ def read_sitrep(session: Session = Depends(get_session)):
     Returns Sitrep data class populated by query-live/mock
     query preparation depends on the environment so will return
     mock data in dev and live (from the API itself)\n\n
-    TODO: live reads where an API already exists need to bypass the query
     """
     q = prepare_query("sitrep")
     results = session.execute(q)  # type: ignore
@@ -94,9 +93,26 @@ def read_census(session: Session = Depends(get_session)):
     Returns Census data class populated by query-live/mock
     query preparation depends on the environment so will return
     mock data in dev and live (from the API itself)\n\n
-    TODO: live reads where an API already exists need to bypass the query
     """
     q = prepare_query("census")
+    results = session.execute(q)  # type: ignore
+    Record = namedtuple("Record", results.keys())  # type: ignore
+    records = [Record(*r) for r in results.fetchall()]
+    return records
+
+
+ElectivesRead = get_model_from_route("Electives", "Read")
+
+
+@app.get("/electives", response_model=List[ElectivesRead])  # type: ignore
+def read_electives(session: Session = Depends(get_session)):
+    """
+    Returns Electives data class populated by query-live/mock
+    query preparation depends on the environment so will return
+    mock data in dev and live (from the API itself)\n\n
+    TODO: need to add logic to join patient identifiers from EMAP
+    """
+    q = prepare_query("electives")
     results = session.execute(q)  # type: ignore
     Record = namedtuple("Record", results.keys())  # type: ignore
     records = [Record(*r) for r in results.fetchall()]
