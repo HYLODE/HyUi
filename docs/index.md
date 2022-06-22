@@ -62,44 +62,6 @@ git clonehttps://github.com/HYLODE/HyUi.git
 cd HyUi
 ```
 
-### Development (Local)
-
-We assume that the majority of the development work will be on your own machine. You will therefore need to set-up your own dev environment. I have been using [conda miniforge](https://github.com/conda-forge/miniforge) because this has the best compatibility with the ARM processor on the Mac. I think it should also work on other machines but I have not tested this.
-
-From within the HyUi directory
-
-```sh
-conda env create --file=./dev/steve/environment-short.yml
-conda activate hyuiv4
-```
-
-Then confirm your set-up is OK
-
-```sh
-pytest src/tests/smoke
-```
-
-#### Local development without docker
-
-Backend (all routes)
-
-```sh
-cd ./src
-uvicorn api.main:app --reload --workers 1 --host 0.0.0.0 --port 8094
-```
-
-then navigate to [http://localhost:8094/docs]() to view the API documentation
-
-... `app/main.py` hosts the various routes for the different apps
-
-
-Frontend (per app)
-
-```sh
-cd ./src
-python apps/app1/index.py
-```
-
 
 #### Local development with docker
 

@@ -2,45 +2,43 @@
 """
 The application itself
 """
-from dash import Dash, Input, Output, dcc, html, callback
 import dash_bootstrap_components as dbc
+from dash import Dash, Input, Output, callback, dcc, html, page_container, page_registry
 
 from config import settings
-from apps.index import home_page
-from apps.consults.consults import consults
-from apps.sitrep.sitrep import sitrep
-from apps.census.census import census
 
 app = Dash(
     __name__,
     title="HyUi",
     update_title=None,
     external_stylesheets=[
-        dbc.themes.FLATLY,
+        dbc.themes.SIMPLEX,
         dbc.icons.FONT_AWESOME,
     ],
     suppress_callback_exceptions=True,
+    use_pages=True,
 )
 
-
-app.layout = html.Div(
-    [dcc.Location(id="url", refresh=False), html.Div(id="page-content")]
+navbar = dbc.NavbarSimple(
+    dbc.Nav(
+        [
+            dbc.NavLink(page["name"], href=page["path"])
+            for page in page_registry.values()
+        ]
+    ),
+    brand="HYLODE",
+    sticky="top",
+    class_name="mb-2",
 )
 
-
-@callback(Output("page-content", "children"), Input("url", "pathname"))
-def display_page(pathname):
-    if pathname == "/":
-        return home_page
-    elif pathname == "/consults":
-        return consults
-    elif pathname == "/sitrep":
-        return sitrep
-    elif pathname == "/census":
-        return census
-    else:
-        # TODO proper 404  route
-        return "404"
+app.layout = dbc.Container(
+    [
+        navbar,
+        dbc.Row([page_container]),
+    ],
+    fluid=True,
+    className="dbc",
+)
 
 
 # standalone apps : please use ports fastapi 8092 and dash 8093

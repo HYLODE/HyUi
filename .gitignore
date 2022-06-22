@@ -885,6 +885,8 @@ docs/reference/api/*
 .secrets
 # Ignore files within portal to avoid accidentally leaking anything
 synth/portal/*
+# Crud from the synth jupyter lab
+synth/.home/*
 
 # Ignore R artifacts
 *.Renviron
