@@ -8,7 +8,7 @@ import dash_bootstrap_components as dbc
 from dash import Input, Output, callback
 from dash import dash_table as dt
 from dash import dcc, html
-from dash import register_page, page_registry
+from dash import register_page
 
 from api.sitrep.model import SitrepRead
 
@@ -16,7 +16,6 @@ from config.settings import settings
 from utils.dash import df_from_store, get_results_response
 
 register_page(__name__)
-print(page_registry)
 
 # APP to define URL
 # maybe run by HyUi API backend or maybe external

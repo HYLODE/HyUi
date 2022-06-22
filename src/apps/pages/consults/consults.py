@@ -132,6 +132,8 @@ card_fig = dbc.Card(
                 html.Div(
                     dcc.Dropdown(
                         id="department_picker",
+                        value="",
+                        placeholder="Pick a consult type",
                     )
                 ),
                 html.Div([html.P("Updates every 5 mins")]),
