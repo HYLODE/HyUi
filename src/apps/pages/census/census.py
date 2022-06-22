@@ -14,6 +14,7 @@ from config.settings import settings
 from utils.dash import df_from_store, get_results_response
 
 register_page(__name__)
+BPID = "CEN_"
 
 # APP to define URL
 # maybe run by HyUi API backend or maybe external
@@ -42,8 +43,8 @@ REFRESH_INTERVAL = 30 * 60 * 1000  # milliseconds
 
 
 @callback(
-    Output("census_request_data", "data"),
-    Input("census_query-interval", "n_intervals"),
+    Output(f"{BPID}census_request_data", "data"),
+    Input(f"{BPID}census_query-interval", "n_intervals"),
 )
 def store_data(n_intervals: int) -> list:
     """
@@ -54,8 +55,8 @@ def store_data(n_intervals: int) -> list:
 
 
 @callback(
-    Output("census_simple_table", "children"),
-    Input("census_request_data", "data"),
+    Output(f"{BPID}census_simple_table", "children"),
+    Input(f"{BPID}census_request_data", "data"),
     # prevent_initial_call=True,
 )
 def gen_simple_table(data: dict):
@@ -80,7 +81,7 @@ census_table = dbc.Card(
                 dcc.Loading(
                     id="loading-1",
                     type="default",
-                    children=html.Div(id="census_simple_table"),
+                    children=html.Div(id=f"{BPID}census_simple_table"),
                 )
             ]
         ),
@@ -90,9 +91,9 @@ census_table = dbc.Card(
 dash_only = html.Div(
     [
         dcc.Interval(
-            id="census_query-interval", interval=REFRESH_INTERVAL, n_intervals=0
+            id=f"{BPID}census_query-interval", interval=REFRESH_INTERVAL, n_intervals=0
         ),
-        dcc.Store(id="census_request_data"),
+        dcc.Store(id=f"{BPID}census_request_data"),
     ]
 )
 

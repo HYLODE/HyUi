@@ -2,10 +2,11 @@
 """
 The application itself
 """
+from dash import Dash, page_container, page_registry
 import dash_bootstrap_components as dbc
-from dash import Dash, Input, Output, callback, dcc, html, page_container, page_registry
-
 from config import settings
+
+BPID = "app_"
 
 app = Dash(
     __name__,

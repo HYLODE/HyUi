@@ -1,5 +1,13 @@
 # Running notes log
 
+## 2022-06-22t22:36:42
+had a go at implementing blueprints from dash_extensions
+didn't seem to work with the new multipage
+gave up quickly
+saw this instead for name spacing
+seems like a good interim solution
+https://community.plotly.com/t/ideas-for-namespacing-component-ids/22446?u=drstevok
+
 ## 2022-06-20t22:36:16
 https://github.com/HYLODE/HyUi/issues/46
 updated dash to 2.5.1

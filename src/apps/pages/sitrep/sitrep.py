@@ -15,6 +15,7 @@ from api.sitrep.model import SitrepRead
 from config.settings import settings
 from utils.dash import df_from_store, get_results_response
 
+BPID = "sit_"
 register_page(__name__)
 
 # APP to define URL
@@ -43,8 +44,8 @@ REFRESH_INTERVAL = 30 * 60 * 1000  # milliseconds
 
 
 @callback(
-    Output("sitrep_request_data", "data"),
-    Input("sitrep_query-interval", "n_intervals"),
+    Output(f"{BPID}request_data", "data"),
+    Input(f"{BPID}query-interval", "n_intervals"),
 )
 def store_data(n_intervals: int) -> list:
     """
@@ -55,8 +56,8 @@ def store_data(n_intervals: int) -> list:
 
 
 @callback(
-    Output("sitrep_simple_table", "children"),
-    Input("sitrep_request_data", "data"),
+    Output(f"{BPID}simple_table", "children"),
+    Input(f"{BPID}request_data", "data"),
     # prevent_initial_call=True,
 )
 def gen_simple_table(data: dict):
@@ -64,7 +65,7 @@ def gen_simple_table(data: dict):
     # limit columns here
     return [
         dt.DataTable(
-            id="sitrep_simple_table_contents",
+            id=f"{BPID}simple_table_contents",
             columns=[{"name": i, "id": i} for i in df.columns],
             data=df.to_dict("records"),
             filter_action="native",
@@ -81,7 +82,7 @@ sitrep_table = dbc.Card(
                 dcc.Loading(
                     id="loading-1",
                     type="default",
-                    children=html.Div(id="sitrep_simple_table"),
+                    children=html.Div(id=f"{BPID}simple_table"),
                 )
             ]
         ),
@@ -91,9 +92,9 @@ sitrep_table = dbc.Card(
 dash_only = html.Div(
     [
         dcc.Interval(
-            id="sitrep_query-interval", interval=REFRESH_INTERVAL, n_intervals=0
+            id=f"{BPID}query-interval", interval=REFRESH_INTERVAL, n_intervals=0
         ),
-        dcc.Store(id="sitrep_request_data"),
+        dcc.Store(id=f"{BPID}request_data"),
     ]
 )
 

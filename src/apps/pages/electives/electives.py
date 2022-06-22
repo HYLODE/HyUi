@@ -17,6 +17,7 @@ from config.settings import settings
 from utils.dash import df_from_store, get_results_response
 
 register_page(__name__)
+BPID = "ELE_"
 
 API_URL = f"{settings.API_URL}/electives"
 
@@ -25,8 +26,8 @@ REFRESH_INTERVAL = 6 * 60 * 60 * 1000  # milliseconds
 
 
 @callback(
-    Output("electives_request_data", "data"),
-    Input("electives_query_interval", "n_intervals"),
+    Output(f"{BPID}request_data", "data"),
+    Input(f"{BPID}query_interval", "n_intervals"),
 )
 def store_data(n_intervals: int) -> dict:
     """
@@ -37,9 +38,9 @@ def store_data(n_intervals: int) -> dict:
 
 
 @callback(
-    Output("electives_filtered_data", "data"),
-    Input("service_picker", "value"),
-    State("electives_request_data", "data"),
+    Output(f"{BPID}filtered_data", "data"),
+    Input(f"{BPID}service_picker", "value"),
+    State(f"{BPID}request_data", "data"),
     prevent_initial_call=True,
 )
 def filter_data(val: List[str], data: dict) -> dict:
@@ -54,9 +55,9 @@ def filter_data(val: List[str], data: dict) -> dict:
 
 
 @callback(
-    Output("fig_electives", "children"),
-    Input("electives_filtered_data", "modified_timestamp"),
-    State("electives_filtered_data", "data"),
+    Output(f"{BPID}fig_electives", "children"),
+    Input(f"{BPID}filtered_data", "modified_timestamp"),
+    State(f"{BPID}filtered_data", "data"),
     prevent_initial_call=True,
 )
 def gen_surgeries_over_time(n_intervals: int, data: dict):
@@ -74,13 +75,13 @@ def gen_surgeries_over_time(n_intervals: int, data: dict):
     fig = px.bar(
         df, x="PlannedOperationStartInstant", y="PatientKey", color="PrimaryService"
     )
-    return dcc.Graph(id="electives_fig", figure=fig)
+    return dcc.Graph(id=f"{BPID}fig", figure=fig)
 
 
 @callback(
-    Output("table_electives", "children"),
-    Input("electives_filtered_data", "modified_timestamp"),
-    State("electives_filtered_data", "data"),
+    Output(f"{BPID}table_electives", "children"),
+    Input(f"{BPID}filtered_data", "modified_timestamp"),
+    State(f"{BPID}filtered_data", "data"),
     prevent_initial_call=True,
 )
 def gen_table_consults(modified: int, data: dict):
@@ -108,8 +109,8 @@ def gen_table_consults(modified: int, data: dict):
 
 
 @callback(
-    Output("service_picker", "options"),
-    Input("electives_request_data", "data"),
+    Output(f"{BPID}service_picker", "options"),
+    Input(f"{BPID}request_data", "data"),
     prevent_initial_call=True,
 )
 def update_service_dropdown(data: dict):
@@ -124,14 +125,14 @@ card_fig = dbc.Card(
             [
                 html.Div(
                     dcc.Dropdown(
-                        id="service_picker",
+                        id=f"{BPID}service_picker",
                         value="",
                         placeholder="Pick a surgical specialty",
                         multi=True,
                     )
                 ),
                 html.Div([html.P("Updates daily")]),
-                html.Div(id="fig_electives"),
+                html.Div(id=f"{BPID}fig_electives"),
             ]
         ),
     ]
@@ -142,7 +143,7 @@ card_table = dbc.Card(
         dbc.CardHeader(html.H6("Elective surgery")),
         dbc.CardBody(
             [
-                html.Div(id="table_electives"),
+                html.Div(id=f"{BPID}table_electives"),
             ]
         ),
     ]
@@ -159,10 +160,10 @@ main = html.Div(
 dash_only = html.Div(
     [
         dcc.Interval(
-            id="electives_query_interval", interval=REFRESH_INTERVAL, n_intervals=0
+            id=f"{BPID}query_interval", interval=REFRESH_INTERVAL, n_intervals=0
         ),
-        dcc.Store(id="electives_request_data"),
-        dcc.Store(id="electives_filtered_data"),
+        dcc.Store(id=f"{BPID}request_data"),
+        dcc.Store(id=f"{BPID}filtered_data"),
     ]
 )
 

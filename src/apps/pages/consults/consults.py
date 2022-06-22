@@ -15,6 +15,7 @@ from config.settings import settings
 from utils.dash import df_from_store, get_results_response
 
 register_page(__name__)
+BPID = "CON_"
 
 # APP to define URL
 # maybe run by HyUi API backend or maybe external
@@ -37,8 +38,8 @@ REFRESH_INTERVAL = 5 * 60 * 1000  # milliseconds
 
 
 @callback(
-    Output("request_data", "data"),
-    Input("query-interval", "n_intervals"),
+    Output(f"{BPID}request_data", "data"),
+    Input(f"{BPID}query-interval", "n_intervals"),
 )
 def store_data(n_intervals: int) -> dict:
     """
@@ -49,9 +50,9 @@ def store_data(n_intervals: int) -> dict:
 
 
 @callback(
-    Output("filtered_data", "data"),
-    Input("department_picker", "value"),
-    State("request_data", "data"),
+    Output(f"{BPID}filtered_data", "data"),
+    Input(f"{BPID}department_picker", "value"),
+    State(f"{BPID}request_data", "data"),
     prevent_initial_call=True,
 )
 def filter_data(val: str, data: dict) -> dict:
@@ -66,9 +67,9 @@ def filter_data(val: str, data: dict) -> dict:
 
 
 @callback(
-    Output("fig_consults", "children"),
-    Input("filtered_data", "modified_timestamp"),
-    State("filtered_data", "data"),
+    Output(f"{BPID}fig_consults", "children"),
+    Input(f"{BPID}filtered_data", "modified_timestamp"),
+    State(f"{BPID}filtered_data", "data"),
     prevent_initial_call=True,
 )
 def gen_consults_over_time(n_intervals: int, data: dict):
@@ -87,9 +88,9 @@ def gen_consults_over_time(n_intervals: int, data: dict):
 
 
 @callback(
-    Output("table_consults", "children"),
-    Input("filtered_data", "modified_timestamp"),
-    State("filtered_data", "data"),
+    Output(f"{BPID}table_consults", "children"),
+    Input(f"{BPID}filtered_data", "modified_timestamp"),
+    State(f"{BPID}filtered_data", "data"),
     prevent_initial_call=True,
 )
 def gen_table_consults(modified: int, data: dict):
@@ -115,8 +116,8 @@ def gen_table_consults(modified: int, data: dict):
 
 
 @callback(
-    Output("department_picker", "options"),
-    Input("request_data", "data"),
+    Output(f"{BPID}department_picker", "options"),
+    Input(f"{BPID}request_data", "data"),
     prevent_initial_call=True,
 )
 def update_dept_dropdown(data: dict):
@@ -131,13 +132,13 @@ card_fig = dbc.Card(
             [
                 html.Div(
                     dcc.Dropdown(
-                        id="department_picker",
+                        id=f"{BPID}department_picker",
                         value="",
                         placeholder="Pick a consult type",
                     )
                 ),
                 html.Div([html.P("Updates every 5 mins")]),
-                html.Div(id="fig_consults"),
+                html.Div(id=f"{BPID}fig_consults"),
             ]
         ),
     ]
@@ -149,7 +150,7 @@ card_table = dbc.Card(
         dbc.CardBody(
             [
                 html.Div([html.P("Consults launched from ED")]),
-                html.Div(id="table_consults"),
+                html.Div(id=f"{BPID}table_consults"),
             ]
         ),
     ]
@@ -165,9 +166,11 @@ main = html.Div(
 
 dash_only = html.Div(
     [
-        dcc.Interval(id="query-interval", interval=REFRESH_INTERVAL, n_intervals=0),
-        dcc.Store(id="request_data"),
-        dcc.Store(id="filtered_data"),
+        dcc.Interval(
+            id=f"{BPID}query-interval", interval=REFRESH_INTERVAL, n_intervals=0
+        ),
+        dcc.Store(id=f"{BPID}request_data"),
+        dcc.Store(id=f"{BPID}filtered_data"),
     ]
 )
 
