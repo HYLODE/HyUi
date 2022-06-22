@@ -23,26 +23,30 @@ app = Dash(
 )
 
 
-def other_pages_dropdown():
-    dropdown = []
+def header_pages_dropdown():
+    """Filters and sorts pages from registry for display in main navbar"""
+    pp = {page["name"]: page["path"] for page in page_registry.values()}
+    ll = []
+    for page in CORE_PAGES:
+        ll.append(dbc.NavItem(dbc.NavLink(page, href=pp[page])))
+    return ll
+
+
+def more_pages_dropdown():
+    """Filters and sorts pages from registry for dropdown"""
+    pp = []
     for page in page_registry.values():
         if page["name"] in CORE_PAGES:
             continue
-        dropdown.append(dbc.DropdownMenuItem(page["name"], href=page["path"]))
-    return dropdown
+        pp.append(dbc.DropdownMenuItem(page["name"], href=page["path"]))
+    return pp
 
 
 navbar = dbc.NavbarSimple(
     children=[
-        dbc.Nav(
-            [
-                dbc.NavLink(page["name"], href=page["path"])
-                for page in page_registry.values()
-                if page["name"] in CORE_PAGES
-            ],
-        ),
+        dbc.Nav(children=header_pages_dropdown()),
         dbc.DropdownMenu(
-            children=other_pages_dropdown(),
+            children=more_pages_dropdown(),
             nav=True,
             in_navbar=True,
             label="More",
