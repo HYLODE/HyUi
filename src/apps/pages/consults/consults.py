@@ -36,10 +36,63 @@ API_URL = f"{settings.API_URL}/consults/"
 
 REFRESH_INTERVAL = 5 * 60 * 1000  # milliseconds
 
+card_fig = dbc.Card(
+    [
+        dbc.CardHeader(html.H6("Real time consults over the last 72")),
+        dbc.CardBody(
+            [
+                html.Div(
+                    department_picker := dcc.Dropdown(
+                        value="",
+                        placeholder="Pick a consult type",
+                    )
+                ),
+                html.Div([html.P("Updates every 5 mins")]),
+                fig_consults := html.Div(),
+            ]
+        ),
+    ]
+)
+
+card_table = dbc.Card(
+    [
+        dbc.CardHeader(html.H6("Consult details")),
+        dbc.CardBody(
+            [
+                html.Div([html.P("Consults launched from ED")]),
+                table_consults := html.Div(),
+            ]
+        ),
+    ]
+)
+
+main = html.Div(
+    [
+        card_fig,
+        card_table,
+    ]
+)
+
+
+dash_only = html.Div(
+    [
+        query_interval := dcc.Interval(interval=REFRESH_INTERVAL, n_intervals=0),
+        request_data := dcc.Store(id=f"{BPID}request_data"),
+        filtered_data := dcc.Store(id=f"{BPID}filtered_data"),
+    ]
+)
+
+layout = html.Div(
+    [
+        main,
+        dash_only,
+    ],
+)
+
 
 @callback(
-    Output(f"{BPID}request_data", "data"),
-    Input(f"{BPID}query-interval", "n_intervals"),
+    Output(request_data, "data"),
+    Input(query_interval, "n_intervals"),
 )
 def store_data(n_intervals: int) -> dict:
     """
@@ -50,9 +103,9 @@ def store_data(n_intervals: int) -> dict:
 
 
 @callback(
-    Output(f"{BPID}filtered_data", "data"),
-    Input(f"{BPID}department_picker", "value"),
-    State(f"{BPID}request_data", "data"),
+    Output(filtered_data, "data"),
+    Input(department_picker, "value"),
+    State(request_data, "data"),
     prevent_initial_call=True,
 )
 def filter_data(val: str, data: dict) -> dict:
@@ -67,9 +120,9 @@ def filter_data(val: str, data: dict) -> dict:
 
 
 @callback(
-    Output(f"{BPID}fig_consults", "children"),
-    Input(f"{BPID}filtered_data", "modified_timestamp"),
-    State(f"{BPID}filtered_data", "data"),
+    Output(fig_consults, "children"),
+    Input(filtered_data, "modified_timestamp"),
+    State(filtered_data, "data"),
     prevent_initial_call=True,
 )
 def gen_consults_over_time(n_intervals: int, data: dict):
@@ -88,9 +141,9 @@ def gen_consults_over_time(n_intervals: int, data: dict):
 
 
 @callback(
-    Output(f"{BPID}table_consults", "children"),
-    Input(f"{BPID}filtered_data", "modified_timestamp"),
-    State(f"{BPID}filtered_data", "data"),
+    Output(table_consults, "children"),
+    Input(filtered_data, "modified_timestamp"),
+    State(filtered_data, "data"),
     prevent_initial_call=True,
 )
 def gen_table_consults(modified: int, data: dict):
@@ -116,67 +169,10 @@ def gen_table_consults(modified: int, data: dict):
 
 
 @callback(
-    Output(f"{BPID}department_picker", "options"),
-    Input(f"{BPID}request_data", "data"),
+    Output(department_picker, "options"),
+    Input(request_data, "data"),
     prevent_initial_call=True,
 )
 def update_dept_dropdown(data: dict):
     df = df_from_store(data, ConsultsRead)
     return df["dept_name"].sort_values().unique()
-
-
-card_fig = dbc.Card(
-    [
-        dbc.CardHeader(html.H6("Real time consults over the last 72")),
-        dbc.CardBody(
-            [
-                html.Div(
-                    dcc.Dropdown(
-                        id=f"{BPID}department_picker",
-                        value="",
-                        placeholder="Pick a consult type",
-                    )
-                ),
-                html.Div([html.P("Updates every 5 mins")]),
-                html.Div(id=f"{BPID}fig_consults"),
-            ]
-        ),
-    ]
-)
-
-card_table = dbc.Card(
-    [
-        dbc.CardHeader(html.H6("Consult details")),
-        dbc.CardBody(
-            [
-                html.Div([html.P("Consults launched from ED")]),
-                html.Div(id=f"{BPID}table_consults"),
-            ]
-        ),
-    ]
-)
-
-main = html.Div(
-    [
-        card_fig,
-        card_table,
-    ]
-)
-
-
-dash_only = html.Div(
-    [
-        dcc.Interval(
-            id=f"{BPID}query-interval", interval=REFRESH_INTERVAL, n_intervals=0
-        ),
-        dcc.Store(id=f"{BPID}request_data"),
-        dcc.Store(id=f"{BPID}filtered_data"),
-    ]
-)
-
-layout = html.Div(
-    [
-        main,
-        dash_only,
-    ],
-)

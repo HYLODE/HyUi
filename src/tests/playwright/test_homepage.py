@@ -14,7 +14,8 @@ else:
 @pytest.mark.e2e
 def test_app_exists(page: Page):
     page.goto(HOMEPAGE_URL)
-    assert page.title() == "HYLODE"
+    expect(page).to_have_title("Home", timeout=5000)
+    # assert page.title() == "Home"
     # Now click and go 'no where'
     page.locator('a:has-text("Home")').click()
     assert page.url == HOMEPAGE_URL

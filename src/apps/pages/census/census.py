@@ -7,7 +7,7 @@ sub-application for census
 import dash_bootstrap_components as dbc
 from dash import Input, Output, callback
 from dash import dash_table as dt
-from dash import dcc, html, page_registry, register_page
+from dash import dcc, html, register_page
 
 from api.census.model import CensusRead
 from config.settings import settings
@@ -41,10 +41,41 @@ else:
 
 REFRESH_INTERVAL = 30 * 60 * 1000  # milliseconds
 
+census_simple_table = html.Div()
+
+census_table = dbc.Card(
+    [
+        dbc.CardHeader(html.H6("Census details")),
+        dbc.CardBody(
+            [
+                dcc.Loading(
+                    id="loading-1",
+                    type="default",
+                    children=census_simple_table,
+                )
+            ]
+        ),
+    ]
+)
+
+dash_only = html.Div(
+    [
+        census_query_interval := dcc.Interval(interval=REFRESH_INTERVAL, n_intervals=0),
+        census_request_data := dcc.Store(id=f"{BPID}census_request_data"),
+    ]
+)
+
+layout = html.Div(
+    [
+        census_table,
+        dash_only,
+    ]
+)
+
 
 @callback(
-    Output(f"{BPID}census_request_data", "data"),
-    Input(f"{BPID}census_query-interval", "n_intervals"),
+    Output(census_request_data, "data"),
+    Input(census_query_interval, "n_intervals"),
 )
 def store_data(n_intervals: int) -> list:
     """
@@ -55,8 +86,8 @@ def store_data(n_intervals: int) -> list:
 
 
 @callback(
-    Output(f"{BPID}census_simple_table", "children"),
-    Input(f"{BPID}census_request_data", "data"),
+    Output(census_simple_table, "children"),
+    Input(census_request_data, "data"),
     # prevent_initial_call=True,
 )
 def gen_simple_table(data: dict):
@@ -71,35 +102,3 @@ def gen_simple_table(data: dict):
             sort_action="native",
         )
     ]
-
-
-census_table = dbc.Card(
-    [
-        dbc.CardHeader(html.H6("Census details")),
-        dbc.CardBody(
-            [
-                dcc.Loading(
-                    id="loading-1",
-                    type="default",
-                    children=html.Div(id=f"{BPID}census_simple_table"),
-                )
-            ]
-        ),
-    ]
-)
-
-dash_only = html.Div(
-    [
-        dcc.Interval(
-            id=f"{BPID}census_query-interval", interval=REFRESH_INTERVAL, n_intervals=0
-        ),
-        dcc.Store(id=f"{BPID}census_request_data"),
-    ]
-)
-
-layout = html.Div(
-    [
-        census_table,
-        dash_only,
-    ]
-)
