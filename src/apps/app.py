@@ -15,7 +15,7 @@ app = Dash(
     title="HyUi",
     update_title=None,
     external_stylesheets=[
-        dbc.themes.SIMPLEX,
+        dbc.themes.YETI,
         dbc.icons.FONT_AWESOME,
     ],
     suppress_callback_exceptions=True,
