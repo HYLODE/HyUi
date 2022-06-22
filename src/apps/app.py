@@ -2,11 +2,13 @@
 """
 The application itself
 """
-from dash import Dash, page_container, page_registry
 import dash_bootstrap_components as dbc
+from dash import Dash, page_container, page_registry
+
 from config import settings
 
 BPID = "app_"
+CORE_PAGES = ["Home", "Sitrep", "Electives"]
 
 app = Dash(
     __name__,
@@ -20,13 +22,32 @@ app = Dash(
     use_pages=True,
 )
 
+
+def other_pages_dropdown():
+    dropdown = []
+    for page in page_registry.values():
+        if page["name"] in CORE_PAGES:
+            continue
+        dropdown.append(dbc.DropdownMenuItem(page["name"], href=page["path"]))
+    return dropdown
+
+
 navbar = dbc.NavbarSimple(
-    dbc.Nav(
-        [
-            dbc.NavLink(page["name"], href=page["path"])
-            for page in page_registry.values()
-        ]
-    ),
+    children=[
+        dbc.Nav(
+            [
+                dbc.NavLink(page["name"], href=page["path"])
+                for page in page_registry.values()
+                if page["name"] in CORE_PAGES
+            ],
+        ),
+        dbc.DropdownMenu(
+            children=other_pages_dropdown(),
+            nav=True,
+            in_navbar=True,
+            label="More",
+        ),
+    ],
     brand="HYLODE",
     sticky="top",
     class_name="mb-2",
