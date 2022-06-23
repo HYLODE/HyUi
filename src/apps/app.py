@@ -34,7 +34,12 @@ def header_pages_dropdown():
 
 def more_pages_dropdown():
     """Filters and sorts pages from registry for dropdown"""
-    pp = [dbc.DropdownMenuItem("Additional reports", header=True)]
+    pp = [
+        dbc.DropdownMenuItem("Additional reports", header=True),
+        dbc.DropdownMenuItem(
+            "COVID SitRep", href="http://uclvlddpragae08:5701/sitrep/T03"
+        ),
+    ]
     for page in page_registry.values():
         if page["name"] in CORE_PAGES:
             continue

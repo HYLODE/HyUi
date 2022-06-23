@@ -226,10 +226,10 @@ ward_radio_button = html.Div(
                     labelCheckedClassName="active btn-primary",
                     options=[
                         {"label": "T03", "value": "T03"},
-                        {"label": "T06", "value": "T06"},
+                        # {"label": "T06", "value": "T06"},
                         {"label": "GWB", "value": "GWB"},
                         {"label": "WMS", "value": "WMS"},
-                        {"label": "NHNN", "value": "NHNN"},
+                        # {"label": "NHNN", "value": "NHNN"},
                     ],
                     value="T03",
                 )
