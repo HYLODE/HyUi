@@ -34,7 +34,7 @@ def header_pages_dropdown():
 
 def more_pages_dropdown():
     """Filters and sorts pages from registry for dropdown"""
-    pp = []
+    pp = [dbc.DropdownMenuItem("Additional reports", header=True)]
     for page in page_registry.values():
         if page["name"] in CORE_PAGES:
             continue
@@ -51,8 +51,21 @@ navbar = dbc.NavbarSimple(
             in_navbar=True,
             label="More",
         ),
+        dbc.DropdownMenu(
+            children=[
+                dbc.DropdownMenuItem("Developer Tools", header=True),
+                dbc.DropdownMenuItem("HYLODE", href="http://172.16.149.202:5001/"),
+                dbc.DropdownMenuItem("HYMIND Lab", href="http://172.16.149.202:5009/"),
+                dbc.DropdownMenuItem("HYUI API", href="http://172.16.149.202:8094/"),
+                dbc.DropdownMenuItem("GitHub", href="https://github.com/HYLODE"),
+            ],
+            nav=True,
+            in_navbar=True,
+            label="Dev",
+        ),
     ],
     brand="HYLODE",
+    brand_href="#",
     sticky="top",
     class_name="mb-2",
 )
@@ -60,7 +73,7 @@ navbar = dbc.NavbarSimple(
 app.layout = dbc.Container(
     [
         navbar,
-        dbc.Row([page_container]),
+        page_container,
     ],
     fluid=True,
     className="dbc",

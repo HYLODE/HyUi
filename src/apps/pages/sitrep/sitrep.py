@@ -38,11 +38,16 @@ register_page(__name__)
 #
 # the latter two are defined as constants here
 
-if settings.ENV == "prod":
-    WARD = "T03"  # initial definition
-    API_URL = f"{settings.BASE_URL}:5006/live/icu/{WARD}/ui"
-else:
-    API_URL = f"{settings.API_URL}/sitrep/"
+
+def build_api_url(ward: str = None) -> str:
+    """Construct API based on environment and requested ward"""
+    if settings.ENV == "prod":
+        ward = ward.upper() if ward else "TO3"
+        API_URL = f"{settings.BASE_URL}:5006/live/icu/{ward}/ui"
+    else:
+        API_URL = f"{settings.API_URL}/sitrep/"
+    return API_URL
+
 
 REFRESH_INTERVAL = 30 * 60 * 1000  # milliseconds
 COLS_ABACUS = [
@@ -84,11 +89,13 @@ COLS = OrderedDict(
 @callback(
     Output(f"{BPID}request_data", "data"),
     Input(f"{BPID}query-interval", "n_intervals"),
+    Input(f"{BPID}ward_radio", "value"),
 )
-def store_data(n_intervals: int) -> list:
+def store_data(n_intervals: int, ward: str) -> list:
     """
     Read data from API then store as JSON
     """
+    API_URL = build_api_url(ward)
     data = get_results_response(API_URL)
     return data  # type: ignore
 
@@ -207,6 +214,33 @@ def gen_fancy_table(data: dict):
     return dto
 
 
+ward_radio_button = html.Div(
+    [
+        html.Div(
+            [
+                dbc.RadioItems(
+                    id=f"{BPID}ward_radio",
+                    className="dbc d-grid d-md-flex justify-content-md-end btn-group",
+                    inputClassName="btn-check",
+                    labelClassName="btn btn-outline-primary",
+                    labelCheckedClassName="active btn-primary",
+                    options=[
+                        {"label": "T03", "value": "T03"},
+                        {"label": "T06", "value": "T06"},
+                        {"label": "GWB", "value": "GWB"},
+                        {"label": "WMS", "value": "WMS"},
+                        {"label": "NHNN", "value": "NHNN"},
+                    ],
+                    value="T03",
+                )
+            ],
+            className="dbc",
+        ),
+        # html.Div(id="which_icu"),
+    ],
+    className="radio-group",
+)
+
 sitrep_table = dbc.Card(
     [
         dbc.CardHeader(html.H6("Sitrep details")),
@@ -234,7 +268,8 @@ dash_only = html.Div(
 
 layout = html.Div(
     [
-        sitrep_table,
+        dbc.Row(dbc.Col([ward_radio_button])),
+        dbc.Row(dbc.Col([sitrep_table])),
         dash_only,
     ]
 )
