@@ -10,7 +10,7 @@ def get_results_response(url: str):
     request_response = requests.get(url)
     try:
         list_of_dicts = request_response.json()["data"]
-    except TypeError as e:
+    except (TypeError, KeyError) as e:
         # likely in dev environment where data is returned directly
         # so you have just tried to use a key to select from a list
         print(e)
