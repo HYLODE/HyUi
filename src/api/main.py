@@ -2,11 +2,12 @@
 # TODO: how to dynamically import a python module
 # from api.models import ResultsRead
 import importlib
+import sqlalchemy as sa
 from collections import namedtuple
 from pathlib import Path
 from typing import List
 
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, Query
 from sqlmodel import Session, create_engine
 
 from config.settings import settings  # type: ignore
@@ -40,7 +41,8 @@ def prepare_query(module: str, env: str = settings.ENV) -> str:
         )
         raise e
     print(f"--- INFO: running {choice[env]} query")
-    return Path(q).read_text()
+    query = Path(q).read_text()
+    return query
 
 
 emap_engine = create_engine(settings.DB_URL, echo=True)
@@ -70,7 +72,7 @@ def read_consults(session: Session = Depends(get_emap_session)):
     mock data in dev and live data in prod
     """
     q = prepare_query("consults")
-    results = session.execute(q)  # type: ignore
+    results = session.exec(q)  # type: ignore
     Record = namedtuple("Record", results.keys())  # type: ignore
     records = [Record(*r) for r in results.fetchall()]
     return records
@@ -87,7 +89,7 @@ def read_sitrep(session: Session = Depends(get_emap_session)):
     mock data in dev and live (from the API itself)\n\n
     """
     q = prepare_query("sitrep")
-    results = session.execute(q)  # type: ignore
+    results = session.exec(q)  # type: ignore
     Record = namedtuple("Record", results.keys())  # type: ignore
     records = [Record(*r) for r in results.fetchall()]
     return records
@@ -104,7 +106,7 @@ def read_census(session: Session = Depends(get_emap_session)):
     mock data in dev and live (from the API itself)\n\n
     """
     q = prepare_query("census")
-    results = session.execute(q)  # type: ignore
+    results = session.exec(q)  # type: ignore
     Record = namedtuple("Record", results.keys())  # type: ignore
     records = [Record(*r) for r in results.fetchall()]
     return records
@@ -122,7 +124,37 @@ def read_electives(session: Session = Depends(get_caboodle_session)):
     TODO: need to add logic to join patient identifiers from EMAP
     """
     q = prepare_query("electives")
-    results = session.execute(q)  # type: ignore
+    results = session.exec(q)  # type: ignore
     Record = namedtuple("Record", results.keys())  # type: ignore
     records = [Record(*r) for r in results.fetchall()]
+    return records
+
+
+PerrtRead = get_model_from_route("Perrt", "Read")
+
+
+@app.get("/perrt", response_model=List[PerrtRead])  # type: ignore
+def read_perrt(
+    session: Session = Depends(get_emap_session),
+    offset: int = 0,
+    limit: int = Query(default=100, lte=100),
+):
+    """
+    Returns Perrt data class populated by query-live/mock
+    query preparation depends on the environment so will return
+    mock data in dev and live (from the API itself)\n\n
+    TODO: need to add logic to join patient identifiers from EMAP
+    """
+    q = prepare_query("perrt")
+    params = dict(this_dept_name="UCH SDEC")
+    # results = session.exec(q)  # type: ignore
+    t = sa.text(q).columns(visit_observation_id=sa.Integer, mrn=sa.String)
+    results = session.exec(t)
+    Record = namedtuple("Record", results.keys())  # type: ignore
+    records = [Record(*r) for r in results.fetchall()]
+    # returning JSON over the API seems to be the slow part
+    # i.e. this is super quick
+    # records = records[:100]
+    # suggesting that the code above is OK for speed
+    records = records[offset:limit]
     return records

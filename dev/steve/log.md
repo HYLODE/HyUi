@@ -1,5 +1,60 @@
 # Running notes log
 
+## 2022-06-24t13:07:44
+
+Working out relevant vitals and NEWS to capture
+
+```sql
+SELECT
+     ot.id_in_application -- indexed
+    ,vo.visit_observation_type_id -- indexed
+    ,ot.display_name
+    ,ot.name
+    ,ot.primary_data_type
+    ,COUNT(vo.visit_observation_type_id) n
+FROM star.visit_observation vo
+INNER JOIN star.visit_observation_type ot ON vo.visit_observation_type_id = ot.visit_observation_type_id
+WHERE ot.display_name LIKE '%Oxy%' -- display_name faster than name
+GROUP BY (vo.visit_observation_type_id, ot.display_name, ot.name, ot.primary_data_type, ot.id_in_application)
+LIMIT 1000
+;
+```
+
+Looking for NEWS ...
+
+UnknownTable
+---
+| id_in_application | visit_observation_type_id | display_name | name | primary_data_type | n |
+| --- | ---: | --- | --- | --- | ---: |
+| 28315 | 47175382 | NEWS score (SpO2 scale 1) | R NEWS SCORE RESULT - DISPLAYED | String Type | 5051578 |
+| 28316 | 47175920 | NEWS score (SpO2 scale 2) | R NEWS SCORE SPO2 SCALE 2 - DISPLAYED | String Type | 165077 |
+
+
+Looking for oxygen ...
+---
+UnknownTable
+---
+| visit_observation_type_id | display_name | name | primary_data_type | n |
+| ---: | --- | --- | --- | ---: |
+| 47175385 | Room Air or Oxygen | R AIR OR OXYGEN | Custom List | 6175125 |
+| 57624741 | O2 flow rate | R OXYGEN FLOW RATE | Numeric Type | 667729 |
+| 57624784 | O2 delivery device | R OXYGEN DELIVERY METHOD | Custom List | 3328796 |
+
+UnknownTable
+---
+| id_in_application | visit_observation_type_id | display_name | name | primary_data_type | n |
+| --- | ---: | --- | --- | --- | ---: |
+| 3040109304 | 47175385 | Room Air or Oxygen | R AIR OR OXYGEN | Custom List | 6175149 |
+| 30415195 | 57714967 | Given Amount (mg) Oxycodone (2 mg/mL) | R UCLH PCA OXYCODONE (2 MG/ML) - GIVEN AMOUNT | Numeric Type | 25052 |
+
+
+
+
+## 2022-06-23t23:41:42
+working on ward tap
+now having working query for all inpatients but not tested
+suggest that you use this to generate the
+
 ## 2022-06-22t22:36:42
 had a go at implementing blueprints from dash_extensions
 didn't seem to work with the new multipage

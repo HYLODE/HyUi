@@ -19,6 +19,14 @@
 # ---------------------------
 # hyui
 # ---------------------------
+## Development setup
+setup:
+	# all work done from src
+	cd src
+	# build mock data
+	python mock/mock.py
+
+
 ## Linting etc
 lint:
 	mypy src/
