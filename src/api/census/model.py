@@ -52,7 +52,7 @@ class CensusBase(SQLModel):
         return v
 
 
-class Census(CensusBase, table=True):
+class CensusTable(CensusBase, table=True):
     """
     The table version of the pydantic class
     Used for creating tables via SQLModel

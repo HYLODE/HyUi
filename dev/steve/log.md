@@ -1,5 +1,25 @@
 # Running notes log
 
+## 2022-06-27t23:15:00
+https://github.com/HYLODE/HyUi/issues/51
+working to modularise the API
+and to manage several different data models
+
+The front end will want the same data
+The back end needs additional routes to validate the import data depending on the source
+The source might depend on the maturity?
+So define the model
+
+read = frontend read (and so always the same)
+load = backend load from source (might be an API or a SQL query)
+load = backend write to local mock database
+
+
+perhaps the trick would be to see the data model defined as the route?
+so
+/perrt/read
+/perrt/
+
 ## 2022-06-24t13:07:44
 
 Working out relevant vitals and NEWS to capture
