@@ -5,7 +5,8 @@ from fastapi.testclient import TestClient
 from sqlmodel import Session
 
 # this next step in turn runs api.models as an import
-from api.main import app, get_emap_session  # type: ignore
+from api.main import app
+from utils import get_emap_session
 from mock.mock import (  # type: ignore
     make_mock_db_in_memory,
     make_mock_df,

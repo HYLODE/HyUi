@@ -6,12 +6,13 @@ from fastapi.testclient import TestClient
 from sqlmodel import Session
 
 # this next step in turn runs api.models as an import
-from api.main import app, get_emap_session  # type: ignore
+from api.main import app
 from mock.mock import (  # type: ignore
     make_mock_db_in_memory,
     make_mock_df,
     path_to_hdf_file,
 )
+from utils import get_emap_session  # type: ignore
 
 ROUTE_NAME = "census"
 
