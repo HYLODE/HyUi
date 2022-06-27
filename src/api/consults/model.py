@@ -49,7 +49,7 @@ class ConsultsBase(SQLModel):
         return v
 
 
-class Consults(ConsultsBase, table=True):
+class ConsultsTable(ConsultsBase, table=True):
     """
     The table version of the pydantic class
     Used for creating tables via SQLModel

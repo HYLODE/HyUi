@@ -47,11 +47,24 @@ def gen_module_path(name: str, root: str = settings.MODULE_ROOT) -> str:
 
 
 def get_model_from_route(route: str, subclass: str = None):
+    """
+    Uses the route to define the (sub)package storing the model e.g. if route =
+    `foo` then the model will be in `foo/model.py` and called `foo`
+
+    :param      route:     The route
+    :type       route:     str
+    :param      subclass:  The subclass
+    :type       subclass:  str
+
+    :returns:   The model from route.
+    :rtype:     { return_type_description }
+    """
+    model_path = gen_module_path(route.lower()) + ".model"
     route_title_case = route.title()
     if subclass:
+        assert subclass.lower() in ["read", "table"]
         subclass = subclass.title()
         route_title_case = f"{route_title_case}{subclass}"
-    model_path = gen_module_path(route.lower()) + ".model"
     model = getattr(importlib.import_module(model_path), route_title_case)  # noqa
     return model
 
