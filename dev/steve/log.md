@@ -1,5 +1,24 @@
 # Running notes log
 
+## 2022-06-28 18:26:44
+so the backend should expose both the raw query and the wrangled results
+then the wrangling should assume it reads from the raw as an input
+then it should be possible to move the wrangling logic to the front end if you need to
+
+i.e.
+backend does the processing
+
+emap --> backend-raw --> wrangle --> backend-clean --> frontend
+
+front end does the processing
+
+emap --> backend-raw --> wrangle --> frontend
+
+doing this b/c it seems that the JSON data exchange is slow
+so we want to avoid this if possible
+and so the backend serves up pre-prepared data (smaller, in the correct 'order' if paginated)
+so info exchange is less of a bottle neck
+
 ## 2022-06-27t23:15:00
 https://github.com/HYLODE/HyUi/issues/51
 working to modularise the API
