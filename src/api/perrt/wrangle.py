@@ -168,6 +168,7 @@ def wrangle(df: pd.DataFrame) -> pd.DataFrame:
         df.replace({"id_in_application": _obs_types_inverse}, inplace=True)
     except TypeError:
         df["id_in_application"] = df["id_in_application"].astype(str)
+        df.replace({"id_in_application": _obs_types_inverse}, inplace=True)
     df["value"] = df["value_as_real"]
     df = _fahrenheit_to_celsius(df)
     df = _news_as_int(df)
