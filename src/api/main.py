@@ -1,5 +1,6 @@
 # src/main.py
 from fastapi import FastAPI
+from fastapi.responses import ORJSONResponse
 
 from .census import router as census
 from .consults import router as consults
@@ -8,7 +9,7 @@ from .perrt import router as perrt
 from .sitrep import router as sitrep
 from .users import router as users
 
-app = FastAPI()
+app = FastAPI(default_response_class=ORJSONResponse)
 app.include_router(census.router)
 app.include_router(consults.router)
 app.include_router(electives.router)
