@@ -10,3 +10,4 @@ requests==2.27.1
 sqlmodel==0.0.6
 tables==3.7.0
 uvicorn==0.17.6
+orjson==3.7.5
