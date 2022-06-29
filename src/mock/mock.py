@@ -83,7 +83,7 @@ def make_mock_db_in_memory(route: str):
         connect_args={"check_same_thread": False},
         poolclass=StaticPool,
     )
-    model = get_model_from_route(route, "Table")
+    model = get_model_from_route(route, "Mock")
     hdf_file = path_to_hdf_file(route)
     df = make_mock_df(hdf_file)
     create_mock_table(engine, model, drop=True)
@@ -95,7 +95,7 @@ if __name__ == "__main__":
     engine = make_engine(echo=True)
     for route in settings.ROUTES:
         try:
-            model = get_model_from_route(route, "Table")
+            model = get_model_from_route(route, "Mock")
             hdf_file = path_to_hdf_file(route)
             df = make_mock_df(hdf_file)
             create_mock_table(engine, model, drop=True)

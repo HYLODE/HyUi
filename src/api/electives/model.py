@@ -61,7 +61,7 @@ class ElectivesBase(SQLModel):
     DepartmentName: Optional[str]
 
 
-class ElectivesTable(ElectivesBase, table=True):
+class ElectivesMock(ElectivesBase, table=True):
     """
     The table version of the pydantic class
     Used for creating tables via SQLModel

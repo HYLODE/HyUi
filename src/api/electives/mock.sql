@@ -3,5 +3,5 @@
 -- in the mock database
 SELECT
 *
-FROM electives
+FROM electivesmock
 ;

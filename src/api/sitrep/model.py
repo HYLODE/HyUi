@@ -64,7 +64,7 @@ class SitrepBase(SQLModel):
         return v
 
 
-class SitrepTable(SitrepBase, table=True):
+class SitrepMock(SitrepBase, table=True):
     """
     The table version of the pydantic class
     Used for creating tables via SQLModel

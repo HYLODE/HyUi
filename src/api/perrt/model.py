@@ -22,7 +22,7 @@ from config.settings import settings  # type: ignore
 
 
 # define the data model that you're expecting from your query
-class PerrtEMAP(SQLModel):
+class PerrtRaw(SQLModel):
     """
     Perrt class to hold data returned from the Perrt query
     the SQL query that runs against EMAP etc
@@ -62,10 +62,10 @@ class PerrtEMAP(SQLModel):
         return v
 
 
-class PerrtTable(PerrtEMAP, table=True):
+class PerrtMock(PerrtRaw, table=True):
     """
     The table version of the pydantic class
-    Used for creating tables via SQLModel
+    Used for creating tables via SQLModel for mocking
     """
 
     # only set schema if in postgres

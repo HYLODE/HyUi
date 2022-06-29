@@ -62,8 +62,6 @@ def get_model_from_route(route: str, subclass: str = None):
     model_path = gen_module_path(route.lower()) + ".model"
     route_title_case = route.title()
     if subclass:
-        assert subclass.lower() in ["read", "table"]
-        subclass = subclass.title()
         route_title_case = f"{route_title_case}{subclass}"
     model = getattr(importlib.import_module(model_path), route_title_case)  # noqa
     return model
