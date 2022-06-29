@@ -5,7 +5,8 @@ from typing import List
 from fastapi import APIRouter, Depends
 from sqlmodel import Session
 
-from utils import get_emap_session, get_model_from_route, prepare_query
+from utils import get_model_from_route, prepare_query
+from utils.api import get_emap_session
 
 router = APIRouter(
     prefix="/sitrep",

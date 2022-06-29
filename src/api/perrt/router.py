@@ -7,7 +7,9 @@ from sqlmodel import Session
 from pydantic import parse_obj_as
 import pandas as pd
 
-from utils import get_emap_session, get_model_from_route, prepare_query
+from utils import get_model_from_route, prepare_query
+from utils.api import get_emap_session
+
 from .wrangle import wrangle
 
 router = APIRouter(
