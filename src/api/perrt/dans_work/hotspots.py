@@ -7,8 +7,10 @@ import dash_bootstrap_components as dbc
 import numpy as np
 import re
 import colorlover
+import pickle
+import shap
 
-###First read in the data and then make the predictions:
+# First read in the data and then make the predictions:
 # Read in data
 morning_data = pd.read_csv("saved_data/practice_dataset.csv", index_col=0)
 extra_data = pd.read_csv("saved_data/extra_data.csv", index_col=0)
@@ -196,7 +198,7 @@ def generate_table(search_value, max_rows):
     hotspots2 = hotspots1.iloc[:max_rows, :]
 
     def discrete_background_color_bins(df, n_bins=5, columns="all"):
-        import colorlover
+        # import colorlover
 
         bounds = [i * (1.0 / n_bins) for i in range(n_bins + 1)]
         if columns == "all":
