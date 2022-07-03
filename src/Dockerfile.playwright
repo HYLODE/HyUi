@@ -37,4 +37,5 @@ RUN wget https://github.com/eficode/wait-for/releases/download/v2.2.3/wait-for &
 # command for 'within' docker network
 # command: ./wait-for http://apps:8095 -- pytest --noconftest -m smoke hyui/src/tests/e2e
 # command for standalone runs (`where docker-compose up -d` has already been run)
+# avoids running conftest.py since this would require other (python) dependencies in the image
 CMD ["./wait-for", "http://localhost:8095", "--", "pytest", "-m", "e2e", "--noconftest", "-m", "smoke", "tests/playwright"]

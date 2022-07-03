@@ -12,7 +12,7 @@ CORE_PAGES = ["Home", "Sitrep", "Electives"]
 
 app = Dash(
     __name__,
-    title="HyUi",
+    title="HYLODE",
     update_title=None,
     external_stylesheets=[
         dbc.themes.YETI,
