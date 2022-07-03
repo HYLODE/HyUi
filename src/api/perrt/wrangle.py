@@ -10,7 +10,8 @@ Use `_` prefix to indicate private methods
 import numpy as np
 import pandas as pd
 
-_model_cols = [
+# use tuples (immutable) to store these data to avoid unintentional copies
+_model_cols = (
     "visit_observation_id",
     "date_of_birth",
     "lastname",
@@ -29,11 +30,11 @@ _model_cols = [
     "bed_hl7",
     "perrt_consult_datetime",
     "Perrt_id",
-]
+)
 
 # columns that change per patient not per observation
 # used to define an index when wrangling
-_cols_per_mrn = [
+_cols_per_mrn = (
     "date_of_birth",
     "lastname",
     "firstname",
@@ -44,21 +45,19 @@ _cols_per_mrn = [
     "room_name",
     "bed_hl7",
     "perrt_consult_datetime",
-]
-
-_obs_types = dict(
-    SpO2="10",
-    BP="5",
-    air_or_o2="3040109304",
-    Temp="6",
-    Pulse="8",
-    Resp="9",
-    AVPU="6466",
-    NEWS_scale_1="28315",
-    NEWS_scale_2="28316",
 )
 
-_obs_types_inverse = {v: k for k, v in _obs_types.items()}
+_obs_types = {
+    10: "SpO2",
+    5: "BP",
+    3040109304: "air_or_o2",
+    6: "Temp",
+    8: "Pulse",
+    9: "Resp",
+    6466: "AVPU",
+    28315: "NEWS_scale_1",
+    28316: "NEWS_scale_2",
+}
 
 
 def _fahrenheit_to_celsius(df, temperature_label: str = "Temp"):
@@ -121,7 +120,7 @@ def _news_as_int(df, news_labels: list[str] = ["NEWS_scale_1", "NEWS_scale_2"]):
     return df
 
 
-def _long_to_wide(df, cols_per_mrn: list = _cols_per_mrn) -> pd.DataFrame:
+def _long_to_wide(df, cols_per_mrn: tuple = _cols_per_mrn) -> pd.DataFrame:
     """
     converts SQL query data (post-wrangling) into wide data for Dash
     :param      df:            { parameter_description }
@@ -130,6 +129,7 @@ def _long_to_wide(df, cols_per_mrn: list = _cols_per_mrn) -> pd.DataFrame:
     :type       cols_per_mrn:  list
     """
 
+    # import pdb; pdb.set_trace()
     dft = (
         df.groupby(["id_in_application", *cols_per_mrn])
         .agg(
@@ -161,14 +161,11 @@ def wrangle(df: pd.DataFrame) -> pd.DataFrame:
     Returns wrangled output
     Note that you will often need to define a new SQLModel for validating at this stage
     """
-    # TODO: error checking / at the v least check the columns exist
+    # check cols exist
     for col in df.columns:
         assert col in _model_cols
-    try:
-        df.replace({"id_in_application": _obs_types_inverse}, inplace=True)
-    except TypeError:
-        df["id_in_application"] = df["id_in_application"].astype(str)
-        df.replace({"id_in_application": _obs_types_inverse}, inplace=True)
+    # be careful as this depends on the 'id' being an integer
+    df.replace({"id_in_application": _obs_types}, inplace=True)
     df["value"] = df["value_as_real"]
     df = _fahrenheit_to_celsius(df)
     df = _news_as_int(df)

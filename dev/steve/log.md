@@ -1,5 +1,19 @@
 # Running notes log
 
+## 2022-07-03t08:06:12
+slowly working to bugfix
+deployment to GAE did not work
+have now replicated what I think is the error on my local machine
+- [x] works outside of docker
+- [x] failing within docker
+        KeyError news_scale_1_max
+        api/perrt/wrangle.py::dft.sort_values line 148
+- [x] write a test to prove this works
+problem above had multiple levels
+- lists being mutable (now use tuples)
+- try/except clause was allowing vars to pass through with the wrong type
+
+
 ## 2022-06-28 18:26:44
 so the backend should expose both the raw query and the wrangled results
 then the wrangling should assume it reads from the raw as an input
