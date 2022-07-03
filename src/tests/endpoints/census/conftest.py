@@ -12,7 +12,8 @@ from mock.mock import (  # type: ignore
     make_mock_df,
     path_to_hdf_file,
 )
-from utils import get_emap_session  # type: ignore
+
+from utils.api import get_emap_session  # type: ignore
 
 ROUTE_NAME = "census"
 

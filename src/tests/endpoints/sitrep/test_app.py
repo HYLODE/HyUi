@@ -15,7 +15,7 @@ def test_request_json_data(session: Session, client: TestClient):
     """
     resp = client.get("/sitrep")
     assert resp.status_code == 200
-    model = get_model_from_route("sitrep", "read")
+    model = get_model_from_route("sitrep", "Read")
     model_instances = validate_json(resp.json(), model)
     assert isinstance(model_instances[0], model)
 
@@ -24,10 +24,15 @@ def test_request_json_data(session: Session, client: TestClient):
 def test_df_from_models(session: Session, client: TestClient):
     """
     Checks we can generate a Pandas data frame from the requests JSON
+
+    :param      session:         created by ./conftest.py::session_fixture
+    :param      client:          created by ./conftest.py::client_fixture
+
+    :raises     AssertionError:  { exception_description }
     """
     resp = client.get("/sitrep")
     assert resp.status_code == 200
-    model = get_model_from_route("sitrep", "read")
+    model = get_model_from_route("sitrep", "Read")
     model_instances = validate_json(resp.json(), model)
     df = df_from_models(model_instances)
     assert isinstance(df, pd.DataFrame)
