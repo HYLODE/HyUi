@@ -7,20 +7,33 @@ Read this if
 - you already have access to data at UCLH (e.g. EMAP databases or a HYLODE API)
 - you want to build a data visualisation using Plotly Dash
 
-Follow these steps
+## Development environments
+
+There are 2 primary environments needed for development: local machine and a live machine
+
+### Local machine
+
+Your own laptop etc. without access to personally identifiable information (PII) etc.
+You wish to be able to build and run applications with test data.
+
+### Live machine
+
+An NHS machine or similar within sensitive environment with access to PII.
+You wish to be able to deploy the actual application or generate synthetic data to use in a local environment.
 
 ## Setting up your local development environment
 
 ### Requirements
-* Python 3.6.1+ installed
-* Install `direnv`, [following these instructions](loading_environment_variables.md#installing-direnv)
-* Install `conda miniforge` (e.g. `brew install miniforge`)
+
+- Python 3.6.1+ installed
+- Install `direnv`, [following these instructions](loading_environment_variables.md#installing-direnv)
+- Install `conda miniforge` (e.g. `brew install miniforge`)
 
 ```{note}
 We assume that the majority of the development work will be on your own machine. You will therefore need to set-up your own dev environment. I have been using [conda miniforge](https://github.com/conda-forge/miniforge) because this has the best compatibility with the ARM processor on the Mac. I think it should also work on other machines but I have not tested this.
 ```
 
-### Install HyUI on your local machine
+### Clone HyUI to your local machine
 
 ```shell
 git clone https://github.com/HYLODE/HyUi.git
@@ -28,7 +41,8 @@ cd HyUi
 cp .env.example .env
 ```
 
-### Set up environment
+### Set up conda environment
+
 ```sh
 conda env create --file=./dev/steve/environment.yml
 conda activate hyuiv4
@@ -40,11 +54,15 @@ Then confirm your set-up is OK
 pytest src/tests/smoke
 ```
 
-## Running the backend and frontend
+### Running the backend and frontend
 
 Depending on your dev computer, you may not want to run HyUI using Docker (e.g. Apple Silicon laptops experience very high memory use when running docker.)
 
-### Backend services
+#### Docker
+
+Run `docker-compose up -d` to stand up both backend and frontend services using docker.
+
+#### Backend services without Docker
 
 ```sh
 cd ./src
@@ -53,8 +71,7 @@ uvicorn api.main:app --reload --workers 4 --host 0.0.0.0 --port 8092
 
 then navigate to [http://localhost:8092/docs](http://localhost:8092/docs) to view the API documentation
 
-
-### Fronend service
+#### Fronend service without Docker
 
 ```sh
 cd ./src

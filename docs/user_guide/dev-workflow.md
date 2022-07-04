@@ -3,14 +3,23 @@
 
 # Development workflow
 
-At this point, you should have a local environment setup running HyUI. Use this guide if you need to create a new API endpoint with synthetic data to develop your HyUI feature against.
+At this point, you should have a local environment setup running HyUI . Use this guide if you need to create a new API endpoint with synthetic data to develop your HyUI feature against.
 
-1. Make synthetic version of the data
-2. Develop with synthetic data
-3. Write some tests and quality control
-4. Update the plot to run live
-5. Allow inspection over the last months
-6. Split by specialty
+## 1. Make synthetic version of the data
+
+We imagine that the developer has the appropriate permissions to view the raw data including patient identifiable information (either themselves, or in partnership with a colleague). A justification for this position is [here][provisioning]. Practically, this means early interactive data exploration using the UCLH Datascience Desktop and similar tools, and in turn access to EMAP and Clarity/Caboodle.
+
+This should generate an initial data specification, and this can be used to generate synthetic data. The synthetic data can then be used to drive the rest of the pathway.
+
+## 2. Develop with synthetic data
+
+## 3. Write some tests and quality control
+
+## 4. Update the plot to run live
+
+## 5. Allow inspection over the last months
+
+## 6. Split by specialty
 
 
 ## Prepare synthetic data at UCLH
