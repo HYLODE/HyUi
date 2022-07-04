@@ -9,6 +9,8 @@ self
 ./reference/README.md
 ```
 
+# HyUI documentation
+
 User interface for the HYLODE project Much of the project structure is based
 on the[`govcookiecutter` template project][govcookiecutter] but is adapted
 for the development of Plotly Dash apps within a hospital environment. A
@@ -17,13 +19,13 @@ communication between the two via HTTP, and the project orchestrated by
 docker-compose.
 
 This file (`./readme.md`) is at the root of the project, but the application
-code including the backend is in `./src/api/app1`, and the application itself is
-kept in `./src/apps/app1`. An annotated figure of the directory structure is shown
+code including the backend is in `./src/api`, and the application itself is
+kept in `./src/apps`. An annotated figure of the directory structure is shown
 below.
 
-## Quick start
+## Deployment
 
-### Deployment not development
+### Quick start
 
 From the commandline of the GAE
 
@@ -37,34 +39,15 @@ pytest # OPTIONAL
 docker-compose up -d --build && docker-composes logs -f
 ```
 
-Go to [](http://my-host-name:8094/docs) for the API
-Go to [](http://my-host-name:8095) for the dashboard landing page
+Go to [http://my-host-name:8094/docs](http://my-host-name:8094/docs) for the API
 
-### Development (local)
+Go to [http://my-host-name:8095](http://my-host-name:8095) for the dashboard landing page
 
-### Development (GAE)
+Refer to [Deployment](user_guide/deployment.md) for more details.
 
+### Development
 
-
-## First run
-
-### Installation
-
-You will need to do this twice:
-
-- on your local development machine
-- on the UCLH generic application environment
-
-Regardless, open the terminal and **git clone**.
-
-```sh
-git clonehttps://github.com/HYLODE/HyUi.git
-cd HyUi
-```
-
-
-#### Local development with docker
-
+Refer to [Dev Setup](user_guide/dev-setup.md) for details on setting up development environments.
 
 ### Development (Hospital)
 
@@ -105,7 +88,8 @@ class ResultsBase(SQLModel):
 ```
 
 You can also use the [`@validator`](https://pydantic-docs.helpmanual.io/usage/validators/) decorator function to add additional validation.
-### Deployment
+
+### Prod deployment
 
 Set the environment variable to *prod*, then run *docker-compose*.
 
@@ -117,18 +101,6 @@ docker-compose up -d --build && docker-compose logs -f
 
 You will need create a local `./.secrets` file with database credentials so preferably set the *ENV* to `prod` there.
 
-
-
-
-
-## Frontend vs Backend
-
-### Backend
-This is a Python FastApi server that is exposed on port 8094 when running `docker-compose up -d` from the project root, or `uvicorn main:app` when running from `src/api/` locally.
-
-### Frontend
-This is a Plotly Dash app served on port 8095.
-
 ### Orchestrating front and back end
 
 **IMPORTANT**: ensure you have created a ./.secrets file with at least the same info as the ./.secrets.example version
@@ -137,7 +109,6 @@ This is a Plotly Dash app served on port 8095.
 docker-compose down
 docker-compose up -d --build && docker-compose logs -f
 ```
-
 
 ## Project structure
 
@@ -167,44 +138,6 @@ docker-compose up -d --build && docker-compose logs -f
 |-- try                 // ideas playground
 
 
-```
-
-
-## Development environments
-
-### Local machine
-
-Your own laptop etc. without access to personally identifiable information (PII) etc.
-You wish to be able to build and run applications with test data.
-
-
-### Live machine
-
-An NHS machine or similar within sensitive environment with access to PII.
-You wish to be able to deploy the actual application.
-
-## Development workflow
-
-### 1. Make synthetic version of the data
-
-We imagine that the developer has the appropriate permissions to view the raw data including patient identifiable information (either themselves, or in partnership with a colleague). A justification for this position is [here][provisioning]. Practically, this means early interactive data exploration using the UCLH Datascience Desktop and similar tools, and in turn access to EMAP and Clarity/Caboodle.
-
-This should generate an initial data specification, and this can be used to generate synthetic data. The synthetic data can then be used to drive the rest of the pathway.
-
-### 2. Develop with synthetic data
-### 3. Write some tests and quality control
-### 4. Update the plot to run live
-### 5. Allow inspection over the last months
-### 6. Split by specialty
-
-
-
-
-
-
-```{warning}
-Where this documentation refers to the root folder we mean where this README.md is
-located.
 ```
 
 ## Getting started
