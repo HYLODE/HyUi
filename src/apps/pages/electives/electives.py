@@ -24,10 +24,63 @@ API_URL = f"{settings.API_URL}/electives"
 # Caboodle data so refresh only needs to happen first thing
 REFRESH_INTERVAL = 6 * 60 * 60 * 1000  # milliseconds
 
+card_fig = dbc.Card(
+    [
+        dbc.CardHeader(html.H6("Elective Surgery over the next week")),
+        dbc.CardBody(
+            [
+                html.Div(
+                    service_picker := dcc.Dropdown(
+                        value="",
+                        placeholder="Pick a surgical specialty",
+                        multi=True,
+                    )
+                ),
+                html.Div([html.P("Updates daily")]),
+                fig_electives := html.Div(),
+            ]
+        ),
+    ]
+)
+
+card_table = dbc.Card(
+    [
+        dbc.CardHeader(html.H6("Elective surgery")),
+        dbc.CardBody(
+            [
+                table_electives := html.Div(),
+            ]
+        ),
+    ]
+)
+
+main = html.Div(
+    [
+        card_fig,
+        card_table,
+    ]
+)
+
+
+dash_only = html.Div(
+    [
+        query_interval := dcc.Interval(interval=REFRESH_INTERVAL, n_intervals=0),
+        request_data := dcc.Store(id=f"{BPID}request_data"),
+        filtered_data := dcc.Store(id=f"{BPID}filtered_data"),
+    ]
+)
+
+layout = html.Div(
+    [
+        main,
+        dash_only,
+    ],
+)
+
 
 @callback(
-    Output(f"{BPID}request_data", "data"),
-    Input(f"{BPID}query_interval", "n_intervals"),
+    Output(request_data, "data"),
+    Input(query_interval, "n_intervals"),
 )
 def store_data(n_intervals: int) -> dict:
     """
@@ -38,9 +91,9 @@ def store_data(n_intervals: int) -> dict:
 
 
 @callback(
-    Output(f"{BPID}filtered_data", "data"),
-    Input(f"{BPID}service_picker", "value"),
-    State(f"{BPID}request_data", "data"),
+    Output(filtered_data, "data"),
+    Input(service_picker, "value"),
+    State(request_data, "data"),
     prevent_initial_call=True,
 )
 def filter_data(val: List[str], data: dict) -> dict:
@@ -55,9 +108,9 @@ def filter_data(val: List[str], data: dict) -> dict:
 
 
 @callback(
-    Output(f"{BPID}fig_electives", "children"),
-    Input(f"{BPID}filtered_data", "modified_timestamp"),
-    State(f"{BPID}filtered_data", "data"),
+    Output(fig_electives, "children"),
+    Input(filtered_data, "modified_timestamp"),
+    State(filtered_data, "data"),
     prevent_initial_call=True,
 )
 def gen_surgeries_over_time(n_intervals: int, data: dict):
@@ -71,7 +124,7 @@ def gen_surgeries_over_time(n_intervals: int, data: dict):
         .agg({"PatientKey": "size"})
     )
     df.reset_index(inplace=True)
-    print(df)
+    # print(df)
     fig = px.bar(
         df, x="PlannedOperationStartInstant", y="PatientKey", color="PrimaryService"
     )
@@ -79,9 +132,9 @@ def gen_surgeries_over_time(n_intervals: int, data: dict):
 
 
 @callback(
-    Output(f"{BPID}table_electives", "children"),
-    Input(f"{BPID}filtered_data", "modified_timestamp"),
-    State(f"{BPID}filtered_data", "data"),
+    Output(table_electives, "children"),
+    Input(filtered_data, "modified_timestamp"),
+    State(filtered_data, "data"),
     prevent_initial_call=True,
 )
 def gen_table_consults(modified: int, data: dict):
@@ -109,67 +162,10 @@ def gen_table_consults(modified: int, data: dict):
 
 
 @callback(
-    Output(f"{BPID}service_picker", "options"),
-    Input(f"{BPID}request_data", "data"),
+    Output(service_picker, "options"),
+    Input(request_data, "data"),
     prevent_initial_call=True,
 )
 def update_service_dropdown(data: dict):
     df = df_from_store(data, ElectivesRead)
     return df["PrimaryService"].sort_values().unique()
-
-
-card_fig = dbc.Card(
-    [
-        dbc.CardHeader(html.H6("Elective Surgery over the next week")),
-        dbc.CardBody(
-            [
-                html.Div(
-                    dcc.Dropdown(
-                        id=f"{BPID}service_picker",
-                        value="",
-                        placeholder="Pick a surgical specialty",
-                        multi=True,
-                    )
-                ),
-                html.Div([html.P("Updates daily")]),
-                html.Div(id=f"{BPID}fig_electives"),
-            ]
-        ),
-    ]
-)
-
-card_table = dbc.Card(
-    [
-        dbc.CardHeader(html.H6("Elective surgery")),
-        dbc.CardBody(
-            [
-                html.Div(id=f"{BPID}table_electives"),
-            ]
-        ),
-    ]
-)
-
-main = html.Div(
-    [
-        card_fig,
-        card_table,
-    ]
-)
-
-
-dash_only = html.Div(
-    [
-        dcc.Interval(
-            id=f"{BPID}query_interval", interval=REFRESH_INTERVAL, n_intervals=0
-        ),
-        dcc.Store(id=f"{BPID}request_data"),
-        dcc.Store(id=f"{BPID}filtered_data"),
-    ]
-)
-
-layout = html.Div(
-    [
-        main,
-        dash_only,
-    ],
-)

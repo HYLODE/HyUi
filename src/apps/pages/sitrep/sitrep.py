@@ -42,10 +42,40 @@ else:
 
 REFRESH_INTERVAL = 30 * 60 * 1000  # milliseconds
 
+simple_table = html.Div()
+
+sitrep_table = dbc.Card(
+    [
+        dbc.CardHeader(html.H6("Sitrep details")),
+        dbc.CardBody(
+            [
+                dcc.Loading(
+                    id="loading-1",
+                    type="default",
+                    children=simple_table,
+                )
+            ]
+        ),
+    ]
+)
+
+dash_only = html.Div(
+    [
+        query_interval := dcc.Interval(interval=REFRESH_INTERVAL, n_intervals=0),
+        request_data := dcc.Store(id=f"{BPID}request_data"),
+    ]
+)
+
+layout = html.Div(
+    [
+        sitrep_table,
+        dash_only,
+    ]
+)
 
 @callback(
-    Output(f"{BPID}request_data", "data"),
-    Input(f"{BPID}query-interval", "n_intervals"),
+    Output(request_data, "data"),
+    Input(query_interval, "n_intervals"),
 )
 def store_data(n_intervals: int) -> list:
     """
@@ -56,8 +86,8 @@ def store_data(n_intervals: int) -> list:
 
 
 @callback(
-    Output(f"{BPID}simple_table", "children"),
-    Input(f"{BPID}request_data", "data"),
+    Output(simple_table, "children"),
+    Input(request_data, "data"),
     # prevent_initial_call=True,
 )
 def gen_simple_table(data: dict):
@@ -72,35 +102,3 @@ def gen_simple_table(data: dict):
             sort_action="native",
         )
     ]
-
-
-sitrep_table = dbc.Card(
-    [
-        dbc.CardHeader(html.H6("Sitrep details")),
-        dbc.CardBody(
-            [
-                dcc.Loading(
-                    id="loading-1",
-                    type="default",
-                    children=html.Div(id=f"{BPID}simple_table"),
-                )
-            ]
-        ),
-    ]
-)
-
-dash_only = html.Div(
-    [
-        dcc.Interval(
-            id=f"{BPID}query-interval", interval=REFRESH_INTERVAL, n_intervals=0
-        ),
-        dcc.Store(id=f"{BPID}request_data"),
-    ]
-)
-
-layout = html.Div(
-    [
-        sitrep_table,
-        dash_only,
-    ]
-)
