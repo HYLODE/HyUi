@@ -89,6 +89,7 @@ layout = html.Div(
     ],
 )
 
+
 @callback(
     Output(request_data, "data"),
     Input(query_interval, "n_intervals"),
@@ -175,6 +176,3 @@ def gen_table_consults(modified: int, data: dict):
 def update_dept_dropdown(data: dict):
     df = df_from_store(data, ConsultsRead)
     return df["dept_name"].sort_values().unique()
-
-
-

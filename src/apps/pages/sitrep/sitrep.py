@@ -73,6 +73,7 @@ layout = html.Div(
     ]
 )
 
+
 @callback(
     Output(request_data, "data"),
     Input(query_interval, "n_intervals"),

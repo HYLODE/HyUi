@@ -7,7 +7,7 @@ sub-application for census
 import dash_bootstrap_components as dbc
 from dash import Input, Output, callback
 from dash import dash_table as dt
-from dash import dcc, html, page_registry, register_page
+from dash import dcc, html, register_page
 
 from api.census.model import CensusRead
 from config.settings import settings
@@ -60,8 +60,7 @@ census_table = dbc.Card(
 
 dash_only = html.Div(
     [
-        census_query_interval := dcc.Interval(interval=REFRESH_INTERVAL, n_intervals=0
-        ),
+        census_query_interval := dcc.Interval(interval=REFRESH_INTERVAL, n_intervals=0),
         census_request_data := dcc.Store(id=f"{BPID}census_request_data"),
     ]
 )
@@ -72,6 +71,7 @@ layout = html.Div(
         dash_only,
     ]
 )
+
 
 @callback(
     Output(census_request_data, "data"),
@@ -102,8 +102,3 @@ def gen_simple_table(data: dict):
             sort_action="native",
         )
     ]
-
-
-
-
-
