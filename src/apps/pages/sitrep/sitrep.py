@@ -110,7 +110,6 @@ def gen_simple_table(data: dict):
     # limit columns here
     return [
         dt.DataTable(
-            id=f"{BPID}simple_table_contents",
             columns=[{"name": i, "id": i} for i in df.columns],
             data=df.to_dict("records"),
             filter_action="native",
