@@ -1,6 +1,17 @@
 % Persona = developer reading this who wants to deploy an dash app
 % Setting: working on their own lap top with access to UCLH data and machines
 
+# Development workflow
+
+At this point, you should have a local environment setup running HyUI. Use this guide if you need to create a new API endpoint with synthetic data to develop your HyUI feature against.
+
+1. Make synthetic version of the data
+2. Develop with synthetic data
+3. Write some tests and quality control
+4. Update the plot to run live
+5. Allow inspection over the last months
+6. Split by specialty
+
 
 ## Prepare synthetic data at UCLH
 
