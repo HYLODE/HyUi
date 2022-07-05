@@ -17,10 +17,11 @@ def test_sitrep_page_loads(page: Page):
     page.goto(SITREP_URL, timeout=5000)
     expect(page).to_have_title("Sitrep", timeout=5000)
     expect(page).to_have_url(SITREP_URL, timeout=5000)
-    # once the page loads then check that it has the correct title
-    # assert (
-    #     page.locator(
-    #         "#page-content > div > div:nth-child(1) > div > div.card-header"
-    #     ).inner_text(timeout=5000)
-    #     == "Sitrep details"
-    # )
+
+
+@pytest.mark.e2e
+def test_sitrep_page_has_content(page: Page):
+    page.goto(SITREP_URL, timeout=5000)
+    expect(page.locator("#sit_fancy_table")).to_be_visible(timeout=2000)
+    loc = page.locator('[id="_pages_content"]')
+    expect(loc).to_contain_text("Sitrep details", timeout=2000)
