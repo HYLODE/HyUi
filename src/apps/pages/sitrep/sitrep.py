@@ -85,41 +85,11 @@ COLS = OrderedDict(
     }
 )
 
-simple_table = html.Div()
-
-sitrep_table = dbc.Card(
-    [
-        dbc.CardHeader(html.H6("Sitrep details")),
-        dbc.CardBody(
-            [
-                dcc.Loading(
-                    id="loading-1",
-                    type="default",
-                    children=simple_table,
-                )
-            ]
-        ),
-    ]
-)
-
-dash_only = html.Div(
-    [
-        query_interval := dcc.Interval(interval=REFRESH_INTERVAL, n_intervals=0),
-        request_data := dcc.Store(id=f"{BPID}request_data"),
-    ]
-)
-
-layout = html.Div(
-    [
-        sitrep_table,
-        dash_only,
-    ]
-)
-
 
 @callback(
-    Output(request_data, "data"),
-    Input(query_interval, "n_intervals"),
+    Output(f"{BPID}request_data", "data"),
+    Input(f"{BPID}query-interval", "n_intervals"),
+    Input(f"{BPID}ward_radio", "value"),
 )
 def store_data(n_intervals: int, ward: str) -> list:
     """
@@ -131,8 +101,8 @@ def store_data(n_intervals: int, ward: str) -> list:
 
 
 @callback(
-    Output(simple_table, "children"),
-    Input(request_data, "data"),
+    Output(f"{BPID}simple_table", "children"),
+    Input(f"{BPID}request_data", "data"),
     # prevent_initial_call=True,
 )
 def gen_simple_table(data: dict):
@@ -140,9 +110,166 @@ def gen_simple_table(data: dict):
     # limit columns here
     return [
         dt.DataTable(
+            id=f"{BPID}simple_table_contents",
             columns=[{"name": i, "id": i} for i in df.columns],
             data=df.to_dict("records"),
             filter_action="native",
             sort_action="native",
         )
     ]
+
+
+@callback(
+    Output(f"{BPID}fancy_table", "children"),
+    Input(f"{BPID}request_data", "data"),
+    # prevent_initial_call=True,
+)
+def gen_fancy_table(data: dict):
+    dfo = pd.DataFrame.from_records(data)
+    dfo["organ_icons"] = ""
+
+    llist = []
+    for t in dfo.itertuples(index=False):
+
+        cvs = icons.cvs(t.n_inotropes_1_4h)
+        rs = icons.rs(t.vent_type_1_4h)
+        aki = icons.aki(t.had_rrt_1_4h)
+
+        icon_string = f"{rs}{cvs}{aki}"
+        ti = t._replace(organ_icons=icon_string)
+        llist.append(ti)
+    dfn = pd.DataFrame(llist, columns=dfo.columns)
+
+    # Prep columns with ids and names
+    COL_DICT = [{"name": v, "id": k} for k, v in COLS.items() if k in COLS_ABACUS]
+    # TODO: add in a method of sorting based on the order in config
+
+    utils.deep_update(
+        utils.get_dict_from_list(COL_DICT, "id", "organ_icons"),
+        dict(presentation="markdown"),
+    )
+    utils.deep_update(
+        utils.get_dict_from_list(COL_DICT, "id", "discharge_ready_1_4h"),
+        dict(editable=True),
+    )
+    utils.deep_update(
+        utils.get_dict_from_list(COL_DICT, "id", "discharge_ready_1_4h"),
+        dict(presentation="dropdown"),
+    )
+
+    DISCHARGE_OPTIONS = ["Ready", "No", "Review"]
+
+    dto = (
+        dt.DataTable(
+            id=f"{BPID}tbl-census",
+            columns=COL_DICT,
+            data=dfn.to_dict("records"),
+            editable=False,
+            dropdown={
+                "discharge_ready_1_4h": {
+                    "options": [{"label": i, "value": i} for i in DISCHARGE_OPTIONS],
+                    "clearable": False,
+                },
+            },
+            style_as_list_view=True,  # remove col lines
+            style_cell={
+                # "fontSize": 12,
+                "font-family": "sans-serif",
+                "padding": "2px",
+            },
+            style_cell_conditional=[
+                {"if": {"column_id": "bay_code"}, "textAlign": "right"},
+                {"if": {"column_id": "bed_code"}, "textAlign": "left"},
+                {"if": {"column_id": "mrn"}, "textAlign": "left"},
+                {"if": {"column_id": "name"}, "textAlign": "left"},
+                {"if": {"column_id": "sex"}, "textAlign": "left"},
+                {"if": {"column_id": "organ_icons"}, "textAlign": "left"},
+                {"if": {"column_id": "name"}, "fontWeight": "bolder"},
+                {"if": {"column_id": "discharge_ready_1_4h"}, "textAlign": "left"},
+            ],
+            style_data={"color": "black", "backgroundColor": "white"},
+            # striped rows
+            style_data_conditional=[
+                {
+                    "if": {"row_index": "odd"},
+                    "backgroundColor": "rgb(220, 220, 220)",
+                }
+            ],
+            sort_action="native",
+            cell_selectable=True,  # possible to click and navigate cells
+            # row_selectable="single",
+            markdown_options={"html": True},
+            persistence=True,
+            persisted_props=["data"],
+        ),
+    )
+
+    # wrap in container
+    dto = [
+        dbc.Container(
+            dto,
+            className="dbc",
+        )
+    ]
+    return dto
+
+
+ward_radio_button = html.Div(
+    [
+        html.Div(
+            [
+                dbc.RadioItems(
+                    id=f"{BPID}ward_radio",
+                    className="dbc d-grid d-md-flex justify-content-md-end btn-group",
+                    inputClassName="btn-check",
+                    labelClassName="btn btn-outline-primary",
+                    labelCheckedClassName="active btn-primary",
+                    options=[
+                        {"label": "T03", "value": "T03"},
+                        # {"label": "T06", "value": "T06"},
+                        {"label": "GWB", "value": "GWB"},
+                        {"label": "WMS", "value": "WMS"},
+                        # {"label": "NHNN", "value": "NHNN"},
+                    ],
+                    value="T03",
+                )
+            ],
+            className="dbc",
+        ),
+        # html.Div(id="which_icu"),
+    ],
+    className="radio-group",
+)
+
+sitrep_table = dbc.Card(
+    [
+        dbc.CardHeader(html.H6("Sitrep details")),
+        dbc.CardBody(id=f"{BPID}fancy_table"),
+        # dbc.CardBody(
+        #     [
+        #         dcc.Loading(
+        #             id="loading-1",
+        #             type="default",
+        #             children=html.Div(id=f"{BPID}simple_table"),
+        #         )
+        #     ]
+        # ),
+    ]
+)
+
+dash_only = html.Div(
+    [
+        dcc.Interval(
+            id=f"{BPID}query-interval", interval=REFRESH_INTERVAL, n_intervals=0
+        ),
+        dcc.Store(id=f"{BPID}request_data"),
+    ]
+)
+
+layout = html.Div(
+    [
+        dbc.Row(dbc.Col([ward_radio_button])),
+        dbc.Row(dbc.Col([sitrep_table])),
+        dash_only,
+    ]
+)
