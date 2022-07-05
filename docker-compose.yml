@@ -61,6 +61,8 @@ services:
       <<: *hyui-common-env
     env_file:
       - .env
+    stdin_open: true
+    tty: true
 
   # Dash (Plotly) docker image / web app that visualises results
   # reads data via requests from api app
