@@ -82,6 +82,9 @@ services:
       - .env
     depends_on:
       - api
+    # the following permits use of the python debugger
+    stdin_open: true
+    tty: true
 
   playwright:
     build:
