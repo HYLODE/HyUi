@@ -5,6 +5,7 @@ sub-application for perrt
 
 
 import dash_bootstrap_components as dbc
+import plotly.express as px
 from dash import Input, Output, callback, register_page
 from dash import dash_table as dt
 from dash import dcc, html
@@ -12,7 +13,7 @@ from pydantic import parse_obj_as
 
 from config.settings import settings
 from utils import get_model_from_route
-from utils.dash import get_results_response
+from utils.dash import get_results_response, df_from_store
 
 register_page(__name__)
 BPID = "PERRT_"
@@ -21,6 +22,18 @@ PerrtRead = get_model_from_route("Perrt", "Read")
 API_URL = f"{settings.API_URL}/perrt/"
 
 REFRESH_INTERVAL = 10 * 60 * 1000  # milliseconds
+
+card_fig = dbc.Card(
+    [
+        dbc.CardHeader(html.H6("Ward patients")),
+        dbc.CardBody(
+            [
+                html.Div([html.P("UCLH inpatients and vital signs")]),
+                fig_perrt := html.Div(),
+            ]
+        ),
+    ]
+)
 
 card_table = dbc.Card(
     [
@@ -36,6 +49,7 @@ card_table = dbc.Card(
 
 main = html.Div(
     [
+        card_fig,
         card_table,
     ]
 )
@@ -69,11 +83,27 @@ def store_data(n_intervals: int) -> dict:
 
 
 @callback(
+    Output(fig_perrt, "children"),
+    Input(request_data, "data"),
+    prevent_initial_call=True,
+)
+def gen_simple_fig(data: dict):
+    # TODO: move data validation to store
+    df = df_from_store(data, PerrtRead)
+    df = df[["dept_name", "news_scale_1_max", "mrn"]]
+    df = df.groupby(["dept_name", "news_scale_1_max"], as_index=False).count()
+    fig = px.bar(df, x="dept_name", y="mrn", color="news_scale_1_max")
+    return dcc.Graph(id="perrt_fig", figure=fig)
+
+
+@callback(
     Output(table_perrt, "children"),
     Input(request_data, "data"),
     prevent_initial_call=True,
 )
 def gen_simple_table(data: dict):
+    # TODO: reintroduce data validation
+    # ideally this should happen when storing
 
     cols = dict(
         mrn="MRN",
@@ -93,5 +123,9 @@ def gen_simple_table(data: dict):
             data=data,
             filter_action="native",
             sort_action="native",
+            page_current=0,
+            page_size=15,
+            export_format="xlsx",
+            export_headers="display",
         )
     ]
