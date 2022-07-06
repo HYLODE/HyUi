@@ -4,12 +4,11 @@ The application itself
 """
 from dash import Dash, page_container, page_registry
 import dash_bootstrap_components as dbc
-from dash import Dash, page_container, page_registry
 
 from config import settings
 
 BPID = "app_"
-CORE_PAGES = ["Home", "Sitrep", "Electives"]
+CORE_PAGES = ["Home", "Sitrep", "Electives", "PERRT"]
 
 app = Dash(
     __name__,
@@ -29,7 +28,7 @@ def header_pages_dropdown():
     pp = {page["name"]: page["path"] for page in page_registry.values()}
     ll = []
     for page in CORE_PAGES:
-        ll.append(dbc.NavItem(dbc.NavLink(page, href=pp[page])))
+        ll.append(dbc.NavItem(dbc.NavLink(page, href=pp[page.title()])))
     return ll
 
 
