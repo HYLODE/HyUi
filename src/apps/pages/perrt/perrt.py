@@ -25,10 +25,10 @@ REFRESH_INTERVAL = 10 * 60 * 1000  # milliseconds
 
 card_fig = dbc.Card(
     [
-        dbc.CardHeader(html.H6("Ward patients")),
+        # dbc.CardHeader(html.H6("Ward patients")),
         dbc.CardBody(
             [
-                html.Div([html.P("UCLH inpatients and vital signs")]),
+                html.Div([html.P("UCLH inpatients and vital signs (Tower)")]),
                 fig_perrt := html.Div(),
             ]
         ),
@@ -37,10 +37,16 @@ card_fig = dbc.Card(
 
 card_table = dbc.Card(
     [
-        dbc.CardHeader(html.H6("Ward patients")),
+        # dbc.CardHeader(html.H6("Ward patients")),
         dbc.CardBody(
             [
-                html.Div([html.P("UCLH inpatients and vital signs")]),
+                html.Div(
+                    [
+                        html.P(
+                            "Inpatients sorted by highest NEWS score in the last 12 hours"
+                        )
+                    ]
+                ),
                 table_perrt := html.Div(),
             ]
         ),
@@ -124,8 +130,8 @@ def gen_simple_table(data: dict):
             filter_action="native",
             sort_action="native",
             page_current=0,
-            page_size=15,
-            export_format="xlsx",
-            export_headers="display",
+            page_size=10,
+            # export_format="xlsx",
+            # export_headers="display",
         )
     ]
