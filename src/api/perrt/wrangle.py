@@ -164,7 +164,10 @@ def wrangle(df: pd.DataFrame) -> pd.DataFrame:
     # check cols exist
     for col in df.columns:
         assert col in _model_cols
-    # be careful as this depends on the 'id' being an integer
+
+    # force id_in_application to integer
+    df["id_in_application"] = df["id_in_application"].astype(int)
+
     df.replace({"id_in_application": _obs_types}, inplace=True)
     df["value"] = df["value_as_real"]
     df = _fahrenheit_to_celsius(df)
