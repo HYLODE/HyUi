@@ -131,7 +131,7 @@ def _long_to_wide(df, cols_per_mrn: tuple = _cols_per_mrn) -> pd.DataFrame:
 
     # import pdb; pdb.set_trace()
     dft = (
-        df.groupby(["id_in_application", *cols_per_mrn])
+        df.groupby(["id_in_application", *cols_per_mrn], dropna=False)
         .agg(
             max=("value", "max"),
             min=("value", "min"),

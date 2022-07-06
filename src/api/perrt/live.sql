@@ -6,27 +6,9 @@
 
 -- return recent vitals
 WITH 
--- FIRST RETURN JUST THE MOST RECENT (TAIL) OBS WITHIN a TIME WINDOW
-obs_tail AS 
-    (SELECT visit_observation_id, ob_tail_i FROM (
-        SELECT
-            ob.visit_observation_id
-            ,ob.hospital_visit_id
-            ,ob.visit_observation_type_id
-            ,row_number() over 
-                (partition BY 
-                    ob.hospital_visit_id, ob.visit_observation_type_id
-                    ORDER BY ob.observation_datetime DESC) ob_tail_i
-        FROM star.visit_observation ob
-        WHERE ob.observation_datetime > NOW() - '12 HOURS'::INTERVAL 
-    ) ob WHERE ob_tail_i <= 1
-    ORDER BY hospital_visit_id, visit_observation_id 
-),
--- NOW RETURN DETAILS FROM THOSE OBS
 obs AS
     (SELECT
         ob.visit_observation_id
-      ,obs_tail.ob_tail_i
       ,ob.hospital_visit_id
       ,ob.observation_datetime
       ,ot.id_in_application
@@ -34,9 +16,10 @@ obs AS
       ,ob.value_as_text
       ,ob.unit 
     FROM star.visit_observation ob
-    INNER JOIN obs_tail ON ob.visit_observation_id = obs_tail.visit_observation_id
     LEFT JOIN star.visit_observation_type ot ON ob.visit_observation_type_id = ot.visit_observation_type_id
     WHERE
+    ob.observation_datetime > NOW() - '12 HOURS'::INTERVAL
+    AND
     ot.id_in_application in 
       (
        '10'            --'SpO2'                  -- 602063230
@@ -93,6 +76,8 @@ loc AS
         vo.patient_class = ANY('{INPATIENT,DAY_CASE,EMERGENCY}')
         AND
         dept.name LIKE 'UCH%'
+        AND
+        dept.name NOT  IN ('UCH P03 THEATRE SUITE', 'UCH P02 ENDOSCOPY', 'UCH EMERGENCY DEPT', 'UCH T02 VASCULAR ANGIO', 'UCH T03 INTENSIVE CARE', 'UCH T02 DAY SURG THR', 'UCH T06 SOUTH PACU')
 ) bed_tail WHERE bed_tail_i = 1),
 consults AS (
     SELECT
@@ -143,7 +128,6 @@ consults AS (
 -- FINALLY MERGE bed/demographic/consults info with obs
 SELECT
      obs.visit_observation_id
-    ,obs.ob_tail_i
     ,obs.observation_datetime
     ,obs.id_in_application
     ,obs.value_as_real

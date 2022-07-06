@@ -20,7 +20,7 @@ PerrtRead = get_model_from_route("Perrt", "Read")
 
 API_URL = f"{settings.API_URL}/perrt/"
 
-REFRESH_INTERVAL = 30 * 1000  # milliseconds
+REFRESH_INTERVAL = 10 * 60 * 1000  # milliseconds
 
 card_table = dbc.Card(
     [
