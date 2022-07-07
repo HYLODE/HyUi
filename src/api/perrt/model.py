@@ -43,7 +43,7 @@ class PerrtRaw(SQLModel):
     perrt_consult_datetime: Optional[datetime]
     # observation level fields
     visit_observation_id: int
-    ob_tail_i: int
+    ob_tail_i: Optional[int]
     observation_datetime: datetime
     id_in_application: int
     value_as_real: Optional[float]

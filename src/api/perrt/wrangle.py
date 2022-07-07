@@ -131,7 +131,7 @@ def _long_to_wide(df, cols_per_mrn: tuple = _cols_per_mrn) -> pd.DataFrame:
 
     # import pdb; pdb.set_trace()
     dft = (
-        df.groupby(["id_in_application", *cols_per_mrn])
+        df.groupby(["id_in_application", *cols_per_mrn], dropna=False)
         .agg(
             max=("value", "max"),
             min=("value", "min"),
@@ -164,7 +164,10 @@ def wrangle(df: pd.DataFrame) -> pd.DataFrame:
     # check cols exist
     for col in df.columns:
         assert col in _model_cols
-    # be careful as this depends on the 'id' being an integer
+
+    # force id_in_application to integer
+    df["id_in_application"] = df["id_in_application"].astype(int)
+
     df.replace({"id_in_application": _obs_types}, inplace=True)
     df["value"] = df["value_as_real"]
     df = _fahrenheit_to_celsius(df)

@@ -4,12 +4,11 @@ The application itself
 """
 from dash import Dash, page_container, page_registry
 import dash_bootstrap_components as dbc
-from dash import Dash, page_container, page_registry
 
 from config import settings
 
 BPID = "app_"
-CORE_PAGES = ["Home", "Sitrep", "Electives"]
+CORE_PAGES = ["Home", "Sitrep", "Electives", "PERRT"]
 
 app = Dash(
     __name__,
@@ -29,7 +28,7 @@ def header_pages_dropdown():
     pp = {page["name"]: page["path"] for page in page_registry.values()}
     ll = []
     for page in CORE_PAGES:
-        ll.append(dbc.NavItem(dbc.NavLink(page, href=pp[page])))
+        ll.append(dbc.NavItem(dbc.NavLink(page, href=pp[page.title()])))
     return ll
 
 
@@ -42,7 +41,8 @@ def more_pages_dropdown():
         ),
     ]
     for page in page_registry.values():
-        if page["name"] in CORE_PAGES:
+        Core_Pages = [i.title() for i in CORE_PAGES]
+        if page["name"] in Core_Pages:
             continue
         pp.append(dbc.DropdownMenuItem(page["name"], href=page["path"]))
     return pp
@@ -62,7 +62,9 @@ navbar = dbc.NavbarSimple(
                 dbc.DropdownMenuItem("Developer Tools", header=True),
                 dbc.DropdownMenuItem("HYLODE", href="http://172.16.149.202:5001/"),
                 dbc.DropdownMenuItem("HYMIND Lab", href="http://172.16.149.202:5009/"),
-                dbc.DropdownMenuItem("HYUI API", href="http://172.16.149.202:8094/"),
+                dbc.DropdownMenuItem(
+                    "HYUI API", href="http://172.16.149.202:8094/docs"
+                ),
                 dbc.DropdownMenuItem("GitHub", href="https://github.com/HYLODE"),
             ],
             nav=True,
