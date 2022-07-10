@@ -107,3 +107,22 @@ services:
       - apps
     profiles:
       - testing
+
+  baserow:
+    container_name: baserow
+    image: baserow/baserow:1.10.2
+    environment:
+      BASEROW_PUBLIC_URL: 'http://localhost:8097'
+      # WEB_FRONTEND_PORT: 8097
+      # WEB_FRONTEND_SSL_PORT: 8098
+      # BASEROW_PUBLIC_URL: ${HOST_URL}
+      # DATABASE_URL: postgresql://user:pwd@host:port/db
+    ports:
+      - "8097:80"
+    volumes:
+      - baserow_data:/baserow/data
+ 
+# top level docker volume - cannot link to local dir
+# but if I use local postgres then don't think this matters 
+volumes:
+  baserow_data:
