@@ -112,16 +112,32 @@ services:
     container_name: baserow
     image: baserow/baserow:1.10.2
     environment:
-      BASEROW_PUBLIC_URL: 'http://localhost:8097'
+      # TODO switch to .env definition
+      # BASEROW_PUBLIC_URL: "${HOST_URL}:8097""
+      BASEROW_PUBLIC_URL: "http://localhost:8097"
+      # TODO: define this in .env and switch to UDS at UCLH
+      DATABASE_URL: "postgresql://steve:@host.docker.internal:5432/hyui"
       # WEB_FRONTEND_PORT: 8097
       # WEB_FRONTEND_SSL_PORT: 8098
-      # BASEROW_PUBLIC_URL: ${HOST_URL}
-      # DATABASE_URL: postgresql://user:pwd@host:port/db
     ports:
       - "8097:80"
     volumes:
+      # test username:password steve:hylode22
       - baserow_data:/baserow/data
  
+
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: example
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8098:8080 
+
 # top level docker volume - cannot link to local dir
 # but if I use local postgres then don't think this matters 
 volumes:
