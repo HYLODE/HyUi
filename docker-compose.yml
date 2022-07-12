@@ -125,7 +125,8 @@ services:
       # BASEROW_PUBLIC_URL: "${HOST_URL}:8097""
       BASEROW_PUBLIC_URL: "http://localhost:8097"
       # TODO: define this in .env and switch to UDS at UCLH
-      DATABASE_URL: "postgresql://steve:@host.docker.internal:5432/hyui"
+      # DATABASE_URL: "postgresql://steve:@host.docker.internal:5432/hyui"
+      DATABASE_URL: "postgres://${HYUI_DB_USER}:${HYUI_DB_PASSWORD}@postgres:5432/${HYUI_DB_NAME}?sslmode=disable"
       # WEB_FRONTEND_PORT: 8097
       # WEB_FRONTEND_SSL_PORT: 8098
     ports:
@@ -133,56 +134,34 @@ services:
     volumes:
       # test username:password steve:hylode22
       - baserow_data:/baserow/data
-
+    depends_on:
+      - postgres
 
   postgres:
     image: postgres:12-buster
     restart: always
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=${HYUI_DB_USER}
+      - POSTGRES_PASSWORD=${HYUI_DB_PASSWORD}
     ports:
-      - '5442:5432'
+      - "${HYUI_DB_PORT}:5432"
     volumes:
       - baserow_db:/var/lib/postgresql/data
-  # postgres:
-  #   build:
-  #     context: ./src
-  #     dockerfile: Dockerfile.postgres
-  #     args:
-  #       <<: *build-args-common
-  #   environment:
-  #     # POSTGRES_USER: ${HYUI_DB_USER}
-  #     # POSTGRES_PASSWORD: ${HYUI_DB_PASSWORD}
-  #     - POSTGRES_USER=postgres
-  #     - POSTGRES_PASSWORD=postgres
-  #     - LANG=${LANG}
-  #     - LC_ALL=${LC_ALL}
-  #     - PGTZ=${PGTZ}
-  #     - TZ=${TZ}
-  #   command: postgres -c 'config_file=/etc/postgresql/postgresql.conf'
-  #   restart: always
-  #   ports:
-  #     - "${HYUI_DB_PORT}:5432"
-  #   volumes:
-  #     - type: volume
-  #       source: baserow_db
-  #       target: /var/lib/postgresql/data
-  #   # healthcheck:
-  #   #   test: [ "CMD", "pg_isready", "-U", "${HYUI_DB_USER}" ]
-  #   #   interval: 10s
-  #   #   timeout: 30s
-    #   retries: 5
 
-  adminer:
-    image: adminer
+  pgweb:
+    image: sosedoff/pgweb
     restart: always
     ports:
-      - 8099:8080
+      - "8099:8081"
+    links:
+      - postgres:postgres
+    environment:
+      - DATABASE_URL="postgres://${HYUI_DB_USER}:${HYUI_DB_PASSWORD}@postgres:5432/${HYUI_DB_NAME}?sslmode=disable"
+    depends_on:
+      - postgres
 
 # top level docker volume - cannot link to local dir
 # but if I use local postgres then don't think this matters
 volumes:
   baserow_data:
   baserow_db:
-    # driver: local
