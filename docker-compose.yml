@@ -121,19 +121,11 @@ services:
     container_name: baserow
     image: baserow/baserow:1.10.2
     environment:
-      # TODO switch to .env definition
-      # BASEROW_PUBLIC_URL: "${HOST_URL}:8097"
-      # BASEROW_PUBLIC_URL: "http://localhost:8097"
-      BASEROW_PUBLIC_URL: "http://uclvlddpragae07:8097"
-      # TODO: define this in .env and switch to UDS at UCLH
-      # DATABASE_URL: "postgresql://steve:@host.docker.internal:5432/hyui"
+      BASEROW_PUBLIC_URL: ${BASEROW_PUBLIC_URL}
       DATABASE_URL: "postgres://${HYUI_DB_USER}:${HYUI_DB_PASSWORD}@postgres:5432/${HYUI_DB_NAME}?sslmode=disable"
-      # WEB_FRONTEND_PORT: 8097
-      # WEB_FRONTEND_SSL_PORT: 8098
     ports:
       - "8097:80"
     volumes:
-      # test username:password steve:hylode22
       - baserow_data:/baserow/data
     depends_on:
       - postgres
@@ -157,7 +149,7 @@ services:
     links:
       - postgres:postgres
     environment:
-      - DATABASE_URL=postgres://${HYUI_DB_USER}:${HYUI_DB_PASSWORD}@postgres:5432/${HYUI_DB_NAME}?sslmode=disable
+      DATABASE_URL: "postgres://${HYUI_DB_USER}:${HYUI_DB_PASSWORD}@postgres:5432/${HYUI_DB_NAME}?sslmode=disable"
     depends_on:
       - postgres
 
