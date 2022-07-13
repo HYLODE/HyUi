@@ -1,5 +1,11 @@
 # Running notes log
 
+## 2022-07-07 15:05:06
+build simple skeleton of beds
+data driven so use sql to define what are likely beds
+then allow the user to edit
+try https://fastapi-crudrouter.awtkns.com/ as mechanism for the latter
+
 ## 2022-07-03t08:06:12
 slowly working to bugfix
 deployment to GAE did not work
