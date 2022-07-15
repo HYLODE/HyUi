@@ -21,8 +21,8 @@ class RosBase(SQLModel):
     name: str
     live_mrn: str
     hospital_visit_id: str
-    order_datetime: datetime
-    lab_result_id: str
+    order_datetime: Optional[datetime]
+    lab_result_id: Optional[float]
 
     # @validator("dob", pre=True)
     # def convert_datetime_to_date(cls, v):
