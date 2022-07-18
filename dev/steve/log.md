@@ -1,5 +1,11 @@
 # Running notes log
 
+## 2022-07-18t22:49:02
+working with beds
+synthetic version now made that returns all census beds in parameterised query
+using sqlite as the transport layer
+now need to make mock data
+
 ## 2022-07-07 15:05:06
 build simple skeleton of beds
 data driven so use sql to define what are likely beds

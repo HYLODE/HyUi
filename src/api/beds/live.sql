@@ -1,26 +1,23 @@
--- 2022-07-09
+-- 2022-07-18
+-- parameterised version
+
+-- pass in
+-- wards : python list of strings
+-- e.g. ['WMS W01 CRITICAL CARE', 'WMS W02 SHORT STAY']
+-- locations: python list of strings
+-- e.g. ['T06C^T06C BY08^BY08-36']
+
+-- locations allows hand editing where departments are not attached to locations
+-- see Bugs and Issues:
+-- T06C^T06C BY08^BY08-36 does not exist in the department table
+
 -- takes around 20s to run but returns essentially a census for each ward
 -- for each location
 -- last open visit
 -- last closed visit
 -- number of open visits
 
--- for each location
--- last open visit
--- last closed visit
--- number of open visits
-
--- for each location
--- last open visit
--- last closed visit
--- number of open visits
-
--- Bugs and Issues
--- T06C^T06C BY08^BY08-36 does not exist in the department table
-
 WITH
-
-
 
 beds AS (
 	SELECT
@@ -29,19 +26,10 @@ beds AS (
 		,dept.name department
 	FROM star.location lo
 	LEFT JOIN star.department dept ON lo.department_id = dept.department_id
-	WHERE
-		(
-		dept.name = ANY
-	-- Built from Tower Report 14 Jun 2022
-	-- NAME                        -- n emap locations
-		(
-        %(wards)s
-		)
-    -- TODO: need to trigger this clause if calling for T6 data
-		OR lo.location_string = ANY
-		(
-		%(locations)s
-		)
+	WHERE (
+		dept.name = ANY ( %(wards)s )
+		OR
+		lo.location_string = ANY ( %(locations)s )
 	)
 
 ),
@@ -112,6 +100,7 @@ SELECT
 	,CASE
 	 	WHEN cvl.discharge_time > ovl.admission_time OR ovl.admission_time IS NULL THEN 0 ELSE 1
 	 END occupied
+
     ,NOW() modified_at
 
 	,hv.patient_class
@@ -134,8 +123,6 @@ LEFT JOIN star.mrn original_mrn ON hv.mrn_id = original_mrn.mrn_id
 LEFT JOIN star.mrn_to_live mtl ON hv.mrn_id = mtl.mrn_id
 -- get live mrn
 LEFT JOIN star.mrn live_mrn ON mtl.live_mrn_id = live_mrn.mrn_id
-
-
 
 ORDER BY beds.location_string
 

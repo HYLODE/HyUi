@@ -31,6 +31,7 @@ class ModuleNames(str, Enum):
     electives = "electives"
     perrt = "perrt"
     ros = "ros"
+    beds = "beds"
 
 
 class Environments(str, Enum):

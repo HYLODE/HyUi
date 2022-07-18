@@ -22,9 +22,11 @@ SYNTH_SQLITE_MEM = "sqlite://"
 ECHO = False
 
 
-def path_to_hdf_file(route: str):
+def path_to_file(route: str, extension: str):
     """Prep path to file based on route"""
-    return Path(__file__).parents[1] / "api" / route / "mock.h5"
+    assert extension in ["h5", "db"]
+    file = f"mock.{extension}"
+    return Path(__file__).parents[1] / "api" / route / file
 
 
 def make_engine(path=SYNTH_SQLITE_URL, **kwargs):
@@ -89,7 +91,7 @@ def make_mock_db_in_memory(route: str):
         poolclass=StaticPool,
     )
     model = get_model_from_route(route, "Mock")
-    hdf_file = path_to_hdf_file(route)
+    hdf_file = path_to_file(route, extension="h5")
     df = make_mock_df(hdf_file)
     create_mock_table(engine, model, drop=True)
     insert_into_mock_table(engine, df, model)
@@ -101,8 +103,17 @@ if __name__ == "__main__":
     for route in settings.ROUTES:
         try:
             model = get_model_from_route(route, "Mock")
-            hdf_file = path_to_hdf_file(route)
-            df = make_mock_df(hdf_file)
+            if path_to_file(route, "h5").is_file():
+                file = path_to_file(route, "h5")
+                df = make_mock_df(file)
+            elif path_to_file(route, "db").is_file():
+                _file = path_to_file(route, "db").as_posix()
+                _URL = f"sqlite:///{_file}"
+                engine_in = create_engine(_URL)
+                with engine_in.connect() as conn:
+                    df = pd.read_sql(route, conn)
+            else:
+                raise Exception
             create_mock_table(engine, model, drop=True)
             insert_into_mock_table(engine, df, model)
         except Exception as e:
