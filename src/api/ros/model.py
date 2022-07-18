@@ -18,7 +18,8 @@ class RosBase(SQLModel):
     admission_time: datetime
     firstname: str
     lastname: str
-    name: str
+    bed_name: str
+    room_name: str
     live_mrn: str
     hospital_visit_id: str
     order_datetime: Optional[datetime]

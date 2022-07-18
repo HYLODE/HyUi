@@ -32,10 +32,11 @@ WITH icupts AS (
 		,cd.firstname
 		,cd.lastname
 
-	--,bed.hl7string
+
 	--,bed.room_id
 	--,room.hl7string
-	,room.name
+	,bed.hl7string AS bed_name
+	,room.name AS room_name
 	--,room.department_id
 	--,department.hl7string
 -- 	,department.name
@@ -62,6 +63,7 @@ WITH icupts AS (
 		AND lv.discharge_time IS NULL
 	ORDER BY lv.admission_time DESC
 ),
+
 icu_labs AS
 (
 	SELECT
