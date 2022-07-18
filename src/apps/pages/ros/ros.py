@@ -86,6 +86,9 @@ def store_data(n_intervals: int) -> dict:
                 "Complete" if last_ros_date >= admission_time.date() else "To do"
             )
 
+    data = sorted(data, key=lambda d: d['bed_name'])
+
+
     return data  # type: ignore
 
 
@@ -112,7 +115,7 @@ def gen_pie_chart(modified: int, data):
 def gen_patient_table(modified: int, data: dict):
 
     cols = dict(
-        name="Bed name",
+        bed_name="Bed name",
         live_mrn="MRN",
         date_of_birth="Date of birth",
         firstname="First name",
