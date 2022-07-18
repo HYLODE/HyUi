@@ -86,6 +86,12 @@ def store_data(n_intervals: int) -> dict:
                 "Complete" if last_ros_date >= admission_time.date() else "To do"
             )
 
+            row["ros_status"] = (
+                "Waiting results.." if row["lab_result_id"] is None else "Complete"
+            )
+
+    data = sorted(data, key=lambda d: d["name"])
+
     return data  # type: ignore
 
 
@@ -133,7 +139,7 @@ def gen_patient_table(modified: int, data: dict):
                 "font-family": "sans-serif",
                 "padding": "2px",
             },
-            editable=True,
+            editable=False,
             style_data_conditional=[
                 {
                     "if": {
@@ -146,7 +152,8 @@ def gen_patient_table(modified: int, data: dict):
                 {
                     "if": {
                         "column_id": "ros_status",
-                        "filter_query": "{ros_status} = Complete",
+                        "filter_query": "{ros_status} = Complete or "
+                        " {ros_status} = 'Waiting results..'",
                     },
                     "backgroundColor": "green",
                     "color": "white",
