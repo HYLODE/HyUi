@@ -83,7 +83,7 @@ def store_data(n_intervals: int) -> dict:
             last_ros_date = order_datetime.date()
 
             row["ros_status"] = (
-                "Complete" if last_ros_date >= row["admission_time"].date() else "To do"
+                "Complete" if last_ros_date >= admission_time.date() else "To do"
             )
 
     return data  # type: ignore
