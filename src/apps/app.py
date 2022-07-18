@@ -60,12 +60,14 @@ navbar = dbc.NavbarSimple(
         dbc.DropdownMenu(
             children=[
                 dbc.DropdownMenuItem("Developer Tools", header=True),
+                dbc.DropdownMenuItem("GitHub", href="https://github.com/HYLODE"),
                 dbc.DropdownMenuItem("HYLODE", href="http://172.16.149.202:5001/"),
                 dbc.DropdownMenuItem("HYMIND Lab", href="http://172.16.149.202:5009/"),
                 dbc.DropdownMenuItem(
                     "HYUI API", href="http://172.16.149.202:8094/docs"
                 ),
-                dbc.DropdownMenuItem("GitHub", href="https://github.com/HYLODE"),
+                dbc.DropdownMenuItem("BaseRow", href="http://172.16.149.202:8097"),
+                dbc.DropdownMenuItem("PGWeb", href="http://172.16.149.202:8099"),
             ],
             nav=True,
             in_navbar=True,

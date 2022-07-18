@@ -39,4 +39,5 @@ dependencies:
   - pip:
       - playwright # microsoft::playwright # not available for macm1
       - pytest-playwright
+      - fastapi-crudrouter
 prefix: /opt/homebrew/Caskroom/miniforge/base/envs/hyuiv4

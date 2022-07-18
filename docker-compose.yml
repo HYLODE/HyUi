@@ -37,6 +37,15 @@ x-caboodle-credentials: &caboodle-credentials
   CABOODLE_DB_USER: ${CABOODLE_DB_USER}
   CABOODLE_DB_PASSWORD: ${CABOODLE_DB_PASSWORD}
 
+# TODO: merge into HYLODE database
+x-HYUI-common-env: &HYUI-common-env
+  HYUI_ENV: ${HYUI_ENV}
+  HYUI_DB_HOST: ${HYUI_DB_HOST}
+  HYUI_DB_PORT: ${HYUI_DB_PORT}
+  HYUI_DB_NAME: ${HYUI_DB_NAME}
+  HYUI_DB_USER: ${HYUI_DB_USER}
+  HYUI_DB_PASSWORD: ${HYUI_DB_PASSWORD}
+
 services:
 
   # API docker image / reads and wrangles data
@@ -107,3 +116,45 @@ services:
       - apps
     profiles:
       - testing
+
+  baserow:
+    container_name: baserow
+    image: baserow/baserow:1.10.2
+    environment:
+      BASEROW_PUBLIC_URL: ${BASEROW_PUBLIC_URL}
+      DATABASE_URL: "postgres://${HYUI_DB_USER}:${HYUI_DB_PASSWORD}@postgres:5432/${HYUI_DB_NAME}?sslmode=disable"
+    ports:
+      - "8097:80"
+    volumes:
+      - baserow_data:/baserow/data
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:12-buster
+    restart: always
+    environment:
+      - POSTGRES_USER=${HYUI_DB_USER}
+      - POSTGRES_PASSWORD=${HYUI_DB_PASSWORD}
+    ports:
+      - "${HYUI_DB_PORT}:5432"
+    volumes:
+      - baserow_db:/var/lib/postgresql/data
+
+  pgweb:
+    image: sosedoff/pgweb
+    restart: always
+    ports:
+      - "8099:8081"
+    links:
+      - postgres:postgres
+    environment:
+      DATABASE_URL: "postgres://${HYUI_DB_USER}:${HYUI_DB_PASSWORD}@postgres:5432/${HYUI_DB_NAME}?sslmode=disable"
+    depends_on:
+      - postgres
+
+# top level docker volume - cannot link to local dir
+# but if I use local postgres then don't think this matters
+volumes:
+  baserow_data:
+  baserow_db:
