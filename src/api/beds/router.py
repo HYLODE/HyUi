@@ -1,24 +1,25 @@
 from collections import namedtuple
-from typing import List
+from typing import List, Union
 
-from fastapi import APIRouter, Depends
-from sqlmodel import Session, select
+from fastapi import APIRouter, Depends, Query
+from sqlmodel import Session
+import sqlalchemy as sa
 
 from utils import get_model_from_route, prepare_query
 from utils.api import get_emap_session
+from utils.wards import wards
 
 router = APIRouter(
     prefix="/beds",
 )
 
 BedsRead = get_model_from_route("Beds", "Read")
-BedsMock = get_model_from_route("Beds", "Mock")
 
 
-@router.get("/", response_model=List[BedsMock])  # type: ignore
+@router.get("/", response_model=List[BedsRead])  # type: ignore
 def read_beds(
     session: Session = Depends(get_emap_session),
-    department: str = "UCH T03 INTENSIVE CARE",
+    department: Union[List[str], None] = Query(default=wards),
 ):
     """
     Returns beds data class populated by query-live/mock
@@ -26,13 +27,19 @@ def read_beds(
     mock data in dev and live data in prod
     """
     q = prepare_query("beds")
-    # results = session.exec(q, params={'department': list(department)})  # type: ignore
-    # results = session.exec(q, params={'department': list(department)})  # type: ignore
-    with session:
-        # statement = select(BedsMock).limit(10)
-        statement = select(BedsMock).where(BedsMock.department == department)
-        results = session.exec(statement).all()
-        return results
-    # Record = namedtuple("Record", results.keys())  # type: ignore
-    # records = [Record(*r) for r in results.fetchall()]
-    # return records
+    # as per https://stackoverflow.com/a/56382828/992999
+    qtext = sa.text(q)
+    qtext = qtext.bindparams(sa.bindparam("depts", expanding=True))
+
+    if type(department) is str:
+        depts = [department]
+    else:
+        depts = department
+
+    params = {"depts": depts}
+    # NOTE: this fails with sqlmodel.exec / works with sa.execute
+    results = session.execute(qtext, params)
+
+    Record = namedtuple("Record", results.keys())  # type: ignore
+    records = [Record(*r) for r in results.fetchall()]
+    return records
