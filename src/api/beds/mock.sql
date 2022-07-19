@@ -4,4 +4,9 @@
 SELECT
 *
 FROM bedsmock
+WHERE (
+    department IN (?)
+    -- OR
+    -- location_string = ANY ( %(locations)s )
+)
 ;
