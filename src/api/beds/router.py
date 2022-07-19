@@ -33,17 +33,14 @@ def read_beds(
             [locations.append(l) for l in locations_to_add]
 
     qtext = prepare_query("beds")
+    qtext = sa.text(qtext)
+    # necessary if working with mock data from sqlite rather than postgres
     if session.get_bind().name == "sqlite":
         # as per https://stackoverflow.com/a/56382828/992999
-        qtext = sa.text(qtext)
         qtext = qtext.bindparams(
             sa.bindparam("departments", expanding=True),
             sa.bindparam("locations", expanding=True),
         )
-    elif session.get_bind().name == "postgresql":
-        qtext = sa.text(qtext)
-    else:
-        raise Exception
 
     params = {"departments": departments, "locations": locations}
     # NOTE: this fails with sqlmodel.exec / works with sa.execute

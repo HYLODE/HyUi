@@ -30,9 +30,6 @@ beds AS (
 		dept.name = ANY ( :departments )
 		OR
 		lo.location_string = ANY ( :locations )
-		-- dept.name = ANY ( %(departments)s )
-		-- OR
-		-- lo.location_string = ANY ( %(locations)s )
 	)
 
 ),
