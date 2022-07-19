@@ -7,7 +7,7 @@ import sqlalchemy as sa
 
 from utils import get_model_from_route, prepare_query
 from utils.api import get_emap_session
-from utils.wards import wards
+from utils.wards import wards, departments_missing_beds
 
 router = APIRouter(
     prefix="/beds",
@@ -20,7 +20,7 @@ BedsRead = get_model_from_route("Beds", "Read")
 def read_beds(
     session: Session = Depends(get_emap_session),
     departments: Union[List[str], None] = Query(default=wards),
-    locations: Union[List[str], None] = Query(default=None),
+    locations: Union[List[str], None] = Query(default=[]),
 ):
     """
     Returns beds data class populated by query-live/mock
@@ -34,7 +34,13 @@ def read_beds(
         sa.bindparam("departments", expanding=True),
         sa.bindparam("locations", expanding=True),
     )
+    for d in departments:
+        if d in departments_missing_beds.keys():
+            locations_to_add = departments_missing_beds[d]
+            [locations.append(l) for l in locations_to_add]
+            print(locations)
 
+    # import pdb; pdb.set_trace()
     params = {"departments": departments, "locations": locations}
     # NOTE: this fails with sqlmodel.exec / works with sa.execute
     results = session.execute(qtext, params)
