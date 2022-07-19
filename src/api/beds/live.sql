@@ -27,9 +27,12 @@ beds AS (
 	FROM star.location lo
 	LEFT JOIN star.department dept ON lo.department_id = dept.department_id
 	WHERE (
-		dept.name = ANY ( %(wards)s )
+		dept.name = ANY ( :departments )
 		OR
-		lo.location_string = ANY ( %(locations)s )
+		lo.location_string = ANY ( :locations )
+		-- dept.name = ANY ( %(departments)s )
+		-- OR
+		-- lo.location_string = ANY ( %(locations)s )
 	)
 
 ),
