@@ -33,14 +33,14 @@ def read_beds(
             [locations.append(l) for l in locations_to_add]
 
     qtext = prepare_query("beds")
-    if session.get_bind().name == 'sqlite':
-    # as per https://stackoverflow.com/a/56382828/992999
+    if session.get_bind().name == "sqlite":
+        # as per https://stackoverflow.com/a/56382828/992999
         qtext = sa.text(qtext)
         qtext = qtext.bindparams(
             sa.bindparam("departments", expanding=True),
             sa.bindparam("locations", expanding=True),
         )
-    elif session.get_bind().name == 'postgresql':
+    elif session.get_bind().name == "postgresql":
         qtext = sa.text(qtext)
     else:
         raise Exception
