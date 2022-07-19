@@ -4,7 +4,8 @@
 SELECT
 *
 FROM bedsmock
-WHERE department IN :depts
+WHERE
+    department IN :departments
+    OR
+    location_string IN :locations
 ;
--- OR
--- location_string = ANY ( %(locations)s )
