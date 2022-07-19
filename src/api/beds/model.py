@@ -48,7 +48,7 @@ class BedsBase(SQLModel):
 
     mrn: Optional[str]
     encounter: Optional[int]
-    date_of_birth: Optional[datetime]
+    date_of_birth: Optional[date]
     lastname: Optional[str]
     firstname: Optional[str]
 
@@ -68,7 +68,7 @@ class BedsBase(SQLModel):
         """
         https://stackoverflow.com/questions/47333227/pandas-valueerror-cannot-convert-float-nan-to-integer
         """
-        return int(v) if v is not np.NaN else None
+        return v if v is not np.NaN else None
 
     # TODO: how to share functions between classes?
     @validator(
@@ -82,7 +82,10 @@ class BedsBase(SQLModel):
 
         NB: pd.NaT is stored as -9223372036854775808 (int64 type)
         ```
-        dfTest = pd.DataFrame([-9223372036854775808, 1655651820000000000],columns=['ts'])
+        dfTest = pd.DataFrame(
+            [-9223372036854775808, 1655651820000000000],
+            columns=['ts']
+            )
         dfTest.apply(pd.to_datetime)
         ```
         """

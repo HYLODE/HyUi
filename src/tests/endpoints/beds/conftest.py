@@ -2,11 +2,15 @@
 # for sharing fixtures between files
 import pytest
 from fastapi.testclient import TestClient
-from sqlmodel import Session, create_engine
+from sqlmodel import Session
 
 # this next step in turn runs api.models as an import
 from api.main import app
 from utils.api import get_emap_session
+from mock.mock import (  # type: ignore
+    make_mock_db_in_memory,
+    df_from_file,
+)
 
 ROUTE_NAME = "beds"
 
@@ -31,7 +35,7 @@ def client_fixture(session: Session):
     def get_session_override():
         return session
 
-    app.dependency_overrides[get_caboodle_session] = get_session_override
+    app.dependency_overrides[get_emap_session] = get_session_override
 
     client = TestClient(app)
     yield client
@@ -39,9 +43,9 @@ def client_fixture(session: Session):
 
 
 @pytest.fixture(scope="session")
-def mock_df_electives():
+def mock_df_beds():
     """
     Use electives data as baseline exemplar for testing
     """
-    df = make_mock_df(path_to_hdf_file("electives"))
+    df = df_from_file("beds")
     return df
