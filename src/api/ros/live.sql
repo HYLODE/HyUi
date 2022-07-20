@@ -1,22 +1,9 @@
--- 2022-07-09
--- takes around 20s to run but returns essentially a census for each ward
--- for each location
--- last open visit
--- last closed visit
--- number of open visits
+-- 2022-07-20
 
--- for each location
--- last open visit
--- last closed visit
--- number of open visits
+-- Heavily based on the following script:
+-- https://github.com/HYLODE/HyUi/blob/10b0dce6b874df9f3d04079d213fab2e011d9155/src/beds/last_open_bed_admits.sql
 
--- for each location
--- last open visit
--- last closed visit
--- number of open visits
-
--- Bugs and Issues
--- T06C^T06C BY08^BY08-36 does not exist in the department table
+-- Retrieves the patients on a ward along with their most recent ROS and MRSA test order info
 
 WITH
 
@@ -128,7 +115,6 @@ open_visits_count AS (
 	GROUP BY ov.location_id
 ),
 
-
 closed_visits AS (
 	SELECT
 		 lv.location_id
@@ -149,29 +135,10 @@ closed_visits_last AS (
 	WHERE discharge_tail = 1
 ),
 
-
 all_beds_annotated AS (
 	SELECT
-		 beds.location_id
-		,beds.bed_id
-		,beds.department
-		,beds.location_string
+		beds.department
 		,beds.hl7string AS bed_name
-	-- 	,ovl.admission_time ovl_admission
-	-- 	,ovl.hospital_visit_id ovl_hv_id
-	-- 	,ovc.open_visits_n
-	-- 	,cvl.admission_time cvl_admission
-	-- 	,cvl.discharge_time cvl_discharge
-	-- 	,cvl.hospital_visit_id cvl_hv_id
-	
-		,CASE
-		 	WHEN cvl.discharge_time > ovl.admission_time THEN 1 ELSE 0
-		 END ovl_ghost
-		,CASE
-		 	WHEN cvl.discharge_time > ovl.admission_time OR ovl.admission_time IS NULL THEN 0 ELSE 1
-		 END occupied
-	
-		,hv.patient_class
 		,live_mrn.mrn
 		,cd.lastname
 		,cd.firstname
@@ -194,11 +161,10 @@ all_beds_annotated AS (
 	-- get live mrn
 	LEFT JOIN star.mrn live_mrn ON mtl.live_mrn_id = live_mrn.mrn_id
 	
-	-- filter by an "occupied" bed, using the same logic as the CASE clause above
+	-- filter out "unoccupied" beds based on closed and open visits
 	WHERE	NOT (cvl.discharge_time > ovl.admission_time OR ovl.admission_time IS NULL)
 	
 ),
-
 
 icu_labs AS 
 (
@@ -245,7 +211,6 @@ ros_mrsa_results AS (
 		USING ("encounter")
 )
 
-
 SELECT 
 		 ab.department
 		,ab.bed_name
@@ -265,4 +230,3 @@ SELECT
 	FROM all_beds_annotated ab
 	LEFT JOIN ros_mrsa_results r ON ab.encounter = r.encounter
 	ORDER BY department, bed_name
-
