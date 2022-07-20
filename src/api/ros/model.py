@@ -16,8 +16,8 @@ class RosBase(SQLModel):
 
     department: str
     bed_name: str
-    mrn: str
-    encounter: str
+    mrn: int
+    encounter: int
     firstname: str
     lastname: str
     date_of_birth: date
