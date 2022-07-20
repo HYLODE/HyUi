@@ -14,26 +14,21 @@ from config.settings import settings  # type: ignore
 # define the data model that you're expecting from your query
 class RosBase(SQLModel):
 
-    date_of_birth: date
-    admission_time: datetime
+    department: str
+    bed_name: str
+    mrn: str
+    encounter: str
     firstname: str
     lastname: str
-    bed_name: str
-    room_name: str
-    live_mrn: str
-    hospital_visit_id: str
-    order_datetime: Optional[datetime]
-    lab_result_id: Optional[float]
-
-    # @validator("dob", pre=True)
-    # def convert_datetime_to_date(cls, v):
-    #     if isinstance(v, str):
-    #         try:
-    #             return arrow.get(v).date()
-    #         except Exception as e:
-    #             print("Unable to convert dob to date")
-    #             print(e)
-    #     return v
+    date_of_birth: date
+    hospital_admission_time: datetime
+    location_admission_time: datetime
+    ros_order_datetime: Optional[datetime]
+    ros_lab_result_id: Optional[float]
+    ros_value_as_text: Optional[str]
+    mrsa_order_datetime: Optional[datetime]
+    mrsa_lab_result_id: Optional[float]
+    mrsa_value_as_text: Optional[str]
 
 
 class RosMock(RosBase, table=True):
