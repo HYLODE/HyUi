@@ -1,19 +1,24 @@
 from collections import namedtuple
 from typing import List, Union
 
-from fastapi import APIRouter, Depends, Query
-from sqlmodel import Session
+import pandas as pd
 import sqlalchemy as sa
+from fastapi import APIRouter, Depends, Query
+from pydantic import parse_obj_as
+from sqlmodel import Session
 
 from utils import get_model_from_route, prepare_query
 from utils.api import get_emap_session
-from utils.wards import wards, departments_missing_beds
+from utils.wards import departments_missing_beds, wards
+
+from .wrangle import aggregate_by_department
 
 router = APIRouter(
     prefix="/beds",
 )
 
 BedsRead = get_model_from_route("Beds", "Read")
+BedsDepartments = get_model_from_route("Beds", "Departments")
 
 
 @router.get("/", response_model=List[BedsRead])  # type: ignore
@@ -30,7 +35,7 @@ def read_beds(
     for d in departments:
         if d in departments_missing_beds.keys():
             locations_to_add = departments_missing_beds[d]
-            [locations.append(l) for l in locations_to_add]
+            [locations.append(i) for i in locations_to_add]
 
     qtext = prepare_query("beds")
     qtext = sa.text(qtext)
@@ -50,3 +55,45 @@ def read_beds(
     Record = namedtuple("Record", results.keys())  # type: ignore
     records = [Record(*r) for r in results.fetchall()]
     return records
+
+
+@router.get("/departments", response_model=List[BedsDepartments])  # type: ignore
+def read_departments(session: Session = Depends(get_emap_session)):
+    """
+    Run the beds query then aggregate
+    """
+    locations = []
+    departments = wards.copy()
+    # this 'duplicates' functionality above but the alternative is to swap out
+    # Query/Depends etc from the function b/c when called directly without the
+    # decorator then all the types are wrong
+
+    # add in locations without departments
+    # TODO: need to use this info to add the department into the results
+    for d in departments:
+        if d in departments_missing_beds.keys():
+            locations_to_add = departments_missing_beds[d]
+            [locations.append(i) for i in locations_to_add]
+
+    qtext = prepare_query("beds")
+    qtext = sa.text(qtext)
+    # necessary if working with mock data from sqlite rather than postgres
+    if session.get_bind().name == "sqlite":
+        # as per https://stackoverflow.com/a/56382828/992999
+        qtext = qtext.bindparams(
+            sa.bindparam("departments", expanding=True),
+            sa.bindparam("locations", expanding=True),
+        )
+
+    params = {"departments": departments, "locations": locations}
+
+    df = pd.read_sql(qtext, session.connection(), params=params)
+
+    # round trip from dataframe to dictionary to records back to dataframe
+    # just to use the data validation properties of pydantic!
+    l_of_d = df.to_dict(orient="records")
+    l_of_r = parse_obj_as(List[BedsRead], l_of_d)
+    df = pd.DataFrame.from_dict([r.dict() for r in l_of_r])
+
+    res = aggregate_by_department(df).to_dict(orient="records")
+    return res

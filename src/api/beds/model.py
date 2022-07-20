@@ -11,10 +11,9 @@ from datetime import date, datetime
 from typing import Optional
 
 import arrow
+import pandas as pd
 from pydantic import validator
 from sqlmodel import Field, SQLModel
-import numpy as np
-import pandas as pd
 
 from config.settings import settings  # type: ignore
 
@@ -68,7 +67,11 @@ class BedsBase(SQLModel):
         """
         https://stackoverflow.com/questions/47333227/pandas-valueerror-cannot-convert-float-nan-to-integer
         """
-        return v if v is not np.NaN else None
+        # import pdb; pdb.set_trace()
+        # print(v)
+        # print(type(v))
+        # return v if not np.isnan(v) else None
+        return v if not pd.isna(v) else None
 
     # TODO: how to share functions between classes?
     @validator(
@@ -110,3 +113,18 @@ class BedsRead(BedsBase):
     """
 
     beds_id: Optional[int]
+
+
+class BedsDepartments(SQLModel):
+    """
+    No base version since this will not exist as a database table
+    """
+
+    department: str
+    beds: int
+    patients: int
+    empties: int
+    opens: int
+    last_dc: int
+    closed_temp: bool
+    modified_at: datetime
