@@ -92,7 +92,10 @@ class BedsBase(SQLModel):
         dfTest.apply(pd.to_datetime)
         ```
         """
-        return v if v is not pd.NaT else None
+        if any([v is pd.NaT, pd.isna(v)]):
+            return None
+        else:
+            return v
 
 
 class BedsMock(BedsBase, table=True):
