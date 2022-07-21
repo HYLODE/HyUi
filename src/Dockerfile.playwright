@@ -1,4 +1,5 @@
-FROM mcr.microsoft.com/playwright:v1.22.0-focal
+
+FROM mcr.microsoft.com/playwright:v1.23.1-focal
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && \
@@ -16,9 +17,10 @@ RUN apt-get update && \
         build-essential && \
    apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# # install shared requirements
-# COPY ./requirements.txt .
-# RUN pip3 install --no-cache-dir -r requirements.txt
+# https://playwright.dev/python/docs/ci
+# install playwright
+RUN pip install playwright
+RUN playwright install --with-deps
 
 # install requirements for playwright (incl those in conftest)
 COPY ./tests/requirements.txt .
@@ -37,4 +39,5 @@ RUN wget https://github.com/eficode/wait-for/releases/download/v2.2.3/wait-for &
 # command for 'within' docker network
 # command: ./wait-for http://apps:8095 -- pytest --noconftest -m smoke hyui/src/tests/e2e
 # command for standalone runs (`where docker-compose up -d` has already been run)
+# avoids running conftest.py since this would require other (python) dependencies in the image
 CMD ["./wait-for", "http://localhost:8095", "--", "pytest", "-m", "e2e", "--noconftest", "-m", "smoke", "tests/playwright"]

@@ -5,7 +5,8 @@ from fastapi.testclient import TestClient
 from sqlmodel import Session
 
 # this next step in turn runs api.models as an import
-from api.main import app, get_session  # type: ignore
+from api.main import app
+from utils.api import get_emap_session
 from mock.mock import (  # type: ignore
     make_mock_db_in_memory,
     make_mock_df,
@@ -32,10 +33,15 @@ def session_fixture():
 
 @pytest.fixture(name="client")
 def client_fixture(session: Session):
+    """
+    Creates a fixture that returns a mock database session
+    based on the function (session_fixture) above??
+    """
+
     def get_session_override():
         return session
 
-    app.dependency_overrides[get_session] = get_session_override
+    app.dependency_overrides[get_emap_session] = get_session_override
 
     client = TestClient(app)
     yield client

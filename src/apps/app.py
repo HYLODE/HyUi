@@ -2,45 +2,92 @@
 """
 The application itself
 """
-from dash import Dash, Input, Output, dcc, html, callback
+from dash import Dash, page_container, page_registry
 import dash_bootstrap_components as dbc
 
 from config import settings
-from apps.index import home_page
-from apps.consults.consults import consults
-from apps.sitrep.sitrep import sitrep
-from apps.census.census import census
+
+BPID = "app_"
+CORE_PAGES = ["Home", "Sitrep", "Electives", "PERRT"]
 
 app = Dash(
     __name__,
-    title="HyUi",
+    title="HYLODE",
     update_title=None,
     external_stylesheets=[
-        dbc.themes.FLATLY,
+        dbc.themes.YETI,
         dbc.icons.FONT_AWESOME,
     ],
     suppress_callback_exceptions=True,
+    use_pages=True,
 )
 
 
-app.layout = html.Div(
-    [dcc.Location(id="url", refresh=False), html.Div(id="page-content")]
+def header_pages_dropdown():
+    """Filters and sorts pages from registry for display in main navbar"""
+    pp = {page["name"]: page["path"] for page in page_registry.values()}
+    ll = []
+    for page in CORE_PAGES:
+        ll.append(dbc.NavItem(dbc.NavLink(page, href=pp[page.title()])))
+    return ll
+
+
+def more_pages_dropdown():
+    """Filters and sorts pages from registry for dropdown"""
+    pp = [
+        dbc.DropdownMenuItem("Additional reports", header=True),
+        dbc.DropdownMenuItem(
+            "COVID SitRep", href="http://uclvlddpragae08:5701/sitrep/T03"
+        ),
+    ]
+    for page in page_registry.values():
+        Core_Pages = [i.title() for i in CORE_PAGES]
+        if page["name"] in Core_Pages:
+            continue
+        pp.append(dbc.DropdownMenuItem(page["name"], href=page["path"]))
+    return pp
+
+
+navbar = dbc.NavbarSimple(
+    children=[
+        dbc.Nav(children=header_pages_dropdown()),
+        dbc.DropdownMenu(
+            children=more_pages_dropdown(),
+            nav=True,
+            in_navbar=True,
+            label="More",
+        ),
+        dbc.DropdownMenu(
+            children=[
+                dbc.DropdownMenuItem("Developer Tools", header=True),
+                dbc.DropdownMenuItem("GitHub", href="https://github.com/HYLODE"),
+                dbc.DropdownMenuItem("HYLODE", href="http://172.16.149.202:5001/"),
+                dbc.DropdownMenuItem("HYMIND Lab", href="http://172.16.149.202:5009/"),
+                dbc.DropdownMenuItem(
+                    "HYUI API", href="http://172.16.149.202:8094/docs"
+                ),
+                dbc.DropdownMenuItem("BaseRow", href="http://172.16.149.202:8097"),
+                dbc.DropdownMenuItem("PGWeb", href="http://172.16.149.202:8099"),
+            ],
+            nav=True,
+            in_navbar=True,
+            label="Dev",
+        ),
+    ],
+    brand="HYLODE",
+    brand_href="#",
+    sticky="top",
+    class_name="mb-2",
 )
 
-
-@callback(Output("page-content", "children"), Input("url", "pathname"))
-def display_page(pathname):
-    if pathname == "/":
-        return home_page
-    elif pathname == "/consults":
-        return consults
-    elif pathname == "/sitrep":
-        return sitrep
-    elif pathname == "/census":
-        return census
-    else:
-        # TODO proper 404  route
-        return "404"
+app.layout = dbc.Container(
+    [
+        navbar,
+        page_container,
+    ],
+    fluid=True,
+    className="dbc",
+)
 
 
 # standalone apps : please use ports fastapi 8092 and dash 8093

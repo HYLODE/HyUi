@@ -1,9 +1,143 @@
 # Running notes log
 
+## 2022-07-07 15:05:06
+build simple skeleton of beds
+data driven so use sql to define what are likely beds
+then allow the user to edit
+try https://fastapi-crudrouter.awtkns.com/ as mechanism for the latter
+
+## 2022-07-03t08:06:12
+slowly working to bugfix
+deployment to GAE did not work
+have now replicated what I think is the error on my local machine
+- [x] works outside of docker
+- [x] failing within docker
+        KeyError news_scale_1_max
+        api/perrt/wrangle.py::dft.sort_values line 148
+- [x] write a test to prove this works
+problem above had multiple levels
+- lists being mutable (now use tuples)
+- try/except clause was allowing vars to pass through with the wrong type
+
+
+## 2022-06-28 18:26:44
+so the backend should expose both the raw query and the wrangled results
+then the wrangling should assume it reads from the raw as an input
+then it should be possible to move the wrangling logic to the front end if you need to
+
+i.e.
+backend does the processing
+
+emap --> backend-raw --> wrangle --> backend-clean --> frontend
+
+front end does the processing
+
+emap --> backend-raw --> wrangle --> frontend
+
+doing this b/c it seems that the JSON data exchange is slow
+so we want to avoid this if possible
+and so the backend serves up pre-prepared data (smaller, in the correct 'order' if paginated)
+so info exchange is less of a bottle neck
+
+## 2022-06-27t23:15:00
+https://github.com/HYLODE/HyUi/issues/51
+working to modularise the API
+and to manage several different data models
+
+The front end will want the same data
+The back end needs additional routes to validate the import data depending on the source
+The source might depend on the maturity?
+So define the model
+
+read = frontend read (and so always the same)
+load = backend load from source (might be an API or a SQL query)
+load = backend write to local mock database
+
+
+perhaps the trick would be to see the data model defined as the route?
+so
+/perrt/read
+/perrt/
+
+## 2022-06-24t13:07:44
+
+Working out relevant vitals and NEWS to capture
+
+```sql
+SELECT
+     ot.id_in_application -- indexed
+    ,vo.visit_observation_type_id -- indexed
+    ,ot.display_name
+    ,ot.name
+    ,ot.primary_data_type
+    ,COUNT(vo.visit_observation_type_id) n
+FROM star.visit_observation vo
+INNER JOIN star.visit_observation_type ot ON vo.visit_observation_type_id = ot.visit_observation_type_id
+WHERE ot.display_name LIKE '%Oxy%' -- display_name faster than name
+GROUP BY (vo.visit_observation_type_id, ot.display_name, ot.name, ot.primary_data_type, ot.id_in_application)
+LIMIT 1000
+;
+```
+
+Looking for NEWS ...
+
+UnknownTable
+---
+| id_in_application | visit_observation_type_id | display_name | name | primary_data_type | n |
+| --- | ---: | --- | --- | --- | ---: |
+| 28315 | 47175382 | NEWS score (SpO2 scale 1) | R NEWS SCORE RESULT - DISPLAYED | String Type | 5051578 |
+| 28316 | 47175920 | NEWS score (SpO2 scale 2) | R NEWS SCORE SPO2 SCALE 2 - DISPLAYED | String Type | 165077 |
+
+
+Looking for oxygen ...
+---
+UnknownTable
+---
+| visit_observation_type_id | display_name | name | primary_data_type | n |
+| ---: | --- | --- | --- | ---: |
+| 47175385 | Room Air or Oxygen | R AIR OR OXYGEN | Custom List | 6175125 |
+| 57624741 | O2 flow rate | R OXYGEN FLOW RATE | Numeric Type | 667729 |
+| 57624784 | O2 delivery device | R OXYGEN DELIVERY METHOD | Custom List | 3328796 |
+
+UnknownTable
+---
+| id_in_application | visit_observation_type_id | display_name | name | primary_data_type | n |
+| --- | ---: | --- | --- | --- | ---: |
+| 3040109304 | 47175385 | Room Air or Oxygen | R AIR OR OXYGEN | Custom List | 6175149 |
+| 30415195 | 57714967 | Given Amount (mg) Oxycodone (2 mg/mL) | R UCLH PCA OXYCODONE (2 MG/ML) - GIVEN AMOUNT | Numeric Type | 25052 |
+
+
+
+
+## 2022-06-23t23:41:42
+working on ward tap
+now having working query for all inpatients but not tested
+suggest that you use this to generate the
+
+## 2022-06-22t22:36:42
+had a go at implementing blueprints from dash_extensions
+didn't seem to work with the new multipage
+gave up quickly
+saw this instead for name spacing
+seems like a good interim solution
+https://community.plotly.com/t/ideas-for-namespacing-component-ids/22446?u=drstevok
+
+## 2022-06-20t22:36:16
+https://github.com/HYLODE/HyUi/issues/46
+updated dash to 2.5.1
+had to reinstall pandas and numpy by hand
+all tests passed so sofarsogood
+## 2022-06-21t22:21:25
+build electives model
+
+- [ ] then rebase multipage on this
+- [ ] then get this to run live (rewrite query function to cope with different DSN)
+
+
+
 ## 2022-06-12t12:33:47
 trying to reconfigure structure for better docker
 using tests to check progress
-
 
 ## 2022-06-09t00:39:45#
 working on playwright testing

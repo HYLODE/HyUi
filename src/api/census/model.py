@@ -27,7 +27,7 @@ class CensusBase(SQLModel):
     dob: date
     mrn: str
     csn: int
-    postcode: str
+    postcode: Optional[str]
     admission_dt: datetime
     # discharge_dt: Optional[datetime]
     ward_code: str
@@ -52,7 +52,7 @@ class CensusBase(SQLModel):
         return v
 
 
-class Census(CensusBase, table=True):
+class CensusMock(CensusBase, table=True):
     """
     The table version of the pydantic class
     Used for creating tables via SQLModel

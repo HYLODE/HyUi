@@ -3,5 +3,5 @@
 -- in the mock database
 SELECT
 *
-FROM consults
+FROM consultsmock
 ;

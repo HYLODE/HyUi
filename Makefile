@@ -19,6 +19,14 @@
 # ---------------------------
 # hyui
 # ---------------------------
+## Development setup
+setup:
+	# all work done from src
+	cd src
+	# build mock data
+	python mock/mock.py
+
+
 ## Linting etc
 lint:
 	mypy src/
@@ -44,15 +52,16 @@ app:
 testdocker:
 	docker-compose down
 	docker-compose build
-	docker-compose run api pytest tests/unit/api
-	docker-compose run apps pytest tests/unit/apps
+	docker-compose run api pytest -m api tests/endpoints
+	docker-compose run apps pytest -m app tests/endpoints
 
 ## Run unit tests locally
 testunit:
 	@echo "Running just smoke tests"
-	pytest -m smoke src/tests/unit
+	pytest -m smoke src/tests/smoke
 	@echo "Running unit tests"
-	pytest -m "not smoke" src/tests/unit
+	pytest -m "not smoke" src/tests/mock
+	pytest -m "not smoke" src/tests/endpoints
 
 ## Run end-2-end tests (playwright)
 teste2e:
