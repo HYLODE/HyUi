@@ -32,6 +32,7 @@ def _aggregate_by_department(df: pd.DataFrame) -> pd.DataFrame:
     """
     Aggregation from location (bed) level to ward level
     """
+    df["cvl_discharge"] = pd.to_datetime(df["cvl_discharge"], errors="coerce", utc=True) 
     groups = df.groupby("department")
     # aggregate by dept
     res = groups.agg(
