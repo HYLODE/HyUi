@@ -18,7 +18,7 @@ def _split_location_string(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def _remove_non_beds(
-    df: pd.DataFrame, nonbeds: List[str] = ["null", "wait"]
+    df: pd.DataFrame, nonbeds: List[str] = ["null", "wait", "proc rm"]
 ) -> pd.DataFrame:
     """
     Removes non beds e.g. null, wait
@@ -32,7 +32,7 @@ def _aggregate_by_department(df: pd.DataFrame) -> pd.DataFrame:
     """
     Aggregation from location (bed) level to ward level
     """
-    df["cvl_discharge"] = pd.to_datetime(df["cvl_discharge"], errors="coerce", utc=True) 
+    df["cvl_discharge"] = pd.to_datetime(df["cvl_discharge"], errors="coerce", utc=True)
     groups = df.groupby("department")
     # aggregate by dept
     res = groups.agg(
