@@ -6,6 +6,7 @@ api.models.Results and then loads the data from the local HDF file
 
 import sys
 import pandas as pd
+import numpy as np
 import sqlalchemy as sa
 from pathlib import Path
 from sqlmodel import Session, SQLModel, create_engine
@@ -64,6 +65,10 @@ def create_mock_table(engine, model: SQLModel, drop=False):
 
 
 def insert_into_mock_table(engine, df: pd.DataFrame, model: SQLModel):
+    df = df.replace(
+        {np.NaN: None}
+    )  # replace NaN / NaT with Nones as otherwise errors are thrown.
+
     rows = df.to_dict(orient="records")
     with Session(engine) as session:
         for row in rows:
