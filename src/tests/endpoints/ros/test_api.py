@@ -45,7 +45,7 @@ def test_get_results_ros_content_match(
 
     assert isinstance(first_result["department"], str)
     assert isinstance(first_result["bed_name"], str)
-    assert isinstance(first_result["mrn"], int)
+    assert isinstance(first_result["mrn"], str)
     assert isinstance(first_result["encounter"], int)
     assert isinstance(first_result["firstname"], str)
     assert isinstance(first_result["lastname"], str)
@@ -72,10 +72,15 @@ def test_get_results_ros_content_match(
 
     df0 = mock_df_ros.loc[0]
 
+    # validate the mock dataframe matches the API data
     for key in list(mock_df_ros):
+        # Assertions are as a tuple so if it
+        # fails the key will be printed in the error
+
         # dates from pandas are of a different type and need to be handled
         if isinstance(df0[key], Timestamp):
             assert (key, df0[key]) == (key, arrow.get(first_result[key]).date())
+        elif key == "mrn":  # pandas thinks MRN is always an int, but it is an str
+            assert (key, str(df0[key])) == (key, first_result[key])
         else:
-            # assert as a tuple so if this fails the key will be printed in the error
             assert (key, df0[key]) == (key, first_result[key])
