@@ -1,6 +1,6 @@
-# src/apps/electives/electives.py
+# src/apps/electives/ros.py
 """
-sub-application for electives
+sub-application for ros
 """
 
 
