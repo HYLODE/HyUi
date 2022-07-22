@@ -1,4 +1,4 @@
-# src/api/electives/ros.py
+# src/api/ros/ros.py
 from collections import namedtuple
 from typing import List
 
