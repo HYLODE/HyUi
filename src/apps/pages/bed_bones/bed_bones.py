@@ -27,9 +27,6 @@ BASEROW_API_URL = f"{settings.BASE_URL}:{settings.BASEROW_PORT}/api"
 # Caboodle data so refresh only needs to happen first thing
 REFRESH_INTERVAL = 1 * 60 * 60 * 1000  # milliseconds
 
-# Install the Python Requests library:
-# `pip install requests`
-
 
 ward_radio_button = html.Div(
     [
@@ -95,7 +92,6 @@ def store_data(n_intervals: int, ward_radio_value: str) -> list:
     """
     # Get Rows
     API_URL = f"{BASEROW_API_URL}/database/rows/table/261/"
-    # print(API_URL)
 
     try:
         response = requests.get(
@@ -104,27 +100,18 @@ def store_data(n_intervals: int, ward_radio_value: str) -> list:
                 "user_field_names": "true",
                 "filter__field_2051__equal": ward_radio_value,
                 "include": "location_id,location_string,closed,unit_order,DepartmentName,room,bed,bed_physical,bed_functional,covid,LocationName",
+                "include": "location_id,location_string,closed,unit_order,DepartmentName,room,bed,bed_physical,bed_functional,covid,LocationName",
             },
             headers={
                 "Authorization": f"Token {settings.BASEROW_READWRITE_TOKEN}",
-                # "Cookie": "i18n-language=en",
             },
         )
-        print(
-            "Response HTTP Status Code: {status_code}".format(
-                status_code=response.status_code
-            )
-        )
-        # print('Response HTTP Response Body: {content}'.format(
-        #     content=response.content))
     except requests.exceptions.RequestException:
-        print("HTTP Request failed")
+        warnings.warn("HTTP Request failed")
 
     content = response.json()
     if not content["count"]:
         warnings.warn(f"No data found at URL {API_URL}")
-    else:
-        print(content["count"])
     data = content["results"]
     return data
 
@@ -132,7 +119,7 @@ def store_data(n_intervals: int, ward_radio_value: str) -> list:
 @callback(
     Output(bed_table, "children"),
     Input(request_data, "data"),
-    # prevent_initial_call=True,
+    prevent_initial_call=True,
 )
 def gen_bed_table(data: dict):
 
@@ -140,17 +127,19 @@ def gen_bed_table(data: dict):
     COLS = OrderedDict(
         {
             "unit_order": "Unit Order",
-            "location_id": "Location ID",
+            # "location_id": "Location ID",
             "location_string": "Location string",
-            "DepartmentName": "Ward",
+            # "DepartmentName": "Ward",
             "room": "Room",
             "bed": "Bed",
             "closed": "Closed",
+            "covid": "COVID",
         }
     )
     df = df[COLS.keys()]
     df["unit_order"] = df["unit_order"].astype(int)
     df["closed"] = df["closed"].astype(str)
+    df["covid"] = df["covid"].astype(str)
 
     # Prep columns with ids and names
     COL_DICT = [{"name": v, "id": k} for k, v in COLS.items() if k in COLS]
@@ -182,6 +171,14 @@ def gen_bed_table(data: dict):
                         "filter_query": "{closed} = 'True'",
                     },
                     "backgroundColor": "tomato",
+                    "color": "white",
+                },
+                {
+                    "if": {
+                        "column_id": "covid",
+                        "filter_query": "{covid} = 'True'",
+                    },
+                    "backgroundColor": "#FF4136",
                     "color": "white",
                 },
             ],
