@@ -1,6 +1,10 @@
+# src/api/perrt/admission_probability/predictions_script.py
+
+# Ignore xgboost import, it's required for pickled file
 import xgboost  # noqa: F401
 import pickle
 import pandas as pd
+from pathlib import Path
 import os
 import re
 import sched
@@ -38,10 +42,14 @@ def get_predictions(dataset):
 
 
 def write_predictions(predictions_map):
-    if not os.path.exists("generated_data"):
-        os.makedirs("generated_data")
+    generated_data_folder_path = Path(f"{Path(__file__).parent}/generated_data")
 
-    with open("generated_data/id_to_admission_prediction.pkl", "wb") as f:
+    if not generated_data_folder_path.is_dir():
+        os.makedirs(generated_data_folder_path)
+
+    with open(
+        f"{generated_data_folder_path}/id_to_admission_prediction.pkl", "wb"
+    ) as f:
         print("Pickling predictions map")
         pickle.dump(predictions_map, f)
 
@@ -58,10 +66,6 @@ def run_prediction_pipeline(db_engine, scheduler, interval):
     scheduler.enter(
         interval, 1, run_prediction_pipeline, (db_engine, scheduler, interval)
     )
-
-
-dir_path = os.path.dirname(os.path.realpath(__file__))
-os.chdir(dir_path)
 
 
 scheduler = sched.scheduler(time.time, time.sleep)
