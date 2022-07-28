@@ -28,7 +28,8 @@ def get_emapdb_engine():
 
 def get_predictions(dataset):
     # Load the model and shap model
-    model = pickle.load(open("final_model.pkl", "rb"))
+    with open("final_model.pkl", "rb") as f:
+        model = pickle.load(f)
 
     # Remove columns with 'ward' in them (these may cause model drift)
     ward_columns = [i for i in dataset.columns if re.match(".*_ward$", i)]
