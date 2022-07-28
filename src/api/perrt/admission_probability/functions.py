@@ -2,6 +2,8 @@
 
 ### D Stein ICU Prediction Processing Pipeline - functions
 
+# Ignore linting for the moment
+# flake8: noqa
 
 from datetime import datetime, timedelta
 import os
@@ -9,7 +11,6 @@ from pathlib import Path
 from pprint import pprint
 import urllib
 
-import arrow
 # import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd

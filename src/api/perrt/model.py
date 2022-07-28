@@ -60,7 +60,10 @@ class PerrtRaw(SQLModel):
 
         NB: pd.NaT is stored as -9223372036854775808 (int64 type)
         ```
-        dfTest = pd.DataFrame([-9223372036854775808, 1655651820000000000],columns=['ts'])
+        dfTest = pd.DataFrame(
+            [-9223372036854775808, 1655651820000000000]
+            ,columns=['ts'])
+
         dfTest.apply(pd.to_datetime)
         ```
         """
@@ -143,7 +146,9 @@ class PerrtBase(SQLModel):
 
         NB: pd.NaT is stored as -9223372036854775808 (int64 type)
         ```
-        dfTest = pd.DataFrame([-9223372036854775808, 1655651820000000000],columns=['ts'])
+        dfTest = pd.DataFrame(
+            [-9223372036854775808, 1655651820000000000],
+            columns=['ts'])
         dfTest.apply(pd.to_datetime)
         ```
         """
