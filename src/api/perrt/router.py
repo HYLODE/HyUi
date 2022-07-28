@@ -2,10 +2,12 @@
 from collections import namedtuple
 from typing import List
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Body
 from sqlmodel import Session
 from pydantic import parse_obj_as
 import pandas as pd
+import pickle
+from pathlib import Path
 
 from utils import get_model_from_route, prepare_query
 from utils.api import get_emap_session
@@ -19,6 +21,7 @@ router = APIRouter(
 PerrtRaw = get_model_from_route("Perrt", "Raw")
 PerrtRead = get_model_from_route("Perrt", "Read")
 
+from .model import AdmissionPrediction
 
 @router.get("/raw", response_model=List[PerrtRaw])  # type: ignore
 def read_perrt_table(
@@ -64,3 +67,16 @@ def read_perrt(session: Session = Depends(get_emap_session)):
     recw = dfw.to_dict(orient="records")
     # recw = recw[:10]
     return recw
+
+@router.post("/admission_predictions", response_model=List[AdmissionPrediction])
+def get_predictions(hospital_visit_ids: List[str] = Body(), 
+    session: Session = Depends(get_emap_session)):
+
+    predictions_filepath = Path(f"{Path(__file__).parent}/admission_probability/id_to_admission_prediction.pkl")
+
+    predictions_map = {}
+
+    if predictions_filepath.is_file():
+        predictions_map = pickle.load(open(predictions_filepath, "rb"))
+
+    return [{'hospital_visit_id': key, 'admission_probability': predictions_map.get(key, None)} for key in hospital_visit_ids]

@@ -15,7 +15,7 @@ from typing import Optional
 
 import arrow
 import pandas as pd
-from pydantic import validator
+from pydantic import validator, BaseModel
 from sqlmodel import Field, SQLModel
 
 from config.settings import settings  # type: ignore
@@ -172,3 +172,8 @@ class PerrtRead(PerrtBase):
     """
 
     Perrt_id: Optional[int]
+
+
+class AdmissionPrediction(BaseModel):
+    hospital_visit_id: str
+    admission_probability: Optional[float]
