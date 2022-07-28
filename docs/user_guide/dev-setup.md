@@ -62,6 +62,9 @@ Depending on your dev computer, you may not want to run HyUI using Docker (e.g. 
 
 Run `docker-compose up -d` to stand up both backend and frontend services using docker.
 
+*WARNING*: you may need `docker compose` rather than `docker-compose` depending on your docker version
+*WARNING*: docker services depend on a valid `.env` file (specifically to hold the postgres credentials)
+
 #### Backend services without Docker
 
 ```sh
