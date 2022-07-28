@@ -46,6 +46,7 @@ class Environments(str, Enum):
 
 class Settings(BaseSettings):
 
+    VERBOSE: bool = True
     ENV: Environments = Environments.dev
     DOCKER: bool = False
 
@@ -64,9 +65,12 @@ class Settings(BaseSettings):
     CABOODLE_DB_NAME: Optional[str]
     CABOODLE_DB_PORT: Optional[str]
 
-    BASEROW_URL: Optional[str]
+    # WARNING! 
+    # The order of variable declaration is important
+    # i.e. don't construct a URL containing a PORT if you haven't declared the port yet
     BASEROW_READWRITE_TOKEN: Optional[str]
     BASEROW_PORT: Optional[str]
+    BASEROW_URL: Optional[str]
 
     BASE_URL: Optional[str]
     API_URL: Optional[str]
@@ -174,11 +178,12 @@ class Settings(BaseSettings):
         """
         BASEROW_PORT = values.get("BASEROW_PORT")
         if values.get("ENV") == "prod":
-            return f"{BASE_URL_GAE}:{BASEROW_PORT}"
+            url = f"{BASE_URL_GAE}:{BASEROW_PORT}"
         elif values.get("ENV") == "dev":
-            return f"{BASE_URL_DEV}:{BASEROW_PORT}"
+            url = f"{BASE_URL_DEV}:{BASEROW_PORT}"
         else:
             raise Exception
+        return url
 
     class Config:
         case_sensitive = True

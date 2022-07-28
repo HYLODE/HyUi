@@ -1,42 +1,76 @@
-# src/apps/consults/consults.py
+# src/apps/sitrep/sitrep.py
 """
-sub-application for consults
+sub-application for sitrep
 """
 
-import pandas as pd
 from collections import OrderedDict
+from typing import List
 
 import dash_bootstrap_components as dbc
+import pandas as pd
+import requests
 from dash import Input, Output, callback
 from dash import dash_table as dt
-from dash import dcc, html
-from dash import register_page
+from dash import dcc, html, register_page
 
-from api.sitrep.model import SitrepRead
-
-from config.settings import settings
 import utils
-from utils.dash import df_from_store, get_results_response
+from api.sitrep.model import SitrepRead
+from config.settings import settings
 from utils import icons
+from utils.dash import df_from_store, get_results_response
+from utils.wards import wards
 
 BPID = "sit_"
 register_page(__name__)
 
-# APP to define URL
-# maybe run by HyUi API backend or maybe external
-# e.g
-#
-# HyUi API backend ...
-# API_URL = f"{settings.API_URL}/consults/"
-#
-# External (HySys) backend ..
-# then define locally here within *this* app
-# API_URL = http://172.16.149.205:5006/icu/live/{ward}/ui
-#
-# External (gov.uk) backend ...
-# API_URL = f"https://coronavirus.data.gov.uk/api/v2/data ..."
-#
-# the latter two are defined as constants here
+
+def get_bed_list(ward: str = "UCH T03 INTENSIVE CARE") -> list:
+    """
+    Queries the baserow API for a list of beds
+
+    :returns:   Beds for this ward
+    """
+    BED_BONES_TABLE_ID = 261
+    DEPARTMENT_FIELD_ID = 2041
+    FIELDS = ["department","room","bed","unit_order","closed","covid","bed_functional","bed_physical"]
+
+    url = f"{settings.BASEROW_URL}/api/database/rows/table/{BED_BONES_TABLE_ID}/"
+    payload = {
+        "user_field_names": "true",
+        f"filter__field_{DEPARTMENT_FIELD_ID}__equal": ward,
+        "include": ",".join(FIELDS),
+    }
+    response = requests.get(
+        url,
+        headers={"Authorization": f"Token {settings.BASEROW_READWRITE_TOKEN}"},
+        params=payload,
+    )
+    assert response.status_code == 200
+    data = response.json()
+    nrows = data["count"]
+    assert nrows < 100  # default page size
+    res = data['results']
+    # extract bed functional characteristics into string
+    for row in res:
+        bfs = row.get('bed_functional', [])
+        funcs = [i.get('value', '') for i in bfs]
+        row['bed_functional_str'] = '|'.join(funcs)
+        row.pop('bed_functional', None)
+
+    # extract bed physical characteristics into string
+    for row in res:
+        bfs = row.get('bed_physical', [])
+        funcs = [i.get('value', '') for i in bfs]
+        row['bed_physical_str'] = '|'.join(funcs)
+        row.pop('bed_physical', None)
+
+    if settings.VERBOSE:
+        df = pd.DataFrame.from_records(res)
+        print(df.head())
+
+    return res
+
+wards = get_bed_list()
 
 
 def build_api_url(ward: str = None) -> str:
