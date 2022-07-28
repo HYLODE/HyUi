@@ -67,6 +67,9 @@ def run_prediction_pipeline(db_engine, scheduler, interval):
         interval, 1, run_prediction_pipeline, (db_engine, scheduler, interval)
     )
 
+# functions.py relies on specific, relative paths
+dir_path = os.path.dirname(os.path.realpath(__file__))
+os.chdir(dir_path)
 
 scheduler = sched.scheduler(time.time, time.sleep)
 
