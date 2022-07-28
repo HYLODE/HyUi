@@ -72,7 +72,7 @@ def read_perrt(session: Session = Depends(get_emap_session)):
 def get_predictions(hospital_visit_ids: List[str] = Body(), 
     session: Session = Depends(get_emap_session)):
 
-    predictions_filepath = Path(f"{Path(__file__).parent}/admission_probability/id_to_admission_prediction.pkl")
+    predictions_filepath = Path(f"{Path(__file__).parent}/admission_probability/generated_data/id_to_admission_prediction.pkl")
 
     predictions_map = {}
 

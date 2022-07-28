@@ -16,7 +16,6 @@ def get_emapdb_engine():
 
     return create_engine(f"postgresql://{uds_user}:{uds_passwd}@{uds_host}:{uds_port}/{uds_name}")
 
-
 def get_predictions(dataset):
     # Load the model and shap model
     model = pickle.load(open("final_model.pkl", "rb"))
@@ -31,12 +30,13 @@ def get_predictions(dataset):
 
     return dict(zip(dataset.index.map(str), predictions))
 
-
 def write_predictions(predictions_map):
-    with open("id_to_admission_prediction.pkl", "wb") as f:
+    if not os.path.exists("generated_data"):
+        os.makedirs("generated_data")
+
+    with open("generated_data/id_to_admission_prediction.pkl", "wb") as f:
         print("Pickling predictions map")
         pickle.dump(predictions_map, f)
-
 
 def run_prediction_pipeline(db_engine, scheduler, interval):
     # most return variables unused for our use case
