@@ -1,15 +1,26 @@
 from typing import Dict
 import requests
+from requests import RequestException
 import pandas as pd
 from sqlmodel import SQLModel
 import warnings
 
 
-def get_results_response(url: str, payload: Dict = {}):
+def get_results_response(url: str, method="GET", **kwargs):
     """
     Given a URL return JSON list of dictionaries
+	uses requests.requests with additional kwargs 
+	defaults to GET
     """
-    request_response = requests.get(url, params=payload)
+
+    if req_type == "GET":
+        request_response = requests.get(url, **kwargs)
+    elif req_type == "POST":
+        request_response = requests.post(url, **kwargs)
+        print(request_response)
+    else:
+        raise RequestException("Invalid request type")
+
     try:
         list_of_dicts = request_response.json()["data"]
     except (TypeError, KeyError) as e:

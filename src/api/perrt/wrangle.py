@@ -13,6 +13,7 @@ import pandas as pd
 # use tuples (immutable) to store these data to avoid unintentional copies
 _model_cols = (
     "visit_observation_id",
+    "hospital_visit_id",
     "date_of_birth",
     "lastname",
     "firstname",
@@ -36,6 +37,7 @@ _model_cols = (
 # used to define an index when wrangling
 _cols_per_mrn = (
     "date_of_birth",
+    "hospital_visit_id",
     "lastname",
     "firstname",
     "mrn",

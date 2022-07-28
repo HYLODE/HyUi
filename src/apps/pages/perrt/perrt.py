@@ -20,6 +20,7 @@ BPID = "PERRT_"
 PerrtRead = get_model_from_route("Perrt", "Read")
 
 API_URL = f"{settings.API_URL}/perrt/"
+ADMISSION_PREDICTION_URL = f"{API_URL}admission_predictions"
 
 REFRESH_INTERVAL = 10 * 60 * 1000  # milliseconds
 
@@ -111,7 +112,19 @@ def store_data(n_intervals: int) -> dict:
     Read data from API then store as JSON
     """
     data = [dict(parse_obj_as(PerrtRead, i)) for i in get_results_response(API_URL)]
-    return data  # type: ignore
+
+    hospital_visit_ids = [x['hospital_visit_id'] for x in data]
+    
+    predictions_list = get_results_response(ADMISSION_PREDICTION_URL, "POST", hospital_visit_ids)
+    predictions = {x['hospital_visit_id'] : x['admission_probability'] for x in predictions_list}
+
+    l = list()
+
+    for entry in data:
+        entry["admission_probability"] = predictions.get(str(entry['hospital_visit_id']), 0.0)
+        l.append(entry)
+
+    return l
 
 
 @callback(
@@ -151,6 +164,7 @@ def gen_simple_table(data: dict):
         perrt_consult_datetime="PERRT consult",
         news_scale_1_max="NEWS (max)",
         news_scale_1_min="NEWS (min)",
+        admission_probability="Admission probability",
     )
     return [
         dt.DataTable(
