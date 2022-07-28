@@ -43,6 +43,7 @@ class PerrtRaw(SQLModel):
     perrt_consult_datetime: Optional[datetime]
     # observation level fields
     visit_observation_id: int
+    hospital_visit_id: str
     ob_tail_i: Optional[int]
     observation_datetime: datetime
     id_in_application: int
@@ -108,6 +109,7 @@ class PerrtBase(SQLModel):
 
     # patient level fields
     mrn: str
+    hospital_visit_id: str
     lastname: str
     firstname: str
     sex: str

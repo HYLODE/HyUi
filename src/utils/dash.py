@@ -1,13 +1,22 @@
 import requests
+from requests import RequestException
 import pandas as pd
 from sqlmodel import SQLModel
 
 
-def get_results_response(url: str):
+def get_results_response(url: str, req_type="GET", data=None):
     """
     Given a URL return JSON list of dictionaries
     """
-    request_response = requests.get(url)
+
+    if req_type == "GET":
+        request_response = requests.get(url)
+    elif req_type == "POST":
+        request_response = requests.post(url, json=data)
+        print(request_response)
+    else:
+        raise RequestException("Invalid request type")
+
     try:
         list_of_dicts = request_response.json()["data"]
     except (TypeError, KeyError) as e:

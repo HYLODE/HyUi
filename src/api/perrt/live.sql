@@ -131,6 +131,7 @@ consults AS (
 -- FINALLY MERGE bed/demographic/consults info with obs
 SELECT
      obs.visit_observation_id
+    ,obs.hospital_visit_id
     ,obs.observation_datetime
     ,obs.id_in_application
     ,obs.value_as_real
