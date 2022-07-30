@@ -55,26 +55,27 @@ class Settings(BaseSettings):
     EMAP_DB_PASSWORD: Optional[str]
     EMAP_DB_NAME: Optional[str]
 
-    DB_URL: Optional[str]
     DB_POSTGRES_SCHEMA = "star"
 
-    CABOODLE_URL: Optional[str]
     CABOODLE_DB_HOST: Optional[str]
     CABOODLE_DB_USER: Optional[str]
     CABOODLE_DB_PASSWORD: Optional[str]
     CABOODLE_DB_NAME: Optional[str]
-    CABOODLE_DB_PORT: Optional[str]
+    CABOODLE_DB_PORT: Optional[int]
 
     # WARNING! 
     # The order of variable declaration is important
     # i.e. don't construct a URL containing a PORT if you haven't declared the port yet
     BASEROW_READWRITE_TOKEN: Optional[str]
     BASEROW_PORT: Optional[str]
-    BASEROW_URL: Optional[str]
 
     BASE_URL: Optional[str]
     API_URL: Optional[str]
     APP_URL: Optional[str]
+
+    CABOODLE_URL: Optional[str]
+    BASEROW_URL: Optional[str]
+    DB_URL: Optional[str]
 
     MODULE_ROOT: str = "api"  # for building paths to modules e.g. ./src/api
     ROUTES = ModuleNames = ModuleNames._member_names_
