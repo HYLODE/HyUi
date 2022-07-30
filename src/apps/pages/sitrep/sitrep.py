@@ -17,60 +17,20 @@ import utils
 from api.sitrep.model import SitrepRead
 from config.settings import settings
 from utils import icons
+from utils.beds import get_bed_list, unpack_nested_dict
 from utils.dash import df_from_store, get_results_response
 from utils.wards import wards
 
-BPID = "sit_"
 register_page(__name__)
 
+BPID = "sit_"
 
-def get_bed_list(ward: str = "UCH T03 INTENSIVE CARE") -> list:
-    """
-    Queries the baserow API for a list of beds
-
-    :returns:   Beds for this ward
-    """
-    BED_BONES_TABLE_ID = 261
-    DEPARTMENT_FIELD_ID = 2041
-    FIELDS = ["department","room","bed","unit_order","closed","covid","bed_functional","bed_physical"]
-
-    url = f"{settings.BASEROW_URL}/api/database/rows/table/{BED_BONES_TABLE_ID}/"
-    payload = {
-        "user_field_names": "true",
-        f"filter__field_{DEPARTMENT_FIELD_ID}__equal": ward,
-        "include": ",".join(FIELDS),
-    }
-    response = requests.get(
-        url,
-        headers={"Authorization": f"Token {settings.BASEROW_READWRITE_TOKEN}"},
-        params=payload,
-    )
-    assert response.status_code == 200
-    data = response.json()
-    nrows = data["count"]
-    assert nrows < 100  # default page size
-    res = data['results']
-    # extract bed functional characteristics into string
-    for row in res:
-        bfs = row.get('bed_functional', [])
-        funcs = [i.get('value', '') for i in bfs]
-        row['bed_functional_str'] = '|'.join(funcs)
-        row.pop('bed_functional', None)
-
-    # extract bed physical characteristics into string
-    for row in res:
-        bfs = row.get('bed_physical', [])
-        funcs = [i.get('value', '') for i in bfs]
-        row['bed_physical_str'] = '|'.join(funcs)
-        row.pop('bed_physical', None)
-
-    if settings.VERBOSE:
-        df = pd.DataFrame.from_records(res)
-        print(df.head())
-
-    return res
-
-wards = get_bed_list()
+DEPT2WARD_MAPPING = {
+    "UCH T03 INTENSIVE CARE": "T03",
+    "UCH T06 SOUTH PACU": "T06",
+    "GWB L01 CRITICAL CARE": "GWB",
+    "WMS W01 CRITICAL CARE": "WMS",
+}
 
 
 def build_api_url(ward: str = None) -> str:
@@ -125,12 +85,38 @@ COLS = OrderedDict(
     Input(f"{BPID}query-interval", "n_intervals"),
     Input(f"{BPID}ward_radio", "value"),
 )
-def store_data(n_intervals: int, ward: str) -> list:
+def store_data(n_intervals: int, dept: str) -> list:
     """
     Read data from API then store as JSON
     """
+    # get the sitrep data
+    ward = DEPT2WARD_MAPPING[dept]
     API_URL = build_api_url(ward)
-    data = get_results_response(API_URL)
+    sitrep = get_results_response(API_URL)
+    # add department into sitrep results for merge
+    for i in sitrep:
+        i["department"] = dept
+
+    # get the bed skeleton
+    beds = get_bed_list(dept)
+    beds = unpack_nested_dict(beds, f2unpack="bed_functional", subkey="value")
+    beds = unpack_nested_dict(beds, f2unpack="bed_physical", subkey="value")
+
+    # merge the two
+    df_sitrep = pd.DataFrame.from_records(sitrep)
+    df_beds = pd.DataFrame.from_records(beds)
+    dfm = pd.merge(
+        df_beds,
+        df_sitrep,
+        how="left",
+        left_on=["department", "room", "bed"],
+        right_on=["department", "bay_code", "bed_code"],
+        indicator=True,
+        suffixes=("_bed", "_sitrep"),
+    )
+
+    
+    data = dfm.to_dict("records")
     return data  # type: ignore
 
 
@@ -259,13 +245,13 @@ ward_radio_button = html.Div(
                     labelClassName="btn btn-outline-primary",
                     labelCheckedClassName="active btn-primary",
                     options=[
-                        {"label": "T03", "value": "T03"},
-                        # {"label": "T06", "value": "T06"},
-                        {"label": "GWB", "value": "GWB"},
-                        {"label": "WMS", "value": "WMS"},
+                        {"label": "T03", "value": "UCH T03 INTENSIVE CARE"},
+                        {"label": "T06", "value": "UCH T06 SOUTH PACU"},
+                        {"label": "GWB", "value": "GWB L01 CRITICAL CARE"},
+                        {"label": "WMS", "value": "WMS W01 CRITICAL CARE"},
                         # {"label": "NHNN", "value": "NHNN"},
                     ],
-                    value="T03",
+                    value="UCH T03 INTENSIVE CARE",
                 )
             ],
             className="dbc",

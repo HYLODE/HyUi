@@ -50,7 +50,7 @@ def cvs(level: str) -> str:
     icon = "fa fa-heart"
     try:
         n = int(level)
-    except ValueError:
+    except (ValueError, TypeError):
         n = 0
     if n == 0:
         colour = COLOUR_GREY
