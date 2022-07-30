@@ -9,6 +9,24 @@ from typing import List
 from config.settings import settings
 from utils.wards import wards
 
+from typing import Optional
+from sqlmodel import SQLModel
+
+class BedBonesBase(SQLModel):
+
+    id: int
+    order: float
+    department: str
+    room: str
+    bed: str
+    unit_order: Optional[str]
+    closed: Optional[bool]
+    covid: Optional[bool]
+    bed_functional: Optional[str]
+    bed_physical: Optional[str]
+
+
+
 BED_BONES_TABLE_ID = 261
 DEPARTMENT_FIELD_ID = 2041
 CORE_FIELDS = [
@@ -48,7 +66,6 @@ def get_bed_list(
         params=payload,
     )
     data = response.json()
-    nrows = data["count"]
     res = data["results"]
 
     if settings.VERBOSE:

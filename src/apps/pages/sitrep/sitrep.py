@@ -17,8 +17,8 @@ import utils
 from api.sitrep.model import SitrepRead
 from config.settings import settings
 from utils import icons
-from utils.beds import get_bed_list, unpack_nested_dict
-from utils.dash import df_from_store, get_results_response
+from utils.beds import get_bed_list, unpack_nested_dict, BedBonesBase
+from utils.dash import df_from_store, get_results_response, validate_json
 from utils.wards import wards
 
 register_page(__name__)
@@ -45,19 +45,23 @@ def build_api_url(ward: str = None) -> str:
 
 REFRESH_INTERVAL = 30 * 60 * 1000  # milliseconds
 COLS_ABACUS = [
-    "bay_code",
-    "bed_code",
+    "unit_order",
+    "room",
+    "bed",
     "name",
     "mrn",
     "admission_age_years",
     "sex",
     "organ_icons",
     "discharge_ready_1_4h",
+    "closed",
 ]
 COLS = OrderedDict(
     {
+        "unit_order": "Order",
         "ward_code": "Ward",
         "bay_code": "Bay",
+        "room": "Bay",
         "bed_code": "Bed code",
         "bed": "Bed",
         "admission_dt": "Admission",
@@ -76,6 +80,8 @@ COLS = OrderedDict(
         "had_rrt_1_4h": "Renal",
         "organ_icons": "Organ Support",
         "discharge_ready_1_4h": "Discharge",
+        "closed": "Closed",
+        "covid": "COVID",
     }
 )
 
@@ -102,6 +108,8 @@ def store_data(n_intervals: int, dept: str) -> list:
     beds = unpack_nested_dict(beds, f2unpack="bed_functional", subkey="value")
     beds = unpack_nested_dict(beds, f2unpack="bed_physical", subkey="value")
 
+    beds = validate_json(beds,BedBonesBase, to_dict=True)
+
     # merge the two
     df_sitrep = pd.DataFrame.from_records(sitrep)
     df_beds = pd.DataFrame.from_records(beds)
@@ -115,7 +123,6 @@ def store_data(n_intervals: int, dept: str) -> list:
         suffixes=("_bed", "_sitrep"),
     )
 
-    
     data = dfm.to_dict("records")
     return data  # type: ignore
 
@@ -147,6 +154,7 @@ def gen_simple_table(data: dict):
 def gen_fancy_table(data: dict):
     dfo = pd.DataFrame.from_records(data)
     dfo["organ_icons"] = ""
+    dfo["unit_order"] = dfo["unit_order"].astype(int)
 
     llist = []
     for t in dfo.itertuples(index=False):
@@ -165,6 +173,11 @@ def gen_fancy_table(data: dict):
     # TODO: add in a method of sorting based on the order in config
 
     utils.deep_update(
+        utils.get_dict_from_list(COL_DICT, "id", "unit_order"),
+        dict(type="numeric"),
+    )
+
+    utils.deep_update(
         utils.get_dict_from_list(COL_DICT, "id", "organ_icons"),
         dict(presentation="markdown"),
     )
@@ -178,6 +191,7 @@ def gen_fancy_table(data: dict):
     )
 
     DISCHARGE_OPTIONS = ["Ready", "No", "Review"]
+
 
     dto = (
         dt.DataTable(
@@ -198,8 +212,8 @@ def gen_fancy_table(data: dict):
                 "padding": "2px",
             },
             style_cell_conditional=[
-                {"if": {"column_id": "bay_code"}, "textAlign": "right"},
-                {"if": {"column_id": "bed_code"}, "textAlign": "left"},
+                {"if": {"column_id": "room"}, "textAlign": "right"},
+                {"if": {"column_id": "bed"}, "textAlign": "left"},
                 {"if": {"column_id": "mrn"}, "textAlign": "left"},
                 {"if": {"column_id": "name"}, "textAlign": "left"},
                 {"if": {"column_id": "sex"}, "textAlign": "left"},
@@ -213,9 +227,19 @@ def gen_fancy_table(data: dict):
                 {
                     "if": {"row_index": "odd"},
                     "backgroundColor": "rgb(220, 220, 220)",
-                }
+                },
+                {
+                    "if": {
+                        "filter_query": "{closed} contains true",
+                        # "column_id": "closed"
+                    },
+                    "color": "maroon"
+                },
             ],
             sort_action="native",
+            sort_by=[
+                {'column_id': 'unit_order', 'direction': 'asc'},
+            ],
             cell_selectable=True,  # possible to click and navigate cells
             # row_selectable="single",
             markdown_options={"html": True},
