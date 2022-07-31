@@ -24,7 +24,7 @@ class ElectivesBase(SQLModel):
 
     PrimaryMrn: str
     PatientKey: int
-    PatientDurableKey: int
+    PatientDurableKey: int  # use this to join to caboodle pre-assessment key
     AgeInYears: int
     PlacedOnWaitingListDate: Optional[date]
     DecidedToAdmitDate: Optional[date]
@@ -47,7 +47,7 @@ class ElectivesBase(SQLModel):
     ReasonNotPerformed: Optional[str]
     Canceled: Optional[int]
     SurgicalCaseUclhKey: int
-    SurgicalCaseKey: int
+    SurgicalCaseKey: int  # use this to join to clarity query
     CaseScheduleStatus: Optional[str]
     CaseCancelReason: Optional[str]
     CaseCancelReasonCode: Optional[str]
@@ -76,3 +76,15 @@ class ElectivesRead(ElectivesBase):
     """
 
     id: Optional[int]
+
+
+# TODO: mocking
+class ElectivesPod(SQLModel):
+    """
+    This class describes an electives clarity base.
+    Post-op destination (pod) from clarity
+    """
+    pod_orc: str
+    SurgicalCaseKey: int
+    SurgeryDateClarity: datetime
+    

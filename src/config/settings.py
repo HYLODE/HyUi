@@ -71,6 +71,12 @@ class Settings(BaseSettings):
     CABOODLE_DB_NAME: Optional[str]
     CABOODLE_DB_PORT: Optional[int]
 
+    CLARITY_DB_HOST: Optional[str]
+    CLARITY_DB_USER: Optional[str]
+    CLARITY_DB_PASSWORD: Optional[str]
+    CLARITY_DB_NAME: Optional[str]
+    CLARITY_DB_PORT: Optional[int]
+
     BASEROW_READWRITE_TOKEN: Optional[str]
     BASEROW_PORT: Optional[str]
     PORT_DOCKER_BASEROW: Optional[str]
@@ -89,8 +95,12 @@ class Settings(BaseSettings):
 
     STAR_URL: Optional[str]
     CABOODLE_URL: Optional[str]
+    CLARITY_URL: Optional[str]
+
+    BASE_URL: Optional[str]
     API_URL: Optional[str]
     APP_URL: Optional[str]
+
     BASEROW_URL: Optional[str]
     BASEROW_PUBLIC_URL: Optional[str]
 
