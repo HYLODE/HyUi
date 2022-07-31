@@ -8,6 +8,15 @@ COLOUR_GREEN = "#008000ff"
 COLOUR_AMBER = "#ffa500ff"
 COLOUR_RED = "#ff0000ff"
 
+def closed(value: bool) -> str:
+    if value:
+        icon = "fa fa-lock"
+        colour = COLOUR_RED
+    else:
+        icon = "fa fa-lock-open"
+        colour = COLOUR_GREEN
+    icon_string = f'<i class="{icon}" style="color: {colour};"></i>'
+    return icon_string
 
 def aki(level: str) -> str:
     icon = "fa fa-flask"

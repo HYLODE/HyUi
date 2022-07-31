@@ -45,6 +45,7 @@ def build_api_url(ward: str = None) -> str:
 
 REFRESH_INTERVAL = 30 * 60 * 1000  # milliseconds
 COLS_ABACUS = [
+    "open",
     "unit_order",
     "room",
     "bed",
@@ -54,10 +55,11 @@ COLS_ABACUS = [
     "sex",
     "organ_icons",
     "discharge_ready_1_4h",
-    "closed",
 ]
 COLS = OrderedDict(
     {
+        "open": "Open",
+        "closed": "Closed",
         "unit_order": "Order",
         "ward_code": "Ward",
         "bay_code": "Bay",
@@ -80,7 +82,6 @@ COLS = OrderedDict(
         "had_rrt_1_4h": "Renal",
         "organ_icons": "Organ Support",
         "discharge_ready_1_4h": "Discharge",
-        "closed": "Closed",
         "covid": "COVID",
     }
 )
@@ -168,6 +169,9 @@ def gen_fancy_table(data: dict):
         llist.append(ti)
     dfn = pd.DataFrame(llist, columns=dfo.columns)
 
+    # 
+    dfn['open'] = dfn['closed'].apply(icons.closed)
+
     # Prep columns with ids and names
     COL_DICT = [{"name": v, "id": k} for k, v in COLS.items() if k in COLS_ABACUS]
     # TODO: add in a method of sorting based on the order in config
@@ -188,6 +192,10 @@ def gen_fancy_table(data: dict):
     utils.deep_update(
         utils.get_dict_from_list(COL_DICT, "id", "discharge_ready_1_4h"),
         dict(presentation="dropdown"),
+    )
+    utils.deep_update(
+        utils.get_dict_from_list(COL_DICT, "id", "open"),
+        dict(presentation="markdown"),
     )
 
     DISCHARGE_OPTIONS = ["Ready", "No", "Review"]
