@@ -49,8 +49,6 @@ class Settings(BaseSettings):
     DOCKER: bool = False
     VERBOSE: bool = True
 
-    # BASE_URL_GAE: "http://172.16.149.202"  # UCLVLDDPRAGAE07
-    BASE_URL_GAE: Optional[str]
 
     EMAP_DB_HOST: Optional[str]
     EMAP_DB_USER: Optional[str]
@@ -72,6 +70,8 @@ class Settings(BaseSettings):
     # The order of variable declaration is important
     # i.e. don't construct a URL containing a PORT if you haven't declared the port yet
     # the variables above of the variables below
+
+    BASE_URL_GAE: Optional[str] # BASE_URL_GAE: "http://172.16.149.202"  # UCLVLDDPRAGAE07
     DB_URL: Optional[str]
     CABOODLE_URL: Optional[str]
     BASE_URL: Optional[str]
@@ -136,6 +136,7 @@ class Settings(BaseSettings):
         Selects and assembles the base URL for the application depending on
         the environment
         """
+        BASE_URL_GAE = values.get("BASE_URL_GAE")
         if values.get("ENV", "dev").lower() == "dev":
             return BASE_URL_DEV
         else:
@@ -170,6 +171,7 @@ class Settings(BaseSettings):
         :returns:   Base URL for the APP (esp for testing)
         :rtype:     str
         """
+        BASE_URL_GAE = values.get("BASE_URL_GAE")
         if values.get("ENV") == "prod":
             return f"{BASE_URL_GAE}:{PORT_DOCKER_APP}"
 
@@ -187,6 +189,7 @@ class Settings(BaseSettings):
         :rtype:     str
         """
         BASEROW_PORT = values.get("BASEROW_PORT")
+        BASE_URL_GAE = values.get("BASE_URL_GAE")
         if values.get("ENV") == "prod":
             url = f"{BASE_URL_GAE}:{BASEROW_PORT}"
         elif values.get("ENV") == "dev":
