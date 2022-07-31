@@ -1,4 +1,4 @@
-# src/apps/electives/ros.py
+# src/apps/ros/ros.py
 """
 sub-application for ros
 """
@@ -108,8 +108,8 @@ def store_data(n_intervals: int) -> dict:
             if last_ros_date >= admission_time.date(): # If a test has been ordered during this admission
                 if row["ros_lab_result_id"] is not None: # And there is a result back: screening complete
                     row["ros_order_status"] = "Complete"
-                else: # If there is no result we are waiting
-                    row["ros_order_status"] = "Waiting results"
+                else: # If there is no result, we are awaiting results
+                    row["ros_order_status"] = "Awaiting results"
 
 
         # Prepare MRSA data
@@ -123,8 +123,8 @@ def store_data(n_intervals: int) -> dict:
             if last_mrsa_date >= (date.today() - timedelta(7)): # If MRSA screening done in last 7 days
                 if row["mrsa_lab_result_id"] is not None: # And we have a result, then we are finished
                     row["mrsa_order_status"]  = "Complete"
-                else: # Else we are waiting for a result
-                    row["mrsa_order_status"] = "Waiting results"
+                else: # Else we are awaiting results
+                    row["mrsa_order_status"] = "Awaiting results"
 
         # Add data to the individual department list
         dept_list = pts_by_department.get(row['department'], [])
@@ -197,7 +197,7 @@ def gen_patient_table(modified: int, ward: str, data: dict):
                     "if": {
                         "column_id": "ros_order_status",
                         "filter_query": "{ros_order_status} = Complete or "
-                        " {ros_order_status} = 'Waiting results'",
+                        " {ros_order_status} = 'Awaiting results'",
                     },
                     "backgroundColor": "green",
                     "color": "white",
@@ -214,7 +214,7 @@ def gen_patient_table(modified: int, ward: str, data: dict):
                     "if": {
                         "column_id": "mrsa_order_status",
                         "filter_query": "{mrsa_order_status} = Complete or "
-                        " {mrsa_order_status} = 'Waiting results'",
+                        " {mrsa_order_status} = 'Awaiting results'",
                     },
                     "backgroundColor": "green",
                     "color": "white",
