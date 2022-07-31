@@ -15,7 +15,6 @@ PORT_DOCKER_API = "8094"
 PORT_DOCKER_APP = "8095"
 
 BASE_URL_DEV = "http://127.0.0.1"
-BASE_URL_GAE = "http://172.16.149.202"  # UCLVLDDPRAGAE07
 BASE_URL_DOCKER_APP = "http://apps"
 BASE_URL_DOCKER_API = "http://api"
 BASE_URL_DOCKER_BASEROW = "http://baserow"
@@ -46,9 +45,12 @@ class Environments(str, Enum):
 
 class Settings(BaseSettings):
 
-    VERBOSE: bool = True
     ENV: Environments = Environments.dev
     DOCKER: bool = False
+    VERBOSE: bool = True
+
+    # BASE_URL_GAE: "http://172.16.149.202"  # UCLVLDDPRAGAE07
+    BASE_URL_GAE: Optional[str]
 
     EMAP_DB_HOST: Optional[str]
     EMAP_DB_USER: Optional[str]
@@ -63,19 +65,19 @@ class Settings(BaseSettings):
     CABOODLE_DB_NAME: Optional[str]
     CABOODLE_DB_PORT: Optional[int]
 
-    # WARNING! 
-    # The order of variable declaration is important
-    # i.e. don't construct a URL containing a PORT if you haven't declared the port yet
     BASEROW_READWRITE_TOKEN: Optional[str]
     BASEROW_PORT: Optional[str]
 
+    # WARNING! 
+    # The order of variable declaration is important
+    # i.e. don't construct a URL containing a PORT if you haven't declared the port yet
+    # the variables above of the variables below
+    DB_URL: Optional[str]
+    CABOODLE_URL: Optional[str]
     BASE_URL: Optional[str]
     API_URL: Optional[str]
     APP_URL: Optional[str]
-
-    CABOODLE_URL: Optional[str]
     BASEROW_URL: Optional[str]
-    DB_URL: Optional[str]
 
     MODULE_ROOT: str = "api"  # for building paths to modules e.g. ./src/api
     ROUTES = ModuleNames = ModuleNames._member_names_
@@ -84,6 +86,13 @@ class Settings(BaseSettings):
     def environment_choice_is_valid(cls, v):
         # b/c when read from .secrets a \r (carriage return) is appended
         return v.rstrip()
+
+    @validator("BASE_URL_GAE")
+    def assemble_url_gae(cls, v: Optional[str], values: Dict[str, Any]) -> str:
+        BASE_URL_GAE = values.get("BASE_URL_GAE")
+        url = f"http://{BASE_URL_GAE}"
+        return url
+
 
     @validator("DB_URL")
     def assemble_db_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:

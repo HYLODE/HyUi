@@ -55,7 +55,10 @@ def get_bed_list(
     """
 
     url = f"{settings.BASEROW_URL}/api/database/rows/table/{table_id}/"
-    print(url)
+
+    if settings.VERBOSE:
+        print(url)
+
     payload = {
         "user_field_names": "true",
         f"filter__field_{department_field_id}__equal": ward,
