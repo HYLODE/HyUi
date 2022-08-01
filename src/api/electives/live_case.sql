@@ -116,6 +116,6 @@ SELECT DISTINCT
         AND (wlef.[IntendedManagement] IN ('*Unspecified', 'Inpatient', 'Inpatient Series', 'Night Admit Series') OR wlef.[IntendedManagement] IS NULL)
 
       -- adjust dates / offsets in here to get today's and patients over the next week
-      AND  scufx.[PlannedOperationStartInstant] > CONVERT(DATE,DATEADD(DAY,0,CURRENT_TIMESTAMP)) AND [PlannedOperationStartInstant] < CONVERT(DATE,DATEADD(DAY, 7,CURRENT_TIMESTAMP))
+      AND  scufx.[PlannedOperationStartInstant] > CONVERT(DATE,DATEADD(DAY,0,CURRENT_TIMESTAMP)) AND [PlannedOperationStartInstant] < CONVERT(DATE,DATEADD(DAY, 3,CURRENT_TIMESTAMP))
 
       ORDER BY  datesurg.[DateValue],dd.[DepartmentName],dd.[RoomName] ASC
