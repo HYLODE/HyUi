@@ -158,6 +158,26 @@ class Settings(BaseSettings):
             )
         return db_url
 
+    @validator("CLARITY_URL")
+    def assemble_clarity_connection(
+        cls, v: Optional[str], values: Dict[str, Any]
+    ) -> str:
+        if values.get("ENV") == "dev":
+            db_path = Path(__file__).resolve().parents[1].absolute() / "mock"
+            db_url = f"sqlite:///{db_path.as_posix()}/mock.db"
+        else:
+            # Construct the MSSQL connection
+            db_host = values.get("CLARITY_DB_HOST")
+            db_user = values.get("CLARITY_DB_USER")
+            db_password = values.get("CLARITY_DB_PASSWORD")
+            db_port = values.get("CLARITY_DB_PORT")
+            db_name = values.get("CLARITY_DB_NAME")
+            db_url = (
+                f"mssql+pyodbc://{db_user}:{db_password}@{db_host}:{db_port}/"
+                + f"{db_name}?driver=ODBC+Driver+17+for+SQL+Server"
+            )
+        return db_url
+
     @validator("API_URL")
     def assemble_api_url(cls, v: Optional[str], values: Dict[str, Any]) -> str:
         """

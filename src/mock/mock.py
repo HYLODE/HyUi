@@ -127,6 +127,16 @@ def make_mock_db_in_memory(route: str):
 if __name__ == "__main__":
     engine = make_engine(echo=True)
 
+    # for additional data: then add into mock db here
+    # TODO: factor this out into better system
+    # for post-op destination
+    model_path = f"{gen_module_path('electives')}.model"
+    model = getattr(importlib.import_module(model_path), "ElectivesPodMock")
+    df = pd.read_json("../data/mock/live_clarity.json")
+    create_mock_table(engine, model, drop=True)
+    insert_into_mock_table(engine, df, model)
+
+    # this works for the principle routes but not for additional data
     # load mock hymind icu discharges
     model_path = f"{gen_module_path('hymind')}.model"
     model = getattr(importlib.import_module(model_path), "IcuDischarge")

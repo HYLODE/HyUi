@@ -88,3 +88,9 @@ class ElectivesPod(SQLModel):
     SurgicalCaseKey: int
     SurgeryDateClarity: datetime
     
+class ElectivesPodMock(ElectivesPod, table=True):
+    """
+    This class describes an electives clarity base.
+    Post-op destination (pod) from clarity
+    """
+    id: Optional[int] = Field(default=None, primary_key=True)
