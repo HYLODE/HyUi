@@ -54,11 +54,14 @@ class ElectivesBase(SQLModel):
     CancelDate: Optional[date]
     PlannedOperationStartInstant: datetime
     PlannedOperationEndInstant: datetime
-    PostOperativeDestination: Optional[str]
+    # PostOperativeDestination: Optional[str]
     Name: Optional[str]
     PatientFriendlyName: Optional[str]
     RoomName: Optional[str]
     DepartmentName: Optional[str]
+    # clarity postop destination
+    pod_orc: Optional[str]
+    SurgeryDateClarity: Optional[datetime]
 
 
 class ElectivesMock(ElectivesBase, table=True):

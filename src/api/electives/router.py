@@ -67,7 +67,7 @@ def read_cases(
 
     df = prepare_electives(dfcases, dfpod)
     if settings.VERBOSE:
-        print(df['PostOperativeDestination'].value_counts())
+        print(df['pod_orc'].value_counts())
     records = df.to_dict(orient="records")
     return records
 

@@ -93,7 +93,12 @@ def prepare_electives(dfcases: pd.DataFrame, dfpod: pd.DataFrame) -> pd.DataFram
 
     # CASES JOIN TO POST OP DEST
     # --------------------------
-    df = dfcases.merge(dfpod, on="SurgicalCaseKey", how="left")
+    dfc = dfcases.copy()
+    dfp = dfpod.copy()
+
+    # drop duplicate columns to avoid suffix after merge
+    dfc.drop(['pod_orc', 'SurgeryDateClarity'], axis=1)
+    df = dfc.merge(dfp, on="SurgicalCaseKey", how="left")
 
     # PREASSESSMENT JOIN TO CASES
     # ---------------------------
