@@ -14,9 +14,11 @@ def get_caboodle_session():
     with Session(caboodle_engine) as caboodle_session:
         yield caboodle_session
 
+
 def get_clarity_session():
     with Session(clarity_engine) as clarity_session:
         yield clarity_session
+
 
 def get_emap_session():
     with Session(emap_engine) as emap_session:
