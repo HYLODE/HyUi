@@ -95,7 +95,6 @@ def prepare_electives(dfcases: pd.DataFrame, dfpod: pd.DataFrame) -> pd.DataFram
     # --------------------------
     dfc = dfcases.copy()
     dfp = dfpod.copy()
-    import ipdb; ipdb.set_trace()
 
     # drop duplicate columns to avoid suffix after merge
     dfc.drop(['pod_orc', 'SurgeryDateClarity'], axis=1, inplace=True)
