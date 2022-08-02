@@ -28,6 +28,10 @@ class ElectivesBase(SQLModel):
     PatientKey: int
     SurgicalCaseEpicId: int  # use this to join to clarity
     PatientDurableKey: int  # use this to join to caboodle pre-assessment key
+    FirstName: str
+    LastName: str
+    Sex: str
+    BirthDate: date
     AgeInYears: int
     PlacedOnWaitingListDate: Optional[date]
     DecidedToAdmitDate: Optional[date]
