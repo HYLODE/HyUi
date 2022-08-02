@@ -29,7 +29,7 @@
            ,wlef.[Type]
        --    ,wlef.[Count]
         --   ,wlef.[_CreationInstant]
-           ,wlef.[_LastUpdatedInstant]
+           ,wlef.[_LastUpdatedInstant] LastUpdatedInstant
         --   ,wlef.[OfferedDateComboIdTypeId]
         --   ,wlef.[OfferedDateNumericId]
          --  ,wlef.[OfferedDateComboId]
