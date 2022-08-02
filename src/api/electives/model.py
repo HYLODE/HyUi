@@ -11,6 +11,8 @@ the module.classname can be reliably used for access
 from datetime import date, datetime
 from typing import Optional
 
+import pandas as pd
+from pydantic import validator
 from sqlmodel import Field, SQLModel
 
 
@@ -64,6 +66,27 @@ class ElectivesBase(SQLModel):
     pod_orc: Optional[str]
     SurgeryDateClarity: Optional[datetime]
 
+    @validator("pod_orc", pre=True)
+    def replace_NaN_with_None(cls, v):
+        """
+        https://stackoverflow.com/questions/47333227/pandas-valueerror-cannot-convert-float-nan-to-integer
+        """
+        return v if not pd.isna(v) else None
+
+    @validator("SurgeryDateClarity", pre=True)
+    def replace_NaT_with_None(cls, v):
+        """
+        SQLAlchemy chokes when converting pd.NaT It seems to convert to a float
+        which is incompatible with the int type used for datetimes so here we
+        simple convert NaT to None
+
+        NB: pd.NaT is stored as -9223372036854775808 (int64 type)
+        """
+        if any([v is pd.NaT, pd.isna(v)]):
+            return None
+        else:
+            return v
+
 
 class ElectivesMock(ElectivesBase, table=True):
     """
@@ -88,13 +111,37 @@ class ElectivesPod(SQLModel):
     This class describes an electives clarity base.
     Post-op destination (pod) from clarity
     """
+
     pod_orc: str
     or_case_id: int
     SurgeryDateClarity: datetime
-    
+
+    @validator("pod_orc", pre=True)
+    def replace_NaN_with_None(cls, v):
+        """
+        https://stackoverflow.com/questions/47333227/pandas-valueerror-cannot-convert-float-nan-to-integer
+        """
+        return v if not pd.isna(v) else None
+
+    @validator("SurgeryDateClarity", pre=True)
+    def replace_NaT_with_None(cls, v):
+        """
+        SQLAlchemy chokes when converting pd.NaT It seems to convert to a float
+        which is incompatible with the int type used for datetimes so here we
+        simple convert NaT to None
+
+        NB: pd.NaT is stored as -9223372036854775808 (int64 type)
+        """
+        if any([v is pd.NaT, pd.isna(v)]):
+            return None
+        else:
+            return v
+
+
 class ElectivesPodMock(ElectivesPod, table=True):
     """
     This class describes an electives clarity base.
     Post-op destination (pod) from clarity
     """
+
     id: Optional[int] = Field(default=None, primary_key=True)
