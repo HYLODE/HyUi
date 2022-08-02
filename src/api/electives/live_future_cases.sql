@@ -6,6 +6,7 @@ SELECT DISTINCT
         --    wlef.[PatientDurableKey]
             patd.[PrimaryMrn]
             ,patd.[AgeInYears]
+            ,scf.[SurgicalCaseEpicId]
         --   ,wlef.[SurgicalCaseKey]
         --   ,wlef.[ProcedureOrderKey]
         --   ,wlef.[PlacedOnWaitingListDateKey]
