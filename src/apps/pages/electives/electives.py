@@ -120,7 +120,7 @@ def gen_surgeries_over_time(n_intervals: int, data: dict):
     df = df_from_store(data, ElectivesRead)
     df = (
         df.groupby("PrimaryService")
-        .resample("12H", on="PlannedOperationStartInstant")
+        .resample("24H", on="PlannedOperationStartInstant")
         .agg({"PatientKey": "size"})
     )
     df.reset_index(inplace=True)
@@ -150,10 +150,23 @@ def gen_table_consults(modified: int, data: dict):
         SurgeryDate="SurgeryDate",
         Name="Name",
     )
+    cols = [
+        {"id": "SurgeryDate", "name": "SurgeryDate"},
+        {"id": "pod_orc", "name": "Post-op destination"},
+        {"id": "PrimaryMRN", "name": "MRN"},
+        {"id": "FirstName", "name": "FirstName"},
+        {"id": "LastName", "name": "LastName"},
+        {"id": "PrimaryService", "name": "PrimaryService"},
+        {"id": "Priority", "name": "Priority"},
+        {"id": "ElectiveAdmissionType", "name": "ElectiveAdmissionType"},
+        {"id": "Status", "name": "Status"},
+        {"id": "Classification", "name": "Classification"},
+        {"id": "Name", "name": "Procedure"},
+    ]
     return [
         dt.DataTable(
             id="elective_results_table",
-            columns=[{"name": v, "id": k} for k, v in cols.items()],
+            columns=cols,
             data=data,
             filter_action="native",
             sort_action="native",

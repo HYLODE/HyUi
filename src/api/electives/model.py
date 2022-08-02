@@ -70,7 +70,7 @@ class ElectivesBase(SQLModel):
     pod_orc: Optional[str]
     SurgeryDateClarity: Optional[datetime]
 
-    @validator("pod_orc", pre=True)
+    @validator("pod_orc", "LastUpdatedInstant", pre=True)
     def replace_NaN_with_None(cls, v):
         """
         https://stackoverflow.com/questions/47333227/pandas-valueerror-cannot-convert-float-nan-to-integer
