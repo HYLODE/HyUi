@@ -99,7 +99,7 @@ def prepare_electives(dfcases: pd.DataFrame, dfpod: pd.DataFrame) -> pd.DataFram
     # drop duplicate columns to avoid suffix after merge
     dfc.drop(['pod_orc', 'SurgeryDateClarity'], axis=1, inplace=True)
     # dfp.drop(['id'], axis=1, inplace=True)
-    df = dfc.merge(dfp, on="SurgicalCaseKey", how="left")
+    df = dfc.merge(dfp, left_on="SurgicalCaseEpicId", right_on="or_case_id", how="left")
 
     # PREASSESSMENT JOIN TO CASES
     # ---------------------------

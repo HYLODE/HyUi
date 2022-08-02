@@ -1,8 +1,3 @@
--- 2022-08-02
--- Query by J Hunter
--- see https://github.com/HYLODE/HyUi/issues/47#issuecomment-1160706270
--- updated to fix join
-
     SELECT DISTINCT
         --    wlef.[PatientDurableKey]
             patd.[PrimaryMrn]
@@ -106,5 +101,5 @@
       --AND dd.[DepartmentName] != 'UCH P02 ENDOSCOPY'
       AND patd.[AgeInYears] >= 18
       AND (wlef.[IntendedManagement] IN ('*Unspecified', 'Inpatient', 'Inpatient Series', 'Night Admit Series') OR wlef.[IntendedManagement] IS NULL)
-      AND  scufx.[PlannedOperationStartInstant] > CONVERT(DATE,DATEADD(DAY, 0 ,CURRENT_TIMESTAMP)) AND [PlannedOperationStartInstant] < CONVERT(DATE,DATEADD(DAY, 3 ,CURRENT_TIMESTAMP))
+      AND  scufx.[PlannedOperationStartInstant] > CONVERT(DATE,DATEADD(DAY, ? ,CURRENT_TIMESTAMP)) AND [PlannedOperationStartInstant] < CONVERT(DATE,DATEADD(DAY, ? ,CURRENT_TIMESTAMP))
       ORDER BY  datesurg.[DateValue],dd.[DepartmentName],dd.[RoomName] ASC

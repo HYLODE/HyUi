@@ -4,9 +4,9 @@
 
 -- TODO: parameterise where clause for greater number of days
 SELECT 
-    pod.NAME AS pod_orc, 
-    c.OR_CASE_ID AS SurgicalCaseKey, 
-    c.SURGERY_DATE AS SurgeryDateClarity
+     pod.NAME AS pod_orc 
+    ,c.OR_CASE_ID AS or_case_id
+    ,c.SURGERY_DATE AS SurgeryDateClarity
 FROM OR_CASE c
 INNER JOIN ZC_OR_POSTOP_DEST pod ON pod.POSTOP_DEST = c.POSTOP_DEST_C
 WHERE c.SURGERY_DATE > GETDATE()
