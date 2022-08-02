@@ -153,15 +153,15 @@ def gen_table_consults(modified: int, data: dict):
     cols = [
         {"id": "SurgeryDate", "name": "SurgeryDate"},
         {"id": "pod_orc", "name": "Post-op destination"},
-        {"id": "PrimaryMRN", "name": "MRN"},
+        {"id": "PrimaryService", "name": "PrimaryService"},
+        {"id": "Name", "name": "Procedure"},
+        {"id": "PrimaryMrn", "name": "MRN"},
         {"id": "FirstName", "name": "FirstName"},
         {"id": "LastName", "name": "LastName"},
-        {"id": "PrimaryService", "name": "PrimaryService"},
         {"id": "Priority", "name": "Priority"},
-        {"id": "ElectiveAdmissionType", "name": "ElectiveAdmissionType"},
+        # {"id": "ElectiveAdmissionType", "name": "ElectiveAdmissionType"},
         {"id": "Status", "name": "Status"},
         {"id": "Classification", "name": "Classification"},
-        {"id": "Name", "name": "Procedure"},
     ]
     return [
         dt.DataTable(
@@ -170,6 +170,7 @@ def gen_table_consults(modified: int, data: dict):
             data=data,
             filter_action="native",
             sort_action="native",
+            style_cell={'textAlign': 'left'},
         )
     ]
 
