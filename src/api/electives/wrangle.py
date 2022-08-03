@@ -119,24 +119,25 @@ def prepare_electives(
     df = dfca.merge(dfp, left_on="SurgicalCaseEpicId", right_on="or_case_id", how="left")
 
 
-    df.drop(columns=[
-        "PatientKey",
-        "SurgicalCaseEpicId",
-        "PatientDurableKey",
-        "PlacedOnWaitingListDate",
-        "PatientDurableKey",
-        "LastUpdatedInstant",
-        "SurgicalCaseUclhKey",
-        "SurgicalCaseKey",
-        "CaseCancelReasonCode",
-        "CaseCancelReason",
-        "Name",
-        "id",
-        "ElectiveAdmissionType",
-        "IntendedManagement",
-        "RemovalReason",
-        "Subgroup",
-    ])
+    # df.drop(columns=[
+    #     "PatientKey",
+    #     "SurgicalCaseEpicId",
+    #     "PatientDurableKey",
+    #     "PlacedOnWaitingListDate",
+    #     "PatientDurableKey",
+    #     "LastUpdatedInstant",
+    #     "SurgicalCaseUclhKey",
+    #     "SurgicalCaseKey",
+    #     "CaseCancelReasonCode",
+    #     "CaseCancelReason",
+    #     "Name",
+    #     "id",
+    #     "ElectiveAdmissionType",
+    #     "IntendedManagement",
+    #     "RemovalReason",
+    #     "Subgroup",
+    #     "PlannedOperationEndInstant",
+    # ], inplace=True)
 
     # import ipdb; ipdb.set_trace()
     df['pacu'] = False
