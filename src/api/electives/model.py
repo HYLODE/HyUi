@@ -109,6 +109,34 @@ class ElectivesRead(ElectivesBase):
     id: Optional[int]
 
 
+class ElectivesPreassess(SQLModel):
+    """
+    This class describes an electives preassess. Post operative destination
+    information derived from pre-assessment clinic smart data elements
+
+    SQL details
+
+    PatientDurableKey   BIGINT  YES NULL
+    CreationInstant DATETIME    YES NULL
+    StringValue TEXT    YES NULL
+    NumericValue    FLOAT   YES NULL
+    Name    TEXT    YES NULL
+    DataType    TEXT    YES NULL
+    """
+
+    PatientDurableKey: int
+    CreationInstant: datetime
+    StringValue: Optional[str]
+    NumericValue: Optional[float]
+    Name: Optional[str]
+    DataType: Optional[str]
+
+
+class ElectivesPreassessMock(ElectivesPreassess, table=True):
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+
+
 # TODO: mocking
 class ElectivesPod(SQLModel):
     """

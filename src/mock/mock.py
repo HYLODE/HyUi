@@ -128,11 +128,23 @@ if __name__ == "__main__":
     engine = make_engine(echo=True)
 
     # for additional data: then add into mock db here
-    # TODO: factor this out into better system
-    # for post-op destination
+    # TODO: factor these standalone imports out into better system
+
+    # clarity post-op destination
     model_path = f"{gen_module_path('electives')}.model"
     model = getattr(importlib.import_module(model_path), "ElectivesPodMock")
-    df = pd.read_json("../data/mock/live_clarity.json")
+    df = pd.read_json("../data/mock/electives_pod.json")
+    create_mock_table(engine, model, drop=True)
+    insert_into_mock_table(engine, df, model)
+
+    # pre-assessment post-op destination
+    model_path = f"{gen_module_path('electives')}.model"
+    model = getattr(importlib.import_module(model_path), "ElectivesPreassessMock")
+    f = Path.cwd().parent / "data" / "mock" / "preassess.db"
+    url = f"sqlite:///{f}"
+    engine_in = create_engine(url)
+    with engine_in.connect() as conn:
+        df = pd.read_sql("preassess", conn)
     create_mock_table(engine, model, drop=True)
     insert_into_mock_table(engine, df, model)
 
