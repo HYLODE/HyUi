@@ -140,38 +140,42 @@ def gen_surgeries_over_time(n_intervals: int, data: dict):
 def gen_table_consults(modified: int, data: dict):
 
     cols = [
+        {"id": "SurgeryDate", "name": "SurgeryDate"},
+        {"id": "SurgicalService", "name": "SurgicalService"},
+        {"id": "pacu", "name": "pacu"},
+        {"id": "PatientFriendlyName", "name": "Procedure"},
+        {"id": "RoomName", "name": "RoomName"},
+
         {"id": "PrimaryMrn", "name": "MRN"},
         {"id": "FirstName", "name": "FirstName"},
         {"id": "LastName", "name": "LastName"},
         {"id": "Sex", "name": "Sex"},
         {"id": "AgeInYears", "name": "Age"},
-        {"id": "PlacedOnWaitingListDate", "name": "PlacedOnWaitingListDate"},
-        {"id": "DecidedToAdmitDate", "name": "DecidedToAdmitDate"},
-        {"id": "AdmissionService", "name": "AdmissionService"},
+
+        {"id": "PrimaryAnesthesiaType", "name": "PrimaryAnesthesiaType"},
+        {"id": "most_recent_ASA", "name": "ASA"},
+        {"id": "most_recent_METs", "name": "METS"},
+
+        {"id": "pod_orc", "name": "Post-op booking"},
+        {"id": "pod_preassessment", "name": "Post-op pre-assess"},
+
         {"id": "Priority", "name": "Priority"},
         {"id": "Status", "name": "Status"},
-        {"id": "PrimaryService", "name": "PrimaryService"},
-        {"id": "SurgicalService", "name": "SurgicalService"},
-        {"id": "Type", "name": "Type"},
-        {"id": "Type", "name": "Type"},
-        {"id": "SurgeryDate", "name": "SurgeryDate"},
-        {"id": "Classification", "name": "Classification"},
-        {"id": "SurgeryPatientClass", "name": "SurgeryPatientClass"},
+
+        # {"id": "PlacedOnWaitingListDate", "name": "PlacedOnWaitingListDate"},
+        # {"id": "DecidedToAdmitDate", "name": "DecidedToAdmitDate"},
+        # {"id": "AdmissionService", "name": "AdmissionService"},
+        # {"id": "PrimaryService", "name": "PrimaryService"},
+        # {"id": "Type", "name": "Type"},
+        # {"id": "Classification", "name": "Classification"},
+        # {"id": "SurgeryPatientClass", "name": "SurgeryPatientClass"},
         {"id": "AdmissionPatientClass", "name": "AdmissionPatientClass"},
-        {"id": "PrimaryAnesthesiaType", "name": "PrimaryAnesthesiaType"},
-        {"id": "ReasonNotPerformed", "name": "ReasonNotPerformed"},
+        # {"id": "ReasonNotPerformed", "name": "ReasonNotPerformed"},
         {"id": "Canceled", "name": "Canceled"},
         {"id": "CaseScheduleStatus", "name": "CaseScheduleStatus"},
         {"id": "CancelDate", "name": "CancelDate"},
         {"id": "PlannedOperationStartInstant", "name": "PlannedOperationStartInstant"},
-        {"id": "PatientFriendlyName", "name": "Procedure"},
-        {"id": "RoomName", "name": "RoomName"},
-        {"id": "DepartmentName", "name": "DepartmentName"},
-        {"id": "most_recent_ASA", "name": "ASA"},
-        {"id": "most_recent_METs", "name": "METS"},
-        {"id": "pod_orc", "name": "Post-op destination"},
-        {"id": "pod_preassessment", "name": "Post-op destination"},
-        {"id": "pacu", "name": "pacu"},
+        # {"id": "DepartmentName", "name": "DepartmentName"},
     ]
     return [
         dt.DataTable(
