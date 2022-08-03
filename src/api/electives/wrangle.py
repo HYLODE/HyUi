@@ -119,6 +119,7 @@ def prepare_electives(
     df = dfca.merge(dfp, left_on="SurgicalCaseEpicId", right_on="or_case_id", how="left")
 
 
+    # Can't drop b/c it breaks the pydantic model
     # df.drop(columns=[
     #     "PatientKey",
     #     "SurgicalCaseEpicId",
@@ -139,10 +140,11 @@ def prepare_electives(
     #     "PlannedOperationEndInstant",
     # ], inplace=True)
 
-    # import ipdb; ipdb.set_trace()
     df['pacu'] = False
     df['pacu'] = np.where(df['pod_orc'].astype(str).str.contains('PACU'), True, df['pacu'])
     df['pacu'] = np.where(df['pod_preassessment'].astype(str).str.contains('PACU'), True, df['pacu'])
 
+    # drop cancellations
+    df = df[~(df['Canceled']==1)]
 
     return df

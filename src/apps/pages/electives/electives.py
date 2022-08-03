@@ -102,7 +102,7 @@ def filter_data(val: List[str], data: dict) -> dict:
     """
     if val:
         print(val)
-        return [row for row in data if row["PrimaryService"] in val]  # type: ignore
+        return [row for row in data if row["SurgicalService"] in val]  # type: ignore
     else:
         return data
 
@@ -119,14 +119,14 @@ def gen_surgeries_over_time(n_intervals: int, data: dict):
     """
     df = df_from_store(data, ElectivesRead)
     df = (
-        df.groupby("PrimaryService")
+        df.groupby("SurgicalService")
         .resample("24H", on="PlannedOperationStartInstant")
         .agg({"PatientKey": "size"})
     )
     df.reset_index(inplace=True)
     # print(df)
     fig = px.bar(
-        df, x="PlannedOperationStartInstant", y="PatientKey", color="PrimaryService"
+        df, x="PlannedOperationStartInstant", y="PatientKey", color="SurgicalService"
     )
     return dcc.Graph(id=f"{BPID}fig", figure=fig)
 
@@ -196,4 +196,4 @@ def gen_table_consults(modified: int, data: dict):
 )
 def update_service_dropdown(data: dict):
     df = df_from_store(data, ElectivesRead)
-    return df["PrimaryService"].sort_values().unique()
+    return df["SurgicalService"].sort_values().unique()

@@ -110,5 +110,5 @@
       --AND dd.[DepartmentName] != 'UCH P02 ENDOSCOPY'
       AND patd.[AgeInYears] >= 18
       AND (wlef.[IntendedManagement] IN ('*Unspecified', 'Inpatient', 'Inpatient Series', 'Night Admit Series') OR wlef.[IntendedManagement] IS NULL)
-      AND  scufx.[PlannedOperationStartInstant] > CONVERT(DATE,DATEADD(DAY, 0 ,CURRENT_TIMESTAMP)) AND [PlannedOperationStartInstant] < CONVERT(DATE,DATEADD(DAY, 3 ,CURRENT_TIMESTAMP))
+      AND  scufx.[PlannedOperationStartInstant] >= CONVERT(DATE,DATEADD(DAY, 0 ,CURRENT_TIMESTAMP)) AND [PlannedOperationStartInstant] <= CONVERT(DATE,DATEADD(DAY, 3 ,CURRENT_TIMESTAMP))
       ORDER BY  datesurg.[DateValue],dd.[DepartmentName],dd.[RoomName] ASC
