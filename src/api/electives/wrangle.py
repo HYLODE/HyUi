@@ -2,6 +2,7 @@
 from typing import List
 
 import pandas as pd
+import numpy as np
 
 
 def _get_most_recent_value(name: str, preassess_data: pd.DataFrame) -> pd.DataFrame:
@@ -116,5 +117,30 @@ def prepare_electives(
     dfca.drop(["pod_orc", "SurgeryDateClarity"], axis=1, inplace=True)
     # dfp.drop(['id'], axis=1, inplace=True)
     df = dfca.merge(dfp, left_on="SurgicalCaseEpicId", right_on="or_case_id", how="left")
+
+
+    df.drop(columns=[
+        "PatientKey",
+        "SurgicalCaseEpicId",
+        "PatientDurableKey",
+        "PlacedOnWaitingListDate",
+        "PatientDurableKey",
+        "LastUpdatedInstant",
+        "SurgicalCaseUclhKey",
+        "SurgicalCaseKey",
+        "CaseCancelReasonCode",
+        "CaseCancelReason",
+        "Name",
+        "id",
+        "ElectiveAdmissionType",
+        "IntendedManagement",
+        "RemovalReason",
+        "Subgroup",
+    ])
+
+    df['pacu'] = False
+    df['pacu'] = np.where(df['pod_orc'].str.contains('PACU'), True, df['pacu'])
+    df['pacu'] = np.where(df['pod_preassessment'].str.contains('PACU'), True, df['pacu'])
+
 
     return df

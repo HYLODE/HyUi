@@ -74,15 +74,16 @@ class ElectivesBase(SQLModel):
     # clarity postop destination
     pod_orc: Optional[str]
     SurgeryDateClarity: Optional[datetime]
+    pacu: Optional[bool]
 
-    @validator("pod_orc", "LastUpdatedInstant", "most_recent_pod_dt", pre=True)
+    @validator("pod_orc", "pod_preassessment", "most_recent_METs", pre=True)
     def replace_NaN_with_None(cls, v):
         """
         https://stackoverflow.com/questions/47333227/pandas-valueerror-cannot-convert-float-nan-to-integer
         """
         return v if not pd.isna(v) else None
 
-    @validator("SurgeryDateClarity", pre=True)
+    @validator("SurgeryDateClarity", "LastUpdatedInstant", "most_recent_pod_dt", pre=True)
     def replace_NaT_with_None(cls, v):
         """
         SQLAlchemy chokes when converting pd.NaT It seems to convert to a float
@@ -135,6 +136,27 @@ class ElectivesPreassess(SQLModel):
     NumericValue: Optional[float]
     Name: Optional[str]
     DataType: Optional[str]
+
+    @validator("StringValue", "Name", "DataType", pre=True)
+    def replace_NaN_with_None(cls, v):
+        """
+        https://stackoverflow.com/questions/47333227/pandas-valueerror-cannot-convert-float-nan-to-integer
+        """
+        return v if not pd.isna(v) else None
+
+    @validator("CreationInstant", pre=True)
+    def replace_NaT_with_None(cls, v):
+        """
+        SQLAlchemy chokes when converting pd.NaT It seems to convert to a float
+        which is incompatible with the int type used for datetimes so here we
+        simple convert NaT to None
+
+        NB: pd.NaT is stored as -9223372036854775808 (int64 type)
+        """
+        if any([v is pd.NaT, pd.isna(v)]):
+            return None
+        else:
+            return v
 
 
 class ElectivesPreassessMock(ElectivesPreassess, table=True):
