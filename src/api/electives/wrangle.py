@@ -138,9 +138,10 @@ def prepare_electives(
         "Subgroup",
     ])
 
+    # import ipdb; ipdb.set_trace()
     df['pacu'] = False
-    df['pacu'] = np.where(df['pod_orc'].str.contains('PACU'), True, df['pacu'])
-    df['pacu'] = np.where(df['pod_preassessment'].str.contains('PACU'), True, df['pacu'])
+    df['pacu'] = np.where(df['pod_orc'].astype(str).str.contains('PACU'), True, df['pacu'])
+    df['pacu'] = np.where(df['pod_preassessment'].astype(str).str.contains('PACU'), True, df['pacu'])
 
 
     return df
