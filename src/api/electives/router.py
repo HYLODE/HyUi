@@ -25,6 +25,7 @@ router = APIRouter(
 
 CasesRead = get_model_from_route("Electives", "Read")
 PodRead = get_model_from_route("Electives", "Pod")  # pod=post-op destination
+PreassessRead = get_model_from_route("Electives", "Preassess")  # preassess info
 
 
 def read_query(file_live: str, table_mock: str):
@@ -46,7 +47,7 @@ def read_query(file_live: str, table_mock: str):
 
 
 @router.get("/", response_model=List[CasesRead])  # type: ignore
-def read_cases(
+def read_electives(
     session_caboodle: Session = Depends(get_caboodle_session),
     session_clarity: Session = Depends(get_clarity_session),
     ):
@@ -65,7 +66,13 @@ def read_cases(
     dfpod = pd.read_sql(qtext, session_clarity.connection())
     dfpod = pydantic_dataframe(dfpod, PodRead)
 
-    df = prepare_electives(dfcases, dfpod)
+    query = read_query("live_preassess.sql", "electivespreassessmock")
+    qtext = sa.text(query)
+    dfpreassess = pd.read_sql(qtext, session_caboodle.connection())
+    dfpreassess = pydantic_dataframe(dfpreassess, PreassessRead)
+
+    df = prepare_electives(dfcases, dfpod, dfpreassess)
+
     if settings.VERBOSE:
         print(df['pod_orc'].value_counts())
     records = df.to_dict(orient="records")
@@ -90,8 +97,19 @@ def read_pod(session: Session = Depends(get_clarity_session)):
     """
     Returns clarity periop destination query
     """
-    # TODO: abstract this out
     query = read_query("live_pod.sql", "electivespodmock")
+    results = session.exec(query)  # type: ignore
+    Record = namedtuple("Record", results.keys())  # type: ignore
+    records = [Record(*r) for r in results.fetchall()]
+    return records
+
+
+@router.get("/preassess", response_model=List[PreassessRead])  # type: ignore
+def read_preassess(session: Session = Depends(get_caboodle_session)):
+    """
+    Returns pre-assesment caboodle query 
+    """
+    query = read_query("live_preassess.sql", "electivespreassessmock")
     results = session.exec(query)  # type: ignore
     Record = namedtuple("Record", results.keys())  # type: ignore
     records = [Record(*r) for r in results.fetchall()]

@@ -66,11 +66,16 @@ class ElectivesBase(SQLModel):
     PatientFriendlyName: Optional[str]
     RoomName: Optional[str]
     DepartmentName: Optional[str]
+    # preassessment clinic post op destination info
+    most_recent_pod_dt: Optional[datetime]
+    pod_preassessment: Optional[str]
+    most_recent_ASA: Optional[float]
+    most_recent_METs: Optional[str]
     # clarity postop destination
     pod_orc: Optional[str]
     SurgeryDateClarity: Optional[datetime]
 
-    @validator("pod_orc", "LastUpdatedInstant", pre=True)
+    @validator("pod_orc", "LastUpdatedInstant", "most_recent_pod_dt", pre=True)
     def replace_NaN_with_None(cls, v):
         """
         https://stackoverflow.com/questions/47333227/pandas-valueerror-cannot-convert-float-nan-to-integer

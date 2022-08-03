@@ -4,7 +4,7 @@ from typing import List
 import pandas as pd
 
 
-def _get_most_recent_value(name, preassess_data):
+def _get_most_recent_value(name: str, preassess_data: pd.DataFrame) -> pd.DataFrame:
     """
     Gets the most recent value.
 
@@ -26,7 +26,9 @@ def _get_most_recent_value(name, preassess_data):
     return data
 
 
-def process_join_preassess_data(preassess_data, future_cases):
+def process_join_preassess_data(
+    preassess_data: pd.DataFrame, future_cases: pd.DataFrame
+) -> pd.DataFrame:
     """
     Merge the preassessment data with the cases
     Jen Hunter 2022-08-01
@@ -69,7 +71,6 @@ def process_join_preassess_data(preassess_data, future_cases):
 
     asa_data = asa_data[["PatientDurableKey", "StringValue"]]
     asa_data = asa_data.rename(columns={"StringValue": "most_recent_ASA"})
-    asa_data.head()
 
     mets_data = mets_data[["PatientDurableKey", "StringValue"]]
     mets_data = mets_data.rename(columns={"StringValue": "most_recent_METs"})
@@ -81,59 +82,39 @@ def process_join_preassess_data(preassess_data, future_cases):
     return future_cases
 
 
-def prepare_electives(dfcases: pd.DataFrame, dfpod: pd.DataFrame) -> pd.DataFrame:
+def prepare_electives(
+    dfcases: pd.DataFrame, dfpod: pd.DataFrame, dfpreassess: pd.DataFrame
+) -> pd.DataFrame:
     """
     Prepare elective case list
 
     :param      dfcases:  dataframe with surgical cases
     :param      dfpod:    dataframe with postop destination
+    :param      dfpreassess:    dataframe with preassessment info
 
     :returns:   merged dataframe
     """
 
-    # CASES JOIN TO POST OP DEST
+    # Prepare copies of each data frame
     # --------------------------
     dfc = dfcases.copy()
     dfp = dfpod.copy()
-
-    # drop duplicate columns to avoid suffix after merge
-    dfc.drop(['pod_orc', 'SurgeryDateClarity'], axis=1, inplace=True)
     # dfp.drop(['id'], axis=1, inplace=True)
-    df = dfc.merge(dfp, left_on="SurgicalCaseEpicId", right_on="or_case_id", how="left")
+    dfa = dfpreassess.copy()
+    # dfa.drop(['id'], axis=1, inplace=True)
 
     # PREASSESSMENT JOIN TO CASES
     # ---------------------------
-    # future_table = process_join_preassess_data(future_preassess_data, future_data)
-    # future_table = future_table.drop(
-    #     columns=[
-    #         "PlacedOnWaitingListDate",
-    #         "DecidedToAdmitDate",
-    #         "ElectiveAdmissionType",
-    #         "IntendedManagement",
-    #         "RemovalReason",
-    #         "Status",
-    #         "Subgroup",
-    #         "SurgicalService",
-    #         "Type",
-    #         "_LastUpdatedInstant",
-    #         "PatientKey",
-    #         "PatientDurableKey",
-    #         "PrimaryService",
-    #         "Classification",
-    #         "SurgeryPatientClass",
-    #         "AdmissionPatientClass",
-    #         "PrimaryAnesthesiaType",
-    #         "ReasonNotPerformed",
-    #         "Canceled",
-    #         "SurgicalCaseUclhKey",
-    #         "SurgicalCaseKey",
-    #         "CaseScheduleStatus",
-    #         "CaseCancelReason",
-    #         "CaseCancelReasonCode",
-    #         "CancelDate",
-    #         "PlannedOperationStartInstantUTC",
-    #         "PlannedOperationEndInstantUTC",
-    #     ]
-    # )
+    # import ipdb; ipdb.set_trace()
+    # drop duplicate columns to avoid suffix after merge
+    dfc.drop(["most_recent_pod_dt", "pod_preassessment", "most_recent_METs", "most_recent_ASA"], axis=1, inplace=True)
+    dfca = process_join_preassess_data(dfa, dfc)
+
+    # Post-op destination from case booking (clarity) join
+    # ----------------------------------------------------
+    # drop duplicate columns to avoid suffix after merge
+    dfca.drop(["pod_orc", "SurgeryDateClarity"], axis=1, inplace=True)
+    # dfp.drop(['id'], axis=1, inplace=True)
+    df = dfca.merge(dfp, left_on="SurgicalCaseEpicId", right_on="or_case_id", how="left")
 
     return df
