@@ -4,11 +4,9 @@ sub-application for sitrep
 """
 
 from collections import OrderedDict
-from typing import List
 
 import dash_bootstrap_components as dbc
 import pandas as pd
-import requests
 from dash import Input, Output, callback, State
 from dash import dash_table as dt
 from dash import dcc, html, register_page
@@ -19,7 +17,6 @@ from config.settings import settings
 from utils import icons
 from utils.beds import get_bed_list, unpack_nested_dict, update_bed_row, BedBonesBase
 from utils.dash import df_from_store, get_results_response, validate_json
-from utils.wards import wards
 
 register_page(__name__)
 
@@ -33,6 +30,7 @@ DEPT2WARD_MAPPING = {
 }
 
 BED_BONES_TABLE_ID = 261
+
 
 def build_api_url(ward: str = None) -> str:
     """Construct API based on environment and requested ward"""
@@ -110,7 +108,7 @@ def store_data(n_intervals: int, dept: str) -> list:
     beds = unpack_nested_dict(beds, f2unpack="bed_functional", subkey="value")
     beds = unpack_nested_dict(beds, f2unpack="bed_physical", subkey="value")
 
-    beds = validate_json(beds,BedBonesBase, to_dict=True)
+    beds = validate_json(beds, BedBonesBase, to_dict=True)
 
     # merge the two
     df_sitrep = pd.DataFrame.from_records(sitrep)
@@ -131,7 +129,7 @@ def store_data(n_intervals: int, dept: str) -> list:
 
 @callback(
     Output("hidden-div", "children"),
-    Input(f"{BPID}tbl-census", 'data_timestamp'),
+    Input(f"{BPID}tbl-census", "data_timestamp"),
     State(f"{BPID}tbl-census", "data_previous"),
     State(f"{BPID}tbl-census", "data"),
     prevent_initial_call=True,
@@ -142,7 +140,7 @@ def diff_table(time, prev_data, data):
         print(prev_data)
         return ""
 
-    diff_rows = [(i,x) for i,x in enumerate(data) if x not in prev_data]
+    diff_rows = [(i, x) for i, x in enumerate(data) if x not in prev_data]
 
     if diff_rows == []:
         return ""
@@ -158,12 +156,12 @@ def diff_table(time, prev_data, data):
         # Get the keys with updated data in the row
         diff_keys = [k for k in new_row if new_row[k] != prev_row[k]]
 
-        if 'DischargeReady' in diff_keys:            
+        if "DischargeReady" in diff_keys:
             discharge_status_updated.append(new_row)
-        
+
     for x in discharge_status_updated:
-        row_id = x['id']
-        row_data = { "DischargeReady": x["DischargeReady"] }
+        row_id = x["id"]
+        row_data = {"DischargeReady": x["DischargeReady"]}
 
         update_bed_row(BED_BONES_TABLE_ID, row_id, row_data)
 
@@ -211,8 +209,8 @@ def gen_fancy_table(data: dict):
         llist.append(ti)
     dfn = pd.DataFrame(llist, columns=dfo.columns)
 
-    # 
-    dfn['open'] = dfn['closed'].apply(icons.closed)
+    #
+    dfn["open"] = dfn["closed"].apply(icons.closed)
 
     # Prep columns with ids and names
     COL_DICT = [{"name": v, "id": k} for k, v in COLS.items() if k in COLS_ABACUS]
@@ -241,7 +239,6 @@ def gen_fancy_table(data: dict):
     )
 
     DISCHARGE_OPTIONS = ["Ready", "No", "Review"]
-
 
     dto = (
         dt.DataTable(
@@ -283,12 +280,12 @@ def gen_fancy_table(data: dict):
                         "filter_query": "{closed} contains true",
                         # "column_id": "closed"
                     },
-                    "color": "maroon"
+                    "color": "maroon",
                 },
             ],
             sort_action="native",
             sort_by=[
-                {'column_id': 'unit_order', 'direction': 'asc'},
+                {"column_id": "unit_order", "direction": "asc"},
             ],
             cell_selectable=True,  # possible to click and navigate cells
             # row_selectable="single",
@@ -311,7 +308,7 @@ def gen_fancy_table(data: dict):
 ward_radio_button = html.Div(
     [
         # Need a hidden div for the callback with no output
-        html.Div(id="hidden-div", style={"display":"none"}),
+        html.Div(id="hidden-div", style={"display": "none"}),
         html.Div(
             [
                 dbc.RadioItems(
