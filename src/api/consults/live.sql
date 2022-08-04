@@ -17,12 +17,12 @@ SELECT
 ,cr.closed_due_to_discharge
 ,cr.comments
 ,cr.scheduled_datetime
-,cr.status_change_time
+,cr.status_change_datetime
 ,cr.hospital_visit_id
 ,ct.code
 ,ct.name
-,loc.admission_time
-,loc.discharge_time
+,loc.admission_datetime
+,loc.discharge_datetime
 ,loc.location_string
 ,loc.name AS dept_name
 
@@ -36,8 +36,8 @@ INNER JOIN (
 	star.location_visit lv
 	LEFT JOIN star.location lo ON lv.location_id = lo.location_id
 	LEFT JOIN star.department de ON lo.department_id = de.department_id
---	WHERE lv.admission_time >= NOW() - INTERVAL '24 HOURS'
-	WHERE lv.discharge_time IS NULL
+--	WHERE lv.admission_datetime >= NOW() - INTERVAL '24 HOURS'
+	WHERE lv.discharge_datetime IS NULL
 ) loc ON cr.hospital_visit_id = loc.hospital_visit_id
 
 
@@ -63,7 +63,7 @@ loc_now AS (
 -- so '1' represents the current location of that patient
 SELECT
  *
-,row_number() over (partition BY consults.hospital_visit_id ORDER BY consults.admission_time DESC) loc_i
+,row_number() over (partition BY consults.hospital_visit_id ORDER BY consults.admission_datetime DESC) loc_i
 FROM consults
 )
 -- now return the consult and the most recent location
@@ -79,10 +79,10 @@ SELECT
 --,loc_now.closed_due_to_discharge
 ,loc_now.comments
 ,loc_now.scheduled_datetime
-,loc_now.status_change_time
+,loc_now.status_change_datetime
 ,loc_now.name
-,loc_now.admission_time
-,loc_now.discharge_time
+,loc_now.admission_datetime
+,loc_now.discharge_datetime
 ,loc_now.dept_name
 ,loc_now.location_string
 FROM loc_now

@@ -141,8 +141,8 @@ WITH ward_location AS (
        (
         SELECT 	hv.encounter AS csn,
    		hv.hospital_visit_id AS hv_id,
-         lv.admission_time    AS admission_dt,
-         lv.discharge_time AS discharge_dt,
+         lv.admission_datetime    AS admission_dt,
+         lv.discharge_datetime AS discharge_dt,
          loc.location_string  AS hl7_location,
 			m.mrn AS mrn
 
@@ -159,11 +159,11 @@ WITH ward_location AS (
 
          WHERE (loc.location_string IN ({location}))--(loc.location_string LIKE 'T03%%' OR loc.location_string LIKE '%%T06PACU%%' OR loc.location_string LIKE '%%GWB L01 CC%%')
            AND hv.patient_class IN ('INPATIENT', 'EMERGENCY')
-           AND hv.admission_time IS NOT NULL -- check a valid hospital visit
-           AND lv.admission_time <= {end_time} -- check location admission happened at or before horizon
-			  AND lv.admission_time >= {end_time} - '6 MONTHS'::INTERVAL -- Bin patients who have been in a given bed an unfeasibly long time
-           AND (hv.discharge_time IS NULL OR hv.discharge_time > {end_time})       -- check patient is still in hospital at horizon
-           AND (lv.discharge_time IS NULL OR lv.discharge_time > {end_time})       -- check patient is still at location at horizon
+           AND hv.admission_datetime IS NOT NULL -- check a valid hospital visit
+           AND lv.admission_datetime <= {end_time} -- check location admission happened at or before horizon
+			  AND lv.admission_datetime >= {end_time} - '6 MONTHS'::INTERVAL -- Bin patients who have been in a given bed an unfeasibly long time
+           AND (hv.discharge_datetime IS NULL OR hv.discharge_datetime > {end_time})       -- check patient is still in hospital at horizon
+           AND (lv.discharge_datetime IS NULL OR lv.discharge_datetime > {end_time})       -- check patient is still at location at horizon
            AND (pt.date_of_death IS NULL OR pt.date_of_death > {end_time}) -- check patient is alive at horizon
 
        ),
@@ -194,8 +194,8 @@ WITH ward_location AS (
        (
         SELECT 	hv.encounter AS csn,
    		hv.hospital_visit_id AS hv_id,
-         lv.admission_time    AS admission_dt,
-         lv.discharge_time AS discharge_dt,
+         lv.admission_datetime    AS admission_dt,
+         lv.discharge_datetime AS discharge_dt,
          loc.location_string  AS hl7_location,
 			m.mrn AS mrn
 
@@ -212,11 +212,11 @@ WITH ward_location AS (
 
          WHERE ({icu_location})
            AND hv.patient_class IN ('INPATIENT', 'EMERGENCY')
-           AND hv.admission_time IS NOT NULL -- check a valid hospital visit
-           AND lv.admission_time >= {end_time} -- check admission happened in the future
-           AND lv.admission_time <= {end_time} + '24 HOURS'::INTERVAL -- check admission happened in about 24h time
-           AND (hv.discharge_time IS NULL OR hv.discharge_time > {end_time} + '24 HOURS'::INTERVAL)       -- check patient is still in hospital at horizon
-           AND (lv.discharge_time IS NULL OR lv.discharge_time > {end_time} + '24 HOURS'::INTERVAL)       -- check patient is still at location at horizon
+           AND hv.admission_datetime IS NOT NULL -- check a valid hospital visit
+           AND lv.admission_datetime >= {end_time} -- check admission happened in the future
+           AND lv.admission_datetime <= {end_time} + '24 HOURS'::INTERVAL -- check admission happened in about 24h time
+           AND (hv.discharge_datetime IS NULL OR hv.discharge_datetime > {end_time} + '24 HOURS'::INTERVAL)       -- check patient is still in hospital at horizon
+           AND (lv.discharge_datetime IS NULL OR lv.discharge_datetime > {end_time} + '24 HOURS'::INTERVAL)       -- check patient is still at location at horizon
            AND (pt.date_of_death IS NULL OR pt.date_of_death > {end_time}) -- check patient is alive at time of prediction, so long as they are admitted to ICU
 
        ),
@@ -276,8 +276,8 @@ SELECT
   	ob.unit,
 
   	-- Admisssion time, discharge time, location, age can probably be removed when happy with this string
-  	--loc.admission_time,
-  	--loc.discharge_time,
+  	--loc.admission_datetime,
+  	--loc.discharge_datetime,
   	lo.location_string,
   	demog.date_of_birth,
 
@@ -307,7 +307,7 @@ SELECT
     END AS icu_admission
 
     -- Hospital discharge date
-    ,visit.discharge_time hospital_discharge_dt
+    ,visit.discharge_datetime hospital_discharge_dt
 
 FROM
   star.visit_observation ob
@@ -372,10 +372,10 @@ AND lo.location_string IN ({location})
 
 -- Now bin all rows where the observation isn't in the location admission window - could be using between here?
 AND
-ob.observation_datetime >= loc.admission_time
+ob.observation_datetime >= loc.admission_datetime
 
 AND
-(ob.observation_datetime <= loc.discharge_time OR loc.discharge_time IS NULL)
+(ob.observation_datetime <= loc.discharge_datetime OR loc.discharge_datetime IS NULL)
 
 -- Only include specified CSNs
 AND visit.encounter IN (SELECT csn from census)

@@ -36,8 +36,8 @@ WHERE ct.name IN ('Inpatient consult to General Surgery',
 						'Inpatient consult to Stoma Care Nursing')
 AND cr.cancelled = 'false'
 AND cr.closed_due_to_discharge = 'false'
-AND cr.scheduled_datetime >= lv.admission_time
-AND (cr.scheduled_datetime <= lv.discharge_time OR lv.discharge_time IS NULL)
+AND cr.scheduled_datetime >= lv.admission_datetime
+AND (cr.scheduled_datetime <= lv.discharge_datetime OR lv.discharge_datetime IS NULL)
 AND loc.location_string IN (SELECT location_string FROM ed_locations)
 ORDER BY cr.hospital_visit_id, cr.scheduled_datetime, ct.name DESC),
 
@@ -71,8 +71,8 @@ WHERE ct.name IN ('Inpatient consult to Acute Medicine',
 						)
 AND cr.cancelled = 'false'
 AND cr.closed_due_to_discharge = 'false'
-AND cr.scheduled_datetime >= lv.admission_time
-AND (cr.scheduled_datetime <= lv.discharge_time OR lv.discharge_time IS NULL)
+AND cr.scheduled_datetime >= lv.admission_datetime
+AND (cr.scheduled_datetime <= lv.discharge_datetime OR lv.discharge_datetime IS NULL)
 AND loc.location_string IN (SELECT location_string FROM ed_locations)
 ORDER BY cr.hospital_visit_id, cr.scheduled_datetime, ct.name DESC),
 
@@ -92,8 +92,8 @@ INNER JOIN star.location loc ON lv.location_id = loc.location_id
 WHERE ct.name IN ('Inpatient consult to Gynaecology', 'Inpatient consult to Obstetrics')
 AND cr.cancelled = 'false'
 AND cr.closed_due_to_discharge = 'false'
-AND cr.scheduled_datetime >= lv.admission_time
-AND (cr.scheduled_datetime <= lv.discharge_time OR lv.discharge_time IS NULL)
+AND cr.scheduled_datetime >= lv.admission_datetime
+AND (cr.scheduled_datetime <= lv.discharge_datetime OR lv.discharge_datetime IS NULL)
 AND loc.location_string IN (SELECT location_string FROM ed_locations)
 ORDER BY cr.hospital_visit_id, cr.scheduled_datetime, ct.name DESC),
 
@@ -113,8 +113,8 @@ INNER JOIN star.location loc ON lv.location_id = loc.location_id
 WHERE ct.name = 'Inpatient consult to Orthopedic Surgery'
 AND cr.cancelled = 'false'
 AND cr.closed_due_to_discharge = 'false'
-AND cr.scheduled_datetime >= lv.admission_time
-AND (cr.scheduled_datetime <= lv.discharge_time OR lv.discharge_time IS NULL)
+AND cr.scheduled_datetime >= lv.admission_datetime
+AND (cr.scheduled_datetime <= lv.discharge_datetime OR lv.discharge_datetime IS NULL)
 AND loc.location_string IN (SELECT location_string FROM ed_locations)
 ORDER BY cr.hospital_visit_id, cr.scheduled_datetime, ct.name DESC),
 
@@ -134,8 +134,8 @@ INNER JOIN star.location loc ON lv.location_id = loc.location_id
 WHERE ct.name IN ('Inpatient consult to Oncology', 'Inpatient consult to Haematology')
 AND cr.cancelled = 'false'
 AND cr.closed_due_to_discharge = 'false'
-AND cr.scheduled_datetime >= lv.admission_time
-AND (cr.scheduled_datetime <= lv.discharge_time OR lv.discharge_time IS NULL)
+AND cr.scheduled_datetime >= lv.admission_datetime
+AND (cr.scheduled_datetime <= lv.discharge_datetime OR lv.discharge_datetime IS NULL)
 AND loc.location_string IN (SELECT location_string FROM ed_locations)
 ORDER BY cr.hospital_visit_id, cr.scheduled_datetime, ct.name DESC),
 
@@ -164,7 +164,7 @@ ORDER BY cr.hospital_visit_id, cr.scheduled_datetime, ct.name DESC),
 	LEFT JOIN star.location loc ON lv.location_id = loc.location_id
 	WHERE lv.hospital_visit_id IN ({hv_ids})
 	AND loc.location_string IN (SELECT location_string FROM ed_locations)
-	ORDER BY lv.hospital_visit_id, lv.admission_time ASC),
+	ORDER BY lv.hospital_visit_id, lv.admission_datetime ASC),
 
 
 -- Now pull whether they have recently been in theatres
@@ -181,15 +181,15 @@ ORDER BY cr.hospital_visit_id, cr.scheduled_datetime, ct.name DESC),
 	AND SPLIT_PART(loc.location_string, '^', 1) IN ('THP3', 'T02THR', '1021800001') -- 1021800001 is GWB theatres
 
 	--Make sure they were only in theatres in the past
-	AND lv.discharge_time <= {end_time}
-	AND lv.discharge_time >= {end_time} - '{horizon}'::INTERVAL
+	AND lv.discharge_datetime <= {end_time}
+	AND lv.discharge_datetime >= {end_time} - '{horizon}'::INTERVAL
 
-	ORDER BY lv.hospital_visit_id, lv.admission_time ASC),
+	ORDER BY lv.hospital_visit_id, lv.admission_datetime ASC),
 
 -- Now pull whether they have ever been in theatres
 	ever_surgery AS (SELECT DISTINCT ON (lv.hospital_visit_id) lv.hospital_visit_id,
 	loc.location_string,
-    AGE(lv.discharge_time, {end_time}) time_since_surgery,
+    AGE(lv.discharge_datetime, {end_time}) time_since_surgery,
 
 	SPLIT_PART(loc.location_string, '^', 1) ward_raw
 
@@ -201,8 +201,8 @@ ORDER BY cr.hospital_visit_id, cr.scheduled_datetime, ct.name DESC),
 	AND SPLIT_PART(loc.location_string, '^', 1) IN ('THP3', 'T02THR', '1021800001') -- 1021800001 is GWB theatres
 
 	--Make sure they were only in theatres in the past
-	AND lv.admission_time <= {end_time}
-	ORDER BY lv.hospital_visit_id, lv.admission_time ASC),
+	AND lv.admission_datetime <= {end_time}
+	ORDER BY lv.hospital_visit_id, lv.admission_datetime ASC),
 
 -- Recent ICU discharge
 	recent_ICU AS (SELECT DISTINCT ON (lv.hospital_visit_id) lv.hospital_visit_id,
@@ -220,10 +220,10 @@ ORDER BY cr.hospital_visit_id, cr.scheduled_datetime, ct.name DESC),
 			loc.location_string LIKE '%%GWB L01W%%')
 
 	--Make sure they were only in theatres in the past
-	AND lv.discharge_time <= {end_time}
-	AND lv.discharge_time >= {end_time} - '{horizon}'::INTERVAL
+	AND lv.discharge_datetime <= {end_time}
+	AND lv.discharge_datetime >= {end_time} - '{horizon}'::INTERVAL
 
-	ORDER BY lv.hospital_visit_id, lv.admission_time ASC),
+	ORDER BY lv.hospital_visit_id, lv.admission_datetime ASC),
 
     recent_PERRT AS (
         SELECT DISTINCT ON (cr.hospital_visit_id) cr.hospital_visit_id,
@@ -243,7 +243,7 @@ ORDER BY cr.hospital_visit_id, cr.scheduled_datetime, ct.name DESC),
 
 
 SELECT hv.hospital_visit_id,
-hv.admission_time,
+hv.admission_datetime,
 surgical.scheduled_datetime surg_ref,
 medical.scheduled_datetime med_ref,
 gynae.scheduled_datetime OG_ref,

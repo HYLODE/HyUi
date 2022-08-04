@@ -21,8 +21,8 @@ class RosBase(SQLModel):
     firstname: str
     lastname: str
     date_of_birth: date
-    hospital_admission_time: datetime
-    location_admission_time: datetime
+    hospital_admission_datetime: datetime
+    location_admission_datetime: datetime
     ros_order_datetime: Optional[datetime]
     ros_lab_result_id: Optional[float]
     ros_value_as_text: Optional[str]
