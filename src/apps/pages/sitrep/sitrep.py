@@ -17,7 +17,7 @@ import utils
 from api.sitrep.model import SitrepRead
 from config.settings import settings
 from utils import icons
-from utils.beds import get_bed_list, unpack_nested_dict, BedBonesBase
+from utils.beds import get_bed_list, unpack_nested_dict, update_bed_row, BedBonesBase
 from utils.dash import df_from_store, get_results_response, validate_json
 from utils.wards import wards
 
@@ -32,6 +32,7 @@ DEPT2WARD_MAPPING = {
     "WMS W01 CRITICAL CARE": "WMS",
 }
 
+BED_BONES_TABLE_ID = 261
 
 def build_api_url(ward: str = None) -> str:
     """Construct API based on environment and requested ward"""
@@ -150,27 +151,21 @@ def diff_table(time, prev_data, data):
 
     for row in diff_rows:
         index = row[0]
-        new_dict = row[1]
+        new_row = row[1]
 
         prev_row = prev_data[index]
-        diffkeys = [k for k in new_dict if new_dict[k] != prev_row[k]]
 
-        if 'DischargeReady' in diffkeys:            
-            discharge_status_updated.append(new_dict)
+        # Get the keys with updated data in the row
+        diff_keys = [k for k in new_row if new_row[k] != prev_row[k]]
+
+        if 'DischargeReady' in diff_keys:            
+            discharge_status_updated.append(new_row)
         
     for x in discharge_status_updated:
+        row_id = x['id']
+        row_data = { "DischargeReady": x["DischargeReady"] }
 
-        requests.patch(
-            f"http://172.16.149.202:8097/api/database/rows/table/261/{x['id']}/?user_field_names=true",
-            headers={
-                "Authorization": f"Token {settings.BASEROW_READWRITE_TOKEN}",
-                "Content-Type": "application/json"
-            },
-            json={
-
-                "DischargeReady": x["DischargeReady"]
-            }
-        )
+        update_bed_row(BED_BONES_TABLE_ID, row_id, row_data)
 
     return ""
 

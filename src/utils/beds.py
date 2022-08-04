@@ -81,6 +81,31 @@ def get_bed_list(
     return res
 
 
+def update_bed_row(
+    table_id=BED_BONES_TABLE_ID,
+    row_id: int = None, 
+    data: dict = {}):
+    """
+    Updates a row in the beds table
+
+    :param      table_id:  Table ID
+    :param      row_id:  The row ID
+    :param      data:  The data fields to update
+
+    """
+
+    url = f"{settings.BASEROW_URL}/api/database/rows/table/{table_id}/"
+
+    requests.patch(
+            url=f"{url}{row_id}/?user_field_names=true",
+            headers={
+                "Authorization": f"Token {settings.BASEROW_READWRITE_TOKEN}",
+                "Content-Type": "application/json"
+            },
+            json=data
+        )
+
+
 def unpack_nested_dict(
     rows: List[dict],
     f2unpack: str,
