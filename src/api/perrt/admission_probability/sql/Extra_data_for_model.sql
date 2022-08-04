@@ -47,12 +47,12 @@ WITH last_location AS (
 		--WHEN SUBSTR(SPLIT_PART(lo.location_string,'^',2), 1, 6) = 'T07SWH' THEN 'T07SWH'
 		ELSE SPLIT_PART(location_string,'^',1)
 	END AS ward_purpose,
-	lv.admission_time
+	lv.admission_datetime
 
 	FROM star.location_visit lv
 	LEFT JOIN star.location loc ON lv.location_id = loc.location_id
 	WHERE lv.hospital_visit_id IN ({csns})
-	ORDER BY lv.hospital_visit_id, lv.admission_time DESC),
+	ORDER BY lv.hospital_visit_id, lv.admission_datetime DESC),
 
 
 -- Get last resus status
@@ -95,7 +95,7 @@ hv.encounter AS csn,
 mrn.mrn,
 last_location.ward_purpose,
 last_location.location_string,
-last_location.admission_time,
+last_location.admission_datetime,
 dnacpr.name dnacpr,
 news.value_as_text news_score,
 news.observation_datetime news_time
