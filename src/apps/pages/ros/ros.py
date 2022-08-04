@@ -94,7 +94,7 @@ def store_data(n_intervals: int) -> dict:
 
     for row in data:
         # Format admission date for table
-        admission_time = datetime.fromisoformat(row["hospital_admission_time"])
+        admission_time = datetime.fromisoformat(row["hospital_admission_datetime"])
         row["admission_time_str"] = admission_time.strftime("%d-%m-%y %H:%M")
 
         # Prepare ROS data
