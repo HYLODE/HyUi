@@ -126,7 +126,8 @@ def gen_simple_fig(data: dict):
     df = df.groupby(["dept_name", "news_scale_1_max"], as_index=False).count()
     df["news_scale_1_max"] = df["news_scale_1_max"].astype(int).astype(str)
     fig = px.bar(df, x="dept_name", y="mrn", color="news_scale_1_max",
-                 color_discrete_map=NEWS_SCORE_COLORS,
+                color_discrete_map=NEWS_SCORE_COLORS,
+                category_orders = {"news_scale_1_max": [str(x) for x in range(1,24)]}
     )
     return dcc.Graph(id="perrt_fig", figure=fig)
 
