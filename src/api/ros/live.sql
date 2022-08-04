@@ -181,7 +181,7 @@ icu_labs AS
 	LEFT JOIN star.lab_order lor ON all_beds_annotated.hospital_visit_id = lor.hospital_visit_id
 	LEFT JOIN star.lab_result lre ON lor.lab_order_id = lre.lab_order_id 
 	
-	WHERE lor.lab_battery_id IN (29846, 1401)
+	WHERE lor.lab_battery_id IN (1418, 29969)
 ),
 
 ros_mrsa_results AS (
@@ -194,7 +194,7 @@ ros_mrsa_results AS (
 						,lab_result_id AS ros_lab_result_id
 						,value_as_text AS ros_value_as_text
 				FROM icu_labs
-				WHERE lab_battery_id = 29846
+				WHERE lab_battery_id = 1418
 				ORDER BY encounter, lab_result_id DESC
 			) AS ros
 		FULL JOIN
@@ -205,7 +205,7 @@ ros_mrsa_results AS (
 						,lab_result_id AS mrsa_lab_result_id
 						,value_as_text AS mrsa_value_as_text
 				FROM icu_labs
-				WHERE lab_battery_id = 1401
+				WHERE lab_battery_id = 29969
 				ORDER BY encounter, lab_result_id DESC
 			) AS mrsa
 		USING ("encounter")
