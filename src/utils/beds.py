@@ -24,6 +24,7 @@ class BedBonesBase(SQLModel):
     covid: Optional[bool]
     bed_functional: Optional[str]
     bed_physical: Optional[str]
+    DischargeReady: str
 
 
 
@@ -38,6 +39,7 @@ CORE_FIELDS = [
     "covid",
     "bed_functional",
     "bed_physical",
+    "DischargeReady"
 ]
 
 

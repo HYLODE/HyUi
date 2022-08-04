@@ -9,7 +9,7 @@ from typing import List
 import dash_bootstrap_components as dbc
 import pandas as pd
 import requests
-from dash import Input, Output, callback
+from dash import Input, Output, callback, State
 from dash import dash_table as dt
 from dash import dcc, html, register_page
 
@@ -54,7 +54,7 @@ COLS_ABACUS = [
     "admission_age_years",
     "sex",
     "organ_icons",
-    "discharge_ready_1_4h",
+    "DischargeReady",
 ]
 COLS = OrderedDict(
     {
@@ -81,7 +81,7 @@ COLS = OrderedDict(
         "n_inotropes_1_4h": "Cardiovascular",
         "had_rrt_1_4h": "Renal",
         "organ_icons": "Organ Support",
-        "discharge_ready_1_4h": "Discharge",
+        "DischargeReady": "Discharge",
         "covid": "COVID",
     }
 )
@@ -126,6 +126,53 @@ def store_data(n_intervals: int, dept: str) -> list:
 
     data = dfm.to_dict("records")
     return data  # type: ignore
+
+
+@callback(
+    Output("hidden-div", "children"),
+    Input(f"{BPID}tbl-census", 'data_timestamp'),
+    State(f"{BPID}tbl-census", "data_previous"),
+    State(f"{BPID}tbl-census", "data"),
+    prevent_initial_call=True,
+)
+def diff_table(time, prev_data, data):
+
+    if data is None or prev_data is None:
+        print(prev_data)
+        return ""
+
+    diff_rows = [(i,x) for i,x in enumerate(data) if x not in prev_data]
+
+    if diff_rows == []:
+        return ""
+
+    discharge_status_updated = []
+
+    for row in diff_rows:
+        index = row[0]
+        new_dict = row[1]
+
+        prev_row = prev_data[index]
+        diffkeys = [k for k in new_dict if new_dict[k] != prev_row[k]]
+
+        if 'DischargeReady' in diffkeys:            
+            discharge_status_updated.append(new_dict)
+        
+    for x in discharge_status_updated:
+
+        requests.patch(
+            f"http://172.16.149.202:8097/api/database/rows/table/261/{x['id']}/?user_field_names=true",
+            headers={
+                "Authorization": f"Token {settings.BASEROW_READWRITE_TOKEN}",
+                "Content-Type": "application/json"
+            },
+            json={
+
+                "DischargeReady": x["DischargeReady"]
+            }
+        )
+
+    return ""
 
 
 @callback(
@@ -186,11 +233,11 @@ def gen_fancy_table(data: dict):
         dict(presentation="markdown"),
     )
     utils.deep_update(
-        utils.get_dict_from_list(COL_DICT, "id", "discharge_ready_1_4h"),
+        utils.get_dict_from_list(COL_DICT, "id", "DischargeReady"),
         dict(editable=True),
     )
     utils.deep_update(
-        utils.get_dict_from_list(COL_DICT, "id", "discharge_ready_1_4h"),
+        utils.get_dict_from_list(COL_DICT, "id", "DischargeReady"),
         dict(presentation="dropdown"),
     )
     utils.deep_update(
@@ -208,7 +255,7 @@ def gen_fancy_table(data: dict):
             data=dfn.to_dict("records"),
             editable=False,
             dropdown={
-                "discharge_ready_1_4h": {
+                "DischargeReady": {
                     "options": [{"label": i, "value": i} for i in DISCHARGE_OPTIONS],
                     "clearable": False,
                 },
@@ -227,7 +274,7 @@ def gen_fancy_table(data: dict):
                 {"if": {"column_id": "sex"}, "textAlign": "left"},
                 {"if": {"column_id": "organ_icons"}, "textAlign": "left"},
                 {"if": {"column_id": "name"}, "fontWeight": "bolder"},
-                {"if": {"column_id": "discharge_ready_1_4h"}, "textAlign": "left"},
+                {"if": {"column_id": "DischargeReady"}, "textAlign": "left"},
             ],
             style_data={"color": "black", "backgroundColor": "white"},
             # striped rows
@@ -268,6 +315,8 @@ def gen_fancy_table(data: dict):
 
 ward_radio_button = html.Div(
     [
+        # Need a hidden div for the callback with no output
+        html.Div(id="hidden-div", style={"display":"none"}),
         html.Div(
             [
                 dbc.RadioItems(
