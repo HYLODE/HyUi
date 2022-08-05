@@ -9,6 +9,17 @@ from config.settings import settings  # type: ignore
 
 
 def prepare_query(module: str, env: str = settings.ENV) -> str:
+    """
+    Returns a string version of the query as defined in the module
+
+    :param      module:  The module
+    :type       module:  str
+    :param      env:     The environment
+    :type       env:     str
+
+    :returns:   { description_of_the_return_value }
+    :rtype:     str
+    """
     choice = {"prod": "LIVE", "dev": "MOCK"}
     module_path = gen_module_path(module)
     query_name = f"QUERY_{choice[env]}_PATH"

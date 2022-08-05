@@ -18,8 +18,8 @@ JOIN star.lab_result res ON res.lab_test_definition_id = def.lab_test_definition
 JOIN star.lab_order lo ON res.lab_order_id = lo.lab_order_id
 
 --Look at last 72h
-WHERE res.result_last_modified_time >= {end_time} - '{horizon}'::INTERVAL
-AND res.result_last_modified_time <= {end_time}
+WHERE res.result_last_modified_datetime >= {end_time} - '{horizon}'::INTERVAL
+AND res.result_last_modified_datetime <= {end_time}
 
 -- Now choose which labs we want
 AND def.test_lab_code IN ('HBGL', 'RCC', 'HCT', 'HCTU', 'MCVU', 'PLT', 'NE', 'WCC', 'LY', -- FBC

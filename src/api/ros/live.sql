@@ -91,12 +91,12 @@ beds AS (
 open_visits AS (
 	SELECT
 		 lv.location_id
-		,lv.admission_time
+		,lv.admission_datetime
 		,lv.hospital_visit_id
-		,row_number() over (partition BY lv.location_id ORDER BY lv.admission_time DESC) admission_tail
+		,row_number() over (partition BY lv.location_id ORDER BY lv.admission_datetime DESC) admission_tail
 	FROM star.location_visit lv
 	INNER JOIN beds on lv.location_id = beds.location_id
-	WHERE lv.discharge_time IS NULL
+	WHERE lv.discharge_datetime IS NULL
 
 ),
 
@@ -118,13 +118,13 @@ open_visits_count AS (
 closed_visits AS (
 	SELECT
 		 lv.location_id
-		,lv.admission_time
-		,lv.discharge_time
+		,lv.admission_datetime
+		,lv.discharge_datetime
 		,lv.hospital_visit_id
-		,row_number() over (partition BY lv.location_id ORDER BY lv.discharge_time DESC) discharge_tail
+		,row_number() over (partition BY lv.location_id ORDER BY lv.discharge_datetime DESC) discharge_tail
 	FROM star.location_visit lv
 	INNER JOIN beds on lv.location_id = beds.location_id
-	WHERE lv.discharge_time IS NOT NULL
+	WHERE lv.discharge_datetime IS NOT NULL
 
 ),
 
@@ -145,8 +145,8 @@ all_beds_annotated AS (
 		,cd.date_of_birth
 		,ovl.hospital_visit_id
 		,hv.encounter
-		,hv.admission_time AS hospital_admission_time
-		,ovl.admission_time AS location_admission_time
+		,hv.admission_datetime AS hospital_admission_datetime
+		,ovl.admission_datetime AS location_admission_datetime
 	FROM beds
 	-- details of the last open visit to that bed
 	LEFT JOIN open_visits_last ovl ON ovl.location_id = beds.location_id
@@ -162,7 +162,7 @@ all_beds_annotated AS (
 	LEFT JOIN star.mrn live_mrn ON mtl.live_mrn_id = live_mrn.mrn_id
 	
 	-- filter out "unoccupied" beds based on closed and open visits
-	WHERE	NOT (cvl.discharge_time > ovl.admission_time OR ovl.admission_time IS NULL)
+	WHERE	NOT (cvl.discharge_datetime > ovl.admission_datetime OR ovl.admission_datetime IS NULL)
 	
 ),
 
@@ -173,7 +173,7 @@ icu_labs AS
 	 ,lor.order_datetime
 	 ,lor.lab_battery_id
 	 ,lre.lab_result_id	
-	 ,lre.result_last_modified_time
+	 ,lre.result_last_modified_datetime
 	 ,lre.value_as_text
 	 ,lre.abnormal_flag
 	 
@@ -181,7 +181,7 @@ icu_labs AS
 	LEFT JOIN star.lab_order lor ON all_beds_annotated.hospital_visit_id = lor.hospital_visit_id
 	LEFT JOIN star.lab_result lre ON lor.lab_order_id = lre.lab_order_id 
 	
-	WHERE lor.lab_battery_id IN (29846, 1401)
+	WHERE lor.lab_battery_id IN (1418, 29969)
 ),
 
 ros_mrsa_results AS (
@@ -194,7 +194,7 @@ ros_mrsa_results AS (
 						,lab_result_id AS ros_lab_result_id
 						,value_as_text AS ros_value_as_text
 				FROM icu_labs
-				WHERE lab_battery_id = 29846
+				WHERE lab_battery_id = 1418
 				ORDER BY encounter, lab_result_id DESC
 			) AS ros
 		FULL JOIN
@@ -205,7 +205,7 @@ ros_mrsa_results AS (
 						,lab_result_id AS mrsa_lab_result_id
 						,value_as_text AS mrsa_value_as_text
 				FROM icu_labs
-				WHERE lab_battery_id = 1401
+				WHERE lab_battery_id = 29969
 				ORDER BY encounter, lab_result_id DESC
 			) AS mrsa
 		USING ("encounter")
@@ -219,8 +219,8 @@ SELECT
 		,ab.firstname
 		,ab.lastname
 		,ab.date_of_birth
-		,ab.hospital_admission_time
-		,ab.location_admission_time
+		,ab.hospital_admission_datetime
+		,ab.location_admission_datetime
 		,r.ros_order_datetime
 		,r.ros_lab_result_id
 		,r.ros_value_as_text

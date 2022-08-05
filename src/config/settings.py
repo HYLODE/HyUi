@@ -18,6 +18,7 @@ BASE_URL_DEV = "http://127.0.0.1"
 BASE_URL_GAE = "http://172.16.149.202"  # UCLVLDDPRAGAE07
 BASE_URL_DOCKER_APP = "http://apps"
 BASE_URL_DOCKER_API = "http://api"
+BASE_URL_DOCKER_BASEROW = "http://baserow"
 
 
 class ModuleNames(str, Enum):
@@ -31,6 +32,7 @@ class ModuleNames(str, Enum):
     electives = "electives"
     perrt = "perrt"
     ros = "ros"
+    beds = "beds"
 
 
 class Environments(str, Enum):
@@ -46,26 +48,35 @@ class Settings(BaseSettings):
 
     ENV: Environments = Environments.dev
     DOCKER: bool = False
+    VERBOSE: bool = True
 
     EMAP_DB_HOST: Optional[str]
     EMAP_DB_USER: Optional[str]
     EMAP_DB_PASSWORD: Optional[str]
     EMAP_DB_NAME: Optional[str]
 
-    DB_URL: Optional[str]
     DB_POSTGRES_SCHEMA = "star"
 
     CABOODLE_DB_HOST: Optional[str]
     CABOODLE_DB_USER: Optional[str]
     CABOODLE_DB_PASSWORD: Optional[str]
     CABOODLE_DB_NAME: Optional[str]
-    CABOODLE_DB_PORT: Optional[str]
+    CABOODLE_DB_PORT: Optional[int]
 
+    BASEROW_READWRITE_TOKEN: Optional[str]
+    BASEROW_PORT: Optional[str]
+
+    # WARNING!
+    # The order of variable declaration is important
+    # i.e. don't construct a URL containing a PORT if you haven't declared the port yet
+    # the variables above of the variables below
+
+    DB_URL: Optional[str]
     CABOODLE_URL: Optional[str]
-
     BASE_URL: Optional[str]
     API_URL: Optional[str]
     APP_URL: Optional[str]
+    BASEROW_URL: Optional[str]
 
     MODULE_ROOT: str = "api"  # for building paths to modules e.g. ./src/api
     ROUTES = ModuleNames = ModuleNames._member_names_
@@ -159,6 +170,21 @@ class Settings(BaseSettings):
                 url = f"{BASE_URL_DOCKER_APP}:{PORT_DOCKER_APP}"
             else:
                 url = f"{BASE_URL_DEV}:{PORT_COMMANDLINE_APP}"
+        return url
+
+    @validator("BASEROW_URL")
+    def assemble_baserow_url(cls, v: Optional[str], values: Dict[str, Any]) -> str:
+        """
+        :returns:   Base URL for BASEROW
+        :rtype:     str
+        """
+        BASEROW_PORT = values.get("BASEROW_PORT")
+        if values.get("ENV") == "prod":
+            url = f"{BASE_URL_GAE}:{BASEROW_PORT}"
+        elif values.get("ENV") == "dev":
+            url = f"{BASE_URL_DEV}:{BASEROW_PORT}"
+        else:
+            raise Exception
         return url
 
     class Config:

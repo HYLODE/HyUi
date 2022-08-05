@@ -3,7 +3,7 @@ version: '3.8'
 # Common vars
 x-http-proxy: &http-proxy ${HTTP_PROXY}
 x-https-proxy: &https-proxy ${HTTPS_PROXY}
-x-no-proxy: &no-proxy localhost,127.0.0.1,uclvlddpragae07,uclvlddpragae08,api,apps
+x-no-proxy: &no-proxy localhost,127.0.0.1,uclvlddpragae07,uclvlddpragae08,api,apps,baserow
 x-proxy-common: &proxy-common
   HTTP_PROXY: *http-proxy
   http_proxy: *http-proxy
@@ -121,10 +121,13 @@ services:
     container_name: baserow
     image: baserow/baserow:1.10.2
     environment:
-      BASEROW_PUBLIC_URL: ${BASEROW_PUBLIC_URL}
+      BASEROW_PUBLIC_URL: "http://172.16.149.202:8097"
+      WEB_FRONTEND_PORT: 8097
       DATABASE_URL: "postgres://${HYUI_DB_USER}:${HYUI_DB_PASSWORD}@postgres:5432/${HYUI_DB_NAME}?sslmode=disable"
     ports:
       - "8097:80"
+    expose:
+      - "8097"
     volumes:
       - baserow_data:/baserow/data
     depends_on:

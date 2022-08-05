@@ -835,7 +835,7 @@ def run_pipeline(date_list: list, engine, now: bool = False) -> pd.DataFrame:
             :,
             [
                 "hospital_visit_id",
-                "admission_time",
+                "admission_datetime",
                 "dnacpr",
                 "recent_surgery",
                 "ever_surgery",

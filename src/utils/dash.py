@@ -28,11 +28,13 @@ def get_results_response(url: str, req_type="GET", data=None):
     return list_of_dicts  # type: ignore
 
 
-def validate_json(json_list, model: SQLModel):
+def validate_json(json_list, model: SQLModel, to_dict=False):
     """
     Validate list of json formatted strings
     """
     model_instances = [model(**i) for i in json_list]  # type: ignore
+    if to_dict:
+        model_instances =[i.dict() for i in model_instances]
     return model_instances
 
 

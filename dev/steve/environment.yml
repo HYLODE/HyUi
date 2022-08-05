@@ -1,5 +1,5 @@
 # run this file from project root
-# conda env update --file dev/steve/environment-short.yml --prune
+# conda env update --file dev/steve/environment.yml --prune
 name: hyuiv4
 channels:
   - conda-forge
@@ -11,6 +11,7 @@ dependencies:
   - fastapi=0.78.0
   - flake8
   - gunicorn
+  - ipdb
   - jupyter
   - jupyterlab=3.4.3
   - myst-parser
