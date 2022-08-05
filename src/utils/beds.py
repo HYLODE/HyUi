@@ -15,6 +15,8 @@ from sqlmodel import SQLModel
 class BedBonesBase(SQLModel):
 
     id: int
+    location_id: Optional[int]
+    location_string: Optional[str]
     order: float
     department: str
     room: str
@@ -39,6 +41,8 @@ CORE_FIELDS = [
     "bed_functional",
     "bed_physical",
     "DischargeReady",
+    "location_id",
+    "location_string",
 ]
 
 
