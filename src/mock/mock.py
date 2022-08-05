@@ -7,8 +7,8 @@ api.models.Results and then loads the data from the local HDF file
 import sys
 from pathlib import Path
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 import sqlalchemy as sa
 from sqlmodel import Session, SQLModel, create_engine
 from sqlmodel.pool import StaticPool
