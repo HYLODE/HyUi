@@ -6,7 +6,7 @@ channels:
 dependencies:
   - arrow=1.2.2
   - coverage
-  - dash-bootstrap-components
+  - dash-bootstrap-components=1.2.1
   - dash=2.5.1
   - fastapi=0.78.0
   - flake8

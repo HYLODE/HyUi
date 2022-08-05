@@ -15,7 +15,7 @@ app = Dash(
     title="HYLODE",
     update_title=None,
     external_stylesheets=[
-        dbc.themes.YETI,
+        dbc.themes.LUX,
         dbc.icons.FONT_AWESOME,
     ],
     suppress_callback_exceptions=True,

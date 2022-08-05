@@ -43,6 +43,7 @@ def build_api_url(ward: str = None) -> str:
 
 
 REFRESH_INTERVAL = 30 * 60 * 1000  # milliseconds
+
 COLS_ABACUS = [
     "open",
     "unit_order",
@@ -55,35 +56,34 @@ COLS_ABACUS = [
     "organ_icons",
     "DischargeReady",
 ]
-COLS = OrderedDict(
-    {
-        "open": "Open",
-        "closed": "Closed",
-        "unit_order": "Order",
-        "ward_code": "Ward",
-        "bay_code": "Bay",
-        "room": "Bay",
-        "bed_code": "Bed code",
-        "bed": "Bed",
-        "admission_dt": "Admission",
-        "elapsed_los_td": "LoS",
-        "mrn": "MRN",
-        "name": "Full Name",
-        "admission_age_years": "Age",
-        "sex": "Sex",
-        # "dob": "DoB",
-        "wim_1": "WIM-P",
-        "wim_r": "WIM-R",
-        "bed_empty": "Empty",
-        "team": "Side",
-        "vent_type_1_4h": "Ventilation",
-        "n_inotropes_1_4h": "Cardiovascular",
-        "had_rrt_1_4h": "Renal",
-        "organ_icons": "Organ Support",
-        "DischargeReady": "Discharge",
-        "covid": "COVID",
-    }
-)
+
+COLS = [
+        {"id": "open", "name": "Open", "presentation": "markdown"},
+        {"id": "closed", "name": "Closed"},
+        {"id": "unit_order", "name": "Order", "type": "numeric"},
+        {"id": "ward_code", "name": "Ward"},
+        {"id": "bay_code", "name": "Bay"},
+        {"id": "room", "name": "Bay"},
+        {"id": "bed_code", "name": "Bed code"},
+        {"id": "bed", "name": "Bed"},
+        {"id": "admission_dt", "name": "Admission"},
+        {"id": "elapsed_los_td", "name": "LoS"},
+        {"id": "mrn", "name": "MRN"},
+        {"id": "name", "name": "Full Name"},
+        {"id": "admission_age_years", "name": "Age"},
+        {"id": "sex", "name": "Sex"},
+        # {"id": "dob", "name": "DoB"},
+        {"id": "wim_1", "name": "WIM-P"},
+        {"id": "wim_r", "name": "WIM-R"},
+        {"id": "bed_empty", "name": "Empty"},
+        {"id": "team", "name": "Side"},
+        {"id": "vent_type_1_4h", "name": "Ventilation"},
+        {"id": "n_inotropes_1_4h", "name": "Cardiovascular"},
+        {"id": "had_rrt_1_4h", "name": "Renal"},
+        {"id": "organ_icons", "name": "Organ Support", "presentation": "markdown"},
+        {"id": "DischargeReady", "name": "Discharge", "presentation": "dropdown", "editable": True},
+        {"id": "covid", "name": "COVID"},
+]
 
 
 @callback(
@@ -169,25 +169,6 @@ def diff_table(time, prev_data, data):
 
 
 @callback(
-    Output(f"{BPID}simple_table", "children"),
-    Input(f"{BPID}request_data", "data"),
-    # prevent_initial_call=True,
-)
-def gen_simple_table(data: dict):
-    df = df_from_store(data, SitrepRead)
-    # limit columns here
-    return [
-        dt.DataTable(
-            id=f"{BPID}simple_table_contents",
-            columns=[{"name": i, "id": i} for i in df.columns],
-            data=df.to_dict("records"),
-            filter_action="native",
-            sort_action="native",
-        )
-    ]
-
-
-@callback(
     Output(f"{BPID}fancy_table", "children"),
     Input(f"{BPID}request_data", "data"),
     # prevent_initial_call=True,
@@ -213,50 +194,30 @@ def gen_fancy_table(data: dict):
     dfn["open"] = dfn["closed"].apply(icons.closed)
 
     # Prep columns with ids and names
-    COL_DICT = [{"name": v, "id": k} for k, v in COLS.items() if k in COLS_ABACUS]
-    # TODO: add in a method of sorting based on the order in config
+    COL_DICT = [i for i in COLS if i['id'] in COLS_ABACUS]
 
-    utils.deep_update(
-        utils.get_dict_from_list(COL_DICT, "id", "unit_order"),
-        dict(type="numeric"),
-    )
-
-    utils.deep_update(
-        utils.get_dict_from_list(COL_DICT, "id", "organ_icons"),
-        dict(presentation="markdown"),
-    )
-    utils.deep_update(
-        utils.get_dict_from_list(COL_DICT, "id", "DischargeReady"),
-        dict(editable=True),
-    )
-    utils.deep_update(
-        utils.get_dict_from_list(COL_DICT, "id", "DischargeReady"),
-        dict(presentation="dropdown"),
-    )
-    utils.deep_update(
-        utils.get_dict_from_list(COL_DICT, "id", "open"),
-        dict(presentation="markdown"),
-    )
-
-    DISCHARGE_OPTIONS = ["Ready", "No", "Review"]
 
     dto = (
         dt.DataTable(
             id=f"{BPID}tbl-census",
             columns=COL_DICT,
             data=dfn.to_dict("records"),
-            editable=False,
+            editable=True,
             dropdown={
                 "DischargeReady": {
-                    "options": [{"label": i, "value": i} for i in DISCHARGE_OPTIONS],
+                    "options": [
+                        {"label": "READY", "value": "ready"},
+                        {"label": "Review", "value": "review"},
+                        {"label": "No", "value": "No"},
+                    ],
                     "clearable": False,
                 },
             },
             style_as_list_view=True,  # remove col lines
             style_cell={
-                # "fontSize": 12,
+                "fontSize": 13,
                 "font-family": "sans-serif",
-                "padding": "2px",
+                "padding": "1px",
             },
             style_cell_conditional=[
                 {"if": {"column_id": "room"}, "textAlign": "right"},
@@ -287,11 +248,11 @@ def gen_fancy_table(data: dict):
             sort_by=[
                 {"column_id": "unit_order", "direction": "asc"},
             ],
-            cell_selectable=True,  # possible to click and navigate cells
+            # cell_selectable=True,  # possible to click and navigate cells
             # row_selectable="single",
             markdown_options={"html": True},
             persistence=True,
-            persisted_props=["data"],
+            # persisted_props=["data"],
         ),
     )
 
