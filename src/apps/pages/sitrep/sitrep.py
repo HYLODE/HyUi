@@ -20,7 +20,7 @@ from config.settings import settings
 from utils import icons
 from utils.beds import BedBonesBase, get_bed_list, unpack_nested_dict, update_bed_row
 from utils.dash import df_from_store, get_results_response, validate_json
-from . import wng
+from apps.pages.sitrep import wng
 
 register_page(__name__)
 
@@ -114,8 +114,8 @@ def wrangle_data_for_table(beds: list, census: list, sitrep: list) -> list:
     df_cb = pd.merge(
         df_beds,
         df_census,
-        left_on=["location_id"],
-        right_on=["location_id"],
+        left_on=["location_string"],
+        right_on=["location_string"],
         how="left",
         suffixes=("_bed", "_census"),
     )

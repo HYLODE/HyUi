@@ -42,6 +42,7 @@ COLS = [
 beds_keep_cols = [
     "id",  # needed for merge on discharge status
     "location_id",
+    "location_string",
     "department",
     "room",
     "bed",
@@ -54,6 +55,7 @@ beds_keep_cols = [
 ]
 
 census_keep_cols = [
+    "location_string",
     "location_id",
     "ovl_admission",
     "ovl_hv_id",
