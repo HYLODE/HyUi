@@ -114,17 +114,18 @@ def store_data(n_intervals: int) -> dict:
     """
     data = [dict(parse_obj_as(PerrtRead, i)) for i in get_results_response(API_URL)]
 
-    hospital_visit_ids = [x["hospital_visit_id"] for x in data]
+    hospital_visit_ids = [perrt_entry["hospital_visit_id"] for perrt_entry in data]
 
     predictions_list = get_results_response(
         ADMISSION_PREDICTION_URL, "POST", hospital_visit_ids
     )
-    predictions = {
-        x["hospital_visit_id"]: x["admission_probability"] for x in predictions_list
+
+    predictions_map = {
+        p["hospital_visit_id"]: p["admission_probability"] for p in predictions_list
     }
 
     for entry in data:
-        entry["admission_probability"] = predictions.get(
+        entry["admission_probability"] = predictions_map.get(
             str(entry["hospital_visit_id"]), 0.0
         )
 
