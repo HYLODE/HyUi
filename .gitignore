@@ -873,6 +873,7 @@ data/external/*
 data/raw/*
 data/interim/*
 data/processed/*
+data/backups/*
 !data/external/.gitkeep
 !data/raw/.gitkeep
 !data/interim/.gitkeep
@@ -910,3 +911,6 @@ docs/_linkcheck/
 
 # Docker cruft
 .bash_history
+
+# ignore generated data
+src/api/perrt/admission_probability/generated_data

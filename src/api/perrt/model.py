@@ -15,7 +15,7 @@ from typing import Optional
 
 import arrow
 import pandas as pd
-from pydantic import validator
+from pydantic import validator, BaseModel
 from sqlmodel import Field, SQLModel
 
 from config.settings import settings  # type: ignore
@@ -60,7 +60,10 @@ class PerrtRaw(SQLModel):
 
         NB: pd.NaT is stored as -9223372036854775808 (int64 type)
         ```
-        dfTest = pd.DataFrame([-9223372036854775808, 1655651820000000000],columns=['ts'])
+        dfTest = pd.DataFrame(
+            [-9223372036854775808, 1655651820000000000]
+            ,columns=['ts'])
+
         dfTest.apply(pd.to_datetime)
         ```
         """
@@ -143,7 +146,9 @@ class PerrtBase(SQLModel):
 
         NB: pd.NaT is stored as -9223372036854775808 (int64 type)
         ```
-        dfTest = pd.DataFrame([-9223372036854775808, 1655651820000000000],columns=['ts'])
+        dfTest = pd.DataFrame(
+            [-9223372036854775808, 1655651820000000000],
+            columns=['ts'])
         dfTest.apply(pd.to_datetime)
         ```
         """
@@ -172,3 +177,8 @@ class PerrtRead(PerrtBase):
     """
 
     Perrt_id: Optional[int]
+
+
+class AdmissionPrediction(BaseModel):
+    hospital_visit_id: str
+    admission_probability: Optional[float]

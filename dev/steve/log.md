@@ -1,5 +1,44 @@
 # Running notes log
 
+## 2022-07-21t19:26:38
+trying to copy the postgres database on the gae to my local machine
+https://stackoverflow.com/a/29913462/992999
+
+```sh
+# example
+docker exec -t your-db-container pg_dumpall -c -U postgres > dump_`date +%d-%m-%Y"_"%H_%M_%S`.sql
+# my command
+docker-compose exec postgres pg_dumpall -c -U hyui > dump_`date +%d-%m-%Y"_"%H_%M_%S`.sql
+```
+
+then export to your local machine
+this contains no pid
+then this answer allowed me to rebuild
+
+https://stackoverflow.com/a/60043344/992999
+
+where dump.sql is the file above
+```sh
+# copy dump into container
+docker cp local/path/to/db.dump CONTAINER_ID:/dump.sql
+
+# shell into container
+docker exec -it CONTAINER_ID sh
+
+# restore it from within
+cat dump.sql | psql -U hyui -d hyui
+```
+
+and conveniently it copies the license etc. across too
+
+
+
+## 2022-07-18t22:49:02
+working with beds
+synthetic version now made that returns all census beds in parameterised query
+using sqlite as the transport layer
+now need to make mock data
+
 ## 2022-07-07 15:05:06
 build simple skeleton of beds
 data driven so use sql to define what are likely beds
