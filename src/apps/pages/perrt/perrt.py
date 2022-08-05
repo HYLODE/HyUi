@@ -23,6 +23,32 @@ API_URL = f"{settings.API_URL}/perrt/"
 
 REFRESH_INTERVAL = 10 * 60 * 1000  # milliseconds
 
+NEWS_SCORE_COLORS = {
+        "1": "rgb(189, 230, 175)",
+        "2": "rgb(189, 230, 175)",
+        "3": "rgb(189, 230, 175)",
+        "4": "rgb(189, 230, 175)",
+        "5": "rgb(247, 215, 172)",
+        "6": "rgb(247, 215, 172)",
+        "7": "rgb(240, 158, 158)",
+        "8": "rgb(240, 158, 158)",
+        "9": "rgb(240, 158, 158)",
+        "10": "rgb(240, 158, 158)",
+        "11": "rgb(240, 158, 158)",
+        "12": "rgb(240, 158, 158)",
+        "13": "rgb(240, 158, 158)",
+        "14": "rgb(240, 158, 158)",
+        "15": "rgb(240, 158, 158)",
+        "16": "rgb(240, 158, 158)",
+        "17": "rgb(240, 158, 158)",
+        "18": "rgb(240, 158, 158)",
+        "19": "rgb(240, 158, 158)",
+        "20": "rgb(240, 158, 158)",
+        "21": "rgb(240, 158, 158)",
+        "22": "rgb(240, 158, 158)",
+        "23": "rgb(240, 158, 158)"
+    }
+
 card_fig = dbc.Card(
     [
         # dbc.CardHeader(html.H6("Ward patients")),
@@ -98,7 +124,11 @@ def gen_simple_fig(data: dict):
     df = df_from_store(data, PerrtRead)
     df = df[["dept_name", "news_scale_1_max", "mrn"]]
     df = df.groupby(["dept_name", "news_scale_1_max"], as_index=False).count()
-    fig = px.bar(df, x="dept_name", y="mrn", color="news_scale_1_max")
+    df["news_scale_1_max"] = df["news_scale_1_max"].astype(int).astype(str)
+    fig = px.bar(df, x="dept_name", y="mrn", color="news_scale_1_max",
+                color_discrete_map=NEWS_SCORE_COLORS,
+                category_orders = {"news_scale_1_max": [str(x) for x in range(1,24)]}
+    )
     return dcc.Graph(id="perrt_fig", figure=fig)
 
 
