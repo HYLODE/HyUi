@@ -88,7 +88,6 @@ def df_from_file(route: str) -> pd.DataFrame:
         with engine_in.connect() as conn:
             df = pd.read_sql(route, conn)
     elif path_to_file(route, "xls").is_file():
-        print("Reading XLS")
         file = path_to_file(route, "xls")
         df = pd.read_excel(file)
     else:
