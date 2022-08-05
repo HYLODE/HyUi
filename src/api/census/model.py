@@ -59,7 +59,7 @@ class CensusMock(CensusBase, table=True):
     """
 
     # only set schema if in postgres
-    if "postgres" in settings.DB_URL:
+    if "postgres" in settings.STAR_URL:
         __table_args__ = {"schema": settings.DB_POSTGRES_SCHEMA}
     id: Optional[int] = Field(default=None, primary_key=True)
 

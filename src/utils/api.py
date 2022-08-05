@@ -2,7 +2,7 @@ from sqlmodel import Session, create_engine
 
 from config.settings import settings  # type: ignore
 
-emap_engine = create_engine(settings.DB_URL, echo=True)
+emap_engine = create_engine(settings.STAR_URL, echo=True)
 caboodle_engine = create_engine(settings.CABOODLE_URL, echo=True)
 
 
