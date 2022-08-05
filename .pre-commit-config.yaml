@@ -35,12 +35,12 @@ repos:
         name: black - consistent Python code formatting (auto-fixes)
         language_version: python # Should be a command that runs python3.6+
         # additional_dependencies: ['click==8.0.4']
-  - repo: https://gitlab.com/pycqa/flake8
+  - repo: https://gitlab.com/pycqa/flake8.git
     rev: 3.9.2
     hooks:
       - id: flake8
         name: flake8 - Python linting
-  - repo: https://github.com/nbQA-dev/nbQA
+  - repo: https://github.com/nbQA-dev/nbQA.git
     rev: 1.3.1
     hooks:
       - id: nbqa-isort
