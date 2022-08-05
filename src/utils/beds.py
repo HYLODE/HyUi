@@ -7,10 +7,10 @@ import requests
 
 from typing import List
 from config.settings import settings
-from utils.wards import wards
 
 from typing import Optional
 from sqlmodel import SQLModel
+
 
 class BedBonesBase(SQLModel):
 
@@ -24,7 +24,7 @@ class BedBonesBase(SQLModel):
     covid: Optional[bool]
     bed_functional: Optional[str]
     bed_physical: Optional[str]
-
+    DischargeReady: str
 
 
 BED_BONES_TABLE_ID = 261
@@ -38,6 +38,7 @@ CORE_FIELDS = [
     "covid",
     "bed_functional",
     "bed_physical",
+    "DischargeReady",
 ]
 
 
@@ -79,6 +80,28 @@ def get_bed_list(
     return res
 
 
+def update_bed_row(table_id=BED_BONES_TABLE_ID, row_id: int = None, data: dict = {}):
+    """
+    Updates a row in the beds table
+
+    :param      table_id:  Table ID
+    :param      row_id:  The row ID
+    :param      data:  The data fields to update
+
+    """
+
+    url = f"{settings.BASEROW_URL}/api/database/rows/table/{table_id}/"
+
+    requests.patch(
+        url=f"{url}{row_id}/?user_field_names=true",
+        headers={
+            "Authorization": f"Token {settings.BASEROW_READWRITE_TOKEN}",
+            "Content-Type": "application/json",
+        },
+        json=data,
+    )
+
+
 def unpack_nested_dict(
     rows: List[dict],
     f2unpack: str,
@@ -105,5 +128,3 @@ def unpack_nested_dict(
             row.pop(f2unpack, None)
             row[f2unpack] = vals_str
     return rows
-
-
