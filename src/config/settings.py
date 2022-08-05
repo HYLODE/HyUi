@@ -1,24 +1,11 @@
 # ./src/api/settings_src.py
 # project wide settings are loaded via ./.envrc and ./.secrets
+import os
 from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, Optional
 
 from pydantic import BaseSettings, PostgresDsn, validator
-
-PORT_JUPYTER = "8091"
-
-PORT_COMMANDLINE_API = "8092"
-PORT_COMMANDLINE_APP = "8093"
-
-PORT_DOCKER_API = "8094"
-PORT_DOCKER_APP = "8095"
-
-BASE_URL_DEV = "http://127.0.0.1"
-BASE_URL_GAE = "http://172.16.149.202"  # UCLVLDDPRAGAE07
-BASE_URL_DOCKER_APP = "http://apps"
-BASE_URL_DOCKER_API = "http://api"
-BASE_URL_DOCKER_BASEROW = "http://baserow"
 
 
 class ModuleNames(str, Enum):
@@ -47,8 +34,18 @@ class Environments(str, Enum):
 class Settings(BaseSettings):
 
     ENV: Environments = Environments.dev
+    BASE_URL: str  # dev:localhost or prod:http://172.16.149.202
+
     DOCKER: bool = False
     VERBOSE: bool = True
+
+    PORT_COMMANDLINE_API: str
+    PORT_DOCKER_API: str
+
+    PORT_COMMANDLINE_APP: str
+    PORT_DOCKER_APP: str
+
+    PORT_JUPYTER: str
 
     EMAP_DB_HOST: Optional[str]
     EMAP_DB_USER: Optional[str]
@@ -65,28 +62,34 @@ class Settings(BaseSettings):
 
     BASEROW_READWRITE_TOKEN: Optional[str]
     BASEROW_PORT: Optional[str]
+    PORT_DOCKER_BASEROW: Optional[str]
+
+    MODULE_ROOT: str = "api"  # for building paths to modules e.g. ./src/api
+    ROUTES = ModuleNames = ModuleNames._member_names_
+
+    BASE_URL_DOCKER_APP: str = "http://apps"
+    BASE_URL_DOCKER_API: str = "http://api"
+    BASE_URL_DOCKER_BASEROW: str = "http://baserow"
 
     # WARNING!
     # The order of variable declaration is important
     # i.e. don't construct a URL containing a PORT if you haven't declared the port yet
     # the variables above of the variables below
 
-    DB_URL: Optional[str]
+    STAR_URL: Optional[str]
     CABOODLE_URL: Optional[str]
-    BASE_URL: Optional[str]
     API_URL: Optional[str]
     APP_URL: Optional[str]
     BASEROW_URL: Optional[str]
+    BASEROW_PUBLIC_URL: Optional[str]
 
-    MODULE_ROOT: str = "api"  # for building paths to modules e.g. ./src/api
-    ROUTES = ModuleNames = ModuleNames._member_names_
 
     @validator("ENV", pre=True)
     def environment_choice_is_valid(cls, v):
         # b/c when read from .secrets a \r (carriage return) is appended
         return v.rstrip()
 
-    @validator("DB_URL")
+    @validator("STAR_URL")
     def assemble_db_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
         if values.get("ENV") == "dev":
             db_path = Path(__file__).resolve().parents[1].absolute() / "mock"
@@ -122,17 +125,6 @@ class Settings(BaseSettings):
             )
         return db_url
 
-    @validator("BASE_URL")
-    def assemble_base_url(cls, v: Optional[str], values: Dict[str, Any]) -> str:
-        """
-        Selects and assembles the base URL for the application depending on
-        the environment
-        """
-        if values.get("ENV", "dev").lower() == "dev":
-            return BASE_URL_DEV
-        else:
-            return BASE_URL_GAE
-
     @validator("API_URL")
     def assemble_api_url(cls, v: Optional[str], values: Dict[str, Any]) -> str:
         """
@@ -146,14 +138,14 @@ class Settings(BaseSettings):
         :returns:   Base URL for API to be used by Frontend
         :rtype:     str
         """
-        if values.get("ENV") == "prod":
+        BASE_URL = values.get("BASE_URL")
+        BASE_URL_DOCKER_API = values.get("BASE_URL_DOCKER_API")
+        PORT_DOCKER_API = values.get("PORT_DOCKER_API")
+        PORT_COMMANDLINE_API = values.get("PORT_COMMANDLINE_API")
+        if values.get("DOCKER") is True:
             url = f"{BASE_URL_DOCKER_API}:{PORT_DOCKER_API}"
-        elif values.get("ENV") == "dev":
-            if values.get("DOCKER") is True:
-                url = f"{BASE_URL_DOCKER_API}:{PORT_DOCKER_API}"
-            else:
-                url = f"{BASE_URL_DEV}:{PORT_COMMANDLINE_API}"
-
+        else:
+            url = f"{BASE_URL}:{PORT_COMMANDLINE_API}"
         return url
 
     @validator("APP_URL")
@@ -162,29 +154,32 @@ class Settings(BaseSettings):
         :returns:   Base URL for the APP (esp for testing)
         :rtype:     str
         """
-        if values.get("ENV") == "prod":
-            return f"{BASE_URL_GAE}:{PORT_DOCKER_APP}"
-
-        if values.get("ENV") == "dev":
-            if values.get("DOCKER") is True:
-                url = f"{BASE_URL_DOCKER_APP}:{PORT_DOCKER_APP}"
-            else:
-                url = f"{BASE_URL_DEV}:{PORT_COMMANDLINE_APP}"
+        BASE_URL = values.get("BASE_URL")
+        BASE_URL_DOCKER_APP = values.get("BASE_URL_DOCKER_APP")
+        PORT_DOCKER_APP = values.get("PORT_DOCKER_APP")
+        PORT_COMMANDLINE_APP = values.get("PORT_COMMANDLINE_APP")
+        if values.get("DOCKER") is True:
+            url = f"{BASE_URL_DOCKER_APP}:{PORT_DOCKER_APP}"
+        else:
+            url = f"{BASE_URL}:{PORT_COMMANDLINE_APP}"
         return url
 
-    @validator("BASEROW_URL")
+    @validator("BASEROW_URL", "BASEROW_PUBLIC_URL")
     def assemble_baserow_url(cls, v: Optional[str], values: Dict[str, Any]) -> str:
         """
         :returns:   Base URL for BASEROW
         :rtype:     str
         """
+        BASE_URL = values.get("BASE_URL")
         BASEROW_PORT = values.get("BASEROW_PORT")
-        if values.get("ENV") == "prod":
-            url = f"{BASE_URL_GAE}:{BASEROW_PORT}"
-        elif values.get("ENV") == "dev":
-            url = f"{BASE_URL_DEV}:{BASEROW_PORT}"
+        BASE_URL_DOCKER_BASEROW = values.get("BASE_URL_DOCKER_BASEROW")
+        PORT_DOCKER_BASEROW = values.get("PORT_DOCKER_BASEROW")
+
+        if values.get("DOCKER") is True:
+            url = f"{BASE_URL_DOCKER_BASEROW}:{PORT_DOCKER_BASEROW}"
         else:
-            raise Exception
+            url = f"{BASE_URL}:{BASEROW_PORT}"
+        # url = f"{BASE_URL}:{BASEROW_PORT}"
         return url
 
     class Config:
@@ -192,4 +187,7 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
-# print(settings.SERVICES)
+
+if __name__ == "__main__":
+    for i in settings:
+        print(i)

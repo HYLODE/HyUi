@@ -5,7 +5,7 @@ The application itself
 from dash import Dash, page_container, page_registry
 import dash_bootstrap_components as dbc
 
-from config import settings
+from config.settings import settings
 
 BPID = "app_"
 CORE_PAGES = ["Home", "Sitrep", "Electives", "PERRT"]
