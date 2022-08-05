@@ -24,7 +24,7 @@ class BedBonesBase(SQLModel):
     covid: Optional[bool]
     bed_functional: Optional[str]
     bed_physical: Optional[str]
-    DischargeReady: str
+    DischargeReady: Optional[str]
 
 
 BED_BONES_TABLE_ID = 261
