@@ -6,8 +6,9 @@ sub-application for sitrep
 from collections import OrderedDict
 
 import dash_bootstrap_components as dbc
+import numpy as np
 import pandas as pd
-from dash import Input, Output, callback, State
+from dash import Input, Output, State, callback
 from dash import dash_table as dt
 from dash import dcc, html, register_page
 
@@ -15,7 +16,7 @@ import utils
 from api.sitrep.model import SitrepRead
 from config.settings import settings
 from utils import icons
-from utils.beds import get_bed_list, unpack_nested_dict, update_bed_row, BedBonesBase
+from utils.beds import BedBonesBase, get_bed_list, unpack_nested_dict, update_bed_row
 from utils.dash import df_from_store, get_results_response, validate_json
 
 register_page(__name__)
@@ -44,45 +45,55 @@ def build_api_url(ward: str = None) -> str:
 
 REFRESH_INTERVAL = 30 * 60 * 1000  # milliseconds
 
-COLS_ABACUS = [
-    "open",
-    "unit_order",
-    "room",
-    "bed",
-    "name",
-    "mrn",
-    "admission_age_years",
-    "sex",
-    "organ_icons",
-    "DischargeReady",
-]
+# COLS_ABACUS = [
+#     "sideroom",
+#     "unit_order",
+#     "open",
+#     # "room",
+#     # "bed",
+#     "name",
+#     "mrn",
+#     "admission_age_years",
+#     "sex",
+#     "organ_icons",
+#     "DischargeReady",
+# ]
 
+# NB: the order of this list determines the order of the table
 COLS = [
-        {"id": "open", "name": "Open", "presentation": "markdown"},
-        {"id": "closed", "name": "Closed"},
-        {"id": "unit_order", "name": "Order", "type": "numeric"},
-        {"id": "ward_code", "name": "Ward"},
-        {"id": "bay_code", "name": "Bay"},
-        {"id": "room", "name": "Bay"},
-        {"id": "bed_code", "name": "Bed code"},
-        {"id": "bed", "name": "Bed"},
-        {"id": "admission_dt", "name": "Admission"},
-        {"id": "elapsed_los_td", "name": "LoS"},
-        {"id": "mrn", "name": "MRN"},
-        {"id": "name", "name": "Full Name"},
-        {"id": "admission_age_years", "name": "Age"},
-        {"id": "sex", "name": "Sex"},
-        # {"id": "dob", "name": "DoB"},
-        {"id": "wim_1", "name": "WIM-P"},
-        {"id": "wim_r", "name": "WIM-R"},
-        {"id": "bed_empty", "name": "Empty"},
-        {"id": "team", "name": "Side"},
-        {"id": "vent_type_1_4h", "name": "Ventilation"},
-        {"id": "n_inotropes_1_4h", "name": "Cardiovascular"},
-        {"id": "had_rrt_1_4h", "name": "Renal"},
-        {"id": "organ_icons", "name": "Organ Support", "presentation": "markdown"},
-        {"id": "DischargeReady", "name": "Discharge", "presentation": "dropdown", "editable": True},
-        {"id": "covid", "name": "COVID"},
+    {"id": "unit_order", "name": "", "type": "numeric"},
+    # {"id": "closed", "name": "Closed"},
+    {"id": "sideroom", "name": ""},
+    # {"id": "sideroom_suffix", "name": ""},
+    # {"id": "ward_code", "name": "Ward"},
+    # {"id": "bay_code", "name": "Bay"},
+    # {"id": "room", "name": "Bay"},
+    # {"id": "bed_code", "name": "Bed code"},
+    # {"id": "bed", "name": "Bed"},
+    # {"id": "admission_dt", "name": "Admission"},
+    # {"id": "elapsed_los_td", "name": "LoS"},
+    {"id": "mrn", "name": "MRN"},
+    {"id": "name", "name": "Full Name"},
+    # {"id": "admission_age_years", "name": "Age"},
+    # {"id": "sex", "name": "Sex"},
+    {"id": "age_sex", "name": "Age Sex"},
+    # {"id": "dob", "name": "DoB"},
+    {"id": "wim_1", "name": "WIM-P"},
+    {"id": "wim_r", "name": "WIM-R"},
+    # {"id": "bed_empty", "name": "Empty"},
+    # {"id": "team", "name": "Side"},
+    # {"id": "vent_type_1_4h", "name": "Ventilation"},
+    # {"id": "n_inotropes_1_4h", "name": "Cardiovascular"},
+    # {"id": "had_rrt_1_4h", "name": "Renal"},
+    {"id": "organ_icons", "name": "Organ Support", "presentation": "markdown"},
+    {
+        "id": "DischargeReady",
+        "name": "D/C",
+        "presentation": "dropdown",
+        "editable": True,
+    },
+    {"id": "open", "name": "", "presentation": "markdown"},
+    # {"id": "covid", "name": "COVID"},
 ]
 
 
@@ -177,7 +188,20 @@ def gen_fancy_table(data: dict):
     dfo = pd.DataFrame.from_records(data)
     dfo["organ_icons"] = ""
     dfo["unit_order"] = dfo["unit_order"].astype(int)
+    dfo["sideroom"] = np.where(
+        dfo["bed_physical"].astype(str).str.contains("sideroom"), "SR", ""
+    )
+    dfo["sideroom_suffix"] = "|"
+    dfo["age_sex"] = dfo.apply(
+        lambda row: f"{row['admission_age_years']:.0f} {row['sex']}"
+        if row["mrn"]
+        else "",
+        axis=1,
+    )
+    dfo["name"] = dfo["name"].str.upper()
 
+    # --------------------
+    # START: Prepare icons
     llist = []
     for t in dfo.itertuples(index=False):
 
@@ -190,19 +214,22 @@ def gen_fancy_table(data: dict):
         llist.append(ti)
     dfn = pd.DataFrame(llist, columns=dfo.columns)
 
-    #
     dfn["open"] = dfn["closed"].apply(icons.closed)
+    # END: Prepare icons
+    # --------------------
 
     # Prep columns with ids and names
-    COL_DICT = [i for i in COLS if i['id'] in COLS_ABACUS]
-
+    dfn.sort_values(by="unit_order", inplace=True)
+    # COL_DICT = [i for i in COLS if i['id'] in COLS_ABACUS]
 
     dto = (
         dt.DataTable(
             id=f"{BPID}tbl-census",
-            columns=COL_DICT,
+            columns=COLS,
             data=dfn.to_dict("records"),
             editable=True,
+            # fixed_columns={},
+            style_table={"width": "100%", "minWidth": "100%", "maxWidth": "100%"},
             dropdown={
                 "DischargeReady": {
                     "options": [
@@ -216,14 +243,32 @@ def gen_fancy_table(data: dict):
             style_as_list_view=True,  # remove col lines
             style_cell={
                 "fontSize": 13,
-                "font-family": "sans-serif",
+                "font-family": "monospace",
                 "padding": "1px",
             },
             style_cell_conditional=[
+                {
+                    "if": {"column_id": "sideroom"},
+                    "textAlign": "left",
+                    "width": "30px",
+                    "whitespace": "normal",
+                },
+                {"if": {"column_id": "open"}, "textAlign": "left", "width": "20px"},
+                {"if": {"column_id": "unit_order"}, "width": "20px"},
                 {"if": {"column_id": "room"}, "textAlign": "right"},
                 {"if": {"column_id": "bed"}, "textAlign": "left"},
-                {"if": {"column_id": "mrn"}, "textAlign": "left"},
-                {"if": {"column_id": "name"}, "textAlign": "left"},
+                {
+                    "if": {"column_id": "mrn"},
+                    "textAlign": "left",
+                    "font-family": "monospace",
+                },
+                {
+                    "if": {"column_id": "name"},
+                    "textAlign": "left",
+                    "font-family": "sans-serif",
+                    "fontWeight": "bold",
+                    "width": "100px",
+                },
                 {"if": {"column_id": "sex"}, "textAlign": "left"},
                 {"if": {"column_id": "organ_icons"}, "textAlign": "left"},
                 {"if": {"column_id": "name"}, "fontWeight": "bolder"},
@@ -244,15 +289,15 @@ def gen_fancy_table(data: dict):
                     "color": "maroon",
                 },
             ],
-            sort_action="native",
-            sort_by=[
-                {"column_id": "unit_order", "direction": "asc"},
-            ],
+            # sort_action="native",
+            # sort_by=[
+            #     {"column_id": "unit_order", "direction": "asc"},
+            # ],
             # cell_selectable=True,  # possible to click and navigate cells
             # row_selectable="single",
             markdown_options={"html": True},
             persistence=True,
-            # persisted_props=["data"],
+            persisted_props=["data"],
         ),
     )
 
