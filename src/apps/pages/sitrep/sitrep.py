@@ -106,9 +106,9 @@ def wrangle_data_for_table(beds: list, census: list, sitrep: list) -> list:
     df_census = pd.DataFrame.from_records(census)
     df_census = df_census[wng.census_keep_cols]
     for col in wng.census_keep_cols:
-        if col in ['location_string', 'location_id', 'cvl_discharge', 'occupied', 'ghost']:
+        if col in ['location_string', 'location_id', 'cvl_discharge', 'occupied', 'ovl_ghost']:
             continue
-        df_census[col] = np.where(df_census['occupied'], dfm[col], None)
+        df_census[col] = np.where(df_census['occupied'], df_census[col], None)
 
 
     df_sitrep = pd.DataFrame.from_records(sitrep)

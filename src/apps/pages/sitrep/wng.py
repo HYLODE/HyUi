@@ -61,7 +61,7 @@ census_keep_cols = [
     "ovl_hv_id",
     "cvl_discharge",
     "occupied",
-    "ghost",
+    "ovl_ghost",
     "mrn",
     "encounter",
     "date_of_birth",
