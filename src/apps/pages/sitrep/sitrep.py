@@ -20,20 +20,15 @@ from config.settings import settings
 from utils import icons
 from utils.beds import BedBonesBase, get_bed_list, unpack_nested_dict, update_bed_row
 from utils.dash import df_from_store, get_results_response, validate_json
+
+from apps.pages.sitrep import BPID, BED_BONES_TABLE_ID, REFRESH_INTERVAL, DEPT2WARD_MAPPING, COLS
+from apps.pages.sitrep import BEDS_KEEP_COLS, CENSUS_KEEP_COLS, SITREP_KEEP_COLS
+
 from apps.pages.sitrep import wng
+from apps.pages.sitrep import widgets
 
 register_page(__name__)
 
-BPID = "sit_"
-BED_BONES_TABLE_ID = 261
-COLS = wng.COLS
-REFRESH_INTERVAL = 30 * 60 * 1000  # milliseconds
-DEPT2WARD_MAPPING = {
-    "UCH T03 INTENSIVE CARE": "T03",
-    "UCH T06 SOUTH PACU": "T06",
-    "GWB L01 CRITICAL CARE": "GWB",
-    "WMS W01 CRITICAL CARE": "WMS",
-}
 
 @callback(
     Output(f"{BPID}beds_data", "data"),
@@ -101,18 +96,18 @@ def wrangle_data_for_table(beds: list, census: list, sitrep: list) -> list:
     """
     # assemble data sources
     df_beds = pd.DataFrame.from_records(beds)
-    df_beds = df_beds[wng.beds_keep_cols]
+    df_beds = df_beds[BEDS_KEEP_COLS]
 
     df_census = pd.DataFrame.from_records(census)
-    df_census = df_census[wng.census_keep_cols]
-    for col in wng.census_keep_cols:
+    df_census = df_census[CENSUS_KEEP_COLS]
+    for col in CENSUS_KEEP_COLS:
         if col in ['location_string', 'location_id', 'cvl_discharge', 'occupied', 'ovl_ghost']:
             continue
         df_census[col] = np.where(df_census['occupied'], df_census[col], None)
 
 
     df_sitrep = pd.DataFrame.from_records(sitrep)
-    df_sitrep = df_sitrep[wng.sitrep_keep_cols]
+    df_sitrep = df_sitrep[SITREP_KEEP_COLS]
 
     # merge the three data sources
 
@@ -134,7 +129,7 @@ def wrangle_data_for_table(beds: list, census: list, sitrep: list) -> list:
         indicator="cbs_merge",
     )
     # replace with None ghost values from sitrep
-    for col in wng.sitrep_keep_cols:
+    for col in SITREP_KEEP_COLS:
         if col in ["department", "room", "bed"]:
             continue
         dfm[col] = np.where(dfm['occupied'], dfm[col], None)
@@ -325,35 +320,6 @@ def gen_fancy_table(data: dict):
     return dto
 
 
-ward_radio_button = html.Div(
-    [
-        # Need a hidden div for the callback with no output
-        html.Div(id="hidden-div", style={"display": "none"}),
-        html.Div(
-            [
-                dbc.RadioItems(
-                    id=f"{BPID}ward_radio",
-                    className="dbc d-grid d-md-flex justify-content-md-end btn-group",
-                    # inputClassName="btn-check",
-                    # labelClassName="btn btn-outline-primary",
-                    # labelCheckedClassName="active btn-primary",
-                    inline=True,
-                    options=[
-                        {"label": "T03", "value": "UCH T03 INTENSIVE CARE"},
-                        {"label": "T06", "value": "UCH T06 SOUTH PACU"},
-                        {"label": "GWB", "value": "GWB L01 CRITICAL CARE"},
-                        {"label": "WMS", "value": "WMS W01 CRITICAL CARE"},
-                        # {"label": "NHNN", "value": "NHNN"},
-                    ],
-                    value="UCH T03 INTENSIVE CARE",
-                )
-            ],
-            className="dbc",
-        ),
-        # html.Div(id="which_icu"),
-    ],
-    className="radio-group",
-)
 
 sitrep_table = dbc.Card(
     [
@@ -376,7 +342,7 @@ dash_only = html.Div(
 
 layout = html.Div(
     [
-        dbc.Row(dbc.Col([ward_radio_button])),
+        dbc.Row(dbc.Col([widgets.ward_radio_button])),
         dbc.Row(dbc.Col([sitrep_table])),
         dash_only,
     ]

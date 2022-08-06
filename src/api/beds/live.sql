@@ -109,6 +109,7 @@ SELECT
 	,cd.lastname
 	,cd.firstname
 	,cd.date_of_birth
+	,cd.sex
 
 FROM beds
 -- details of the last open visit to that bed

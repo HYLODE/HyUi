@@ -50,6 +50,7 @@ class BedsBase(SQLModel):
     date_of_birth: Optional[date]
     lastname: Optional[str]
     firstname: Optional[str]
+    sex: Optional[str]
 
     @validator("date_of_birth", pre=True)
     def convert_datetime_to_date(cls, v):
