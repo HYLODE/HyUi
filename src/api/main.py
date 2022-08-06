@@ -10,6 +10,7 @@ from .sitrep import router as sitrep
 from .users import router as users
 from .ros import router as ros
 from .beds import router as beds
+from .hymind import router as hymind
 
 app = FastAPI(default_response_class=ORJSONResponse)
 app.include_router(census.router)
@@ -20,6 +21,7 @@ app.include_router(sitrep.router)
 app.include_router(users.router)
 app.include_router(ros.router)
 app.include_router(beds.router)
+app.include_router(hymind.router)
 
 
 # ======

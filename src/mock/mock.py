@@ -4,6 +4,7 @@ Generates sqlite database with a table holding modelled as per
 api.models.Results and then loads the data from the local HDF file
 """
 
+import importlib
 import sys
 from pathlib import Path
 
@@ -14,7 +15,7 @@ from sqlmodel import Session, SQLModel, create_engine
 from sqlmodel.pool import StaticPool
 
 from config.settings import settings  # type: ignore
-from utils import get_model_from_route  # type: ignore
+from utils import gen_module_path, get_model_from_route  # type: ignore
 
 # you can use this function in testing but swap in an in memory version
 SYNTH_SQLITE_FILE = Path(__file__).parent / "mock.db"
@@ -125,6 +126,15 @@ def make_mock_db_in_memory(route: str):
 
 if __name__ == "__main__":
     engine = make_engine(echo=True)
+
+    # load mock hymind icu discharges
+    model_path = f"{gen_module_path('hymind')}.model"
+    model = getattr(importlib.import_module(model_path), "IcuDischarge")
+    _ = pd.read_json("../src/api/hymind/data/mock_icu_discharge.json")
+    df = pd.DataFrame.from_records(_['data'])
+    create_mock_table(engine, model, drop=True)
+    insert_into_mock_table(engine, df, model)
+
     for route in settings.ROUTES:
         try:
             model = get_model_from_route(route, "Mock")
