@@ -1,7 +1,7 @@
 # src/apps/pages/sitrep/__init__.py
 # set the sitrep level of maturity/development here as this is a sub-app
 # rather than in the main app settings
-SITREP_ENV="test"  # test (staging red) or prod 
+SITREP_ENV = "test"  # test (staging red) or prod
 
 BPID = "sit_"
 
@@ -21,6 +21,7 @@ COLS = [
     # {"id": "bed_code", "name": "Bed code"},
     # {"id": "room", "name": ""},
     # {"id": "bed", "name": "Bed"},
+    # ROOM STATUS
     {"id": "open", "name": "", "presentation": "markdown"},
     {"id": "bed_label", "name": "Bed", "type": "text"},
     {"id": "room_label", "name": ""},
@@ -28,31 +29,36 @@ COLS = [
     # {"id": "sideroom", "name": ""},
     # {"id": "admission_dt", "name": "Admission"},
     # {"id": "elapsed_los_td", "name": "LoS"},
+    # DEMOGRAPHICS
     {"id": "age_sex", "name": ""},
     {"id": "name", "name": "Full Name"},
     {"id": "mrn", "name": "MRN", "type": "text"},
-    {"id": "episode_slice_id", "name": "Slice", "type": "numeric"},
-    {"id": "prediction_as_real", "name": "Pr(DC)", "type": "numeric"},
     # {"id": "admission_age_years", "name": "Age"},
     # {"id": "sex", "name": "Sex"},
     # {"id": "dob", "name": "DoB"},
     # {"id": "bed_empty", "name": "Empty"},
     # {"id": "team", "name": "Side"},
+    # PHYSIOLOGY
     # {"id": "vent_type_1_4h", "name": "Ventilation"},
     # {"id": "n_inotropes_1_4h", "name": "Cardiovascular"},
     # {"id": "had_rrt_1_4h", "name": "Renal"},
     {"id": "organ_icons", "name": "Organ Support", "presentation": "markdown"},
     {"id": "wim_1", "name": "WIM", "type": "numeric"},
+    # DISCHARGE
+    {"id": "episode_slice_id", "name": "Slice", "type": "numeric"},
+    {"id": "prediction_as_real", "name": "Pr(DC)", "type": "numeric"},
     {
         "id": "DischargeReady",
         "name": "D/C",
         "presentation": "dropdown",
         "editable": True,
     },
+    {"id": "planned_move", "name": "Request?", "type": "text"},
+    {"id": "pm_dept", "name": "Destination", "type": "text"},
     # {"id": "covid", "name": "COVID"},
 ]
 
-STYLE_CELL_CONDITIONAL=[
+STYLE_CELL_CONDITIONAL = [
     {
         "if": {"column_id": "bed_label"},
         "textAlign": "right",
@@ -80,7 +86,10 @@ STYLE_CELL_CONDITIONAL=[
         "fontWeight": "bold",
         "width": "100px",
     },
-    {"if": {"column_id": "age_sex"}, "textAlign": "right", },
+    {
+        "if": {"column_id": "age_sex"},
+        "textAlign": "right",
+    },
     {"if": {"column_id": "organ_icons"}, "textAlign": "left"},
     {"if": {"column_id": "name"}, "fontWeight": "bold"},
     {"if": {"column_id": "DischargeReady"}, "textAlign": "left"},
@@ -115,6 +124,11 @@ CENSUS_KEEP_COLS = [
     "lastname",
     "firstname",
     "sex",
+    "planned_move",
+    "pm_datetime",
+    "pm_type",
+    "pm_dept",
+    "pm_location_string",
 ]
 
 SITREP_KEEP_COLS = [

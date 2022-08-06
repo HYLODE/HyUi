@@ -3,23 +3,18 @@
 sub-application for sitrep
 """
 
-from collections import OrderedDict
 
 import dash_bootstrap_components as dbc
 import numpy as np
 import pandas as pd
-import requests
-from dash import Input, Output, State, callback
+from dash import Input, Output, callback
 from dash import dash_table as dt
 from dash import dcc, html, register_page
 
-import utils
 from apps.pages.sitrep import BPID, STYLE_CELL_CONDITIONAL, widgets
 from apps.pages.sitrep.callbacks import *
 from config.settings import settings
 from utils import icons
-from utils.beds import BedBonesBase, get_bed_list, unpack_nested_dict, update_bed_row
-from utils.dash import df_from_store, get_results_response, validate_json
 
 register_page(__name__)
 
@@ -52,6 +47,11 @@ def gen_fancy_table(data: dict):
     dfo["age_sex"] = dfo.apply(
         lambda row: f"{row['age']:.0f}{row['sex']} " if row["mrn"] else "",
         axis=1,
+    )
+    # TODO: format this in dash so can change colour with number
+    # import ipdb; ipdb.set_trace()
+    dfo["prediction_as_real"] = dfo["prediction_as_real"].apply(
+        lambda x: f"{100*x:0.0f}%" if not pd.isna(x) else ""
     )
 
     # --------------------

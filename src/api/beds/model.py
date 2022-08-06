@@ -52,6 +52,12 @@ class BedsBase(SQLModel):
     firstname: Optional[str]
     sex: Optional[str]
 
+    planned_move: Optional[str]
+    pm_datetime: Optional[datetime]
+    pm_type: Optional[str]
+    pm_dept: Optional[str]
+    pm_location_string: Optional[str]
+
     @validator("date_of_birth", pre=True)
     def convert_datetime_to_date(cls, v):
         if isinstance(v, str):
@@ -76,7 +82,12 @@ class BedsBase(SQLModel):
 
     # TODO: how to share functions between classes?
     @validator(
-        "ovl_admission", "cvl_discharge", "cvl_admission", "date_of_birth", pre=True
+        "ovl_admission",
+        "cvl_discharge",
+        "cvl_admission",
+        "date_of_birth",
+        "pm_datetime",
+        pre=True,
     )
     def replace_NaT_with_None(cls, v):
         """
