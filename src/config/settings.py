@@ -28,13 +28,18 @@ class Environments(str, Enum):
     """
 
     dev = "dev"
+    test = "test"
     prod = "prod"
 
 
 class Settings(BaseSettings):
 
     ENV: Environments = Environments.dev
-    BASE_URL: str  # dev:localhost or prod:http://172.16.149.202
+    BASE_URL_DEV: str  # http://locahost
+    BASE_URL_TEST: str  # http://172.16.149.205
+    BASE_URL_PROD: str  # http://172.16.149.202
+
+    BASE_URL: str = ""
 
     DOCKER: bool = False
     VERBOSE: bool = True
@@ -83,10 +88,22 @@ class Settings(BaseSettings):
     BASEROW_URL: Optional[str]
     BASEROW_PUBLIC_URL: Optional[str]
 
-
     @validator("ENV", pre=True)
     def environment_choice_is_valid(cls, v):
         # b/c when read from .secrets a \r (carriage return) is appended
+        return v.rstrip()
+
+    @validator("BASE_URL", pre=True)
+    def select_base_url_from_env(cls, v, values: Dict[str, Any]):
+        # b/c when read from .secrets a \r (carriage return) is appended
+        if values.get("ENV") == "dev":
+            v = values.get("BASE_URL_DEV")
+        elif values.get("ENV") == "test":
+            v = values.get("BASE_URL_TEST")
+        elif values.get("ENV") == "prod":
+            v = values.get("BASE_URL_PROD")
+        else:
+            raise ValueError("Environment not recognised")
         return v.rstrip()
 
     @validator("STAR_URL")
