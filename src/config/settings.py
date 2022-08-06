@@ -33,7 +33,13 @@ class Environments(str, Enum):
 
 
 class Settings(BaseSettings):
-
+    """
+    Note that the front end app may contain components from multiple sources at
+    various stages of maturity so any or all of the dev/test/prod URLs may be in
+    use.
+    TODO: Also note that the ports are not aligned between staging_red and prod
+    """
+ 
     ENV: Environments = Environments.dev
     BASE_URL_DEV: str  # http://locahost
     BASE_URL_TEST: str  # http://172.16.149.205

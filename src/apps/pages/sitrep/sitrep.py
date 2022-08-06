@@ -17,6 +17,7 @@ import utils
 from api.beds.model import BedsRead
 from api.sitrep.model import SitrepRead
 from apps.pages.sitrep import (
+    SITREP_ENV,
     BED_BONES_TABLE_ID,
     BEDS_KEEP_COLS,
     BPID,
@@ -235,7 +236,7 @@ def gen_fancy_table(data: dict):
     # )
 
     dfo["age_sex"] = dfo.apply(
-        lambda row: f"{row['age']:.0f} {row['sex']}" if row["mrn"] else "",
+        lambda row: f"{row['age']:.0f}{row['sex']} " if row["mrn"] else "",
         axis=1,
     )
 

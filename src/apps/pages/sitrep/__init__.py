@@ -1,6 +1,10 @@
-# src/__init__.py
+# src/apps/pages/sitrep/__init__.py
+# set the sitrep level of maturity/development here as this is a sub-app
+# rather than in the main app settings
+SITREP_ENV="test"  # test (staging red) or prod 
 
 BPID = "sit_"
+
 BED_BONES_TABLE_ID = 261
 REFRESH_INTERVAL = 30 * 60 * 1000  # milliseconds
 DEPT2WARD_MAPPING = {
