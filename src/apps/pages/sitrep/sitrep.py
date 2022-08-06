@@ -56,6 +56,7 @@ def gen_fancy_table(data: dict):
 
     # --------------------
     # START: Prepare icons
+    dfo_copy = dfo.copy()
     # organ support icons
     dfo["organ_icons"] = ""
     llist = []
@@ -68,22 +69,35 @@ def gen_fancy_table(data: dict):
         icon_string = f"{rs}{cvs}{aki}"
         ti = t._replace(organ_icons=icon_string)
         llist.append(ti)
-    dfn = pd.DataFrame(llist, columns=dfo.columns)
+    dfo = pd.DataFrame(llist, columns=dfo.columns)
 
     # bed status icons
-    dfn["open"] = dfn["closed"].apply(icons.closed)
+    dfo["bed_icons"] = ""
+    llist = []
+    for t in dfo.itertuples(index=False):
+
+        closed = icons.closed(t.closed)
+        covid = icons.covid(t.covid)
+
+        icon_string = f"{closed}{covid}"
+        ti = t._replace(bed_icons=icon_string)
+        llist.append(ti)
+    dfo = pd.DataFrame(llist, columns=dfo.columns)
+
+    # dfn["open"] = dfn["closed"].apply(icons.closed)
+    # dfn["covid"] = dfn["covid"].apply(icons.covid)
     # END: Prepare icons
     # --------------------
 
     # Sort into unit order / displayed tables will NOT be sortable
     # ------------------------------------------------------------
-    dfn.sort_values(by="unit_order", inplace=True)
+    dfo.sort_values(by="unit_order", inplace=True)
 
     dto = (
         dt.DataTable(
             id=f"{BPID}tbl-census",
             columns=COLS,
-            data=dfn.to_dict("records"),
+            data=dfo.to_dict("records"),
             editable=True,
             # fixed_columns={},
             style_table={"width": "100%", "minWidth": "100%", "maxWidth": "100%"},

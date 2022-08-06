@@ -22,7 +22,8 @@ COLS = [
     # {"id": "room", "name": ""},
     # {"id": "bed", "name": "Bed"},
     # ROOM STATUS
-    {"id": "open", "name": "", "presentation": "markdown"},
+    # {"id": "open", "name": "", "presentation": "markdown"},
+    {"id": "bed_icons", "name": "", "presentation": "markdown"},
     {"id": "bed_label", "name": "Bed", "type": "text"},
     {"id": "room_label", "name": ""},
     # {"id": "closed", "name": "Closed"},
@@ -45,7 +46,7 @@ COLS = [
     {"id": "organ_icons", "name": "Organ Support", "presentation": "markdown"},
     {"id": "wim_1", "name": "WIM", "type": "numeric"},
     # DISCHARGE
-    {"id": "episode_slice_id", "name": "Slice", "type": "numeric"},
+    # {"id": "episode_slice_id", "name": "Slice", "type": "numeric"},
     {"id": "prediction_as_real", "name": "Pr(DC)", "type": "numeric"},
     {
         "id": "DischargeReady",
@@ -55,7 +56,7 @@ COLS = [
     },
     {"id": "pm_type", "name": "Request?", "type": "text"},
     {"id": "pm_dept", "name": "Destination", "type": "text"},
-    # {"id": "covid", "name": "COVID"},
+    {"id": "covid", "name": "COVID", "presentation": "markdown"},
 ]
 
 STYLE_CELL_CONDITIONAL = [
