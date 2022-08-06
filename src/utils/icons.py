@@ -10,12 +10,13 @@ COLOUR_RED = "#ff0000ff"
 
 def closed(value: bool) -> str:
     if value:
-        icon = "fa fa-lock"
+        icon = "fa fa-ban"
         colour = COLOUR_RED
+        icon_string = f'<i class="{icon}" style="color: {colour};"></i>'
     else:
-        icon = "fa fa-lock-open"
-        colour = COLOUR_GREEN
-    icon_string = f'<i class="{icon}" style="color: {colour};"></i>'
+        # icon = "fa fa-lock-open"
+        # colour = COLOUR_GREEN
+        icon_string = ""
     return icon_string
 
 def aki(level: str) -> str:

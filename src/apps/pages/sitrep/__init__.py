@@ -11,15 +11,17 @@ DEPT2WARD_MAPPING = {
 }
 
 COLS = [
-    {"id": "unit_order", "name": "", "type": "numeric"},
-    # {"id": "closed", "name": "Closed"},
-    {"id": "sideroom", "name": ""},
-    # {"id": "sideroom_suffix", "name": ""},
+    # {"id": "unit_order", "name": "", "type": "numeric"},
     # {"id": "ward_code", "name": "Ward"},
     # {"id": "bay_code", "name": "Bay"},
-    # {"id": "room", "name": "Bay"},
     # {"id": "bed_code", "name": "Bed code"},
+    # {"id": "room", "name": ""},
     # {"id": "bed", "name": "Bed"},
+    {"id": "open", "name": "", "presentation": "markdown"},
+    {"id": "bed_label", "name": "Bed", "type": "text"},
+    {"id": "room_label", "name": ""},
+    # {"id": "closed", "name": "Closed"},
+    # {"id": "sideroom", "name": ""},
     # {"id": "admission_dt", "name": "Admission"},
     # {"id": "elapsed_los_td", "name": "LoS"},
     {"id": "mrn", "name": "MRN", "type": "text"},
@@ -41,7 +43,6 @@ COLS = [
         "presentation": "dropdown",
         "editable": True,
     },
-    {"id": "open", "name": "", "presentation": "markdown"},
     # {"id": "covid", "name": "COVID"},
 ]
 

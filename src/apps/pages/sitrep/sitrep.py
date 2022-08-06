@@ -14,18 +14,24 @@ from dash import dash_table as dt
 from dash import dcc, html, register_page
 
 import utils
-from api.sitrep.model import SitrepRead
 from api.beds.model import BedsRead
+from api.sitrep.model import SitrepRead
+from apps.pages.sitrep import (
+    BED_BONES_TABLE_ID,
+    BEDS_KEEP_COLS,
+    BPID,
+    CENSUS_KEEP_COLS,
+    COLS,
+    DEPT2WARD_MAPPING,
+    REFRESH_INTERVAL,
+    SITREP_KEEP_COLS,
+    widgets,
+    wng,
+)
 from config.settings import settings
 from utils import icons
 from utils.beds import BedBonesBase, get_bed_list, unpack_nested_dict, update_bed_row
 from utils.dash import df_from_store, get_results_response, validate_json
-
-from apps.pages.sitrep import BPID, BED_BONES_TABLE_ID, REFRESH_INTERVAL, DEPT2WARD_MAPPING, COLS
-from apps.pages.sitrep import BEDS_KEEP_COLS, CENSUS_KEEP_COLS, SITREP_KEEP_COLS
-
-from apps.pages.sitrep import wng
-from apps.pages.sitrep import widgets
 
 register_page(__name__)
 
@@ -101,10 +107,15 @@ def wrangle_data_for_table(beds: list, census: list, sitrep: list) -> list:
     df_census = pd.DataFrame.from_records(census)
     df_census = df_census[CENSUS_KEEP_COLS]
     for col in CENSUS_KEEP_COLS:
-        if col in ['location_string', 'location_id', 'cvl_discharge', 'occupied', 'ovl_ghost']:
+        if col in [
+            "location_string",
+            "location_id",
+            "cvl_discharge",
+            "occupied",
+            "ovl_ghost",
+        ]:
             continue
-        df_census[col] = np.where(df_census['occupied'], df_census[col], None)
-
+        df_census[col] = np.where(df_census["occupied"], df_census[col], None)
 
     df_sitrep = pd.DataFrame.from_records(sitrep)
     df_sitrep = df_sitrep[SITREP_KEEP_COLS]
@@ -132,14 +143,18 @@ def wrangle_data_for_table(beds: list, census: list, sitrep: list) -> list:
     for col in SITREP_KEEP_COLS:
         if col in ["department", "room", "bed"]:
             continue
-        dfm[col] = np.where(dfm['occupied'], dfm[col], None)
+        dfm[col] = np.where(dfm["occupied"], dfm[col], None)
 
     # prepare field
-    dfm['age'] = (pd.Timestamp.now() - dfm['date_of_birth'].apply(pd.to_datetime)) / np.timedelta64(1, 'Y')
-    dfm['firstname'] = dfm['firstname'].fillna("")
-    dfm['lastname'] = dfm['lastname'].fillna("")
-    dfm['sex'] = dfm['sex'].fillna("")
-    dfm['name'] = dfm.apply(lambda row: f"{row.firstname.title()} {row.lastname.upper()}", axis=1)
+    dfm["age"] = (
+        pd.Timestamp.now() - dfm["date_of_birth"].apply(pd.to_datetime)
+    ) / np.timedelta64(1, "Y")
+    dfm["firstname"] = dfm["firstname"].fillna("")
+    dfm["lastname"] = dfm["lastname"].fillna("")
+    dfm["sex"] = dfm["sex"].fillna("")
+    dfm["name"] = dfm.apply(
+        lambda row: f"{row.firstname.title()} {row.lastname.upper()}", axis=1
+    )
     dfm["unit_order"] = dfm["unit_order"].astype(int)
 
     if settings.VERBOSE:
@@ -197,20 +212,37 @@ def diff_table(time, prev_data, data):
 )
 def gen_fancy_table(data: dict):
     dfo = pd.DataFrame.from_records(data)
-    dfo["organ_icons"] = ""
-    dfo["sideroom"] = np.where(
-        dfo["bed_physical"].astype(str).str.contains("sideroom"), "SR", ""
+    if settings.VERBOSE:
+        print(dfo.iloc[0])
+
+    # import ipdb; ipdb.set_trace()
+    dfo["bed_label"] = dfo["bed"].str.split(pat="-", expand=True).iloc[:, 1]
+    dfo["room_label"] = dfo["room"]
+    dfo["room_label"] = np.where(
+        dfo["room"].astype(str).str.contains("SR"), "SR", dfo["room_label"]
     )
-    dfo["sideroom_suffix"] = "|"
+
+    dfo["room_i"] = dfo.apply(lambda row: f"Bay {int(row['room'][2:])}", axis=1)
+    dfo["room_label"] = np.where(
+        dfo["room"].astype(str).str.contains("BY"), dfo["room_i"], dfo["room_label"]
+    )
+    dfo["room_label"] = np.where(
+        dfo["room"].astype(str).str.contains("CB"), "", dfo["room_label"]
+    )
+    # dfo["room_label"] = np.where(
+    #     dfo["room"].astype(str).str.contains("BY"), f"Bay {dfo['room']}",
+    #     dfo["room_label"]
+    # )
+
     dfo["age_sex"] = dfo.apply(
-        lambda row: f"{row['age']:.0f} {row['sex']}"
-        if row["mrn"]
-        else "",
+        lambda row: f"{row['age']:.0f} {row['sex']}" if row["mrn"] else "",
         axis=1,
     )
 
     # --------------------
     # START: Prepare icons
+    # organ support icons
+    dfo["organ_icons"] = ""
     llist = []
     for t in dfo.itertuples(index=False):
 
@@ -223,13 +255,14 @@ def gen_fancy_table(data: dict):
         llist.append(ti)
     dfn = pd.DataFrame(llist, columns=dfo.columns)
 
+    # bed status icons
     dfn["open"] = dfn["closed"].apply(icons.closed)
     # END: Prepare icons
     # --------------------
 
-    # Prep columns with ids and names
+    # Sort into unit order / displayed tables will NOT be sortable
+    # ------------------------------------------------------------
     dfn.sort_values(by="unit_order", inplace=True)
-    # COL_DICT = [i for i in COLS if i['id'] in COLS_ABACUS]
 
     dto = (
         dt.DataTable(
@@ -257,15 +290,20 @@ def gen_fancy_table(data: dict):
             },
             style_cell_conditional=[
                 {
-                    "if": {"column_id": "sideroom"},
+                    "if": {"column_id": "bed_label"},
+                    "textAlign": "right",
+                    "fontWeight": "bold",
+                    # "fontSize": 14,
+                },
+                {
+                    "if": {"column_id": "room_label"},
                     "textAlign": "left",
-                    "width": "30px",
+                    "width": "60px",
+                    "minWidth": "60px",
+                    "maxWidth": "60px",
                     "whitespace": "normal",
                 },
                 {"if": {"column_id": "open"}, "textAlign": "left", "width": "20px"},
-                {"if": {"column_id": "unit_order"}, "width": "20px"},
-                {"if": {"column_id": "room"}, "textAlign": "right"},
-                {"if": {"column_id": "bed"}, "textAlign": "left"},
                 {
                     "if": {"column_id": "mrn"},
                     "textAlign": "left",
@@ -318,7 +356,6 @@ def gen_fancy_table(data: dict):
         )
     ]
     return dto
-
 
 
 sitrep_table = dbc.Card(
