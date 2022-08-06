@@ -34,10 +34,12 @@ def build_hymind_icu_discharge_url(ward: str = None, env: str = None) -> str:
     """
     Construct API based on environment and requested ward
     e.g.
-    prod
+    prod: not available
     http://uclvlddpragae07:5007/predictions/icu/discharge?ward=T03
-    test
+    test: new model : not working
     http://uclvlddpragae08:5907/predictions/icu/discharge?ward=T03 
+    test: old model : working
+    http://uclvlddpragae08:5208/predictions/icu/discharge?ward=T03 
     """
 
     ward = ward.upper() if ward else "TO3"
@@ -50,10 +52,10 @@ def build_hymind_icu_discharge_url(ward: str = None, env: str = None) -> str:
 
     if env == "prod":
         API_PORT = "5007"
-        HYMIND_URL = f"{settings.BASE_URL_PROD}:{API_PORT}/icu/discharge"
+        HYMIND_URL = f"{settings.BASE_URL_PROD}:{API_PORT}/predictions/icu/discharge"
     elif env == "test":
-        API_PORT = "5907"
-        HYMIND_URL = f"{settings.BASE_URL_TEST}:{API_PORT}/icu/discharge"
+        API_PORT = "5208"  # 5208 = old model  5907 = new model
+        HYMIND_URL = f"{settings.BASE_URL_TEST}:{API_PORT}/predictions/icu/discharge"
     elif env == "dev":
         HYMIND_URL = f"{settings.API_URL}/hymind/icu/discharge"
     else:
