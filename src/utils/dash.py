@@ -1,13 +1,14 @@
+from typing import Dict
 import requests
 import pandas as pd
 from sqlmodel import SQLModel
 
 
-def get_results_response(url: str):
+def get_results_response(url: str, payload: Dict = {}):
     """
     Given a URL return JSON list of dictionaries
     """
-    request_response = requests.get(url)
+    request_response = requests.get(url, params=payload)
     try:
         list_of_dicts = request_response.json()["data"]
     except (TypeError, KeyError) as e:

@@ -32,6 +32,7 @@ COLS = [
     {"id": "name", "name": "Full Name"},
     {"id": "mrn", "name": "MRN", "type": "text"},
     {"id": "episode_slice_id", "name": "Slice", "type": "numeric"},
+    {"id": "prediction_as_real", "name": "Pr(DC)", "type": "numeric"},
     # {"id": "admission_age_years", "name": "Age"},
     # {"id": "sex", "name": "Sex"},
     # {"id": "dob", "name": "DoB"},
@@ -49,6 +50,40 @@ COLS = [
         "editable": True,
     },
     # {"id": "covid", "name": "COVID"},
+]
+
+STYLE_CELL_CONDITIONAL=[
+    {
+        "if": {"column_id": "bed_label"},
+        "textAlign": "right",
+        "fontWeight": "bold",
+        # "fontSize": 14,
+    },
+    {
+        "if": {"column_id": "room_label"},
+        "textAlign": "left",
+        "width": "60px",
+        "minWidth": "60px",
+        "maxWidth": "60px",
+        "whitespace": "normal",
+    },
+    {"if": {"column_id": "open"}, "textAlign": "left", "width": "20px"},
+    {
+        "if": {"column_id": "mrn"},
+        "textAlign": "left",
+        "font-family": "monospace",
+    },
+    {
+        "if": {"column_id": "name"},
+        "textAlign": "left",
+        "font-family": "sans-serif",
+        "fontWeight": "bold",
+        "width": "100px",
+    },
+    {"if": {"column_id": "age_sex"}, "textAlign": "right", },
+    {"if": {"column_id": "organ_icons"}, "textAlign": "left"},
+    {"if": {"column_id": "name"}, "fontWeight": "bold"},
+    {"if": {"column_id": "DischargeReady"}, "textAlign": "left"},
 ]
 
 BEDS_KEEP_COLS = [
@@ -94,4 +129,11 @@ SITREP_KEEP_COLS = [
     "wim_1",
 ]
 
-
+HYMIND_ICU_DISCHARGE_COLS = [
+    # "prediction_id",
+    "episode_slice_id",
+    # "model_name",
+    # "model_version",
+    "prediction_as_real",
+    # "predict_dt",
+]

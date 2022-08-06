@@ -41,7 +41,7 @@ def read_query(file_live: str, table_mock: str):
     return query
 
 
-@router.get("/")  # type: ignore
+@router.get("/icu/discharge")  # type: ignore
 def read_icu_discharge(ward: str):
     """ """
     if settings.ENV == "dev":

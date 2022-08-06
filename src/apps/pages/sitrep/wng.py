@@ -5,7 +5,6 @@ from apps.pages.sitrep import SITREP_ENV
 from config.settings import settings
 
 
-# NB: the order of this list determines the order of the table
 def build_sitrep_url(ward: str = None, env: str = None) -> str:
     """Construct API based on environment and requested ward"""
 
@@ -29,3 +28,35 @@ def build_sitrep_url(ward: str = None, env: str = None) -> str:
         raise ValueError
 
     return SITREP_URL
+
+
+def build_hymind_icu_discharge_url(ward: str = None, env: str = None) -> str:
+    """
+    Construct API based on environment and requested ward
+    e.g.
+    prod
+    http://uclvlddpragae07:5007/predictions/icu/discharge?ward=T03
+    test
+    http://uclvlddpragae08:5907/predictions/icu/discharge?ward=T03 
+    """
+
+    ward = ward.upper() if ward else "TO3"
+
+    # over-ride sitrep maturity if working in dev environment
+    if settings.ENV == "dev":
+        env = settings.ENV
+    else:
+        env = SITREP_ENV
+
+    if env == "prod":
+        API_PORT = "5007"
+        HYMIND_URL = f"{settings.BASE_URL_PROD}:{API_PORT}/icu/discharge"
+    elif env == "test":
+        API_PORT = "5907"
+        HYMIND_URL = f"{settings.BASE_URL_TEST}:{API_PORT}/icu/discharge"
+    elif env == "dev":
+        HYMIND_URL = f"{settings.API_URL}/hymind/icu/discharge"
+    else:
+        raise ValueError
+
+    return HYMIND_URL
