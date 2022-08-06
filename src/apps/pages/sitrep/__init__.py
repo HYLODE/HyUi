@@ -53,7 +53,7 @@ COLS = [
         "presentation": "dropdown",
         "editable": True,
     },
-    {"id": "planned_move", "name": "Request?", "type": "text"},
+    {"id": "pm_type", "name": "Request?", "type": "text"},
     {"id": "pm_dept", "name": "Destination", "type": "text"},
     # {"id": "covid", "name": "COVID"},
 ]

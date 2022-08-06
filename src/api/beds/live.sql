@@ -102,8 +102,8 @@ planned_moves_last AS (
 	,loc.location_string pm_location_string
 	,dpt.name pm_dept
 	FROM planned_moves pm
-	LEFT JOIN location loc ON pm.location_id = loc.location_id
-	LEFT JOIN department dpt ON loc.department_id = dpt.department_id
+	LEFT JOIN star.location loc ON pm.location_id = loc.location_id
+	LEFT JOIN star.department dpt ON loc.department_id = dpt.department_id
 	WHERE pm_tail = 1
 )
 
