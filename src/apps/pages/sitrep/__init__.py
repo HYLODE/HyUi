@@ -31,6 +31,7 @@ COLS = [
     {"id": "age_sex", "name": ""},
     {"id": "name", "name": "Full Name"},
     {"id": "mrn", "name": "MRN", "type": "text"},
+    {"id": "episode_slice_id", "name": "Slice", "type": "numeric"},
     # {"id": "admission_age_years", "name": "Age"},
     # {"id": "sex", "name": "Sex"},
     # {"id": "dob", "name": "DoB"},
@@ -82,6 +83,7 @@ CENSUS_KEEP_COLS = [
 ]
 
 SITREP_KEEP_COLS = [
+    "episode_slice_id",
     "department",
     "bay_code",
     "bed_code",
