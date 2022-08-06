@@ -334,9 +334,10 @@ ward_radio_button = html.Div(
                 dbc.RadioItems(
                     id=f"{BPID}ward_radio",
                     className="dbc d-grid d-md-flex justify-content-md-end btn-group",
-                    inputClassName="btn-check",
-                    labelClassName="btn btn-outline-primary",
-                    labelCheckedClassName="active btn-primary",
+                    # inputClassName="btn-check",
+                    # labelClassName="btn btn-outline-primary",
+                    # labelCheckedClassName="active btn-primary",
+                    inline=True,
                     options=[
                         {"label": "T03", "value": "UCH T03 INTENSIVE CARE"},
                         {"label": "T06", "value": "UCH T06 SOUTH PACU"},
