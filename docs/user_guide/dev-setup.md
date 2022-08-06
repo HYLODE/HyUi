@@ -54,6 +54,14 @@ Then confirm your set-up is OK
 pytest src/tests/smoke
 ```
 
+### Pre-commit
+see docs/contributor_guide/pre_commit_hooks.md
+need to run this by hand the first time
+```sh
+pre-commit install
+pre-commit run
+```
+
 ### Running the backend and frontend
 
 Depending on your dev computer, you may not want to run HyUI using Docker (e.g. Apple Silicon laptops experience very high memory use when running docker.)
