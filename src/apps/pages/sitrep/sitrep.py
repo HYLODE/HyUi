@@ -7,12 +7,28 @@ sub-application for sitrep
 import dash_bootstrap_components as dbc
 import numpy as np
 import pandas as pd
+import warnings
 from dash import Input, Output, callback
 from dash import dash_table as dt
 from dash import dcc, html, register_page
 
-from apps.pages.sitrep import BPID, STYLE_CELL_CONDITIONAL, widgets
-from apps.pages.sitrep.callbacks import *
+
+from apps.pages.sitrep import (
+    BPID,
+    STYLE_CELL_CONDITIONAL,
+    widgets,
+    COLS,
+    REFRESH_INTERVAL,
+)
+from apps.pages.sitrep.callbacks import (
+    store_beds,
+    store_ward,
+    store_census,
+    store_patients,
+    store_sitrep,
+    store_hymind_icu_discharge,
+    diff_table,
+)
 from config.settings import settings
 from utils import icons
 
@@ -21,12 +37,15 @@ register_page(__name__)
 
 @callback(
     Output(f"{BPID}fancy_table", "children"),
-    Input(f"{BPID}wrangled_data", "data"),
+    Input(f"{BPID}ward_data", "data"),
     # prevent_initial_call=True,
 )
 def gen_fancy_table(data: dict):
     dfo = pd.DataFrame.from_records(data)
-    if settings.VERBOSE:
+    if len(dfo) == 0:
+        warnings.warn("[WARN] No data provided for table")
+        return html.H2("No data found for table")
+    if settings.VERBOSE and len(dfo):
         print(dfo.iloc[0])
 
     # import ipdb; ipdb.set_trace()
@@ -36,7 +55,17 @@ def gen_fancy_table(data: dict):
         dfo["room"].astype(str).str.contains("SR"), "SR", dfo["room_label"]
     )
 
-    dfo["room_i"] = dfo.apply(lambda row: f"Bay {int(row['room'][2:])}", axis=1)
+    try:
+
+        # https://stackoverflow.com/a/4289557/992999
+        # int(''.join(filter(str.isdigit, your_string)))
+        dfo["room_i"] = dfo.apply(
+            lambda row: int("".join(filter(str.isdigit, row["room"]))), axis=1
+        )
+        dfo["room_i"] = dfo.apply(lambda row: f"Bay {row['room_i']}", axis=1)
+    except ValueError:
+        dfo["room_i"] = ""
+
     dfo["room_label"] = np.where(
         dfo["room"].astype(str).str.contains("BY"), dfo["room_i"], dfo["room_label"]
     )
@@ -56,7 +85,6 @@ def gen_fancy_table(data: dict):
 
     # --------------------
     # START: Prepare icons
-    dfo_copy = dfo.copy()
     # organ support icons
     dfo["organ_icons"] = ""
     llist = []
@@ -170,8 +198,9 @@ dash_only = html.Div(
         dcc.Store(id=f"{BPID}beds_data"),
         dcc.Store(id=f"{BPID}census_data"),
         dcc.Store(id=f"{BPID}sitrep_data"),
-        dcc.Store(id=f"{BPID}wrangled_data"),
         dcc.Store(id=f"{BPID}hymind_icu_discharge_data"),
+        dcc.Store(id=f"{BPID}patients_data"),
+        dcc.Store(id=f"{BPID}ward_data"),
     ]
 )
 

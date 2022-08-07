@@ -2,6 +2,7 @@ from typing import Dict
 import requests
 import pandas as pd
 from sqlmodel import SQLModel
+import warnings
 
 
 def get_results_response(url: str, payload: Dict = {}):
@@ -16,7 +17,14 @@ def get_results_response(url: str, payload: Dict = {}):
         # so you have just tried to use a key to select from a list
         print(e)
         list_of_dicts = request_response.json()
-    assert type(list_of_dicts) is list
+    try:
+        assert type(list_of_dicts) is list
+        assert request_response.status_code == 200
+    except AssertionError:
+        warnings.warn(f"[WARN] {request_response.status_code}: {request_response.text}")
+        warnings.warn(f"[WARN] Incorrect response type for {request_response.url}")
+        warnings.warn(f"[WARN] ... returning an empty list of dictionaries")
+        list_of_dicts = [{}]
     return list_of_dicts  # type: ignore
 
 
@@ -26,7 +34,7 @@ def validate_json(json_list, model: SQLModel, to_dict=False):
     """
     model_instances = [model(**i) for i in json_list]  # type: ignore
     if to_dict:
-        model_instances =[i.dict() for i in model_instances]
+        model_instances = [i.dict() for i in model_instances]
     return model_instances
 
 

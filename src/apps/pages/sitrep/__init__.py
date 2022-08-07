@@ -12,6 +12,8 @@ DEPT2WARD_MAPPING = {
     "UCH T06 SOUTH PACU": "T06",
     "GWB L01 CRITICAL CARE": "GWB",
     "WMS W01 CRITICAL CARE": "WMS",
+    "NHNN C0 NCCU": "NCCU0",
+    "NHNN C1 NCCU": "NCCU1",
 }
 
 COLS = [
@@ -56,7 +58,7 @@ COLS = [
     },
     {"id": "pm_type", "name": "Request?", "type": "text"},
     {"id": "pm_dept", "name": "Destination", "type": "text"},
-    {"id": "covid", "name": "COVID", "presentation": "markdown"},
+    # {"id": "covid", "name": "COVID", "presentation": "markdown"},
 ]
 
 STYLE_CELL_CONDITIONAL = [
@@ -134,7 +136,8 @@ CENSUS_KEEP_COLS = [
 
 SITREP_KEEP_COLS = [
     "episode_slice_id",
-    "department",
+    "csn",
+    # "department",
     "bay_code",
     "bed_code",
     "discharge_ready_1_4h",

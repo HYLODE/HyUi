@@ -21,7 +21,8 @@ ward_radio_button = html.Div(
                         {"label": "T06", "value": "UCH T06 SOUTH PACU"},
                         {"label": "GWB", "value": "GWB L01 CRITICAL CARE"},
                         {"label": "WMS", "value": "WMS W01 CRITICAL CARE"},
-                        # {"label": "NHNN", "value": "NHNN"},
+                        {"label": "NHNN0", "value": "NHNN C0 NCCU"},
+                        {"label": "NHNN1", "value": "NHNN C1 NCCU"},
                     ],
                     value="UCH T03 INTENSIVE CARE",
                 )

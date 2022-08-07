@@ -121,7 +121,7 @@ services:
     container_name: baserow
     image: baserow/baserow:1.10.2
     environment:
-      BASEROW_PUBLIC_URL: "${BASE_URL}:${BASEROW_PORT}"
+      BASEROW_PUBLIC_URL: "${BASEROW_URL}:${BASEROW_PORT}"
       WEB_FRONTEND_PORT: "${BASEROW_PORT}"
       DATABASE_URL: "postgres://${HYUI_DB_USER}:${HYUI_DB_PASSWORD}@postgres:5432/${HYUI_DB_NAME}?sslmode=disable"
       BASEROW_EXTRA_ALLOWED_HOSTS: "baserow"
