@@ -119,7 +119,7 @@ def store_data(n_intervals: int, days_ahead: int) -> dict:
     Output(filtered_data, "data"),
     Input(service_picker, "value"),
     Input(pacu_checklist, "value"),
-    State(request_data, "data"),
+    Input(request_data, "data"),
     prevent_initial_call=True,
 )
 def filter_data(service: List[str], pacu: List[bool], data: dict) -> dict:
