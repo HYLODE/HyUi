@@ -50,6 +50,8 @@ def gen_fancy_table(data: dict):
 
     # import ipdb; ipdb.set_trace()
     dfo["bed_label"] = dfo["bed"].str.split(pat="-", expand=True).iloc[:, 1]
+    dfo["bed_label"] = dfo["bed_label"].apply(lambda x: "".join(filter(str.isdigit, x)))
+    # TODO: abstract this out into a function
     dfo["room_label"] = dfo["room"]
     dfo["room_label"] = np.where(
         dfo["room"].astype(str).str.contains("SR"), "SR", dfo["room_label"]
