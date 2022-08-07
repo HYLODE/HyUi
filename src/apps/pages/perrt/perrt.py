@@ -117,7 +117,7 @@ def store_data(n_intervals: int) -> dict:
     hospital_visit_ids = [perrt_entry["hospital_visit_id"] for perrt_entry in data]
 
     predictions_list = get_results_response(
-        ADMISSION_PREDICTION_URL, "POST", hospital_visit_ids
+        ADMISSION_PREDICTION_URL, "POST", json=hospital_visit_ids
     )
 
     predictions_map = {

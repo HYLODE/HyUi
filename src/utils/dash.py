@@ -9,13 +9,13 @@ import warnings
 def get_results_response(url: str, method="GET", **kwargs):
     """
     Given a URL return JSON list of dictionaries
-	uses requests.requests with additional kwargs 
-	defaults to GET
+        uses requests.requests with additional kwargs
+        defaults to GET
     """
 
-    if req_type == "GET":
+    if method == "GET":
         request_response = requests.get(url, **kwargs)
-    elif req_type == "POST":
+    elif method == "POST":
         request_response = requests.post(url, **kwargs)
         print(request_response)
     else:

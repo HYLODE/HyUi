@@ -108,7 +108,7 @@ def store_hymind_icu_discharge(n_intervals: int, dept: str) -> list:
     ward = DEPT2WARD_MAPPING[dept]
     API_URL = wng.build_hymind_icu_discharge_url(ward)
     payload = {"ward": ward}
-    predictions = get_results_response(API_URL, payload=payload)
+    predictions = get_results_response(API_URL, params=payload)
     if all([not bool(i) for i in predictions]):
         warnings.warn(
             "[WARN] store_hymind_icu_discharge returned an empty list of dictionaries"
