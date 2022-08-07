@@ -6,11 +6,10 @@ from typing import List
 import pandas as pd
 import sqlalchemy as sa
 from fastapi import APIRouter, Depends
-from pydantic import parse_obj_as
 from sqlmodel import Session
 
 from config.settings import settings
-from utils import get_model_from_route, prepare_query
+from utils import get_model_from_route
 from utils.api import (
     get_caboodle_session,
     get_clarity_session,
@@ -48,9 +47,10 @@ def read_query(file_live: str, table_mock: str):
 
 @router.get("/", response_model=List[CasesRead])  # type: ignore
 def read_electives(
+    days_ahead: int = 3,
     session_caboodle: Session = Depends(get_caboodle_session),
     session_clarity: Session = Depends(get_clarity_session),
-    ):
+):
     """
     Returns Electives data class populated by query-live/mock
     Includes
@@ -58,23 +58,26 @@ def read_electives(
     """
     query = read_query("live_case.sql", "electivesmock")
     qtext = sa.text(query)
-    dfcases = pd.read_sql(qtext, session_caboodle.connection())
+    params = {"days_ahead": days_ahead}
+    dfcases = pd.read_sql(qtext, session_caboodle.connection(), params=params)
     dfcases = pydantic_dataframe(dfcases, CasesRead)
 
     query = read_query("live_pod.sql", "electivespodmock")
     qtext = sa.text(query)
-    dfpod = pd.read_sql(qtext, session_clarity.connection())
+    params = {"days_ahead": days_ahead}
+    dfpod = pd.read_sql(qtext, session_clarity.connection(), params=params)
     dfpod = pydantic_dataframe(dfpod, PodRead)
 
     query = read_query("live_preassess.sql", "electivespreassessmock")
     qtext = sa.text(query)
-    dfpreassess = pd.read_sql(qtext, session_caboodle.connection())
+    params = {"days_ahead": days_ahead}
+    dfpreassess = pd.read_sql(qtext, session_caboodle.connection(), params=params)
     dfpreassess = pydantic_dataframe(dfpreassess, PreassessRead)
 
     df = prepare_electives(dfcases, dfpod, dfpreassess)
 
     if settings.VERBOSE:
-        print(df['pod_orc'].value_counts())
+        print(df["pod_orc"].value_counts())
     records = df.to_dict(orient="records")
     return records
 
@@ -107,7 +110,7 @@ def read_pod(session: Session = Depends(get_clarity_session)):
 @router.get("/preassess", response_model=List[PreassessRead])  # type: ignore
 def read_preassess(session: Session = Depends(get_caboodle_session)):
     """
-    Returns pre-assesment caboodle query 
+    Returns pre-assesment caboodle query
     """
     query = read_query("live_preassess.sql", "electivespreassessmock")
     results = session.exec(query)  # type: ignore

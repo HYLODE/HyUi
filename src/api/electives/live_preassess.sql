@@ -39,6 +39,5 @@
          AND dd.[DepartmentName] != 'NHNN THEATRE SUITE' AND dd.[DepartmentName] != 'RNTNE THEATRE SUITE' AND dd.[DepartmentName] != 'EGA E02 LABOUR WARD'
          AND dd.[DepartmentName] != 'MCC H-1 THEATRE SUITE' AND dd.[DepartmentName] != 'UCH P02 ENDOSCOPY' AND dd.[DepartmentName] != 'UCH ANAESTHESIA DEPT'
          AND patd.[AgeInYears] >= 18
-          AND  scufx.[PlannedOperationStartInstant] >= CONVERT(DATE,DATEADD(DAY, 0 ,CURRENT_TIMESTAMP)) AND [PlannedOperationStartInstant] <= CONVERT(DATE,DATEADD(DAY, 3 ,CURRENT_TIMESTAMP))
+          AND  scufx.[PlannedOperationStartInstant] >= CONVERT(DATE,DATEADD(DAY, 0 ,CURRENT_TIMESTAMP)) AND [PlannedOperationStartInstant] <= CONVERT(DATE,DATEADD(DAY, :days_ahead ,CURRENT_TIMESTAMP))
          AND (wlef.[IntendedManagement] IN ('*Unspecified', 'Inpatient', 'Inpatient Series', 'Night Admit Series') OR wlef.[IntendedManagement] IS NULL))
-             

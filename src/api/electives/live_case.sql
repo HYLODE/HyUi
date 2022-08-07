@@ -89,7 +89,7 @@
            ,pd.[PatientFriendlyName]
            ,dd.[RoomName]
            ,dd.[DepartmentName]
-      FROM [CABOODLE_REPORT].[dbo].[SurgicalCaseFact] scf 
+      FROM [CABOODLE_REPORT].[dbo].[SurgicalCaseFact] scf
       LEFT JOIN [CABOODLE_REPORT].[dbo].[WaitingListEntryFact] wlef ON wlef.[SurgicalCaseKey] = scf.[SurgicalCaseKey]
       LEFT JOIN [CABOODLE_REPORT].[dbo].[SurgicalCaseUclhFactX] scufx ON scf.[SurgicalCaseKey] = scufx.[SurgicalCaseKey]
       LEFT JOIN [CABOODLE_REPORT].[dbo].[PatientDim] patd ON scf.[PatientDurableKey] = patd.[DurableKey]
@@ -102,7 +102,7 @@
       LEFT JOIN [CABOODLE_REPORT].[dbo].[TimeOfDayDim] todcase ON scf.[CaseRequestTimeOfDayKey] = todcase.[TimeOfDayKey]
       LEFT JOIN [CABOODLE_REPORT].[dbo].[DateDim] datecancel ON scufx.[CancelDateKey] = datecancel.[DateKey]
       WHERE scf.[PatientDurableKey] > 1 AND scf.[PatientDurableKey] IS NOT NULL
-    --  AND wlef.[SurgicalService] != '*Unspecified' 
+    --  AND wlef.[SurgicalService] != '*Unspecified'
       AND scf.[PrimaryService] != 'Obstetrics' AND scf.[PrimaryService] != 'Neurosurgery' AND scf.[PrimaryService] != 'Paediatric Dental'
       AND scf.[PatientInFacilityDateKey] < 0
       AND dd.[DepartmentName] != 'NHNN THEATRE SUITE' AND dd.[DepartmentName] != 'RNTNE THEATRE SUITE' AND dd.[DepartmentName] != 'EGA E02 LABOUR WARD'
@@ -110,5 +110,5 @@
       --AND dd.[DepartmentName] != 'UCH P02 ENDOSCOPY'
       AND patd.[AgeInYears] >= 18
       AND (wlef.[IntendedManagement] IN ('*Unspecified', 'Inpatient', 'Inpatient Series', 'Night Admit Series') OR wlef.[IntendedManagement] IS NULL)
-      AND  scufx.[PlannedOperationStartInstant] >= CONVERT(DATE,DATEADD(DAY, 0 ,CURRENT_TIMESTAMP)) AND [PlannedOperationStartInstant] <= CONVERT(DATE,DATEADD(DAY, 3 ,CURRENT_TIMESTAMP))
+      AND  scufx.[PlannedOperationStartInstant] >= CONVERT(DATE,DATEADD(DAY, 0 ,CURRENT_TIMESTAMP)) AND [PlannedOperationStartInstant] <= CONVERT(DATE,DATEADD(DAY, :days_ahead ,CURRENT_TIMESTAMP))
       ORDER BY  datesurg.[DateValue],dd.[DepartmentName],dd.[RoomName] ASC
