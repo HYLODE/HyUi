@@ -31,7 +31,19 @@ card_fig = dbc.Card(
         dbc.CardHeader(html.H6("Elective Surgery over the next week")),
         dbc.CardBody(
             [
-                html.Div([html.P("Updates daily")]),
+                html.Div(
+                    [
+                        dbc.Label("PACU"),
+                        pacu_checklist := dbc.RadioItems(
+                            options=[
+                                {"label": "Booked", "value": True},
+                                {"label": "Not booked", "value": False},
+                            ],
+                            value=True,
+                            inline=True,
+                        ),
+                    ]
+                ),
                 html.Div(
                     service_picker := dcc.Dropdown(
                         value="",
@@ -39,7 +51,13 @@ card_fig = dbc.Card(
                         multi=True,
                     )
                 ),
-                html.Div([html.P("Pick a range of days over the next week")]),
+                html.Div(
+                    [
+                        html.P(
+                            "Pick a range of days over the next week (data refreshes every night)"
+                        )
+                    ]
+                ),
                 html.Div(
                     days_ahead_slider := dcc.Slider(min=2, max=7, step=1, value=4)
                 ),
@@ -100,18 +118,20 @@ def store_data(n_intervals: int, days_ahead: int) -> dict:
 @callback(
     Output(filtered_data, "data"),
     Input(service_picker, "value"),
+    Input(pacu_checklist, "value"),
     State(request_data, "data"),
     prevent_initial_call=True,
 )
-def filter_data(val: List[str], data: dict) -> dict:
+def filter_data(service: List[str], pacu: List[bool], data: dict) -> dict:
     """
     Update data based on picker
     """
-    if val:
-        print(val)
-        return [row for row in data if row["SurgicalService"] in val]  # type: ignore
-    else:
-        return data
+    # import ipdb; ipdb.set_trace()
+    if pacu:
+        data = [row for row in data if row["pacu"]]  # type: ignore
+    if service:
+        data = [row for row in data if row["SurgicalService"] in service]  # type: ignore
+    return data
 
 
 @callback(
@@ -124,6 +144,8 @@ def gen_surgeries_over_time(n_intervals: int, data: dict):
     """
     Plot stacked bar
     """
+    if len(data) == 0:
+        return html.H2("No data to plot")
     df = df_from_store(data, ElectivesRead)
     df = (
         df.groupby("SurgicalService")
@@ -146,6 +168,8 @@ def gen_surgeries_over_time(n_intervals: int, data: dict):
 )
 def gen_table_consults(modified: int, data: dict):
 
+    if len(data) == 0:
+        return html.H2("No data to tabulate")
     dfo = pd.DataFrame.from_records(data)
     dfo["pacu"] = dfo["pacu"].apply(lambda x: "PACU" if x else "")
     dfo["age_sex"] = dfo.apply(
