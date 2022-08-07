@@ -34,12 +34,12 @@ card_fig = dbc.Card(
                 html.Div(
                     [
                         dbc.Label("PACU"),
-                        pacu_checklist := dbc.RadioItems(
+                        pacu_checklist := dbc.Checklist(
                             options=[
                                 {"label": "Booked", "value": True},
                                 {"label": "Not booked", "value": False},
                             ],
-                            value=True,
+                            value=[True],
                             inline=True,
                         ),
                     ]
@@ -127,8 +127,7 @@ def filter_data(service: List[str], pacu: List[bool], data: dict) -> dict:
     Update data based on picker
     """
     # import ipdb; ipdb.set_trace()
-    if pacu:
-        data = [row for row in data if row["pacu"]]  # type: ignore
+    data = [row for row in data if row["pacu"] in pacu]  # type: ignore
     if service:
         data = [row for row in data if row["SurgicalService"] in service]  # type: ignore
     return data
