@@ -41,7 +41,7 @@ def extra_apps():
     pp = []
     for page in page_registry.values():
         Core_Pages = [i.title() for i in CORE_PAGES]
-        if page["name"] in Core_Pages:
+        if page["name"] in Core_Pages or page["name"] == "Home":
             continue
         pp.append(dbc.DropdownMenuItem(page["name"], href=page["path"]))
     return pp
