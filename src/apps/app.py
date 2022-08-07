@@ -9,6 +9,7 @@ from config.settings import settings
 
 BPID = "app_"
 CORE_PAGES = ["Home", "Sitrep", "Electives", "PERRT"]
+ED_PAGE_URL = "http://uclvlddpragae08:5212/"
 
 app = Dash(
     __name__,
@@ -26,9 +27,12 @@ app = Dash(
 def header_pages_dropdown():
     """Filters and sorts pages from registry for display in main navbar"""
     pp = {page["name"]: page["path"] for page in page_registry.values()}
-    ll = []
-    for page in CORE_PAGES:
-        ll.append(dbc.NavItem(dbc.NavLink(page, href=pp[page.title()])))
+
+    ll = [dbc.NavItem(dbc.NavLink(page, href=pp[page.title()])) for page in CORE_PAGES]
+
+    # ED page placeholder
+    ll.append(dbc.NavItem(dbc.NavLink("ED", href=ED_PAGE_URL, target="_blank")))
+
     return ll
 
 
