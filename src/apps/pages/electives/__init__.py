@@ -56,6 +56,7 @@ STYLE_CELL_CONDITIONAL = [
         "textAlign": "right",
     },
     {"if": {"column_id": "name"}, "fontWeight": "bold"},
+    {"if": {"column_id": "pacu"}, "fontWeight": "bold"},
 ]
 
 SPECIALTY_SHORTNAMES = {

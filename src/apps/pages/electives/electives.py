@@ -31,6 +31,7 @@ card_fig = dbc.Card(
         dbc.CardHeader(html.H6("Elective Surgery over the next week")),
         dbc.CardBody(
             [
+                html.Div([html.P("Updates daily")]),
                 html.Div(
                     service_picker := dcc.Dropdown(
                         value="",
@@ -38,10 +39,10 @@ card_fig = dbc.Card(
                         multi=True,
                     )
                 ),
+                html.Div([html.P("Pick a range of days over the next week")]),
                 html.Div(
                     days_ahead_slider := dcc.Slider(min=2, max=7, step=1, value=4)
                 ),
-                html.Div([html.P("Updates daily")]),
                 fig_electives := html.Div(),
             ]
         ),
@@ -155,6 +156,10 @@ def gen_table_consults(modified: int, data: dict):
     dfo["name"] = dfo.apply(
         lambda row: f"{row.FirstName.title()} {row.LastName.upper()}", axis=1
     )
+    dfo["RoomName"] = dfo["RoomName"].fillna("")
+    dfo["RoomName"] = dfo["RoomName"].apply(
+        lambda x: "" if "Not Applicable" in x else x
+    )
     dfo["SurgicalService"] = dfo["SurgicalService"].fillna("")
     dfo["SurgicalService"] = dfo["SurgicalService"].apply(
         lambda x: x.replace("Surgery", "" if x else "")
@@ -164,7 +169,7 @@ def gen_table_consults(modified: int, data: dict):
     )
     # Sort into unit order / displayed tables will NOT be sortable
     # ------------------------------------------------------------
-    dfo.sort_values(by="SurgeryDate", ascending=False, inplace=True)
+    dfo.sort_values(by="SurgeryDate", ascending=True, inplace=True)
 
     return [
         dt.DataTable(
