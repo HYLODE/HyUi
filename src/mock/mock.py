@@ -169,16 +169,25 @@ if __name__ == "__main__":
     if recreate_this := False:
         model_path = f"{gen_module_path('hymind')}.model"
         model = getattr(importlib.import_module(model_path), "IcuDischarge")
-        _ = pd.read_json("../src/api/hymind/data/mock_icu_discharge.json")
+        _ = pd.read_json("api/hymind/data/mock_icu_discharge.json")
         df = pd.DataFrame.from_records(_["data"])
         create_mock_table(engine, model, drop=True)
         insert_into_mock_table(engine, df, model)
 
-    # hymind taps
+    # hymind taps - emergency
     if recreate_this := True:
         model_path = f"{gen_module_path('hymind')}.model"
-        model = getattr(importlib.import_module(model_path), "ElEmTap")
-        _ = pd.read_json("../src/api/hymind/data/tap_nonelective_tower.json")
+        model = getattr(importlib.import_module(model_path), "EmTap")
+        _ = pd.read_json("api/hymind/data/tap_nonelective_tower.json")
+        df = pd.DataFrame.from_records(_["data"])
+        create_mock_table(engine, model, drop=True)
+        insert_into_mock_table(engine, df, model)
+
+    # hymind taps - elective
+    if recreate_this := True:
+        model_path = f"{gen_module_path('hymind')}.model"
+        model = getattr(importlib.import_module(model_path), "ElTap")
+        _ = pd.read_json("api/hymind/data/tap_elective_tower.json")
         df = pd.DataFrame.from_records(_["data"])
         create_mock_table(engine, model, drop=True)
         insert_into_mock_table(engine, df, model)

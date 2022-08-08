@@ -1,12 +1,8 @@
 # src/api/hymind/model.py
-from datetime import date, datetime
-from typing import Dict, List, Optional
+from datetime import datetime
+from typing import Optional
 
-import arrow
-from pydantic import validator, BaseModel
 from sqlmodel import Field, SQLModel
-
-from config.settings import settings  # type: ignore
 
 
 class IcuDischarge(SQLModel, table=True):
@@ -31,9 +27,43 @@ class IcuDischarge(SQLModel, table=True):
     predict_dt: datetime
 
 
-class ElEmTap(SQLModel, table=True):
+class EmTap(SQLModel, table=True):
     """
-    Hymind Elective Tap / Emergency Taps
+     Hymind Emergency Taps
+     e.g.
+
+    {
+       "bed_count": 0,
+       "probability": 0.018392433908071763,
+       "predict_dt": "2022-08-08T07:48:24.757274+01:00",
+       "model_name": "tap_nonelective_tower",
+       "model_version": 1,
+       "run_id": "1e44565aa34e4b16970d1e5598b9a028",
+       "horizon_dt": "2022-08-08T00:00:00+01:00"
+     },
+     via
+     ```python
+     json_data = json.dumps({
+         "horizon_dt": date.today().strftime('%Y-%m-%dT%H:%M:%S.%f'),
+         "department": "tower",
+     })
+     response = requests.post("http://uclvlddpragae08:5230/predict/", json_data)
+     response.status_code
+     ```
+    """
+
+    bed_count: int = Field(primary_key=True)
+    probability: float
+    predict_dt: datetime
+    model_name: str
+    model_version: int
+    run_id: str
+    horizon_dt: datetime
+
+
+class ElTap(SQLModel, table=True):
+    """
+    Hymind Elective Tap
     e.g.
 
     {'bed_count': 0,
@@ -53,9 +83,10 @@ class ElEmTap(SQLModel, table=True):
         "department": "tower",
     })
     requests.post("http://uclvlddpragae08:5219/predict/", data).json()
-    ```
     """
 
+    # you could go further and specify the nested dictionary model
+    # https://stackoverflow.com/a/63259907/992999
     bed_count: int = Field(primary_key=True)
     probability: float
     predict_dt: datetime
@@ -63,4 +94,4 @@ class ElEmTap(SQLModel, table=True):
     model_version: int
     run_id: str
     horizon_dt: datetime
-    # inputs: Optional[Dict]
+    inputs: Optional[str]
