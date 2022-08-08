@@ -1,0 +1,34 @@
+{
+  "data": [
+    {
+      "bed_count": 0,
+      "probability": 0.4886959420284716,
+      "predict_dt": "2022-08-08T07:51:49.250269+01:00",
+      "model_name": "tap_elective_tower",
+      "model_version": 1,
+      "run_id": "71f4264cd52d416fbf45ebafdb599160",
+      "horizon_dt": "2022-08-10T07:51:38+01:00",
+      "inputs": "{\"model_function\":\"binom\",\"date\":1.660114298e+18,\"icu_counts\":0,\"noticu_counts\":0,\"wkday\":2,\"N\":12}"
+    },
+    {
+      "bed_count": 1,
+      "probability": 0.4207439348511793,
+      "predict_dt": "2022-08-08T07:51:49.250269+01:00",
+      "model_name": "tap_elective_tower",
+      "model_version": 1,
+      "run_id": "71f4264cd52d416fbf45ebafdb599160",
+      "horizon_dt": "2022-08-10T07:51:38+01:00",
+      "inputs": null
+    },
+    {
+      "bed_count": 2,
+      "probability": 0.09056012312034903,
+      "predict_dt": "2022-08-08T07:51:49.250269+01:00",
+      "model_name": "tap_elective_tower",
+      "model_version": 1,
+      "run_id": "71f4264cd52d416fbf45ebafdb599160",
+      "horizon_dt": "2022-08-10T07:51:38+01:00",
+      "inputs": null
+    }
+  ]
+}

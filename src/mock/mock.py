@@ -165,8 +165,8 @@ if __name__ == "__main__":
                 f"[WARN] Failed to generate pre-assessment post-op mock data: {e}"
             )
 
+    # hymind icu discharge predictions
     if recreate_this := False:
-        # this works for the principle routes but not for additional data
         model_path = f"{gen_module_path('hymind')}.model"
         model = getattr(importlib.import_module(model_path), "IcuDischarge")
         _ = pd.read_json("../src/api/hymind/data/mock_icu_discharge.json")
@@ -174,6 +174,17 @@ if __name__ == "__main__":
         create_mock_table(engine, model, drop=True)
         insert_into_mock_table(engine, df, model)
 
+    # hymind taps
+    if recreate_this := True:
+        model_path = f"{gen_module_path('hymind')}.model"
+        model = getattr(importlib.import_module(model_path), "ElEmTap")
+        _ = pd.read_json("../src/api/hymind/data/tap_nonelective_tower.json")
+        df = pd.DataFrame.from_records(_["data"])
+        create_mock_table(engine, model, drop=True)
+        insert_into_mock_table(engine, df, model)
+
+    if recreate_this := False:
+        # this works for the principle routes but not for additional data
         for route in settings.ROUTES:
             try:
                 model = get_model_from_route(route, "Mock")
