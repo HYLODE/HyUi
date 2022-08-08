@@ -11,7 +11,7 @@ import warnings
 from dash import Input, Output, callback
 from dash import dash_table as dt
 from dash import dcc, html, register_page
-
+from flask_login import current_user
 
 from apps.pages.sitrep import (
     BPID,
@@ -208,10 +208,14 @@ dash_only = html.Div(
     ]
 )
 
-layout = html.Div(
-    [
-        dbc.Row(dbc.Col([widgets.ward_radio_button])),
-        dbc.Row(dbc.Col([sitrep_table])),
-        dash_only,
-    ]
-)
+
+def layout():
+    if not current_user.is_authenticated:
+        return html.Div(["Please ", dcc.Link("login", href="/login"), " to continue"])
+    return html.Div(
+        [
+            dbc.Row(dbc.Col([widgets.ward_radio_button])),
+            dbc.Row(dbc.Col([sitrep_table])),
+            dash_only,
+        ]
+    )

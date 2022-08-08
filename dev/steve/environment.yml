@@ -11,10 +11,12 @@ dependencies:
   - fastapi=0.78.0
   - flake8
   - flask-caching
+  - flask-login
   - gunicorn
   - ipdb
   - jupyter
   - jupyterlab=3.4.3
+  - ldap3==2.9.1
   - myst-parser
   - nbqa
   - numpy>=1.22.3

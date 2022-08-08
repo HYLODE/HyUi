@@ -42,6 +42,11 @@ class Settings(BaseSettings):
     """
 
     ENV: Environments = Environments.dev
+
+    HYUI_USER: str
+    HYUI_PASSWORD: str
+    SECRET_KEY: str
+
     BASE_URL_DEV: str  # http://locahost
     BASE_URL_TEST: str  # http://172.16.149.205
     BASE_URL_PROD: str  # http://172.16.149.202

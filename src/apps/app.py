@@ -2,8 +2,11 @@
 """
 The application itself
 """
+import dash
 import dash_bootstrap_components as dbc
-from dash import Dash, page_container, page_registry
+from dash import Dash, Input, Output, State, dcc, html, page_container, page_registry
+from flask import Flask
+from flask_login import login_user, LoginManager, UserMixin, current_user
 
 from config.settings import settings
 
@@ -11,8 +14,12 @@ BPID = "app_"
 CORE_PAGES = ["Sitrep", "Electives", "PERRT"]
 ED_PAGE_URL = "http://uclvlddpragae08:5212/"
 
+# Exposing the Flask Server to enable configuring it for logging in
+# https://github.com/AnnMarieW/dash-flask-login
+server = Flask(__name__)
 app = Dash(
     __name__,
+    server=server,
     title="HYLODE",
     update_title=None,
     external_stylesheets=[
@@ -22,6 +29,61 @@ app = Dash(
     suppress_callback_exceptions=True,
     use_pages=True,
 )
+
+# Keep this out of source code repository - save in a file or a database
+#  passwords should be encrypted
+VALID_USERNAME_PASSWORD = {"test": "test", "hello": "world"}
+
+
+# Updating the Flask Server configuration with Secret Key to encrypt the user session cookie
+server.config.update(SECRET_KEY=settings.SECRET_KEY)
+
+# Login manager object will be used to login / logout users
+login_manager = LoginManager()
+login_manager.init_app(server)
+login_manager.login_view = "/login"
+
+
+class User(UserMixin):
+    # User data model. It has to have at least self.id as a minimum
+    def __init__(self, username):
+        self.id = username
+
+
+@login_manager.user_loader
+def load_user(username):
+    """This function loads the user by user id. Typically this looks up the user from a user database.
+    We won't be registering or looking up users in this example, since we'll just login using LDAP server.
+    So we'll simply return a User object with the passed in username.
+    """
+    return User(username)
+
+
+@app.callback(
+    Output("user-status-header", "children"),
+    Input("url", "pathname"),
+)
+def update_authentication_status(_):
+    if current_user.is_authenticated:
+        return dcc.Link("logout", href="/logout")
+    return dcc.Link("login", href="/login")
+
+
+@app.callback(
+    Output("output-state", "children"),
+    Input("login-button", "n_clicks"),
+    State("uname-box", "value"),
+    State("pwd-box", "value"),
+    prevent_initial_call=True,
+)
+def login_button_click(n_clicks, username, password):
+    if n_clicks > 0:
+        if VALID_USERNAME_PASSWORD.get(username) is None:
+            return "Invalid username"
+        if VALID_USERNAME_PASSWORD.get(username) == password:
+            login_user(User(username))
+            return "Login Successful"
+        return "Incorrect  password"
 
 
 def header_pages_dropdown():
@@ -83,6 +145,9 @@ navbar = dbc.NavbarSimple(
 
 app.layout = dbc.Container(
     [
+        dcc.Location(id="url"),
+        html.Div(id="user-status-header"),
+        html.Hr(),
         navbar,
         page_container,
     ],
