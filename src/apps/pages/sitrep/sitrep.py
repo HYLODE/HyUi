@@ -19,6 +19,7 @@ from apps.pages.sitrep import (
     widgets,
     COLS,
     REFRESH_INTERVAL,
+    PROBABILITY_COLOUR_SCALE,
 )
 from apps.pages.sitrep.callbacks import (
     store_beds,
@@ -81,9 +82,9 @@ def gen_fancy_table(data: dict):
     )
     # TODO: format this in dash so can change colour with number
     # import ipdb; ipdb.set_trace()
-    dfo["prediction_as_real"] = dfo["prediction_as_real"].apply(
-        lambda x: f"{100*x:0.0f}%" if not pd.isna(x) else ""
-    )
+    # dfo["prediction_as_real"] = dfo["prediction_as_real"].apply(
+    #     lambda x: f"{100*x:0.0f}%" if not pd.isna(x) else ""
+    # )
 
     # --------------------
     # START: Prepare icons
@@ -151,10 +152,10 @@ def gen_fancy_table(data: dict):
             style_data={"color": "black", "backgroundColor": "white"},
             # striped rows
             style_data_conditional=[
-                {
-                    "if": {"row_index": "odd"},
-                    "backgroundColor": "rgb(220, 220, 220)",
-                },
+                # {
+                #     "if": {"row_index": "odd"},
+                #     "backgroundColor": "rgb(220, 220, 220)",
+                # },
                 {
                     "if": {
                         "filter_query": "{closed} contains true",
@@ -162,6 +163,7 @@ def gen_fancy_table(data: dict):
                     },
                     "color": "maroon",
                 },
+                *PROBABILITY_COLOUR_SCALE,
             ],
             # sort_action="native",
             # sort_by=[

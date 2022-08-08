@@ -1,11 +1,14 @@
 # src/apps/pages/sitrep/__init__.py
 # set the sitrep level of maturity/development here as this is a sub-app
 # rather than in the main app settings
+from dash.dash_table import FormatTemplate
+
 SITREP_ENV = "test"  # test (staging red) or prod
 
 BPID = "sit_"
 
 BED_BONES_TABLE_ID = 261
+CACHE_TIMEOUT = 5 * 60 * 1000
 REFRESH_INTERVAL = 30 * 60 * 1000  # milliseconds
 DEPT2WARD_MAPPING = {
     "UCH T03 INTENSIVE CARE": "T03",
@@ -49,7 +52,12 @@ COLS = [
     {"id": "wim_1", "name": "WIM", "type": "numeric"},
     # DISCHARGE
     # {"id": "episode_slice_id", "name": "Slice", "type": "numeric"},
-    {"id": "prediction_as_real", "name": "Pr(DC)", "type": "numeric"},
+    {
+        "id": "prediction_as_real",
+        "name": "Discharge?",
+        "type": "numeric",
+        "format": FormatTemplate.percentage(0),
+    },
     {
         "id": "DischargeReady",
         "name": "D/C",
@@ -154,4 +162,18 @@ HYMIND_ICU_DISCHARGE_COLS = [
     # "model_version",
     "prediction_as_real",
     # "predict_dt",
+]
+
+PROBABILITY_COLOUR_SCALE = [
+    {
+        "if": {
+            "column_id": "prediction_as_real",
+            "filter_query": (
+                f"{{prediction_as_real}} >= {c / 10} "
+                f"&& {{prediction_as_real}} < {c / 10 + 0.1}"
+            ),
+        },
+        "backgroundColor": f"rgba(255, 65, 54, {c / 10})",
+    }
+    for c in range(0, 11)
 ]

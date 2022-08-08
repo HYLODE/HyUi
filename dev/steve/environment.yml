@@ -10,6 +10,7 @@ dependencies:
   - dash=2.5.1
   - fastapi=0.78.0
   - flake8
+  - flask-caching
   - gunicorn
   - ipdb
   - jupyter

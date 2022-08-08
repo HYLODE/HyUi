@@ -862,6 +862,9 @@ MigrationBackup/
 
 ### HyUI ###
 
+# caches
+cache-directory/*
+
 # Ignore the contents of the `data` folder, except for the `README.md` file
 data/*
 !data/README.md

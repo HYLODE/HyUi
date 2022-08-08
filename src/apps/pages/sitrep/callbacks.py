@@ -4,13 +4,15 @@ import warnings
 import numpy as np
 import pandas as pd
 import requests
-from dash import Input, Output, State, callback
+from dash import Input, Output, State, callback, get_app
+from flask_caching import Cache
 
 from api.beds.model import BedsRead
 from apps.pages.sitrep import (
     BED_BONES_TABLE_ID,
     BEDS_KEEP_COLS,
     BPID,
+    CACHE_TIMEOUT,
     CENSUS_KEEP_COLS,
     DEPT2WARD_MAPPING,
     HYMIND_ICU_DISCHARGE_COLS,
@@ -21,12 +23,23 @@ from config.settings import settings
 from utils.beds import BedBonesBase, get_bed_list, unpack_nested_dict, update_bed_row
 from utils.dash import get_results_response, validate_json
 
+app = get_app()
+cache = Cache(
+    app.server,
+    config={
+        "CACHE_TYPE": "filesystem",
+        "CACHE_DIR": "cache-directory",
+    },
+)
+
 
 @callback(
     Output(f"{BPID}beds_data", "data"),
     Input(f"{BPID}query-interval", "n_intervals"),
     Input(f"{BPID}ward_radio", "value"),
 )
+# @cache.memoize(timeout=CACHE_TIMEOUT)
+# not caching since this is how we update beds
 def store_beds(n_intervals: int, dept: str) -> list:
     """
     Stores data from beds api (i.e. skeleton)
@@ -51,6 +64,7 @@ def store_beds(n_intervals: int, dept: str) -> list:
     Input(f"{BPID}query-interval", "n_intervals"),
     Input(f"{BPID}ward_radio", "value"),
 )
+@cache.memoize(timeout=CACHE_TIMEOUT)
 def store_census(n_intervals: int, dept: str) -> list:
     """
     Stores data from census api (i.e. current beds occupant)
@@ -76,6 +90,7 @@ def store_census(n_intervals: int, dept: str) -> list:
     Input(f"{BPID}query-interval", "n_intervals"),
     Input(f"{BPID}ward_radio", "value"),
 )
+@cache.memoize(timeout=CACHE_TIMEOUT)
 def store_sitrep(n_intervals: int, dept: str) -> list:
     """
     Stores data from sitrep api (i.e. organ status)
@@ -99,6 +114,7 @@ def store_sitrep(n_intervals: int, dept: str) -> list:
     Input(f"{BPID}query-interval", "n_intervals"),
     Input(f"{BPID}ward_radio", "value"),
 )
+@cache.memoize(timeout=CACHE_TIMEOUT)
 def store_hymind_icu_discharge(n_intervals: int, dept: str) -> list:
     """
     Stores data from HyMind ICU discharge predictions
@@ -125,6 +141,7 @@ def store_hymind_icu_discharge(n_intervals: int, dept: str) -> list:
     Input(f"{BPID}sitrep_data", "data"),
     Input(f"{BPID}hymind_icu_discharge_data", "data"),
 )
+@cache.memoize(timeout=CACHE_TIMEOUT)
 def store_patients(census: list, sitrep: list, hymind: list) -> list:
     """
     Assembles patient level info (without beds)
@@ -192,6 +209,7 @@ def store_patients(census: list, sitrep: list, hymind: list) -> list:
     Input(f"{BPID}beds_data", "data"),
     Input(f"{BPID}patients_data", "data"),
 )
+@cache.memoize(timeout=CACHE_TIMEOUT)
 def store_ward(beds: list, patients: list) -> list:
     """
     Merges patients onto beds

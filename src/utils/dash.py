@@ -21,6 +21,9 @@ def get_results_response(url: str, method="GET", **kwargs):
     else:
         raise RequestException("Invalid request type")
 
+    if request_response.status_code != 200:
+        print(f"[WARN] {request_response.url} returned {request_response.status_code}")
+
     try:
         list_of_dicts = request_response.json()["data"]
     except (TypeError, KeyError) as e:

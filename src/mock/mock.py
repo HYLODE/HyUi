@@ -132,49 +132,75 @@ if __name__ == "__main__":
     # TODO: factor these standalone imports out into better system
 
     # clarity post-op destination
-    try:
-        model_path = f"{gen_module_path('electives')}.model"
-        model = getattr(importlib.import_module(model_path), "ElectivesPodMock")
-        df = pd.read_json("../data/mock/electives_pod.json")
-        if len(df):
-            create_mock_table(engine, model, drop=True)
-            insert_into_mock_table(engine, df, model)
-    except ValueError as e:
-        warnings.warn(f"[WARN] Failed to generate post-op destination mock data: {e}")
-
-    # pre-assessment post-op destination
-    try:
-        model_path = f"{gen_module_path('electives')}.model"
-        model = getattr(importlib.import_module(model_path), "ElectivesPreassessMock")
-        f = Path.cwd().parent / "data" / "mock" / "preassess.db"
-        url = f"sqlite:///{f}"
-        engine_in = create_engine(url)
-        with engine_in.connect() as conn:
-            df = pd.read_sql("preassess", conn)
-        if len(df):
-            create_mock_table(engine, model, drop=True)
-            insert_into_mock_table(engine, df, model)
-    except ValueError as e:
-        warnings.warn(
-            f"[WARN] Failed to generate pre-assessment post-op mock data: {e}"
-        )
-
-    # this works for the principle routes but not for additional data
-    # load mock hymind icu discharges
-    model_path = f"{gen_module_path('hymind')}.model"
-    model = getattr(importlib.import_module(model_path), "IcuDischarge")
-    _ = pd.read_json("../src/api/hymind/data/mock_icu_discharge.json")
-    df = pd.DataFrame.from_records(_["data"])
-    create_mock_table(engine, model, drop=True)
-    insert_into_mock_table(engine, df, model)
-
-    for route in settings.ROUTES:
+    if recreate_this := False:
         try:
-            model = get_model_from_route(route, "Mock")
-            df = df_from_file(route)
+            model_path = f"{gen_module_path('electives')}.model"
+            model = getattr(importlib.import_module(model_path), "ElectivesPodMock")
+            df = pd.read_json("../data/mock/electives_pod.json")
             if len(df):
                 create_mock_table(engine, model, drop=True)
                 insert_into_mock_table(engine, df, model)
-        except Exception as e:
-            print(e)
-            sys.exit(1)
+        except ValueError as e:
+            warnings.warn(
+                f"[WARN] Failed to generate post-op destination mock data: {e}"
+            )
+
+    # pre-assessment post-op destination
+    if recreate_this := False:
+        try:
+            model_path = f"{gen_module_path('electives')}.model"
+            model = getattr(
+                importlib.import_module(model_path), "ElectivesPreassessMock"
+            )
+            f = Path.cwd().parent / "data" / "mock" / "preassess.db"
+            url = f"sqlite:///{f}"
+            engine_in = create_engine(url)
+            with engine_in.connect() as conn:
+                df = pd.read_sql("preassess", conn)
+            if len(df):
+                create_mock_table(engine, model, drop=True)
+                insert_into_mock_table(engine, df, model)
+        except ValueError as e:
+            warnings.warn(
+                f"[WARN] Failed to generate pre-assessment post-op mock data: {e}"
+            )
+
+    # hymind icu discharge predictions
+    if recreate_this := False:
+        model_path = f"{gen_module_path('hymind')}.model"
+        model = getattr(importlib.import_module(model_path), "IcuDischarge")
+        _ = pd.read_json("api/hymind/data/mock_icu_discharge.json")
+        df = pd.DataFrame.from_records(_["data"])
+        create_mock_table(engine, model, drop=True)
+        insert_into_mock_table(engine, df, model)
+
+    # hymind taps - emergency
+    if recreate_this := True:
+        model_path = f"{gen_module_path('hymind')}.model"
+        model = getattr(importlib.import_module(model_path), "EmTap")
+        _ = pd.read_json("api/hymind/data/tap_nonelective_tower.json")
+        df = pd.DataFrame.from_records(_["data"])
+        create_mock_table(engine, model, drop=True)
+        insert_into_mock_table(engine, df, model)
+
+    # hymind taps - elective
+    if recreate_this := True:
+        model_path = f"{gen_module_path('hymind')}.model"
+        model = getattr(importlib.import_module(model_path), "ElTap")
+        _ = pd.read_json("api/hymind/data/tap_elective_tower.json")
+        df = pd.DataFrame.from_records(_["data"])
+        create_mock_table(engine, model, drop=True)
+        insert_into_mock_table(engine, df, model)
+
+    if recreate_this := False:
+        # this works for the principle routes but not for additional data
+        for route in settings.ROUTES:
+            try:
+                model = get_model_from_route(route, "Mock")
+                df = df_from_file(route)
+                if len(df):
+                    create_mock_table(engine, model, drop=True)
+                    insert_into_mock_table(engine, df, model)
+            except Exception as e:
+                print(e)
+                sys.exit(1)

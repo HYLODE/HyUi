@@ -9,9 +9,10 @@ from typing import List
 import dash_bootstrap_components as dbc
 import pandas as pd
 import plotly.express as px
-from dash import Input, Output, State, callback
+from dash import Input, Output, State, callback, get_app
 from dash import dash_table as dt
 from dash import dcc, html, register_page
+from flask_caching import Cache
 
 from api.electives.model import ElectivesRead
 from apps.pages.electives import (
@@ -24,7 +25,17 @@ from apps.pages.electives import (
 )
 from utils.dash import df_from_store, get_results_response
 
+CACHE_TIMEOUT = 4 * 3600 * 1000
+
 register_page(__name__)
+app = get_app()
+cache = Cache(
+    app.server,
+    config={
+        "CACHE_TYPE": "filesystem",
+        "CACHE_DIR": "cache-directory",
+    },
+)
 
 card_fig = dbc.Card(
     [
@@ -107,6 +118,7 @@ layout = html.Div(
     Input(query_interval, "n_intervals"),
     Input(days_ahead_slider, "value"),
 )
+@cache.memoize(timeout=CACHE_TIMEOUT)
 def store_data(n_intervals: int, days_ahead: int) -> dict:
     """
     Read data from API then store as JSON
