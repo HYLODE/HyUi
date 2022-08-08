@@ -4,17 +4,19 @@ Generates sqlite database with a table holding modelled as per
 api.models.Results and then loads the data from the local HDF file
 """
 
+import importlib
 import sys
+import warnings
 from pathlib import Path
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 import sqlalchemy as sa
 from sqlmodel import Session, SQLModel, create_engine
 from sqlmodel.pool import StaticPool
 
 from config.settings import settings  # type: ignore
-from utils import get_model_from_route  # type: ignore
+from utils import gen_module_path, get_model_from_route  # type: ignore
 
 # you can use this function in testing but swap in an in memory version
 SYNTH_SQLITE_FILE = Path(__file__).parent / "mock.db"
@@ -125,12 +127,54 @@ def make_mock_db_in_memory(route: str):
 
 if __name__ == "__main__":
     engine = make_engine(echo=True)
+
+    # for additional data: then add into mock db here
+    # TODO: factor these standalone imports out into better system
+
+    # clarity post-op destination
+    try:
+        model_path = f"{gen_module_path('electives')}.model"
+        model = getattr(importlib.import_module(model_path), "ElectivesPodMock")
+        df = pd.read_json("../data/mock/electives_pod.json")
+        if len(df):
+            create_mock_table(engine, model, drop=True)
+            insert_into_mock_table(engine, df, model)
+    except ValueError as e:
+        warnings.warn(f"[WARN] Failed to generate post-op destination mock data: {e}")
+
+    # pre-assessment post-op destination
+    try:
+        model_path = f"{gen_module_path('electives')}.model"
+        model = getattr(importlib.import_module(model_path), "ElectivesPreassessMock")
+        f = Path.cwd().parent / "data" / "mock" / "preassess.db"
+        url = f"sqlite:///{f}"
+        engine_in = create_engine(url)
+        with engine_in.connect() as conn:
+            df = pd.read_sql("preassess", conn)
+        if len(df):
+            create_mock_table(engine, model, drop=True)
+            insert_into_mock_table(engine, df, model)
+    except ValueError as e:
+        warnings.warn(
+            f"[WARN] Failed to generate pre-assessment post-op mock data: {e}"
+        )
+
+    # this works for the principle routes but not for additional data
+    # load mock hymind icu discharges
+    model_path = f"{gen_module_path('hymind')}.model"
+    model = getattr(importlib.import_module(model_path), "IcuDischarge")
+    _ = pd.read_json("../src/api/hymind/data/mock_icu_discharge.json")
+    df = pd.DataFrame.from_records(_["data"])
+    create_mock_table(engine, model, drop=True)
+    insert_into_mock_table(engine, df, model)
+
     for route in settings.ROUTES:
         try:
             model = get_model_from_route(route, "Mock")
             df = df_from_file(route)
-            create_mock_table(engine, model, drop=True)
-            insert_into_mock_table(engine, df, model)
+            if len(df):
+                create_mock_table(engine, model, drop=True)
+                insert_into_mock_table(engine, df, model)
         except Exception as e:
             print(e)
             sys.exit(1)

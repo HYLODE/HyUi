@@ -4,25 +4,27 @@ sub-application for electives
 """
 
 
-import dash_bootstrap_components as dbc
-import plotly.express as px
-from dash import Input, Output, State, callback, register_page
-from dash import dash_table as dt
-from dash import dcc, html
-
 from typing import List
 
+import dash_bootstrap_components as dbc
+import pandas as pd
+import plotly.express as px
+from dash import Input, Output, State, callback
+from dash import dash_table as dt
+from dash import dcc, html, register_page
+
 from api.electives.model import ElectivesRead
-from config.settings import settings
+from apps.pages.electives import (
+    API_URL,
+    BPID,
+    COLS,
+    REFRESH_INTERVAL,
+    SPECIALTY_SHORTNAMES,
+    STYLE_CELL_CONDITIONAL,
+)
 from utils.dash import df_from_store, get_results_response
 
 register_page(__name__)
-BPID = "ELE_"
-
-API_URL = f"{settings.API_URL}/electives"
-
-# Caboodle data so refresh only needs to happen first thing
-REFRESH_INTERVAL = 6 * 60 * 60 * 1000  # milliseconds
 
 card_fig = dbc.Card(
     [
@@ -30,13 +32,35 @@ card_fig = dbc.Card(
         dbc.CardBody(
             [
                 html.Div(
+                    [
+                        dbc.Label("PACU"),
+                        pacu_checklist := dbc.Checklist(
+                            options=[
+                                {"label": "Booked", "value": True},
+                                {"label": "Not booked", "value": False},
+                            ],
+                            value=[True],
+                            inline=True,
+                        ),
+                    ]
+                ),
+                html.Div(
                     service_picker := dcc.Dropdown(
                         value="",
                         placeholder="Pick a surgical specialty",
                         multi=True,
                     )
                 ),
-                html.Div([html.P("Updates daily")]),
+                html.Div(
+                    [
+                        html.P(
+                            "Pick a range of days over the next week (data refreshes every night)"
+                        )
+                    ]
+                ),
+                html.Div(
+                    days_ahead_slider := dcc.Slider(min=2, max=7, step=1, value=4)
+                ),
                 fig_electives := html.Div(),
             ]
         ),
@@ -81,30 +105,32 @@ layout = html.Div(
 @callback(
     Output(request_data, "data"),
     Input(query_interval, "n_intervals"),
+    Input(days_ahead_slider, "value"),
 )
-def store_data(n_intervals: int) -> dict:
+def store_data(n_intervals: int, days_ahead: int) -> dict:
     """
     Read data from API then store as JSON
     """
-    data = get_results_response(API_URL)
+    data = get_results_response(API_URL, params={"days_ahead": days_ahead})
     return data  # type: ignore
 
 
 @callback(
     Output(filtered_data, "data"),
     Input(service_picker, "value"),
-    State(request_data, "data"),
+    Input(pacu_checklist, "value"),
+    Input(request_data, "data"),
     prevent_initial_call=True,
 )
-def filter_data(val: List[str], data: dict) -> dict:
+def filter_data(service: List[str], pacu: List[bool], data: dict) -> dict:
     """
     Update data based on picker
     """
-    if val:
-        print(val)
-        return [row for row in data if row["PrimaryService"] in val]  # type: ignore
-    else:
-        return data
+    # import ipdb; ipdb.set_trace()
+    data = [row for row in data if row["pacu"] in pacu]  # type: ignore
+    if service:
+        data = [row for row in data if row["SurgicalService"] in service]  # type: ignore
+    return data
 
 
 @callback(
@@ -117,16 +143,18 @@ def gen_surgeries_over_time(n_intervals: int, data: dict):
     """
     Plot stacked bar
     """
+    if len(data) == 0:
+        return html.H2("No data to plot")
     df = df_from_store(data, ElectivesRead)
     df = (
-        df.groupby("PrimaryService")
-        .resample("12H", on="PlannedOperationStartInstant")
+        df.groupby("SurgicalService")
+        .resample("24H", on="PlannedOperationStartInstant")
         .agg({"PatientKey": "size"})
     )
     df.reset_index(inplace=True)
     # print(df)
     fig = px.bar(
-        df, x="PlannedOperationStartInstant", y="PatientKey", color="PrimaryService"
+        df, x="PlannedOperationStartInstant", y="PatientKey", color="SurgicalService"
     )
     return dcc.Graph(id=f"{BPID}fig", figure=fig)
 
@@ -139,22 +167,62 @@ def gen_surgeries_over_time(n_intervals: int, data: dict):
 )
 def gen_table_consults(modified: int, data: dict):
 
-    cols = dict(
-        PrimaryMrn="MRN",
-        AgeInYears="Age",
-        PrimaryService="PrimaryService",
-        Priority="Priority",
-        ElectiveAdmissionType="ElectiveAdmissionType",
-        Status="Status",
-        Classification="Classification",
-        SurgeryDate="SurgeryDate",
-        Name="Name",
+    if len(data) == 0:
+        return html.H2("No data to tabulate")
+    dfo = pd.DataFrame.from_records(data)
+    dfo["pacu"] = dfo["pacu"].apply(lambda x: "PACU" if x else "")
+    dfo["age_sex"] = dfo.apply(
+        lambda row: f"{row['AgeInYears']:.0f}{row['Sex'][:1]} ",
+        axis=1,
     )
+
+    dfo["name"] = dfo.apply(
+        lambda row: f"{row.FirstName.title()} {row.LastName.upper()}", axis=1
+    )
+    dfo["RoomName"] = dfo["RoomName"].fillna("")
+    dfo["RoomName"] = dfo["RoomName"].apply(
+        lambda x: "" if "Not Applicable" in x else x
+    )
+    dfo["SurgicalService"] = dfo["SurgicalService"].fillna("")
+    dfo["SurgicalService"] = dfo["SurgicalService"].apply(
+        lambda x: x.replace("Surgery", "" if x else "")
+    )
+    dfo["SurgicalService"] = dfo["SurgicalService"].apply(
+        lambda x: SPECIALTY_SHORTNAMES.get(x, x)
+    )
+    # Sort into unit order / displayed tables will NOT be sortable
+    # ------------------------------------------------------------
+    dfo.sort_values(by="SurgeryDate", ascending=True, inplace=True)
+
     return [
         dt.DataTable(
-            id="elective_results_table",
-            columns=[{"name": v, "id": k} for k, v in cols.items()],
-            data=data,
+            id=f"{BPID}_data_table",
+            columns=COLS,
+            data=dfo.to_dict("records"),
+            style_table={"width": "100%", "minWidth": "100%", "maxWidth": "100%"},
+            style_as_list_view=True,  # remove col lines
+            style_cell={
+                "fontSize": 13,
+                "font-family": "monospace",
+                "padding": "1px",
+                "textAlign": "left",
+            },
+            style_cell_conditional=STYLE_CELL_CONDITIONAL,
+            style_data={"color": "black", "backgroundColor": "white"},
+            # striped rows
+            style_data_conditional=[
+                {
+                    "if": {"row_index": "odd"},
+                    "backgroundColor": "rgb(220, 220, 220)",
+                },
+                {
+                    "if": {
+                        "filter_query": "{pacu} contains 'PACU'",
+                        # "column_id": "closed"
+                    },
+                    "color": "maroon",
+                },
+            ],
             filter_action="native",
             sort_action="native",
         )
@@ -168,4 +236,4 @@ def gen_table_consults(modified: int, data: dict):
 )
 def update_service_dropdown(data: dict):
     df = df_from_store(data, ElectivesRead)
-    return df["PrimaryService"].sort_values().unique()
+    return df["SurgicalService"].sort_values().unique()

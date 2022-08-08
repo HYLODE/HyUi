@@ -1,24 +1,11 @@
 # ./src/api/settings_src.py
 # project wide settings are loaded via ./.envrc and ./.secrets
+import os
 from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, Optional
 
 from pydantic import BaseSettings, PostgresDsn, validator
-
-PORT_JUPYTER = "8091"
-
-PORT_COMMANDLINE_API = "8092"
-PORT_COMMANDLINE_APP = "8093"
-
-PORT_DOCKER_API = "8094"
-PORT_DOCKER_APP = "8095"
-
-BASE_URL_DEV = "http://127.0.0.1"
-BASE_URL_GAE = "http://172.16.149.202"  # UCLVLDDPRAGAE07
-BASE_URL_DOCKER_APP = "http://apps"
-BASE_URL_DOCKER_API = "http://api"
-BASE_URL_DOCKER_BASEROW = "http://baserow"
 
 
 class ModuleNames(str, Enum):
@@ -41,14 +28,35 @@ class Environments(str, Enum):
     """
 
     dev = "dev"
+    test = "test"
     prod = "prod"
 
 
 class Settings(BaseSettings):
-
+    """
+    Note that the front end app may contain components from multiple sources at
+    various stages of maturity so any or all of the dev/test/prod URLs may be in
+    use.
+    TODO: Also note that the ports are not aligned between staging_red and prod
+    """
+ 
     ENV: Environments = Environments.dev
+    BASE_URL_DEV: str  # http://locahost
+    BASE_URL_TEST: str  # http://172.16.149.205
+    BASE_URL_PROD: str  # http://172.16.149.202
+
+    BASE_URL: str = ""
+
     DOCKER: bool = False
     VERBOSE: bool = True
+
+    PORT_COMMANDLINE_API: str
+    PORT_DOCKER_API: str
+
+    PORT_COMMANDLINE_APP: str
+    PORT_DOCKER_APP: str
+
+    PORT_JUPYTER: str
 
     EMAP_DB_HOST: Optional[str]
     EMAP_DB_USER: Optional[str]
@@ -63,30 +71,58 @@ class Settings(BaseSettings):
     CABOODLE_DB_NAME: Optional[str]
     CABOODLE_DB_PORT: Optional[int]
 
+    CLARITY_DB_HOST: Optional[str]
+    CLARITY_DB_USER: Optional[str]
+    CLARITY_DB_PASSWORD: Optional[str]
+    CLARITY_DB_NAME: Optional[str]
+    CLARITY_DB_PORT: Optional[int]
+
     BASEROW_READWRITE_TOKEN: Optional[str]
     BASEROW_PORT: Optional[str]
+    PORT_DOCKER_BASEROW: Optional[str]
+
+    MODULE_ROOT: str = "api"  # for building paths to modules e.g. ./src/api
+    ROUTES = ModuleNames = ModuleNames._member_names_
+
+    BASE_URL_DOCKER_APP: str = "http://apps"
+    BASE_URL_DOCKER_API: str = "http://api"
+    BASE_URL_DOCKER_BASEROW: str = "http://baserow"
 
     # WARNING!
     # The order of variable declaration is important
     # i.e. don't construct a URL containing a PORT if you haven't declared the port yet
     # the variables above of the variables below
 
-    DB_URL: Optional[str]
+    STAR_URL: Optional[str]
     CABOODLE_URL: Optional[str]
+    CLARITY_URL: Optional[str]
+
     BASE_URL: Optional[str]
     API_URL: Optional[str]
     APP_URL: Optional[str]
-    BASEROW_URL: Optional[str]
 
-    MODULE_ROOT: str = "api"  # for building paths to modules e.g. ./src/api
-    ROUTES = ModuleNames = ModuleNames._member_names_
+    BASEROW_URL: Optional[str]
+    BASEROW_PUBLIC_URL: Optional[str]
 
     @validator("ENV", pre=True)
     def environment_choice_is_valid(cls, v):
         # b/c when read from .secrets a \r (carriage return) is appended
         return v.rstrip()
 
-    @validator("DB_URL")
+    @validator("BASE_URL", pre=True)
+    def select_base_url_from_env(cls, v, values: Dict[str, Any]):
+        # b/c when read from .secrets a \r (carriage return) is appended
+        if values.get("ENV") == "dev":
+            v = values.get("BASE_URL_DEV")
+        elif values.get("ENV") == "test":
+            v = values.get("BASE_URL_TEST")
+        elif values.get("ENV") == "prod":
+            v = values.get("BASE_URL_PROD")
+        else:
+            raise ValueError("Environment not recognised")
+        return v.rstrip()
+
+    @validator("STAR_URL")
     def assemble_db_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
         if values.get("ENV") == "dev":
             db_path = Path(__file__).resolve().parents[1].absolute() / "mock"
@@ -122,16 +158,25 @@ class Settings(BaseSettings):
             )
         return db_url
 
-    @validator("BASE_URL")
-    def assemble_base_url(cls, v: Optional[str], values: Dict[str, Any]) -> str:
-        """
-        Selects and assembles the base URL for the application depending on
-        the environment
-        """
-        if values.get("ENV", "dev").lower() == "dev":
-            return BASE_URL_DEV
+    @validator("CLARITY_URL")
+    def assemble_clarity_connection(
+        cls, v: Optional[str], values: Dict[str, Any]
+    ) -> str:
+        if values.get("ENV") == "dev":
+            db_path = Path(__file__).resolve().parents[1].absolute() / "mock"
+            db_url = f"sqlite:///{db_path.as_posix()}/mock.db"
         else:
-            return BASE_URL_GAE
+            # Construct the MSSQL connection
+            db_host = values.get("CLARITY_DB_HOST")
+            db_user = values.get("CLARITY_DB_USER")
+            db_password = values.get("CLARITY_DB_PASSWORD")
+            db_port = values.get("CLARITY_DB_PORT")
+            db_name = values.get("CLARITY_DB_NAME")
+            db_url = (
+                f"mssql+pyodbc://{db_user}:{db_password}@{db_host}:{db_port}/"
+                + f"{db_name}?driver=ODBC+Driver+17+for+SQL+Server"
+            )
+        return db_url
 
     @validator("API_URL")
     def assemble_api_url(cls, v: Optional[str], values: Dict[str, Any]) -> str:
@@ -146,14 +191,14 @@ class Settings(BaseSettings):
         :returns:   Base URL for API to be used by Frontend
         :rtype:     str
         """
-        if values.get("ENV") == "prod":
+        BASE_URL = values.get("BASE_URL")
+        BASE_URL_DOCKER_API = values.get("BASE_URL_DOCKER_API")
+        PORT_DOCKER_API = values.get("PORT_DOCKER_API")
+        PORT_COMMANDLINE_API = values.get("PORT_COMMANDLINE_API")
+        if values.get("DOCKER") is True:
             url = f"{BASE_URL_DOCKER_API}:{PORT_DOCKER_API}"
-        elif values.get("ENV") == "dev":
-            if values.get("DOCKER") is True:
-                url = f"{BASE_URL_DOCKER_API}:{PORT_DOCKER_API}"
-            else:
-                url = f"{BASE_URL_DEV}:{PORT_COMMANDLINE_API}"
-
+        else:
+            url = f"{BASE_URL}:{PORT_COMMANDLINE_API}"
         return url
 
     @validator("APP_URL")
@@ -162,29 +207,32 @@ class Settings(BaseSettings):
         :returns:   Base URL for the APP (esp for testing)
         :rtype:     str
         """
-        if values.get("ENV") == "prod":
-            return f"{BASE_URL_GAE}:{PORT_DOCKER_APP}"
-
-        if values.get("ENV") == "dev":
-            if values.get("DOCKER") is True:
-                url = f"{BASE_URL_DOCKER_APP}:{PORT_DOCKER_APP}"
-            else:
-                url = f"{BASE_URL_DEV}:{PORT_COMMANDLINE_APP}"
+        BASE_URL = values.get("BASE_URL")
+        BASE_URL_DOCKER_APP = values.get("BASE_URL_DOCKER_APP")
+        PORT_DOCKER_APP = values.get("PORT_DOCKER_APP")
+        PORT_COMMANDLINE_APP = values.get("PORT_COMMANDLINE_APP")
+        if values.get("DOCKER") is True:
+            url = f"{BASE_URL_DOCKER_APP}:{PORT_DOCKER_APP}"
+        else:
+            url = f"{BASE_URL}:{PORT_COMMANDLINE_APP}"
         return url
 
-    @validator("BASEROW_URL")
+    @validator("BASEROW_URL", "BASEROW_PUBLIC_URL")
     def assemble_baserow_url(cls, v: Optional[str], values: Dict[str, Any]) -> str:
         """
         :returns:   Base URL for BASEROW
         :rtype:     str
         """
+        BASE_URL = values.get("BASE_URL")
         BASEROW_PORT = values.get("BASEROW_PORT")
-        if values.get("ENV") == "prod":
-            url = f"{BASE_URL_GAE}:{BASEROW_PORT}"
-        elif values.get("ENV") == "dev":
-            url = f"{BASE_URL_DEV}:{BASEROW_PORT}"
+        BASE_URL_DOCKER_BASEROW = values.get("BASE_URL_DOCKER_BASEROW")
+        PORT_DOCKER_BASEROW = values.get("PORT_DOCKER_BASEROW")
+
+        if values.get("DOCKER") is True:
+            url = f"{BASE_URL_DOCKER_BASEROW}:{PORT_DOCKER_BASEROW}"
         else:
-            raise Exception
+            url = f"{BASE_URL}:{BASEROW_PORT}"
+        # url = f"{BASE_URL}:{BASEROW_PORT}"
         return url
 
     class Config:
@@ -192,4 +240,7 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
-# print(settings.SERVICES)
+
+if __name__ == "__main__":
+    for i in settings:
+        print(i)

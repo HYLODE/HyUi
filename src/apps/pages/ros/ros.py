@@ -18,7 +18,7 @@ from datetime import datetime, date, timedelta
 import pandas as pd
 import numpy as np
 
-register_page(__name__)
+register_page(__name__, name="ROS")
 BPID = "ROS_"
 
 API_URL = f"{settings.API_URL}/ros"
@@ -90,7 +90,7 @@ def store_data(n_intervals: int) -> dict:
     """
     data = get_results_response(API_URL)
 
-    pts_by_department = dict() # stores the patient lists keyed on the department name
+    pts_by_department = dict()  # stores the patient lists keyed on the department name
 
     for row in data:
         # Format admission date for table
@@ -105,12 +105,15 @@ def store_data(n_intervals: int) -> dict:
             row["ros_order_datetime_str"] = order_datetime.strftime("%d-%m-%y %H:%M")
             last_ros_date = order_datetime.date()
 
-            if last_ros_date >= admission_time.date(): # If a test has been ordered during this admission
-                if row["ros_lab_result_id"] is not None: # And there is a result back: screening complete
+            if (
+                last_ros_date >= admission_time.date()
+            ):  # If a test has been ordered during this admission
+                if (
+                    row["ros_lab_result_id"] is not None
+                ):  # And there is a result back: screening complete
                     row["ros_order_status"] = "Complete"
-                else: # If there is no result, we are awaiting results
+                else:  # If there is no result, we are awaiting results
                     row["ros_order_status"] = "Awaiting results"
-
 
         # Prepare MRSA data
         row["mrsa_order_status"] = "To do"
@@ -120,17 +123,21 @@ def store_data(n_intervals: int) -> dict:
             row["mrsa_order_datetime_str"] = order_datetime.strftime("%d-%m-%y %H:%M")
             last_mrsa_date = order_datetime.date()
 
-            if last_mrsa_date >= (date.today() - timedelta(7)): # If MRSA screening done in last 7 days
-                if row["mrsa_lab_result_id"] is not None: # And we have a result, then we are finished
-                    row["mrsa_order_status"]  = "Complete"
-                else: # Else we are awaiting results
+            if last_mrsa_date >= (
+                date.today() - timedelta(7)
+            ):  # If MRSA screening done in last 7 days
+                if (
+                    row["mrsa_lab_result_id"] is not None
+                ):  # And we have a result, then we are finished
+                    row["mrsa_order_status"] = "Complete"
+                else:  # Else we are awaiting results
                     row["mrsa_order_status"] = "Awaiting results"
 
         # Add data to the individual department list
-        dept_list = pts_by_department.get(row['department'], [])
+        dept_list = pts_by_department.get(row["department"], [])
         dept_list.append(row)
-        dept_list = sorted(dept_list, key=lambda d: d['bed_name'])
-        pts_by_department[row['department']] = dept_list
+        dept_list = sorted(dept_list, key=lambda d: d["bed_name"])
+        pts_by_department[row["department"]] = dept_list
 
     return pts_by_department
 
@@ -171,7 +178,7 @@ def gen_patient_table(modified: int, ward: str, data: dict):
         ros_order_datetime_str="Last ROS order",
         ros_order_status="ROS order status",
         mrsa_order_datetime_str="Last MRSA order",
-        mrsa_order_status="MRSA order status"
+        mrsa_order_status="MRSA order status",
     )
 
     return [
@@ -202,7 +209,7 @@ def gen_patient_table(modified: int, ward: str, data: dict):
                     "backgroundColor": "green",
                     "color": "white",
                 },
-                                {
+                {
                     "if": {
                         "column_id": "mrsa_order_status",
                         "filter_query": "{mrsa_order_status} = 'To do'",

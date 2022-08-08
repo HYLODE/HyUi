@@ -43,6 +43,7 @@ class PerrtRaw(SQLModel):
     perrt_consult_datetime: Optional[datetime]
     # observation level fields
     visit_observation_id: int
+    hospital_visit_id: str
     ob_tail_i: Optional[int]
     observation_datetime: datetime
     id_in_application: int
@@ -93,7 +94,7 @@ class PerrtMock(PerrtRaw, table=True):
     """
 
     # only set schema if in postgres
-    if "postgres" in settings.DB_URL:
+    if "postgres" in settings.STAR_URL:
         __table_args__ = {"schema": settings.DB_POSTGRES_SCHEMA}
     Perrt_id: Optional[int] = Field(default=None, primary_key=True)
 
@@ -108,6 +109,7 @@ class PerrtBase(SQLModel):
 
     # patient level fields
     mrn: str
+    hospital_visit_id: str
     lastname: str
     firstname: str
     sex: str

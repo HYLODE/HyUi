@@ -21,7 +21,7 @@ wards = [
     "UCH T07 HDRU",  # 20    12
     "UCH T08 NORTH (T08N)",  # 28    13
     "UCH T08 SOUTH (T08S)",  # 25    14
-    "UCH T08S ARCU",  #  6    15
+    "UCH T08S ARCU",  # 6    15
     "UCH T09 SOUTH (T09S)",  # 34    16
     "UCH T09 NORTH (T09N)",  # 32    17
     "UCH T09 CENTRAL (T09C)",  # 25    18
@@ -31,7 +31,7 @@ wards = [
     "UCH T11 SOUTH (T11S)",  # 27    22
     "UCH T11 NORTH (T11N)",  # 25    23
     "UCH T11 EAST (T11E)",  # 16    24
-    "UCH T11 NORTH (T11NO)",  #  8    25
+    "UCH T11 NORTH (T11NO)",  # 8    25
     "UCH T12 SOUTH (T12S)",  # 32    26
     "UCH T12 NORTH (T12N)",  # 23    27
     "UCH T13 SOUTH (T13S)",  # 31    28
@@ -60,6 +60,9 @@ wards = [
     "WMS W02 SHORT STAY",  # 20    51
     "WMS W03 WARD",  # 27    52
     "WMS W04 WARD",  # 28    53
+    # NOTE: 2022-08-07 Adding in NHNN critical care areas ONLY for now
+    "NHNN C0 NCCU",
+    "NHNN C1 NCCU",
 ]
 
 # beds that don't have a department and needed to be added in by hand

@@ -1,18 +1,22 @@
--- 2022-06-21
+-- 2022-08-02
 -- Query by J Hunter
 -- see https://github.com/HYLODE/HyUi/issues/47#issuecomment-1160706270
+-- updated to fix join
 
-SELECT DISTINCT
+    SELECT DISTINCT
         --    wlef.[PatientDurableKey]
             patd.[PrimaryMrn]
+            ,scf.[SurgicalCaseEpicId]
             ,patd.[AgeInYears]
+            ,patd.[FirstName]
+            ,patd.[LastName]
+            ,patd.[Sex]
+            ,patd.[BirthDate]
         --   ,wlef.[SurgicalCaseKey]
         --   ,wlef.[ProcedureOrderKey]
         --   ,wlef.[PlacedOnWaitingListDateKey]
-                -- ** standalone table that is used for managing waiting list / not related to actual booking which will follow
            ,datewl.[DateValue] PlacedOnWaitingListDate
         --   ,wlef.[DecidedToAdmitDateKey]
-                -- ** similar to placeonwaitinglistdate
            ,datedta.[DateValue] DecidedToAdmitDate
         --   ,wlef.[DiagnosisComboKey]
         --   ,wlef.[ProcedureComboKey]
@@ -21,7 +25,6 @@ SELECT DISTINCT
            ,wlef.[ElectiveAdmissionType]
            ,wlef.[IntendedManagement]
            ,wlef.[Priority]
-           -- ** should be empty / not the same as cancellation / removed from waiting list
            ,wlef.[RemovalReason]
         --   ,wlef.[ShortNoticeDays]
            ,wlef.[Status]
@@ -51,7 +54,6 @@ SELECT DISTINCT
         --   ,scf.[PrimaryProcedureKey]
         --   ,scf.[PrimaryProcedureCodeKey]
         --   ,scf.[SurgeryDateKey]
-                -- ** complete/useful field (surgerydate)
            ,datesurg.[DateValue] SurgeryDate
         --   ,scf.[OperatingRoomKey]
         --   ,scf.[HospitalEncounterKey]
@@ -99,23 +101,14 @@ SELECT DISTINCT
       LEFT JOIN [CABOODLE_REPORT].[dbo].[DateDim] datecasereq ON scf.[CaseRequestDateKey] = datecasereq.[DateKey]
       LEFT JOIN [CABOODLE_REPORT].[dbo].[TimeOfDayDim] todcase ON scf.[CaseRequestTimeOfDayKey] = todcase.[TimeOfDayKey]
       LEFT JOIN [CABOODLE_REPORT].[dbo].[DateDim] datecancel ON scufx.[CancelDateKey] = datecancel.[DateKey]
-
-      WHERE
-        -- drop dummy patients
-        scf.[PatientDurableKey] > 1 AND scf.[PatientDurableKey] IS NOT NULL
-        --  AND wlef.[SurgicalService] != '*Unspecified'
+      WHERE scf.[PatientDurableKey] > 1 AND scf.[PatientDurableKey] IS NOT NULL
+    --  AND wlef.[SurgicalService] != '*Unspecified'
       AND scf.[PrimaryService] != 'Obstetrics' AND scf.[PrimaryService] != 'Neurosurgery' AND scf.[PrimaryService] != 'Paediatric Dental'
-      -- gets rid of more dummy patients
       AND scf.[PatientInFacilityDateKey] < 0
       AND dd.[DepartmentName] != 'NHNN THEATRE SUITE' AND dd.[DepartmentName] != 'RNTNE THEATRE SUITE' AND dd.[DepartmentName] != 'EGA E02 LABOUR WARD'
-      -- UCH anaesthesia department is an old hangover etc
       AND dd.[DepartmentName] != 'MCC H-1 THEATRE SUITE' AND dd.[DepartmentName] != 'UCH ANAESTHESIA DEPT'
-      -- excluding kids from modelling; might be important for understanding work
-        AND patd.[AgeInYears] >= 18
-      -- only looking for inpatients (exclude day cases etc.)
-        AND (wlef.[IntendedManagement] IN ('*Unspecified', 'Inpatient', 'Inpatient Series', 'Night Admit Series') OR wlef.[IntendedManagement] IS NULL)
-
-      -- adjust dates / offsets in here to get today's and patients over the next week
-      AND  scufx.[PlannedOperationStartInstant] > CONVERT(DATE,DATEADD(DAY,0,CURRENT_TIMESTAMP)) AND [PlannedOperationStartInstant] < CONVERT(DATE,DATEADD(DAY, 7,CURRENT_TIMESTAMP))
-
+      --AND dd.[DepartmentName] != 'UCH P02 ENDOSCOPY'
+      AND patd.[AgeInYears] >= 18
+      AND (wlef.[IntendedManagement] IN ('*Unspecified', 'Inpatient', 'Inpatient Series', 'Night Admit Series') OR wlef.[IntendedManagement] IS NULL)
+      AND  scufx.[PlannedOperationStartInstant] >= CONVERT(DATE,DATEADD(DAY, 0 ,CURRENT_TIMESTAMP)) AND [PlannedOperationStartInstant] <= CONVERT(DATE,DATEADD(DAY, :days_ahead ,CURRENT_TIMESTAMP))
       ORDER BY  datesurg.[DateValue],dd.[DepartmentName],dd.[RoomName] ASC

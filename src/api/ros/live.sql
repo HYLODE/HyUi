@@ -78,11 +78,11 @@ beds AS (
 -- 		'WMS W03 WARD',                -- 27
 -- 		'WMS W02 SHORT STAY',          -- 20
  		'WMS W01 CRITICAL CARE'        -- 11
--- 
+--
 -- 		OR lo.location_string IN
 -- 		(
 -- 		'T06C^T06C BY08^BY08-36'
--- 		)		
+-- 		)
 		)
 	)
 
@@ -160,33 +160,44 @@ all_beds_annotated AS (
 	LEFT JOIN star.mrn_to_live mtl ON hv.mrn_id = mtl.mrn_id
 	-- get live mrn
 	LEFT JOIN star.mrn live_mrn ON mtl.live_mrn_id = live_mrn.mrn_id
-	
+
 	-- filter out "unoccupied" beds based on closed and open visits
 	WHERE	NOT (cvl.discharge_datetime > ovl.admission_datetime OR ovl.admission_datetime IS NULL)
-	
+
 ),
 
-icu_labs AS 
+lab_battery_ids AS
 (
-	SELECT 
+	SELECT
+		ltd.test_lab_code,
+		lbe.lab_battery_id
+		FROM star.lab_battery_element lbe
+		LEFT JOIN star.lab_test_definition ltd ON lbe.lab_test_definition_id = ltd.lab_test_definition_id
+		WHERE ltd.test_lab_code = 'ROS'
+		   OR ltd.test_lab_code = 'MRSA'
+),
+
+icu_labs AS
+(
+	SELECT
 	  all_beds_annotated.*
 	 ,lor.order_datetime
 	 ,lor.lab_battery_id
-	 ,lre.lab_result_id	
+	 ,lre.lab_result_id
 	 ,lre.result_last_modified_datetime
 	 ,lre.value_as_text
 	 ,lre.abnormal_flag
-	 
+
 	FROM all_beds_annotated
 	LEFT JOIN star.lab_order lor ON all_beds_annotated.hospital_visit_id = lor.hospital_visit_id
-	LEFT JOIN star.lab_result lre ON lor.lab_order_id = lre.lab_order_id 
-	
-	WHERE lor.lab_battery_id IN (1418, 29969)
+	LEFT JOIN star.lab_result lre ON lor.lab_order_id = lre.lab_order_id
+
+	WHERE lor.lab_battery_id IN (SELECT lab_battery_id FROM lab_battery_ids)
 ),
 
 ros_mrsa_results AS (
 	SELECT *
-	FROM 
+	FROM
 			(
 				SELECT DISTINCT ON (encounter)
 						encounter
@@ -194,7 +205,7 @@ ros_mrsa_results AS (
 						,lab_result_id AS ros_lab_result_id
 						,value_as_text AS ros_value_as_text
 				FROM icu_labs
-				WHERE lab_battery_id = 1418
+				WHERE lab_battery_id = (SELECT lab_battery_id FROM lab_battery_ids WHERE test_lab_code = 'ROS')
 				ORDER BY encounter, lab_result_id DESC
 			) AS ros
 		FULL JOIN
@@ -205,13 +216,13 @@ ros_mrsa_results AS (
 						,lab_result_id AS mrsa_lab_result_id
 						,value_as_text AS mrsa_value_as_text
 				FROM icu_labs
-				WHERE lab_battery_id = 29969
+				WHERE lab_battery_id = (SELECT lab_battery_id FROM lab_battery_ids WHERE test_lab_code = 'MRSA')
 				ORDER BY encounter, lab_result_id DESC
 			) AS mrsa
 		USING ("encounter")
 )
 
-SELECT 
+SELECT
 		 ab.department
 		,ab.bed_name
 		,ab.mrn

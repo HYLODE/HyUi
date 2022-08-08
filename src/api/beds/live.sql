@@ -80,6 +80,31 @@ closed_visits_last AS (
 	*
 	FROM closed_visits
 	WHERE discharge_tail = 1
+),
+
+planned_moves AS (
+	SELECT
+	 pm.planned_movement_id
+	,pm.cancelled
+	,pm.event_datetime
+	,pm.event_type
+	,pm.hospital_visit_id
+	,pm.location_id
+	,row_number() over (partition BY pm.hospital_visit_id ORDER BY pm.event_datetime DESC) pm_tail
+	FROM star.planned_movement pm
+	WHERE pm.cancelled = FALSE
+
+),
+
+planned_moves_last AS (
+	SELECT
+	 pm.*
+	,loc.location_string pm_location_string
+	,dpt.name pm_dept
+	FROM planned_moves pm
+	LEFT JOIN star.location loc ON pm.location_id = loc.location_id
+	LEFT JOIN star.department dpt ON loc.department_id = dpt.department_id
+	WHERE pm_tail = 1
 )
 
 
@@ -109,6 +134,25 @@ SELECT
 	,cd.lastname
 	,cd.firstname
 	,cd.date_of_birth
+	,cd.sex
+
+	,pml.event_type planned_move
+	,pml.event_datetime pm_datetime
+	,CASE
+		-- buffer 2h to handle near overlaps
+		WHEN pml.event_datetime > ovl.admission_datetime + INTERVAL '2 HOURS' THEN 'OUTBOUND'
+		ELSE ''
+	 END pm_type
+	,CASE
+		-- buffer 2h to handle near overlaps
+		WHEN pml.event_datetime > ovl.admission_datetime + INTERVAL '2 HOURS' THEN pml.pm_dept
+		ELSE ''
+	 END pm_dept
+	,CASE
+		-- buffer 2h to handle near overlaps
+		WHEN pml.event_datetime > ovl.admission_datetime + INTERVAL '2 HOURS' THEN pml.pm_location_string
+		ELSE ''
+	 END pm_location_string
 
 FROM beds
 -- details of the last open visit to that bed
@@ -123,6 +167,7 @@ LEFT JOIN star.mrn original_mrn ON hv.mrn_id = original_mrn.mrn_id
 LEFT JOIN star.mrn_to_live mtl ON hv.mrn_id = mtl.mrn_id
 -- get live mrn
 LEFT JOIN star.mrn live_mrn ON mtl.live_mrn_id = live_mrn.mrn_id
+LEFT JOIN planned_moves_last pml ON ovl.hospital_visit_id = pml.hospital_visit_id
 
 ORDER BY beds.location_string
 
