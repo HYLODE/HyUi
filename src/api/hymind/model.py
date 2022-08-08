@@ -31,6 +31,7 @@ class IcuDischarge(SQLModel, table=True):
     predict_dt: datetime
 
 
+
 class ElEmTap(SQLModel, table=True):
     """
     Hymind Elective Tap / Emergency Taps
