@@ -3,7 +3,7 @@ from datetime import date, datetime
 from typing import Dict, List, Optional
 
 import arrow
-from pydantic import validator
+from pydantic import validator, BaseModel
 from sqlmodel import Field, SQLModel
 
 from config.settings import settings  # type: ignore
@@ -29,7 +29,6 @@ class IcuDischarge(SQLModel, table=True):
     model_version: int
     prediction_as_real: float
     predict_dt: datetime
-
 
 
 class ElEmTap(SQLModel, table=True):
