@@ -20,6 +20,7 @@ class ModuleNames(str, Enum):
     perrt = "perrt"
     ros = "ros"
     beds = "beds"
+    hymind = "hymind"
 
 
 class Environments(str, Enum):
@@ -39,7 +40,7 @@ class Settings(BaseSettings):
     use.
     TODO: Also note that the ports are not aligned between staging_red and prod
     """
- 
+
     ENV: Environments = Environments.dev
     BASE_URL_DEV: str  # http://locahost
     BASE_URL_TEST: str  # http://172.16.149.205
