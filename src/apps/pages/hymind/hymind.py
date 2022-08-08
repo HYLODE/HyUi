@@ -7,14 +7,30 @@ import arrow
 import dash_bootstrap_components as dbc
 import plotly.express as px
 import plotly.graph_objects as go
-from dash import Input, Output, callback, dcc, html, register_page
+from dash import Input, Output, callback, dcc, get_app, html, register_page
+from flask_caching import Cache
 
-from apps.pages.hymind import BPID, HYMIND_ENV, REFRESH_INTERVAL, wng
-from src.apps.pages.hymind import layout
+from apps.pages.hymind import (
+    BPID,
+    CACHE_TIMEOUT,
+    HYMIND_ENV,
+    REFRESH_INTERVAL,
+    layout,
+    wng,
+)
 from utils import get_model_from_route
 from utils.dash import df_from_store, get_results_response
 
 register_page(__name__)
+app = get_app()
+cache = Cache(
+    app.server,
+    config={
+        "CACHE_TYPE": "filesystem",
+        "CACHE_DIR": "cache-directory",
+    },
+)
+
 
 em_tap_model = get_model_from_route("HyMind", standalone="EmTap")
 em_tap_url = wng.build_emergency_tap_url()
@@ -30,6 +46,7 @@ layout = layout.layout()
     Input(f"{BPID}query_interval", "n_intervals"),
     # Input(f"{BPID}building_radio", "value"),
 )
+@cache.memoize(timeout=CACHE_TIMEOUT)
 def store_em_tap(n_intervals: int, building: str = "tower"):
     """
     { item_description }
@@ -77,6 +94,7 @@ def em_tap_fig(data: dict):
     Input(f"{BPID}query_interval", "n_intervals"),
     # Input(f"{BPID}building_radio", "value"),
 )
+@cache.memoize(timeout=CACHE_TIMEOUT)
 def store_el_tap(n_intervals: int, building: str = "tower"):
     """
     { item_description }
