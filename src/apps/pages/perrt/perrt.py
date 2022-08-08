@@ -6,17 +6,30 @@ sub-application for perrt
 
 import dash_bootstrap_components as dbc
 import plotly.express as px
-from dash import Input, Output, callback, register_page
+from dash import Input, Output, callback, register_page, get_app
 from dash import dash_table as dt
 from dash import dcc, html
+from flask_caching import Cache
 from pydantic import parse_obj_as
 
 from config.settings import settings
 from utils import get_model_from_route
 from utils.dash import get_results_response, df_from_store
 
-register_page(__name__)
+CACHE_TIMEOUT = 5 * 60 * 1000
 BPID = "PERRT_"
+
+register_page(__name__)
+app = get_app()
+cache = Cache(
+    app.server,
+    config={
+        "CACHE_TYPE": "filesystem",
+        "CACHE_DIR": "cache-directory",
+    },
+)
+
+
 PerrtRead = get_model_from_route("Perrt", "Read")
 
 API_URL = f"{settings.API_URL}/perrt/"
@@ -108,6 +121,7 @@ layout = html.Div(
     Output(request_data, "data"),
     Input(query_interval, "n_intervals"),
 )
+@cache.memoize(timeout=CACHE_TIMEOUT)
 def store_data(n_intervals: int) -> dict:
     """
     Read data from API then store as JSON
