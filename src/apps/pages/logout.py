@@ -1,5 +1,5 @@
 import dash
-from dash import html, dcc
+from dash import html
 from flask_login import logout_user, current_user
 
 dash.register_page(__name__)
@@ -11,7 +11,5 @@ def layout():
     return html.Div(
         [
             html.Div(html.H2("You have been logged out - Please login")),
-            html.Br(),
-            dcc.Link("Home", href="/"),
         ]
     )

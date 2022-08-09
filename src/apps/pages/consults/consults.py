@@ -9,6 +9,7 @@ import plotly.express as px
 from dash import Input, Output, State, callback, register_page
 from dash import dash_table as dt
 from dash import dcc, html
+from flask_login import current_user
 
 from api.consults.model import ConsultsRead
 from config.settings import settings
@@ -82,12 +83,16 @@ dash_only = html.Div(
     ]
 )
 
-layout = html.Div(
-    [
-        main,
-        dash_only,
-    ],
-)
+
+def layout():
+    if not current_user.is_authenticated:
+        return html.Div(["Please ", dcc.Link("login", href="/login"), " to continue"])
+    return html.Div(
+        [
+            main,
+            dash_only,
+        ],
+    )
 
 
 @callback(

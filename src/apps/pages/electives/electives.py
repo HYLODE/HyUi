@@ -13,6 +13,7 @@ from dash import Input, Output, State, callback, get_app
 from dash import dash_table as dt
 from dash import dcc, html, register_page
 from flask_caching import Cache
+from flask_login import current_user
 
 from api.electives.model import ElectivesRead
 from apps.pages.electives import (
@@ -105,12 +106,16 @@ dash_only = html.Div(
     ]
 )
 
-layout = html.Div(
-    [
-        main,
-        dash_only,
-    ],
-)
+
+def layout():
+    if not current_user.is_authenticated:
+        return html.Div(["Please ", dcc.Link("login", href="/login"), " to continue"])
+    return html.Div(
+        [
+            main,
+            dash_only,
+        ],
+    )
 
 
 @callback(
