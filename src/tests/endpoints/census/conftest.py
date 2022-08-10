@@ -10,7 +10,7 @@ from api.main import app
 from mock.mock import (  # type: ignore
     make_mock_db_in_memory,
     make_mock_df,
-    path_to_hdf_file,
+    path_to_file,
 )
 
 from utils.api import get_emap_session  # type: ignore
@@ -69,7 +69,7 @@ def mock_df_sitrep():
     """
     Use sitrep data as baseline exemplar for testing
     """
-    df = make_mock_df(path_to_hdf_file("sitrep"))
+    df = make_mock_df(path_to_file("sitrep", "h5"))
     return df
 
 
@@ -78,5 +78,5 @@ def mock_df_census():
     """
     Generate data frame from mock census data for testing
     """
-    df = make_mock_df(path_to_hdf_file("census"))
+    df = make_mock_df(path_to_file("census", "h5"))
     return df
