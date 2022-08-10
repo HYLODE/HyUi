@@ -6,8 +6,6 @@ from fastapi import APIRouter, Depends, Query, Body
 from sqlmodel import Session
 from pydantic import parse_obj_as
 import pandas as pd
-import pickle
-from pathlib import Path
 
 from utils import get_model_from_route, prepare_query
 from utils.api import get_emap_session
@@ -74,20 +72,22 @@ def get_predictions(
     hospital_visit_ids: List[str] = Body(), session: Session = Depends(get_emap_session)
 ):
 
-    predictions_filepath = Path(
-        f"{Path(__file__).parent}/admission_probability/"
-        + "generated_data/id_to_admission_prediction.pkl"
-    )
+    return []
 
-    predictions_map = {}
+    # predictions_filepath = Path(
+    #     f"{Path(__file__).parent}/admission_probability/"
+    #     + "generated_data/id_to_admission_prediction.pkl"
+    # )
 
-    if predictions_filepath.is_file():
-        predictions_map = pickle.load(open(predictions_filepath, "rb"))
+    # predictions_map = {}
 
-    return [
-        {
-            "hospital_visit_id": key,
-            "admission_probability": predictions_map.get(key, None),
-        }
-        for key in hospital_visit_ids
-    ]
+    # if predictions_filepath.is_file():
+    #     predictions_map = pickle.load(open(predictions_filepath, "rb"))
+
+    # return [
+    #     {
+    #         "hospital_visit_id": key,
+    #         "admission_probability": predictions_map.get(key, None),
+    #     }
+    #     for key in hospital_visit_ids
+    # ]
