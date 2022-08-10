@@ -1,16 +1,18 @@
 # run this file from project root
-# conda env update --file dev/steve/environment-short.yml --prune
+# conda env update --file dev/steve/environment.yml --prune
 name: hyuiv4
 channels:
   - conda-forge
 dependencies:
   - arrow=1.2.2
   - coverage
-  - dash-bootstrap-components
+  - dash-bootstrap-components=1.2.1
   - dash=2.5.1
   - fastapi=0.78.0
   - flake8
+  - flask-caching
   - gunicorn
+  - ipdb
   - jupyter
   - jupyterlab=3.4.3
   - myst-parser

@@ -9,6 +9,28 @@ COLOUR_AMBER = "#ffa500ff"
 COLOUR_RED = "#ff0000ff"
 
 
+def covid(value: bool) -> str:
+    if value:
+        icon = "fa fa-virus-covid"
+        colour = COLOUR_RED
+    else:
+        icon = "fa fa-virus"
+        colour = COLOUR_GREY
+    icon_string = f'<i class="{icon}" style="color: {colour};"></i>'
+    return icon_string
+
+
+def closed(value: bool) -> str:
+    if value:
+        icon = "fa fa-ban"
+        colour = COLOUR_RED
+    else:
+        icon = "fa fa-ban"
+        colour = COLOUR_GREY
+    icon_string = f'<i class="{icon}" style="color: {colour};"></i>'
+    return icon_string
+
+
 def aki(level: str) -> str:
     icon = "fa fa-flask"
     try:
@@ -50,7 +72,7 @@ def cvs(level: str) -> str:
     icon = "fa fa-heart"
     try:
         n = int(level)
-    except ValueError:
+    except (ValueError, TypeError):
         n = 0
     if n == 0:
         colour = COLOUR_GREY

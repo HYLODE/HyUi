@@ -44,9 +44,9 @@ loc AS
         ,room.name room_name
         ,bed.hl7string bed_hl7
         -- time admitted to that bed/theatre/scan etc.
-        ,vo.admission_time hosp_admit_dt
-        ,vd.admission_time bed_admit_dt
-        ,row_number() over (partition BY vd.hospital_visit_id ORDER BY vd.admission_time DESC) bed_tail_i
+        ,vo.admission_datetime hosp_admit_dt
+        ,vd.admission_datetime bed_admit_dt
+        ,row_number() over (partition BY vd.hospital_visit_id ORDER BY vd.admission_datetime DESC) bed_tail_i
 
     FROM star.location_visit vd
         INNER JOIN star.location lo ON vd.location_id = lo.location_id
@@ -62,9 +62,9 @@ loc AS
         -- get live mrn
         INNER JOIN star.mrn live_mrn ON mtl.live_mrn_id = live_mrn.mrn_id
     WHERE
-        vo.admission_time IS NOT NULL
+        vo.admission_datetime IS NOT NULL
         AND
-        vo.discharge_time IS NULL
+        vo.discharge_datetime IS NULL
         AND
         cd.date_of_death IS NULL
         AND
@@ -131,6 +131,7 @@ consults AS (
 -- FINALLY MERGE bed/demographic/consults info with obs
 SELECT
      obs.visit_observation_id
+    ,obs.hospital_visit_id
     ,obs.observation_datetime
     ,obs.id_in_application
     ,obs.value_as_real

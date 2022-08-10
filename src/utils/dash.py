@@ -1,13 +1,29 @@
+from typing import Dict
 import requests
+from requests import RequestException
 import pandas as pd
 from sqlmodel import SQLModel
+import warnings
 
 
-def get_results_response(url: str):
+def get_results_response(url: str, method="GET", **kwargs):
     """
     Given a URL return JSON list of dictionaries
+        uses requests.requests with additional kwargs
+        defaults to GET
     """
-    request_response = requests.get(url)
+
+    if method == "GET":
+        request_response = requests.get(url, **kwargs)
+    elif method == "POST":
+        request_response = requests.post(url, **kwargs)
+        print(request_response)
+    else:
+        raise RequestException("Invalid request type")
+
+    if request_response.status_code != 200:
+        print(f"[WARN] {request_response.url} returned {request_response.status_code}")
+
     try:
         list_of_dicts = request_response.json()["data"]
     except (TypeError, KeyError) as e:
@@ -15,15 +31,24 @@ def get_results_response(url: str):
         # so you have just tried to use a key to select from a list
         print(e)
         list_of_dicts = request_response.json()
-    assert type(list_of_dicts) is list
+    try:
+        assert type(list_of_dicts) is list
+        assert request_response.status_code == 200
+    except AssertionError:
+        warnings.warn(f"[WARN] {request_response.status_code}: {request_response.text}")
+        warnings.warn(f"[WARN] Incorrect response type for {request_response.url}")
+        warnings.warn(f"[WARN] ... returning an empty list of dictionaries")
+        list_of_dicts = [{}]
     return list_of_dicts  # type: ignore
 
 
-def validate_json(json_list, model: SQLModel):
+def validate_json(json_list, model: SQLModel, to_dict=False):
     """
     Validate list of json formatted strings
     """
     model_instances = [model(**i) for i in json_list]  # type: ignore
+    if to_dict:
+        model_instances = [i.dict() for i in model_instances]
     return model_instances
 
 

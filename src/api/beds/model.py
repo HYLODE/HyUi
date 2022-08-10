@@ -50,6 +50,13 @@ class BedsBase(SQLModel):
     date_of_birth: Optional[date]
     lastname: Optional[str]
     firstname: Optional[str]
+    sex: Optional[str]
+
+    planned_move: Optional[str]
+    pm_datetime: Optional[datetime]
+    pm_type: Optional[str]
+    pm_dept: Optional[str]
+    pm_location_string: Optional[str]
 
     @validator("date_of_birth", pre=True)
     def convert_datetime_to_date(cls, v):
@@ -75,7 +82,12 @@ class BedsBase(SQLModel):
 
     # TODO: how to share functions between classes?
     @validator(
-        "ovl_admission", "cvl_discharge", "cvl_admission", "date_of_birth", pre=True
+        "ovl_admission",
+        "cvl_discharge",
+        "cvl_admission",
+        "date_of_birth",
+        "pm_datetime",
+        pre=True,
     )
     def replace_NaT_with_None(cls, v):
         """
@@ -105,7 +117,7 @@ class BedsMock(BedsBase, table=True):
     """
 
     # only set schema if in postgres
-    if "postgres" in settings.DB_URL:
+    if "postgres" in settings.STAR_URL:
         __table_args__ = {"schema": settings.DB_POSTGRES_SCHEMA}
     beds_id: Optional[int] = Field(default=None, primary_key=True)
 

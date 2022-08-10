@@ -15,7 +15,7 @@ from typing import Optional
 
 import arrow
 import pandas as pd
-from pydantic import validator
+from pydantic import validator, BaseModel
 from sqlmodel import Field, SQLModel
 
 from config.settings import settings  # type: ignore
@@ -43,6 +43,7 @@ class PerrtRaw(SQLModel):
     perrt_consult_datetime: Optional[datetime]
     # observation level fields
     visit_observation_id: int
+    hospital_visit_id: str
     ob_tail_i: Optional[int]
     observation_datetime: datetime
     id_in_application: int
@@ -60,7 +61,10 @@ class PerrtRaw(SQLModel):
 
         NB: pd.NaT is stored as -9223372036854775808 (int64 type)
         ```
-        dfTest = pd.DataFrame([-9223372036854775808, 1655651820000000000],columns=['ts'])
+        dfTest = pd.DataFrame(
+            [-9223372036854775808, 1655651820000000000]
+            ,columns=['ts'])
+
         dfTest.apply(pd.to_datetime)
         ```
         """
@@ -90,7 +94,7 @@ class PerrtMock(PerrtRaw, table=True):
     """
 
     # only set schema if in postgres
-    if "postgres" in settings.DB_URL:
+    if "postgres" in settings.STAR_URL:
         __table_args__ = {"schema": settings.DB_POSTGRES_SCHEMA}
     Perrt_id: Optional[int] = Field(default=None, primary_key=True)
 
@@ -105,6 +109,7 @@ class PerrtBase(SQLModel):
 
     # patient level fields
     mrn: str
+    hospital_visit_id: str
     lastname: str
     firstname: str
     sex: str
@@ -143,7 +148,9 @@ class PerrtBase(SQLModel):
 
         NB: pd.NaT is stored as -9223372036854775808 (int64 type)
         ```
-        dfTest = pd.DataFrame([-9223372036854775808, 1655651820000000000],columns=['ts'])
+        dfTest = pd.DataFrame(
+            [-9223372036854775808, 1655651820000000000],
+            columns=['ts'])
         dfTest.apply(pd.to_datetime)
         ```
         """
@@ -172,3 +179,8 @@ class PerrtRead(PerrtBase):
     """
 
     Perrt_id: Optional[int]
+
+
+class AdmissionPrediction(BaseModel):
+    hospital_visit_id: str
+    admission_probability: Optional[float]

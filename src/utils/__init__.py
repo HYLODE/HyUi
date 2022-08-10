@@ -43,24 +43,28 @@ def gen_module_path(name: str, root: str = settings.MODULE_ROOT) -> str:
     return f"{root}.{name}"
 
 
-def get_model_from_route(route: str, subclass: str = None):
+def get_model_from_route(route: str, subclass: str = None, standalone: str = None):
     """
     Uses the route to define the (sub)package storing the model e.g. if route =
     `foo` then the model will be in `foo/model.py` and called `foo`
+    NB: only one of subclass and standalone can be true
 
-    :param      route:     The route
-    :type       route:     str
-    :param      subclass:  The subclass
-    :type       subclass:  str
+    :param      route:          The route e.g. electives
+    :param      subclass:       subclass e.g. ElectivesRead
+    :param      standalone:     standalone in the model.py file
 
     :returns:   The model from route.
-    :rtype:     { return_type_description }
     """
+    if all([subclass, standalone]) is True:
+        raise ValueError('Only one of subclass and standalone may be provided')
     model_path = gen_module_path(route.lower()) + ".model"
-    route_title_case = route.title()
-    if subclass:
-        route_title_case = f"{route_title_case}{subclass}"
-    model = getattr(importlib.import_module(model_path), route_title_case)  # noqa
+    if standalone:
+        model = getattr(importlib.import_module(model_path), standalone)  # noqa
+    else:
+        route_title_case = route.title()
+        if subclass:
+            route_title_case = f"{route_title_case}{subclass}"
+        model = getattr(importlib.import_module(model_path), route_title_case)  # noqa
     return model
 
 
