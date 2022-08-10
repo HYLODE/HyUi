@@ -5,7 +5,6 @@ sub-application for ros
 
 
 import dash_bootstrap_components as dbc
-import plotly.express as px
 from dash import Input, Output, State, callback, register_page
 from dash import dash_table as dt
 from dash import dcc, html
@@ -14,9 +13,6 @@ from config.settings import settings
 from utils.dash import get_results_response
 
 from datetime import datetime, date, timedelta
-
-import pandas as pd
-import numpy as np
 
 register_page(__name__, name="ROS")
 BPID = "ROS_"
@@ -189,7 +185,19 @@ def gen_patient_table(modified: int, ward: str, data: dict):
             style_cell={
                 "font-family": "sans-serif",
                 "padding": "2px",
+                "textAlign": "left",
+                "whiteSpace": "normal",
+                "height": "auto",
             },
+            css=[
+                {
+                    "selector": ".dash-spreadsheet table",
+                    "rule": """
+                    table-layout:fixed;
+                    width:100%;
+                """,
+                }
+            ],
             editable=False,
             style_data_conditional=[
                 {
