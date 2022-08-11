@@ -14,7 +14,7 @@ import pandas as pd
 import warnings
 from dash import Input, Output, callback
 from dash import dash_table as dt
-from dash import dcc, html, register_page
+from dash import html, dcc, register_page
 from flask_login import current_user
 
 from apps.pages.sitrep import (
@@ -25,7 +25,9 @@ from apps.pages.sitrep import (
     REFRESH_INTERVAL,
     PROBABILITY_COLOUR_SCALE,
 )
-from apps.pages.sitrep.callbacks import (
+
+# switch off flake8 linting error as the callbacks must be imported
+from apps.pages.sitrep.callbacks import (  # noqa
     store_beds,
     store_ward,
     store_census,
@@ -33,7 +35,7 @@ from apps.pages.sitrep.callbacks import (
     store_sitrep,
     store_hymind_icu_discharge,
     diff_table,
-)
+)  # noqa
 from config.settings import settings
 from utils import icons
 
@@ -198,6 +200,13 @@ sitrep_table = dbc.Card(
     ]
 )
 
+config_footer = dbc.Card(
+    [
+        dbc.CardHeader(html.H6("Settings")),
+        dbc.CardBody(id=f"{BPID}settings", children=[widgets.closed_beds_switch]),
+    ]
+)
+
 dash_only = html.Div(
     [
         dcc.Interval(
@@ -222,20 +231,20 @@ def layout():
         [
             dbc.Row(
                 [
-                    dbc.Col([widgets.ward_radio_button]),
-                    # dbc.Col([widgets.closed_beds_switch], width=2),
-                ]
-            ),
-            dbc.Row(
-                [
-                    # dbc.Col([ widgets.ward_radio_button]),
                     dbc.Col(
-                        [widgets.closed_beds_switch],
-                        width={"size": 2, "order": "last", "offset": 10},
+                        [widgets.ward_radio_button],
+                        width={"size": 6, "order": "last", "offset": 6},
                     ),
                 ]
             ),
             dbc.Row(dbc.Col([sitrep_table])),
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [config_footer],
+                    ),
+                ]
+            ),
             dash_only,
         ]
     )

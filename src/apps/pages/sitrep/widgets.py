@@ -1,5 +1,5 @@
 # src/apps/pages/sitrep/widgets.py
-from dash import dcc, html
+from dash import html
 import dash_bootstrap_components as dbc
 from apps.pages.sitrep import BPID
 
@@ -10,9 +10,6 @@ ward_radio_button = html.Div(
                 dbc.RadioItems(
                     id=f"{BPID}ward_radio",
                     className="dbc d-grid d-md-flex justify-content-md-end btn-group",
-                    # inputClassName="btn-check",
-                    # labelClassName="btn btn-outline-primary",
-                    # labelCheckedClassName="active btn-primary",
                     inline=True,
                     options=[
                         {"label": "T03", "value": "UCH T03 INTENSIVE CARE"},
@@ -35,15 +32,19 @@ closed_beds_switch = html.Div(
     [
         html.Div(
             [
-                dbc.Switch(
+                dbc.RadioItems(
                     id=f"{BPID}closed_beds_switch",
                     className="dbc d-grid d-md-flex justify-content-md-end",
-                    label="Reveal closed beds",
+                    inline=True,
+                    options=[
+                        {"label": "Open beds", "value": False},
+                        {"label": "All beds", "value": True},
+                    ],
                     value=False,
                 )
             ],
             className="dbc",
         ),
     ],
-    # className="radio-group",
+    className="radio-group",
 )
