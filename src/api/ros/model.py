@@ -4,7 +4,7 @@
 """
 
 from datetime import date, datetime
-from typing import Optional
+from typing import Optional, List
 
 from sqlmodel import Field, SQLModel
 
@@ -23,12 +23,9 @@ class RosBase(SQLModel):
     date_of_birth: date
     hospital_admission_datetime: datetime
     location_admission_datetime: datetime
-    ros_order_datetime: Optional[datetime]
-    ros_lab_result_id: Optional[float]
-    ros_value_as_text: Optional[str]
-    mrsa_order_datetime: Optional[datetime]
-    mrsa_lab_result_id: Optional[float]
-    mrsa_value_as_text: Optional[str]
+    ros_orders: Optional[List[dict[str, object]]]
+    mrsa_orders: Optional[List[dict[str, object]]]
+    covid_orders: Optional[List[dict[str, object]]]
 
 
 class RosMock(RosBase, table=True):

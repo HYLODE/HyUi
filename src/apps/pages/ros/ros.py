@@ -76,6 +76,18 @@ layout = html.Div(
 )
 
 
+def format_datetime(d):
+    return d.strftime("%d/%m/%y %H:%M")
+
+
+def from_isodate(d):
+    return datetime.fromisoformat(d)
+
+
+def create_and_format_date(st):
+    return format_datetime(from_isodate(st))
+
+
 @callback(
     Output(request_data, "data"),
     Input(query_interval, "n_intervals"),
@@ -90,44 +102,112 @@ def store_data(n_intervals: int) -> dict:
 
     for row in data:
         # Format admission date for table
-        admission_time = datetime.fromisoformat(row["hospital_admission_datetime"])
-        row["admission_time_str"] = admission_time.strftime("%d-%m-%y %H:%M")
+        admission_time = from_isodate(row["hospital_admission_datetime"])
+        row["admission_time_str"] = admission_time.strftime("%d/%m/%y %H:%M")
 
-        # Prepare ROS data
         row["ros_order_status"] = "To do"
+        row["mrsa_order_status"] = "To do"
 
-        if row["ros_order_datetime"] is not None:
-            order_datetime = datetime.fromisoformat(row["ros_order_datetime"])
-            row["ros_order_datetime_str"] = order_datetime.strftime("%d-%m-%y %H:%M")
-            last_ros_date = order_datetime.date()
+        row["ros_orders_tooltip"] = ""
+        row["mrsa_orders_tooltip"] = ""
+        row["covid_orders_tooltip"] = ""
+
+        if row["ros_orders"]:
+            ros_orders = row["ros_orders"]
+
+            most_recent_order = ros_orders[0]
+            recent_order_datetime = from_isodate(most_recent_order["order_datetime"])
+
+            row["ros_order_datetime_str"] = format_datetime(recent_order_datetime)
 
             if (
-                last_ros_date >= admission_time.date()
+                recent_order_datetime.date() >= admission_time.date()
             ):  # If a test has been ordered during this admission
                 if (
-                    row["ros_lab_result_id"] is not None
+                    most_recent_order["result_status"] is not None
                 ):  # And there is a result back: screening complete
                     row["ros_order_status"] = "Complete"
                 else:  # If there is no result, we are awaiting results
                     row["ros_order_status"] = "Awaiting results"
 
-        # Prepare MRSA data
-        row["mrsa_order_status"] = "To do"
+            temp_str = "\n\n".join(
+                [
+                    (
+                        f"{create_and_format_date(x['order_datetime'])}; "
+                        f"{x['result_status']}; "
+                        f"{x['abnormal_flag'] if x['abnormal_flag'] else ''} "
+                    )
+                    for x in ros_orders
+                ]
+            )
 
-        if row["mrsa_order_datetime"] is not None:
-            order_datetime = datetime.fromisoformat(row["mrsa_order_datetime"])
-            row["mrsa_order_datetime_str"] = order_datetime.strftime("%d-%m-%y %H:%M")
-            last_mrsa_date = order_datetime.date()
+            row[
+                "ros_orders_tooltip"
+            ] = f"{row['firstname']} {row['lastname']} – ROS\n\n{temp_str}"
 
-            if last_mrsa_date >= (
+        if row["mrsa_orders"]:
+
+            mrsa_orders = row["mrsa_orders"]
+
+            most_recent_order = mrsa_orders[0]
+
+            recent_order_datetime = from_isodate(most_recent_order["order_datetime"])
+
+            row["mrsa_order_datetime_str"] = format_datetime(recent_order_datetime)
+
+            row["mrsa_order_status"] = "To do"
+
+            if recent_order_datetime.date() >= (
                 date.today() - timedelta(7)
             ):  # If MRSA screening done in last 7 days
                 if (
-                    row["mrsa_lab_result_id"] is not None
+                    most_recent_order["result_status"] is not None
                 ):  # And we have a result, then we are finished
                     row["mrsa_order_status"] = "Complete"
                 else:  # Else we are awaiting results
                     row["mrsa_order_status"] = "Awaiting results"
+
+            temp_str = "\n\n".join(
+                [
+                    (
+                        f"{create_and_format_date(x['order_datetime'])}; "
+                        f"{x['result_status']}; "
+                        f"{x['abnormal_flag'] if x['abnormal_flag'] else ''}"
+                    )
+                    for x in mrsa_orders
+                ]
+            )
+
+            row[
+                "mrsa_orders_tooltip"
+            ] = f"{row['firstname']} {row['lastname']} – MRSA\n\n{temp_str}"
+
+        if row["covid_orders"]:
+
+            covid_orders = row["covid_orders"]
+
+            most_recent_order = covid_orders[0]
+            recent_order_datetime = from_isodate(most_recent_order["order_datetime"])
+
+            row["covid_order_datetime_str"] = (
+                f"{format_datetime(recent_order_datetime)}; "
+                f"({abs((recent_order_datetime.date() - date.today()).days)} days ago)"
+            )
+
+            temp_str = "\n\n".join(
+                [
+                    (
+                        f"{create_and_format_date(x['order_datetime'])}; "
+                        f"{x['result_status']}; "
+                        f"{x['abnormal_flag'] if x['abnormal_flag'] else ''}"
+                    )
+                    for x in covid_orders
+                ]
+            )
+
+            row[
+                "covid_orders_tooltip"
+            ] = f"{row['firstname']} {row['lastname']} – COVID PCR\n\n{temp_str}"
 
         # Add data to the individual department list
         dept_list = pts_by_department.get(row["department"], [])
@@ -175,12 +255,33 @@ def gen_patient_table(modified: int, ward: str, data: dict):
         ros_order_status="ROS order status",
         mrsa_order_datetime_str="Last MRSA order",
         mrsa_order_status="MRSA order status",
+        covid_order_datetime_str="Last COVID19 PCR order",
     )
 
     return [
         dt.DataTable(
             columns=[{"name": v, "id": k} for k, v in cols.items()],
             data=data.get(ward, []),
+            tooltip_data=[
+                {
+                    "ros_order_datetime_str": {
+                        "value": row["ros_orders_tooltip"],
+                        "type": "markdown",
+                    },
+                    "mrsa_order_datetime_str": {
+                        "value": row["mrsa_orders_tooltip"],
+                        "type": "markdown",
+                    },
+                    "covid_order_datetime_str": {
+                        "value": row["covid_orders_tooltip"],
+                        "type": "markdown",
+                    },
+                }
+                for row in data.get(ward, [])
+            ],
+            tooltip_delay=0,
+            tooltip_duration=None,
+            style_as_list_view=True,
             sort_action="native",
             style_cell={
                 "font-family": "sans-serif",

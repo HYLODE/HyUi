@@ -173,20 +173,25 @@ lab_battery_ids AS
 		lbe.lab_battery_id
 		FROM star.lab_battery_element lbe
 		LEFT JOIN star.lab_test_definition ltd ON lbe.lab_test_definition_id = ltd.lab_test_definition_id
-		WHERE ltd.test_lab_code = 'ROS'
-		   OR ltd.test_lab_code = 'MRSA'
+		WHERE ltd.test_lab_code IN ('ROS', 'MRSA', 'NCOV', 'XCOV')
 ),
+
+-- NCOV -> Standard PCR
+-- XCOV -> Rapid PCR
 
 icu_labs AS
 (
 	SELECT
-	  all_beds_annotated.*
-	 ,lor.order_datetime
-	 ,lor.lab_battery_id
-	 ,lre.lab_result_id
-	 ,lre.result_last_modified_datetime
-	 ,lre.value_as_text
+	  all_beds_annotated.encounter
+-- 	 ,lor.order_datetime
+-- 	 ,lor.lab_battery_id
+	 ,lor.lab_order_id
+-- 	 ,lre.lab_result_id
+-- 	 ,lre.result_last_modified_datetime
+-- 	 ,lre.value_as_text
 	 ,lre.abnormal_flag
+-- 	 ,lre."comment"
+	 ,lre.result_status
 
 	FROM all_beds_annotated
 	LEFT JOIN star.lab_order lor ON all_beds_annotated.hospital_visit_id = lor.hospital_visit_id
@@ -195,30 +200,105 @@ icu_labs AS
 	WHERE lor.lab_battery_id IN (SELECT lab_battery_id FROM lab_battery_ids)
 ),
 
+lab_result_status AS (
+	SELECT
+-- 		,lab_order,
+		lab_order_id
+		,CASE
+			WHEN 'A' = ANY(ARRAY_AGG(abnormal_flag)) THEN 'A' ELSE NULL
+		END abnormal_flag
+		,CASE
+			WHEN 'FINAL' = ANY(ARRAY_AGG(result_status)) THEN 'FINAL' ELSE NULL
+		END result_status
+		FROM icu_labs
+		GROUP BY lab_order_id
+),
+
+labs_agg AS (
+	SELECT
+		DISTINCT lor.lab_order_id
+		,all_beds_annotated.encounter
+		,lrs.abnormal_flag
+		,lrs.result_status
+		,lor.order_datetime
+		,lor.lab_battery_id
+		FROM all_beds_annotated
+		LEFT JOIN star.lab_order lor ON all_beds_annotated.hospital_visit_id = lor.hospital_visit_id
+		LEFT JOIN lab_result_status lrs ON lrs.lab_order_id = lor.lab_order_id
+		WHERE lor.lab_battery_id IN (SELECT lab_battery_id FROM lab_battery_ids)
+),
+
+
 ros_mrsa_results AS (
 	SELECT *
 	FROM
 			(
-				SELECT DISTINCT ON (encounter)
+				SELECT
 						encounter
-						,order_datetime AS ros_order_datetime
-						,lab_result_id AS ros_lab_result_id
-						,value_as_text AS ros_value_as_text
-				FROM icu_labs
-				WHERE lab_battery_id = (SELECT lab_battery_id FROM lab_battery_ids WHERE test_lab_code = 'ROS')
-				ORDER BY encounter, lab_result_id DESC
+						,json_agg
+							(
+								json_build_object
+									(
+										'order_datetime', labs_agg.order_datetime,
+										'result_status', labs_agg.result_status,
+										'abnormal_flag', labs_agg.abnormal_flag
+									)
+								ORDER BY labs_agg.lab_order_id DESC
+							)
+							AS ros_orders
+-- 						,ARRAY_AGG(labs_agg.order_datetime ORDER BY labs_agg.lab_order_id DESC) AS ros_order_datetime
+-- 						,ARRAY_AGG(labs_agg.result_status ORDER BY labs_agg.lab_order_id DESC) AS ros_result_status
+-- 						,ARRAY_AGG(labs_agg.abnormal_flag ORDER BY labs_agg.lab_order_id DESC) AS ros_abnormal_flag
+				FROM labs_agg
+				WHERE lab_battery_id IN (SELECT lab_battery_id FROM lab_battery_ids WHERE test_lab_code = 'ROS')
+				GROUP BY encounter
+				ORDER BY encounter
 			) AS ros
 		FULL JOIN
 			(
-				SELECT DISTINCT ON (encounter)
+				SELECT
 						encounter
-						,order_datetime AS mrsa_order_datetime
-						,lab_result_id AS mrsa_lab_result_id
-						,value_as_text AS mrsa_value_as_text
-				FROM icu_labs
+						,json_agg
+							(
+								json_build_object
+									(
+										'order_datetime', labs_agg.order_datetime,
+										'result_status', labs_agg.result_status,
+										'abnormal_flag', labs_agg.abnormal_flag
+									)
+								ORDER BY labs_agg.lab_order_id DESC
+							)
+							AS mrsa_orders
+-- 						,ARRAY_AGG(labs_agg.result_status ORDER BY labs_agg.lab_order_id DESC) AS mrsa_result_status
+-- 						,ARRAY_AGG(labs_agg.abnormal_flag ORDER BY labs_agg.lab_order_id DESC) AS mrsa_abnormal_flag
+				FROM labs_agg
 				WHERE lab_battery_id = (SELECT lab_battery_id FROM lab_battery_ids WHERE test_lab_code = 'MRSA')
-				ORDER BY encounter, lab_result_id DESC
+				GROUP BY encounter
+				ORDER BY encounter
 			) AS mrsa
+		USING ("encounter")
+		FULL JOIN
+			(
+				SELECT
+						encounter
+						,json_agg
+							(
+								json_build_object
+									(
+										'order_datetime', labs_agg.order_datetime,
+										'result_status', labs_agg.result_status,
+										'abnormal_flag', labs_agg.abnormal_flag
+									)
+								ORDER BY labs_agg.lab_order_id DESC
+							)
+							AS covid_orders
+-- 						,ARRAY_AGG(labs_agg.result_status ORDER BY labs_agg.lab_order_id DESC) AS mrsa_result_status
+-- 						,ARRAY_AGG(labs_agg.abnormal_flag ORDER BY labs_agg.lab_order_id DESC) AS mrsa_abnormal_flag
+				FROM labs_agg
+				WHERE lab_battery_id IN (SELECT lab_battery_id FROM lab_battery_ids WHERE test_lab_code IN ('NCOV', 'XCOV'))
+				GROUP BY encounter
+				ORDER BY encounter
+			) AS covid
 		USING ("encounter")
 )
 
@@ -226,18 +306,21 @@ SELECT
 		 ab.department
 		,ab.bed_name
 		,ab.mrn
-		,ab.encounter
 		,ab.firstname
 		,ab.lastname
+		,ab.encounter
 		,ab.date_of_birth
 		,ab.hospital_admission_datetime
 		,ab.location_admission_datetime
-		,r.ros_order_datetime
-		,r.ros_lab_result_id
-		,r.ros_value_as_text
-		,r.mrsa_order_datetime
-		,r.mrsa_lab_result_id
-		,r.mrsa_value_as_text
+		,r.ros_orders
+-- 		,r.ros_order_datetime
+-- 		,r.ros_result_status
+-- 		,r.ros_abnormal_flag
+		,r.mrsa_orders
+-- 		,r.mrsa_order_datetime
+-- 		,r.mrsa_result_status
+-- 		,r.mrsa_abnormal_flag
+		,r.covid_orders
 	FROM all_beds_annotated ab
 	LEFT JOIN ros_mrsa_results r ON ab.encounter = r.encounter
 	ORDER BY department, bed_name
