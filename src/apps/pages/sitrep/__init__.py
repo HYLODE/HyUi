@@ -69,18 +69,19 @@ COLS = [
     # {"id": "episode_slice_id", "name": "Slice", "type": "numeric"},
     {
         "id": "prediction_as_real",
-        "name": "Discharge?",
+        "name": "Dischargeable",
         "type": "numeric",
         "format": FormatTemplate.percentage(0),
     },
     {
         "id": "DischargeReady",
-        "name": "D/C",
+        "name": "Discharge decision",
         "presentation": "dropdown",
         "editable": True,
     },
-    {"id": "pm_type", "name": "Request?", "type": "text"},
-    {"id": "pm_dept", "name": "Destination", "type": "text"},
+    {"id": "pm_type", "name": "Epic bed request", "type": "text"},
+    # {"id": "epic_bed_request", "name": "Epic bed request", "type": "text"},
+    {"id": "pm_dept", "name": "Bed assigned", "type": "text"},
     # {"id": "covid", "name": "COVID", "presentation": "markdown"},
 ]
 

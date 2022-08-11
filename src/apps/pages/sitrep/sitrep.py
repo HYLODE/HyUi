@@ -143,7 +143,7 @@ def gen_fancy_table(data: dict):
                     "options": [
                         {"label": "READY", "value": "ready"},
                         {"label": "Review", "value": "review"},
-                        {"label": "No", "value": "No"},
+                        {"label": "-", "value": "No"},
                     ],
                     "clearable": False,
                 },

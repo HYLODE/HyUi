@@ -249,7 +249,7 @@ def store_ward(beds: list, patients: list, closed: bool) -> list:
         indicator="_merge_ward",
     )
 
-    # prepare field
+    # prepare fields
     dfm["age"] = (
         pd.Timestamp.now() - dfm["date_of_birth"].apply(pd.to_datetime)
     ) / np.timedelta64(1, "Y")
@@ -257,9 +257,10 @@ def store_ward(beds: list, patients: list, closed: bool) -> list:
     dfm["lastname"] = dfm["lastname"].fillna("")
     dfm["sex"] = dfm["sex"].fillna("")
     dfm["name"] = dfm.apply(
-        lambda row: f"{row.firstname.title()} {row.lastname.upper()}", axis=1
+        lambda row: f"{row.lastname.upper()}, {row.firstname.title()}", axis=1
     )
     dfm["unit_order"] = dfm["unit_order"].astype(int, errors="ignore")
+    # dfm["epic_bed_request"] = dfm["pm_type"].apply(lambda x: "Ready to plan" if x == "OUTBOUND" else "")
     # always return not closed; optionally return closed
     if not closed:
         dfm = dfm[dfm["closed"] == False]
