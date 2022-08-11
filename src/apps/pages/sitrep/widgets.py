@@ -5,8 +5,6 @@ from apps.pages.sitrep import BPID
 
 ward_radio_button = html.Div(
     [
-        # Need a hidden div for the callback with no output
-        html.Div(id="hidden-div", style={"display": "none"}),
         html.Div(
             [
                 dbc.RadioItems(
@@ -29,7 +27,23 @@ ward_radio_button = html.Div(
             ],
             className="dbc",
         ),
-        # html.Div(id="which_icu"),
     ],
     className="radio-group",
+)
+
+closed_beds_switch = html.Div(
+    [
+        html.Div(
+            [
+                dbc.Switch(
+                    id=f"{BPID}closed_beds_switch",
+                    className="dbc d-grid d-md-flex justify-content-md-end",
+                    label="Reveal closed beds",
+                    value=False,
+                )
+            ],
+            className="dbc",
+        ),
+    ],
+    # className="radio-group",
 )

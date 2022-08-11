@@ -1,6 +1,10 @@
 # src/apps/sitrep/sitrep.py
 """
-sub-application for sitrep
+Layout sub-application for sitrep
+See for other functions
+./callbacks.py
+./widgets.py
+./wng.py
 """
 
 
@@ -205,16 +209,32 @@ dash_only = html.Div(
         dcc.Store(id=f"{BPID}hymind_icu_discharge_data"),
         dcc.Store(id=f"{BPID}patients_data"),
         dcc.Store(id=f"{BPID}ward_data"),
+        # Need a hidden div for the callback with no output
+        html.Div(id="hidden-div-diff-table", style={"display": "none"}),
     ]
 )
 
 
 def layout():
-    if not current_user.is_authenticated:
+    if not current_user.is_authenticated and settings.ENV != "dev":
         return html.Div(["Please ", dcc.Link("login", href="/login"), " to continue"])
     return html.Div(
         [
-            dbc.Row(dbc.Col([widgets.ward_radio_button])),
+            dbc.Row(
+                [
+                    dbc.Col([widgets.ward_radio_button]),
+                    # dbc.Col([widgets.closed_beds_switch], width=2),
+                ]
+            ),
+            dbc.Row(
+                [
+                    # dbc.Col([ widgets.ward_radio_button]),
+                    dbc.Col(
+                        [widgets.closed_beds_switch],
+                        width={"size": 2, "order": "last", "offset": 10},
+                    ),
+                ]
+            ),
             dbc.Row(dbc.Col([sitrep_table])),
             dash_only,
         ]

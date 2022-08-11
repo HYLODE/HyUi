@@ -216,11 +216,12 @@ def store_patients(census: list, sitrep: list, hymind: list) -> list:
     Output(f"{BPID}ward_data", "data"),
     Input(f"{BPID}beds_data", "data"),
     Input(f"{BPID}patients_data", "data"),
+    Input(f"{BPID}closed_beds_switch", "value"),
 )
 @cache.memoize(
     timeout=CACHE_TIMEOUT
 )  # cache decorator must come between callback and function
-def store_ward(beds: list, patients: list) -> list:
+def store_ward(beds: list, patients: list, closed: bool) -> list:
     """
     Merges patients onto beds
     """
@@ -259,6 +260,9 @@ def store_ward(beds: list, patients: list) -> list:
         lambda row: f"{row.firstname.title()} {row.lastname.upper()}", axis=1
     )
     dfm["unit_order"] = dfm["unit_order"].astype(int, errors="ignore")
+    # always return not closed; optionally return closed
+    if not closed:
+        dfm = dfm[dfm["closed"] == False]
 
     # if settings.VERBOSE:
     #     print(dfm.info())
@@ -268,7 +272,7 @@ def store_ward(beds: list, patients: list) -> list:
 
 
 @callback(
-    Output("hidden-div", "children"),
+    Output("hidden-div-diff-table", "children"),
     Input(f"{BPID}tbl-census", "data_timestamp"),
     State(f"{BPID}tbl-census", "data_previous"),
     State(f"{BPID}tbl-census", "data"),
