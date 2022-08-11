@@ -8,7 +8,7 @@ SITREP_ENV = "test"  # test (staging red) or prod
 BPID = "sit_"
 
 BED_BONES_TABLE_ID = 261
-CACHE_TIMEOUT = 5 * 60 * 1000
+CACHE_TIMEOUT = 5 * 60  # seconds!!!
 REFRESH_INTERVAL = 30 * 60 * 1000  # milliseconds
 DEPT2WARD_MAPPING = {
     "UCH T03 INTENSIVE CARE": "T03",

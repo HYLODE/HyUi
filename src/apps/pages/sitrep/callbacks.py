@@ -64,7 +64,9 @@ def store_beds(n_intervals: int, dept: str) -> list:
     Input(f"{BPID}query-interval", "n_intervals"),
     Input(f"{BPID}ward_radio", "value"),
 )
-@cache.memoize(timeout=CACHE_TIMEOUT)
+@cache.memoize(
+    timeout=CACHE_TIMEOUT
+)  # cache decorator must come between callback and function
 def store_census(n_intervals: int, dept: str) -> list:
     """
     Stores data from census api (i.e. current beds occupant)
@@ -90,7 +92,9 @@ def store_census(n_intervals: int, dept: str) -> list:
     Input(f"{BPID}query-interval", "n_intervals"),
     Input(f"{BPID}ward_radio", "value"),
 )
-@cache.memoize(timeout=CACHE_TIMEOUT)
+@cache.memoize(
+    timeout=CACHE_TIMEOUT
+)  # cache decorator must come between callback and function
 def store_sitrep(n_intervals: int, dept: str) -> list:
     """
     Stores data from sitrep api (i.e. organ status)
@@ -114,7 +118,9 @@ def store_sitrep(n_intervals: int, dept: str) -> list:
     Input(f"{BPID}query-interval", "n_intervals"),
     Input(f"{BPID}ward_radio", "value"),
 )
-@cache.memoize(timeout=CACHE_TIMEOUT)
+@cache.memoize(
+    timeout=CACHE_TIMEOUT
+)  # cache decorator must come between callback and function
 def store_hymind_icu_discharge(n_intervals: int, dept: str) -> list:
     """
     Stores data from HyMind ICU discharge predictions
@@ -141,7 +147,9 @@ def store_hymind_icu_discharge(n_intervals: int, dept: str) -> list:
     Input(f"{BPID}sitrep_data", "data"),
     Input(f"{BPID}hymind_icu_discharge_data", "data"),
 )
-@cache.memoize(timeout=CACHE_TIMEOUT)
+@cache.memoize(
+    timeout=CACHE_TIMEOUT
+)  # cache decorator must come between callback and function
 def store_patients(census: list, sitrep: list, hymind: list) -> list:
     """
     Assembles patient level info (without beds)
@@ -209,7 +217,9 @@ def store_patients(census: list, sitrep: list, hymind: list) -> list:
     Input(f"{BPID}beds_data", "data"),
     Input(f"{BPID}patients_data", "data"),
 )
-@cache.memoize(timeout=CACHE_TIMEOUT)
+@cache.memoize(
+    timeout=CACHE_TIMEOUT
+)  # cache decorator must come between callback and function
 def store_ward(beds: list, patients: list) -> list:
     """
     Merges patients onto beds
