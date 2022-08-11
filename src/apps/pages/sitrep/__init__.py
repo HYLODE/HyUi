@@ -4,6 +4,8 @@
 from dash.dash_table import FormatTemplate
 
 SITREP_ENV = "test"  # test (staging red) or prod
+# GREEN = TCN model
+# RED = original model
 STAGING_COLOUR = "GREEN"  # or RED or BLUE
 
 if STAGING_COLOUR == "GREEN":
