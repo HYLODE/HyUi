@@ -4,6 +4,19 @@
 from dash.dash_table import FormatTemplate
 
 SITREP_ENV = "test"  # test (staging red) or prod
+STAGING_COLOUR = "GREEN"  # or RED or BLUE
+
+if STAGING_COLOUR == "GREEN":
+    HYCASTLE_API_PORT = 5906
+    HYMIND_API_PORT = 5907
+elif STAGING_COLOUR == "RED":
+    HYCASTLE_API_PORT = 5207
+    HYMIND_API_PORT = 5208
+# elif STAGING_COLOUR == "BLUE":
+#     HYCASTLE_API_PORT =
+#     HYMIND_API_PORT =
+else:
+    raise ValueError("STAGING not defined")
 
 BPID = "sit_"
 
