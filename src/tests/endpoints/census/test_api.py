@@ -1,11 +1,13 @@
+# src/tests/beds/test_api.py
 """
-Unit tests for the census API module
+Unit tests for the beds API module
 """
 import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import Session
 
 from api.main import app  # type: ignore
+from datetime import date, datetime
 import arrow
 import pandas as pd
 
@@ -13,7 +15,7 @@ client = TestClient(app)
 
 
 @pytest.mark.smoke
-def test_get_results_census(session: Session, client: TestClient):
+def test_get_results_beds(session: Session, client: TestClient):
     """
     Prove that the test session/client relationship works
     and that there are data in the database
@@ -26,11 +28,11 @@ def test_get_results_census(session: Session, client: TestClient):
 
 
 @pytest.mark.api
-def test_get_results_census_content_match(
-    session: Session, client: TestClient, mock_df_census: pd.DataFrame
+def test_get_results_beds_content_match(
+    session: Session, client: TestClient, mock_df_beds: pd.DataFrame
 ):
     """
-    Specific test for census
+    Specific test for beds
     Provided here as an example
     Will need duplicating and re-writing for each endpoint
     """
@@ -40,22 +42,36 @@ def test_get_results_census_content_match(
     data = response.json()
     assert len(data) > 0
 
-    res = data[0]
+    res = data[3]
 
-    assert isinstance(res["name"], str)
+    assert isinstance(res["patient_class"], str)
+    assert isinstance(res["firstname"], str)
+    assert isinstance(res["lastname"], str)
     assert isinstance(res["mrn"], str)
-    assert isinstance(res["csn"], int)
-    assert isinstance(res["dob"], str)
-    assert isinstance(res["postcode"], str)
-    assert isinstance(res["ward_code"], str)
-    assert isinstance(res["bay_code"], str)
-    assert isinstance(res["bed_code"], str)
+    assert isinstance(res["encounter"], int)
+    assert isinstance(arrow.get(res["date_of_birth"]).date(), date)
+
+    assert isinstance(res["department"], str)
+    assert isinstance(res["location_id"], int)
+    assert isinstance(res["location_string"], str)
+
+    assert isinstance(arrow.get(res["ovl_admission"]).datetime, datetime)
+    assert isinstance(res["ovl_hv_id"], int)
+
+    assert isinstance(arrow.get(res["cvl_admission"]).datetime, datetime)
+    assert isinstance(arrow.get(res["cvl_discharge"]).datetime, datetime)
+    assert isinstance(res["cvl_hv_id"], int)
+
+    assert isinstance(res["ovl_ghost"], bool)
+    assert isinstance(res["occupied"], bool)
 
     # should load the first row of the mock data directly from file
-    df0 = mock_df_census.loc[0]
+    df3 = mock_df_beds.loc[3]
 
     # check that the API delivers the same data
-    assert df0["name"] == res["name"]
-    assert str(df0["mrn"]) == str(res["mrn"])
-    assert df0["dob"] == arrow.get(res["dob"]).date()
-    assert df0["postcode"] == res["postcode"]
+    assert df3["firstname"] == res["firstname"]
+    assert df3["lastname"] == res["lastname"]
+    assert str(df3["mrn"]) == str(res["mrn"])
+    assert df3["date_of_birth"] == arrow.get(res["date_of_birth"]).date()
+    assert df3["location_string"] == res["location_string"]
+    assert df3["department"] == res["department"]

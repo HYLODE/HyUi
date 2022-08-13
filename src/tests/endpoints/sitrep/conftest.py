@@ -9,8 +9,8 @@ from api.main import app
 from utils.api import get_emap_session
 from mock.mock import (  # type: ignore
     make_mock_db_in_memory,
-    make_mock_df,
-    path_to_hdf_file,
+    path_to_file,
+    df_from_file,
 )
 
 ROUTE_NAME = "sitrep"
@@ -53,5 +53,5 @@ def mock_df():
     """
     Use sitrep data as baseline exemplar for testing
     """
-    df = make_mock_df(path_to_hdf_file(ROUTE_NAME))
+    df = df_from_file(ROUTE_NAME)
     return df

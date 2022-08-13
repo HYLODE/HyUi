@@ -90,7 +90,7 @@ def df_from_file(route: str) -> pd.DataFrame:
         with engine_in.connect() as conn:
             df = pd.read_sql(route, conn)
     else:
-        raise Exception
+        raise Exception("[ERROR] Cannot find mock data either as .db or .h5")
     return df
 
 
