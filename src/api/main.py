@@ -2,25 +2,23 @@
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 
-from .census import router as census
 from .consults import router as consults
 from .electives import router as electives
 from .perrt import router as perrt
 from .sitrep import router as sitrep
 from .users import router as users
 from .ros import router as ros
-from .beds import router as beds
+from .census import router as census
 from .hymind import router as hymind
 
 app = FastAPI(default_response_class=ORJSONResponse)
-app.include_router(census.router)
 app.include_router(consults.router)
 app.include_router(electives.router)
 app.include_router(perrt.router)
 app.include_router(sitrep.router)
 app.include_router(users.router)
 app.include_router(ros.router)
-app.include_router(beds.router)
+app.include_router(census.router)
 app.include_router(hymind.router)
 
 

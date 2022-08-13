@@ -21,7 +21,7 @@ def test_get_results_beds(session: Session, client: TestClient):
     and that there are data in the database
     """
     # https://sqlmodel.tiangolo.com/tutorial/fastapi/tests/#pytest-fixtures
-    response = client.get("/beds")
+    response = client.get("/census")
     assert response.status_code == 200
     data = response.json()
     assert len(data) > 0
@@ -37,7 +37,7 @@ def test_get_results_beds_content_match(
     Will need duplicating and re-writing for each endpoint
     """
     # https://sqlmodel.tiangolo.com/tutorial/fastapi/tests/#pytest-fixtures
-    response = client.get("/beds")
+    response = client.get("/census")
     assert response.status_code == 200
     data = response.json()
     assert len(data) > 0

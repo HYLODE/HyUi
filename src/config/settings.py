@@ -1,6 +1,5 @@
 # ./src/api/settings_src.py
 # project wide settings are loaded via ./.envrc and ./.secrets
-import os
 from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, Optional
@@ -15,11 +14,10 @@ class ModuleNames(str, Enum):
 
     consults = "consults"
     sitrep = "sitrep"
-    census = "census"
     electives = "electives"
     perrt = "perrt"
     ros = "ros"
-    beds = "beds"
+    census = "census"
     hymind = "hymind"
 
 

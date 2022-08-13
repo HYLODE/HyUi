@@ -1,10 +1,13 @@
-# src/api/census/__init__.py
+# src/api/beds/__init__.py
 """
-Results from Census API
-eg.
+EMAP beds and census
 
-http://uclvlddpragae07:5006/emap/icu/census/T03/
+The developer should specify the data models here
+and follow the **same** naming convention such that
+the module.classname can be reliably used for access
 """
+
 from pathlib import Path
 
+QUERY_LIVE_PATH = Path(__file__).resolve().parent / "live.sql"
 QUERY_MOCK_PATH = Path(__file__).resolve().parent / "mock.sql"

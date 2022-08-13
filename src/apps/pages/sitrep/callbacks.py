@@ -7,7 +7,7 @@ import requests
 from dash import Input, Output, State, callback, get_app
 from flask_caching import Cache
 
-from api.beds.model import BedsRead
+from api.census.model import CensusRead
 from apps.pages.sitrep import (
     BED_BONES_TABLE_ID,
     BEDS_KEEP_COLS,
@@ -42,8 +42,7 @@ cache = Cache(
 # not caching since this is how we update beds
 def store_beds(n_intervals: int, dept: str) -> list:
     """
-    Stores data from beds api (i.e. skeleton)
-    Confusingly census is in BedsRead which is different to BedBones
+    Stores data from census api (i.e. skeleton)
     """
     beds = get_bed_list(dept)
     beds = unpack_nested_dict(beds, f2unpack="bed_functional", subkey="value")
@@ -70,12 +69,11 @@ def store_beds(n_intervals: int, dept: str) -> list:
 def store_census(n_intervals: int, dept: str) -> list:
     """
     Stores data from census api (i.e. current beds occupant)
-    Confusingly BedsRead refers to census
     """
     payload = {"departments": dept}
-    res = requests.get(f"{settings.API_URL}/beds", params=payload)
+    res = requests.get(f"{settings.API_URL}/census", params=payload)
     census = res.json()
-    census = validate_json(census, BedsRead, to_dict=True)
+    census = validate_json(census, CensusRead, to_dict=True)
     if all([not bool(i) for i in census]):
         warnings.warn("[WARN] store_census returned an empty list of dictionaries")
         return census

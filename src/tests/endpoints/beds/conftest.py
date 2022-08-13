@@ -12,7 +12,7 @@ from mock.mock import (  # type: ignore
     df_from_file,
 )
 
-ROUTE_NAME = "beds"
+ROUTE_NAME = "census"
 
 
 # https://sqlmodel.tiangolo.com/tutorial/fastapi/tests
@@ -47,5 +47,5 @@ def mock_df_beds():
     """
     Use electives data as baseline exemplar for testing
     """
-    df = df_from_file("beds")
+    df = df_from_file("census")
     return df
