@@ -1,19 +1,24 @@
 # src/apps/pages/census/callbacks.py
+import importlib
 import warnings
 
 import numpy as np
 import pandas as pd
 import requests
-from dash import Input, Output, State, callback, get_app
+from dash import Input, Output, State, callback, get_app, dcc
 from flask_caching import Cache
 
-from api.census.model import CensusRead
+import utils.wards
+from api.census.model import CensusDepartments, CensusRead
 from apps.pages.census import (
     BED_BONES_TABLE_ID,
     BEDS_KEEP_COLS,
     BPID,
     CACHE_TIMEOUT,
+    CENSUS_API_URL,
     CENSUS_KEEP_COLS,
+    DEPARTMENTS_API_URL,
+    DEPT_KEEP_COLS,
 )
 from config.settings import settings
 from utils.beds import BedBonesBase, get_bed_list, unpack_nested_dict, update_bed_row
@@ -29,20 +34,60 @@ cache = Cache(
     },
 )
 
-# @callback(
-#     Output(f"{BPID}dept_dropdown", "options"),
-#     Input(f"{BPID}beds_data", "data"),
-#     prevent_initial_call=True,
-# )
-# def update_dept_dropdown(data: dict):
-#     df = pd.DataFrame.from_records(data)
-#     return df["department"].sort_values().unique()
+
+@callback(
+    Output(f"{BPID}dept_dropdown_div", "children"),
+    Input(f"{BPID}building_radio", "value"),
+)
+def store_depts(building: str) -> list:
+    """
+    Dynamically build department picker list
+
+    :param      building:  The building
+    :type       building:  str
+
+    :returns:   { description_of_the_return_value }
+    :rtype:     list
+    """
+    dept_list = getattr(importlib.import_module("utils.wards"), building)
+    return dcc.Dropdown(
+        id=f"{BPID}dept_dropdown",
+        value="UCH T03 INTENSIVE CARE",
+        options=[{"label": v, "value": v} for v in dept_list],
+        placeholder="Pick a department",
+        multi=False,
+    )
+
+
+@callback(
+    Output(f"{BPID}dept_data", "data"),
+    Input(f"{BPID}query-interval", "n_intervals"),
+    Input(f"{BPID}building_radio", "value"),
+)
+@cache.memoize(timeout=CACHE_TIMEOUT)
+def store_depts(n_intervals: int, building: str) -> list:
+    """
+    Stores data from census api (i.e. skeleton)
+    """
+    res = requests.get(DEPARTMENTS_API_URL)
+    depts = res.json()
+    depts = validate_json(depts, CensusDepartments, to_dict=True)
+    if all([not bool(i) for i in depts]):
+        warnings.warn("[WARN] store_census returned an empty list of dictionaries")
+        return depts
+    df = pd.DataFrame.from_records(depts)
+    dept_list = getattr(importlib.import_module("utils.wards"), building)
+    df = df[df["department"].isin(dept_list)]
+    df = df[DEPT_KEEP_COLS]
+    # TODO: filter and organise by building
+    return df.to_dict(orient="records")
 
 
 @callback(
     Output(f"{BPID}beds_data", "data"),
     Input(f"{BPID}query-interval", "n_intervals"),
     Input(f"{BPID}dept_dropdown", "value"),
+    prevent_initial_call=True,
 )
 # @cache.memoize(timeout=CACHE_TIMEOUT)
 # not caching since this is how we update beds
@@ -68,6 +113,7 @@ def store_beds(n_intervals: int, dept: str) -> list:
     Output(f"{BPID}census_data", "data"),
     Input(f"{BPID}query-interval", "n_intervals"),
     Input(f"{BPID}dept_dropdown", "value"),
+    prevent_initial_call=True,
 )
 @cache.memoize(
     timeout=CACHE_TIMEOUT
@@ -77,7 +123,7 @@ def store_census(n_intervals: int, dept: str) -> list:
     Stores data from census api (i.e. current beds occupant)
     """
     payload = {"departments": dept}
-    res = requests.get(f"{settings.API_URL}/census", params=payload)
+    res = requests.get(CENSUS_API_URL, params=payload)
     census = res.json()
     census = validate_json(census, CensusRead, to_dict=True)
     if all([not bool(i) for i in census]):
@@ -94,6 +140,7 @@ def store_census(n_intervals: int, dept: str) -> list:
 @callback(
     Output(f"{BPID}patients_data", "data"),
     Input(f"{BPID}census_data", "data"),
+    prevent_initial_call=True,
 )
 @cache.memoize(
     timeout=CACHE_TIMEOUT
@@ -124,6 +171,7 @@ def store_patients(census: list) -> list:
     Input(f"{BPID}beds_data", "data"),
     Input(f"{BPID}patients_data", "data"),
     Input(f"{BPID}closed_beds_switch", "value"),
+    prevent_initial_call=True,
 )
 @cache.memoize(
     timeout=CACHE_TIMEOUT

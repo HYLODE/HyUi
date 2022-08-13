@@ -4,7 +4,8 @@
 # then adding in WMS
 # ward names represent department names in star.departments
 
-wards = [
+
+tower = [
     # where n = number of distinct locations in EMAP
     #    NAME                           # n      seq
     "UCH T01 ACUTE MEDICAL",  # 86     1
@@ -48,6 +49,9 @@ wards = [
     "UCH T16 NORTH (T16N)",  # 19    39
     "UCH T16 SOUTH (T16S)",  # 18    40
     "UCH T16 SOUTH WINTER",  # 17    41
+]
+
+gwb = [
     "GWB L01 ELECTIVE SURG",  # 37    42
     "GWB L01 CRITICAL CARE",  # 12    43
     "GWB L02 NORTH (L02N)",  # 19    44
@@ -56,10 +60,16 @@ wards = [
     "GWB L03 EAST (L03E)",  # 19    47
     "GWB L04 NORTH (L04N)",  # 20    48
     "GWB L04 EAST (L04E)",  # 17    49
+]
+
+wms = [
     "WMS W01 CRITICAL CARE",  # 11    50
     "WMS W02 SHORT STAY",  # 20    51
     "WMS W03 WARD",  # 27    52
     "WMS W04 WARD",  # 28    53
+]
+
+nhnn = [
     # NOTE: 2022-08-07 Adding in NHNN critical care areas ONLY for now
     "NHNN C0 NCCU",
     "NHNN C1 NCCU",
@@ -67,3 +77,5 @@ wards = [
 
 # beds that don't have a department and needed to be added in by hand
 departments_missing_beds = {"UCH T06 CENTRAL (T06C)": ["T06C^T06C BY08^BY08-36"]}
+
+wards = tower + gwb + wms + nhnn

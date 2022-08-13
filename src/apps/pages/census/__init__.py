@@ -2,8 +2,8 @@
 from config.settings import settings
 
 BPID = "CENSUS_"
-CENSUS_API_URL = f"{settings.API_URL}/consults/"
-DEPARTMENTS_API_URL = f"{settings.API_URL}/consults/departments"
+CENSUS_API_URL = f"{settings.API_URL}/census/"
+DEPARTMENTS_API_URL = f"{settings.API_URL}/census/departments"
 
 MINUTES = 60 * 1000  # milliseconds
 REFRESH_INTERVAL = 15 * MINUTES
@@ -12,7 +12,19 @@ CACHE_TIMEOUT = 5 * 60  # seconds!!!
 
 BED_BONES_TABLE_ID = 261
 
-COLS = [
+
+DEPT_COLS = [
+    {"id": "department", "name": "department"},
+    {"id": "beds", "name": "beds"},
+    {"id": "patients", "name": "patients"},
+    {"id": "empties", "name": "empties"},
+    {"id": "last_dc", "name": "last_dc"},
+    {"id": "closed_temp", "name": "closed_temp"},
+    {"id": "closed_perm", "name": "closed_perm"},
+    {"id": "modified_at", "name": "modified_at"},
+]
+
+CENSUS_COLS = [
     # {"id": "unit_order", "name": "", "type": "numeric"},
     # {"id": "ward_code", "name": "Ward"},
     # {"id": "bay_code", "name": "Bay"},
@@ -63,7 +75,7 @@ COLS = [
     # {"id": "covid", "name": "COVID", "presentation": "markdown"},
 ]
 
-STYLE_CELL_CONDITIONAL = [
+CENSUS_STYLE_CELL_CONDITIONAL = [
     {
         "if": {"column_id": "bed_label"},
         "textAlign": "right",
@@ -98,6 +110,17 @@ STYLE_CELL_CONDITIONAL = [
     # {"if": {"column_id": "organ_icons"}, "textAlign": "left"},
     {"if": {"column_id": "name"}, "fontWeight": "bold"},
     # {"if": {"column_id": "DischargeReady"}, "textAlign": "left"},
+]
+
+DEPT_KEEP_COLS = [
+    "department",
+    "beds",
+    "patients",
+    "empties",
+    "last_dc",
+    "closed_temp",
+    "closed_perm",
+    "modified_at",
 ]
 
 BEDS_KEEP_COLS = [

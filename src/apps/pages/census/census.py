@@ -15,8 +15,9 @@ from flask_login import current_user
 
 from apps.pages.census import (
     BPID,
-    STYLE_CELL_CONDITIONAL,
-    COLS,
+    CENSUS_STYLE_CELL_CONDITIONAL,
+    CENSUS_COLS,
+    DEPT_COLS,
     REFRESH_INTERVAL,
     widgets,
 )
@@ -33,11 +34,65 @@ register_page(__name__)
 
 
 @callback(
-    Output(f"{BPID}fancy_table", "children"),
+    Output(f"{BPID}dept_table", "children"),
+    Input(f"{BPID}dept_data", "data"),
+    # prevent_initial_call=True,
+)
+def gen_dept_table(data: dict):
+    # import ipdb; ipdb.set_trace()
+    dfo = pd.DataFrame.from_records(data)
+    if len(dfo) == 0:
+        warnings.warn("[WARN] No data provided for department/ward table")
+        return html.H2("No data found for department/ward table")
+    if settings.VERBOSE and len(dfo):
+        print(dfo.iloc[0])
+
+    dto = (
+        dt.DataTable(
+            id=f"{BPID}tbl-dept",
+            columns=DEPT_COLS,
+            data=dfo.to_dict("records"),
+            editable=True,
+            # fixed_columns={},
+            style_table={"width": "100%", "minWidth": "100%", "maxWidth": "100%"},
+            style_as_list_view=True,  # remove col lines
+            style_cell={
+                "fontSize": 13,
+                "font-family": "monospace",
+                "padding": "1px",
+            },
+            # style_cell_conditional=CENSUS_STYLE_CELL_CONDITIONAL,
+            style_data={"color": "black", "backgroundColor": "white"},
+            # striped rows
+            style_data_conditional=[
+                {
+                    "if": {"row_index": "odd"},
+                    "backgroundColor": "rgb(220, 220, 220)",
+                },
+            ],
+            # sort_action="native",
+            markdown_options={"html": True},
+            persistence=True,
+            persisted_props=["data"],
+        ),
+    )
+
+    # wrap in container
+    dto = [
+        dbc.Container(
+            dto,
+            className="dbc",
+        )
+    ]
+    return dto
+
+
+@callback(
+    Output(f"{BPID}census_table", "children"),
     Input(f"{BPID}ward_data", "data"),
     # prevent_initial_call=True,
 )
-def gen_fancy_table(data: dict):
+def gen_census_table(data: dict):
     # import ipdb; ipdb.set_trace()
     dfo = pd.DataFrame.from_records(data)
     if len(dfo) == 0:
@@ -95,7 +150,7 @@ def gen_fancy_table(data: dict):
     dto = (
         dt.DataTable(
             id=f"{BPID}tbl-census",
-            columns=COLS,
+            columns=CENSUS_COLS,
             data=dfo.to_dict("records"),
             editable=True,
             # fixed_columns={},
@@ -106,7 +161,7 @@ def gen_fancy_table(data: dict):
                 "font-family": "monospace",
                 "padding": "1px",
             },
-            # style_cell_conditional=STYLE_CELL_CONDITIONAL,
+            # style_cell_conditional=CENSUS_STYLE_CELL_CONDITIONAL,
             style_data={"color": "black", "backgroundColor": "white"},
             # striped rows
             style_data_conditional=[
@@ -142,22 +197,21 @@ def gen_fancy_table(data: dict):
 dept_selector = dbc.Card(
     [
         dbc.CardHeader(html.H6("Select a ward")),
-        dbc.CardBody(
-            dcc.Dropdown(
-                id=f"{BPID}dept_dropdown",
-                # value=WARDS,
-                value="UCH T03 INTENSIVE CARE",
-                placeholder="Pick a department",
-                multi=False,
-            )
-        ),
+        dbc.CardBody(html.Div(id=f"{BPID}dept_dropdown_div")),
+    ]
+)
+
+dept_table = dbc.Card(
+    [
+        dbc.CardHeader(html.H6("Ward details")),
+        dbc.CardBody(id=f"{BPID}dept_table"),
     ]
 )
 
 census_table = dbc.Card(
     [
         dbc.CardHeader(html.H6("census details")),
-        dbc.CardBody(id=f"{BPID}fancy_table"),
+        dbc.CardBody(id=f"{BPID}census_table"),
     ]
 )
 
@@ -173,6 +227,7 @@ dash_only = html.Div(
         dcc.Interval(
             id=f"{BPID}query-interval", interval=REFRESH_INTERVAL, n_intervals=0
         ),
+        dcc.Store(id=f"{BPID}dept_data"),
         dcc.Store(id=f"{BPID}beds_data"),
         dcc.Store(id=f"{BPID}census_data"),
         dcc.Store(id=f"{BPID}patients_data"),
@@ -188,6 +243,15 @@ def layout():
         return html.Div(["Please ", dcc.Link("login", href="/login"), " to continue"])
     return html.Div(
         [
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [widgets.building_radio_button],
+                        width={"size": 6, "order": "last", "offset": 6},
+                    ),
+                ]
+            ),
+            dbc.Row(dbc.Col([dept_table])),
             dbc.Row(dbc.Col([dept_selector])),
             dbc.Row(dbc.Col([census_table])),
             dbc.Row(
