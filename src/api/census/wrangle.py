@@ -34,9 +34,7 @@ def _aggregate_by_department(df: pd.DataFrame) -> pd.DataFrame:
     Aggregation from location (bed) level to ward level
     Generates estimates of beds likely to be closed
     """
-    if df["cvl_discharge"].dt.tz is None:
-        df["cvl_discharge"] = df["cvl_discharge"].dt.tz_localize("UTC")
-        warnings.warn("[WARN] Forcing timezone to UTC for 'modified_at'")
+    df["cvl_discharge"] = pd.to_datetime(df["cvl_discharge"], errors="coerce", utc=True)
     if df["modified_at"].dt.tz is None:
         df["modified_at"] = df["modified_at"].dt.tz_localize("UTC")
         warnings.warn("[WARN] Forcing timezone to UTC for 'modified_at'")
