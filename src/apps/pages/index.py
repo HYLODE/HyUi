@@ -3,7 +3,7 @@ Menu and landing page
 """
 
 import dash_bootstrap_components as dbc
-from dash import html, register_page
+from dash import html, register_page, dcc
 
 
 register_page(__name__, path="/", name="Home")
@@ -12,7 +12,17 @@ register_page(__name__, path="/", name="Home")
 jumbotron = html.Div(
     dbc.Container(
         [
-            html.H1("Hy!", className="display-3"),
+            dcc.Markdown(
+                """
+                Hi there!
+            """,
+                className="display-3",
+            ),
+            dcc.Markdown(
+                """
+                ... or even _Hy there!_
+            """
+            ),
             html.P(["HyperLocal Bed Demand Forecasting at UCLH"], className="lead"),
             html.Hr(className="my-2"),
             html.P("Funded by NHS-X"),
