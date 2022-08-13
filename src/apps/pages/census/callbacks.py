@@ -1,0 +1,179 @@
+# src/apps/pages/census/callbacks.py
+import warnings
+
+import numpy as np
+import pandas as pd
+import requests
+from dash import Input, Output, State, callback, get_app
+from flask_caching import Cache
+
+from api.census.model import CensusRead
+from apps.pages.census import (
+    BED_BONES_TABLE_ID,
+    BEDS_KEEP_COLS,
+    BPID,
+    CACHE_TIMEOUT,
+    CENSUS_KEEP_COLS,
+)
+from config.settings import settings
+from utils.beds import BedBonesBase, get_bed_list, unpack_nested_dict, update_bed_row
+from utils.dash import get_results_response, validate_json
+
+# this structure is necessary for flask_cache
+app = get_app()
+cache = Cache(
+    app.server,
+    config={
+        "CACHE_TYPE": "filesystem",
+        "CACHE_DIR": "cache-directory",
+    },
+)
+
+# @callback(
+#     Output(f"{BPID}dept_dropdown", "options"),
+#     Input(f"{BPID}beds_data", "data"),
+#     prevent_initial_call=True,
+# )
+# def update_dept_dropdown(data: dict):
+#     df = pd.DataFrame.from_records(data)
+#     return df["department"].sort_values().unique()
+
+
+@callback(
+    Output(f"{BPID}beds_data", "data"),
+    Input(f"{BPID}query-interval", "n_intervals"),
+    Input(f"{BPID}dept_dropdown", "value"),
+)
+# @cache.memoize(timeout=CACHE_TIMEOUT)
+# not caching since this is how we update beds
+def store_beds(n_intervals: int, dept: str) -> list:
+    """
+    Stores data from census api (i.e. skeleton)
+    """
+    beds = get_bed_list(dept)
+    beds = unpack_nested_dict(beds, f2unpack="bed_functional", subkey="value")
+    beds = unpack_nested_dict(beds, f2unpack="bed_physical", subkey="value")
+    beds = validate_json(beds, BedBonesBase, to_dict=True)
+    if all([not bool(i) for i in beds]):
+        warnings.warn("[WARN] store_beds returned an empty list of dictionaries")
+        return beds
+    df = pd.DataFrame.from_records(beds)
+    df = df[BEDS_KEEP_COLS]
+    mask = df["bed_physical"].str.contains("virtual")
+    df = df[~mask]
+    return df.to_dict(orient="records")
+
+
+@callback(
+    Output(f"{BPID}census_data", "data"),
+    Input(f"{BPID}query-interval", "n_intervals"),
+    Input(f"{BPID}dept_dropdown", "value"),
+)
+@cache.memoize(
+    timeout=CACHE_TIMEOUT
+)  # cache decorator must come between callback and function
+def store_census(n_intervals: int, dept: str) -> list:
+    """
+    Stores data from census api (i.e. current beds occupant)
+    """
+    payload = {"departments": dept}
+    res = requests.get(f"{settings.API_URL}/census", params=payload)
+    census = res.json()
+    census = validate_json(census, CensusRead, to_dict=True)
+    if all([not bool(i) for i in census]):
+        warnings.warn("[WARN] store_census returned an empty list of dictionaries")
+        return census
+    df = pd.DataFrame.from_records(census)
+    df = df[CENSUS_KEEP_COLS]
+    # scrub ghosts
+    mask = df["occupied"]
+    df = df[mask]
+    return df.to_dict(orient="records")
+
+
+@callback(
+    Output(f"{BPID}patients_data", "data"),
+    Input(f"{BPID}census_data", "data"),
+)
+@cache.memoize(
+    timeout=CACHE_TIMEOUT
+)  # cache decorator must come between callback and function
+def store_patients(census: list) -> list:
+    """
+    Assembles patient level info (without beds)
+
+    :returns:   { description_of_the_return_value }
+    :rtype:     list
+    """
+    # Load data into dataframes; ensure columns exist even if store is empty
+
+    df_census = pd.DataFrame.from_records(census)
+    if len(df_census) == 0:
+        warnings.warn("[WARN] store_patients returned an empty list of dictionaries")
+        return [{}]
+    else:
+        df = df_census.copy()
+
+    if settings.VERBOSE:
+        print(df.iloc[0])
+    return df.to_dict(orient="records")
+
+
+@callback(
+    Output(f"{BPID}ward_data", "data"),
+    Input(f"{BPID}beds_data", "data"),
+    Input(f"{BPID}patients_data", "data"),
+    Input(f"{BPID}closed_beds_switch", "value"),
+)
+@cache.memoize(
+    timeout=CACHE_TIMEOUT
+)  # cache decorator must come between callback and function
+def store_ward(beds: list, patients: list, closed: bool) -> list:
+    """
+    Merges patients onto beds
+    """
+    df_beds = pd.DataFrame.from_records(beds)
+    if len(df_beds) == 0:
+        warnings.warn("[WARN] store_beds returned an empty list of dictionaries")
+        return [{}]
+
+    df_pats = pd.DataFrame.from_records(patients)
+    if len(df_pats) == 0:
+        warnings.warn("[WARN] NO patients found for these beds")
+        # prepare empty dataframe so the remainder of the function can run
+        cols = CENSUS_KEEP_COLS
+        df_pats = pd.DataFrame(columns=cols)
+
+    dfm = pd.merge(
+        df_beds,
+        df_pats,
+        how="left",
+        # FIXME: location_id has been updated since EMAP upgrade since the
+        # bed_skeleton is partially hand built then need a better way of
+        # managing this for now merge on string rather than id
+        on=["location_string"],
+        # on=["location_id"],
+        indicator="_merge_ward",
+    )
+
+    # prepare fields
+    dfm["age"] = (
+        pd.Timestamp.now() - dfm["date_of_birth"].apply(pd.to_datetime)
+    ) / np.timedelta64(1, "Y")
+    dfm["firstname"] = dfm["firstname"].fillna("")
+    dfm["lastname"] = dfm["lastname"].fillna("")
+    dfm["sex"] = dfm["sex"].fillna("")
+    dfm["name"] = dfm.apply(
+        lambda row: f"{row.lastname.upper()}, {row.firstname.title()}", axis=1
+    )
+    # dfm["unit_order"] = dfm["unit_order"].astype(int, errors="ignore")
+    # dfm["epic_bed_request"] = dfm["pm_type"].apply(lambda x: "Ready to plan" if x == "OUTBOUND" else "")
+    # always return not closed; optionally return closed
+    if not closed:
+        dfm = dfm[dfm["closed"] == False]
+
+    # if settings.VERBOSE:
+    #     print(dfm.info())
+
+    data = dfm.to_dict("records")
+    return data  # type: ignore

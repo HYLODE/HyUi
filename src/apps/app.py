@@ -20,7 +20,7 @@ class NavbarDropdown(NamedTuple):
 BPID = "app_"
 CORE_PAGES = ["Sitrep", "Electives", "PERRT"]
 ADMIN_PAGES = ["Home", "Login", "Logout"]
-HIDDEN_PAGES = ["Census"]
+HIDDEN_PAGES = []
 ED_PAGE_URL = "http://uclvlddpragae08:5212/"
 # Keep this out of source code repository - save in a file or a database
 #  passwords should be encrypted
