@@ -2,6 +2,7 @@
 Unit tests for the electives API module
 """
 import pytest
+import os
 from fastapi.testclient import TestClient
 from sqlmodel import Session
 
@@ -13,6 +14,10 @@ client = TestClient(app)
 
 
 @pytest.mark.smoke
+@pytest.mark.skipif(
+    os.environ["TEST_LEVEL"] == "SKIP_BROKEN_TESTS",
+    reason="FIXME: mock data not available",
+)
 def test_get_results_electives(session: Session, client: TestClient):
     """
     Prove that the test session/client relationship works
@@ -26,6 +31,10 @@ def test_get_results_electives(session: Session, client: TestClient):
 
 
 @pytest.mark.api
+@pytest.mark.skipif(
+    os.environ["TEST_LEVEL"] == "SKIP_BROKEN_TESTS",
+    reason="FIXME: mock data not available",
+)
 def test_get_results_electives_content_match(
     session: Session, client: TestClient, mock_df_electives: pd.DataFrame
 ):
