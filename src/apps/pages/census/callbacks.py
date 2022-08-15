@@ -5,7 +5,7 @@ import warnings
 import numpy as np
 import pandas as pd
 import requests
-from dash import Input, Output, State, callback, get_app, dcc
+from dash import Input, Output, State, callback, dcc, get_app
 from flask_caching import Cache
 
 import utils.wards
@@ -21,7 +21,13 @@ from apps.pages.census import (
     DEPT_KEEP_COLS,
 )
 from config.settings import settings
-from utils.beds import BedBonesBase, get_bed_list, unpack_nested_dict, update_bed_row
+from utils.beds import (
+    BedBonesBase,
+    get_bed_list,
+    get_closed_beds,
+    unpack_nested_dict,
+    update_bed_row,
+)
 from utils.dash import get_results_response, validate_json
 
 # this structure is necessary for flask_cache
@@ -39,7 +45,7 @@ cache = Cache(
     Output(f"{BPID}dept_dropdown_div", "children"),
     Input(f"{BPID}building_radio", "value"),
 )
-def store_depts(building: str) -> list:
+def gen_dept_dropdown(building: str) -> list:
     """
     Dynamically build department picker list
 
@@ -68,6 +74,7 @@ def store_depts(building: str) -> list:
 def store_depts(n_intervals: int, building: str) -> list:
     """
     Stores data from census api (i.e. skeleton)
+    Also reaches out to bed_bones and pulls in additional closed beds
     """
     res = requests.get(DEPARTMENTS_API_URL)
     depts = res.json()
@@ -78,8 +85,17 @@ def store_depts(n_intervals: int, building: str) -> list:
     df = pd.DataFrame.from_records(depts)
     dept_list = getattr(importlib.import_module("utils.wards"), building)
     df = df[df["department"].isin(dept_list)]
+
+    # Now update with closed beds from bed_bones
+    df_closed = pd.DataFrame.from_records(get_closed_beds())
+    closed = df_closed.groupby("department")["closed"].sum()
+    df = df.merge(closed, on="department", how="left")
+    df["closed"].fillna(0, inplace=True)
+
+    # Then update empties
+    df["empties"] = df["empties"] - df["closed"]
+
     df = df[DEPT_KEEP_COLS]
-    # TODO: filter and organise by building
     return df.to_dict(orient="records")
 
 

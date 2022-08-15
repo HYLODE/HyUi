@@ -139,7 +139,7 @@ class CensusDepartments(SQLModel):
     beds: int
     patients: int
     empties: int
-    last_dc: int
+    days_since_last_dc: int
     closed_temp: bool
     closed_perm: Optional[bool]
     modified_at: datetime

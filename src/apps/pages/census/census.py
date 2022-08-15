@@ -22,10 +22,9 @@ from apps.pages.census import (
     widgets,
 )
 
-# switch off flake8 linting error as the callbacks must be imported
-from apps.pages.census.callbacks import (  # noqa
-    store_census,
-)  # noqa
+# this brings all the callbacks into the namespace
+import apps.pages.census.callbacks
+
 from config.settings import settings
 from utils import icons
 from utils.wards import wards as WARDS
@@ -39,8 +38,8 @@ register_page(__name__)
     # prevent_initial_call=True,
 )
 def gen_dept_table(data: dict):
-    # import ipdb; ipdb.set_trace()
     dfo = pd.DataFrame.from_records(data)
+    # import ipdb; ipdb.set_trace()
     if len(dfo) == 0:
         warnings.warn("[WARN] No data provided for department/ward table")
         return html.H2("No data found for department/ward table")
@@ -90,7 +89,7 @@ def gen_dept_table(data: dict):
 @callback(
     Output(f"{BPID}census_table", "children"),
     Input(f"{BPID}ward_data", "data"),
-    # prevent_initial_call=True,
+    prevent_initial_call=True,
 )
 def gen_census_table(data: dict):
     # import ipdb; ipdb.set_trace()

@@ -16,9 +16,10 @@ BED_BONES_TABLE_ID = 261
 DEPT_COLS = [
     {"id": "department", "name": "department"},
     {"id": "beds", "name": "beds"},
+    {"id": "closed", "name": "closed"},
     {"id": "patients", "name": "patients"},
     {"id": "empties", "name": "empties"},
-    {"id": "last_dc", "name": "last_dc"},
+    {"id": "days_since_last_dc", "name": "Days since d/c"},
     {"id": "closed_temp", "name": "closed_temp"},
     {"id": "closed_perm", "name": "closed_perm"},
     {"id": "modified_at", "name": "modified_at"},
@@ -117,10 +118,11 @@ DEPT_KEEP_COLS = [
     "beds",
     "patients",
     "empties",
-    "last_dc",
+    "days_since_last_dc",
     "closed_temp",
     "closed_perm",
     "modified_at",
+    "closed",  # only exists after merging with bed_bones
 ]
 
 BEDS_KEEP_COLS = [
@@ -136,6 +138,7 @@ BEDS_KEEP_COLS = [
     "bed_functional",
     "bed_physical",
     "DischargeReady",
+    "closed",  # only exists after merging with bed_bones
 ]
 
 CENSUS_KEEP_COLS = [
