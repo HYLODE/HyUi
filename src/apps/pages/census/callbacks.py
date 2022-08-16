@@ -5,13 +5,11 @@ import warnings
 import numpy as np
 import pandas as pd
 import requests
-from dash import Input, Output, State, callback, dcc, get_app
+from dash import Input, Output, callback, dcc, get_app
 from flask_caching import Cache
 
-import utils.wards
 from api.census.model import CensusDepartments, CensusRead
 from apps.pages.census import (
-    BED_BONES_TABLE_ID,
     BEDS_KEEP_COLS,
     BPID,
     CACHE_TIMEOUT,
@@ -26,9 +24,8 @@ from utils.beds import (
     get_bed_list,
     get_closed_beds,
     unpack_nested_dict,
-    update_bed_row,
 )
-from utils.dash import get_results_response, validate_json
+from utils.dash import validate_json
 
 # this structure is necessary for flask_cache
 app = get_app()
@@ -56,22 +53,17 @@ def gen_dept_dropdown(building: str) -> list:
     :rtype:     list
     """
     dept_list = getattr(importlib.import_module("utils.wards"), building)
+    default_value = dept_list[0]
     return dcc.Dropdown(
         id=f"{BPID}dept_dropdown",
-        value="UCH T03 INTENSIVE CARE",
+        value=default_value,
         options=[{"label": v, "value": v} for v in dept_list],
         placeholder="Pick a department",
         multi=False,
     )
 
 
-@callback(
-    Output(f"{BPID}dept_data", "data"),
-    Input(f"{BPID}query-interval", "n_intervals"),
-    Input(f"{BPID}building_radio", "value"),
-)
-@cache.memoize(timeout=CACHE_TIMEOUT)
-def store_depts(n_intervals: int, building: str) -> list:
+def store_depts_fn(n_intervals: int, building: str) -> list:
     """
     Stores data from census api (i.e. skeleton)
     Also reaches out to bed_bones and pulls in additional closed beds
@@ -83,8 +75,9 @@ def store_depts(n_intervals: int, building: str) -> list:
         warnings.warn("[WARN] store_census returned an empty list of dictionaries")
         return depts
     df = pd.DataFrame.from_records(depts)
-    dept_list = getattr(importlib.import_module("utils.wards"), building)
-    df = df[df["department"].isin(dept_list)]
+    if building:
+        dept_list = getattr(importlib.import_module("utils.wards"), building)
+        df = df[df["department"].isin(dept_list)]
 
     # Now update with closed beds from bed_bones
     df_closed = pd.DataFrame.from_records(get_closed_beds())
@@ -97,6 +90,16 @@ def store_depts(n_intervals: int, building: str) -> list:
 
     df = df[DEPT_KEEP_COLS]
     return df.to_dict(orient="records")
+
+
+@callback(
+    Output(f"{BPID}dept_data", "data"),
+    Input(f"{BPID}query-interval", "n_intervals"),
+    Input(f"{BPID}building_radio", "value"),
+)
+@cache.memoize(timeout=CACHE_TIMEOUT)
+def store_depts(*args, **kwargs):
+    return store_depts_fn(*args, **kwargs)
 
 
 @callback(

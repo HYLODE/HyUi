@@ -4,14 +4,16 @@
 # then adding in WMS
 # ward names represent department names in star.departments
 
+# NB: the first item will be the default in the list picker
 
 tower = [
     # where n = number of distinct locations in EMAP
     #    NAME                           # n      seq
+    # default value = tower[0]
+    "UCH T03 INTENSIVE CARE",  # 37     3
     "UCH SDEC",
     "UCH T01 ACUTE MEDICAL",  # 86     1
     "UCH T01 ENHANCED CARE",  # 20     2
-    "UCH T03 INTENSIVE CARE",  # 37     3
     "UCH T06 HEAD (T06H)",  # 27     4
     "UCH T06 CENTRAL (T06C)",  # 25     5
     "UCH T06 SOUTH PACU",  # 22     6
@@ -53,8 +55,9 @@ tower = [
 ]
 
 gwb = [
+    # default value = gwb[0]
+    "GWB L01 CRITICAL CARE",  # 12    43 
     "GWB L01 ELECTIVE SURG",  # 37    42
-    "GWB L01 CRITICAL CARE",  # 12    43
     "GWB L02 NORTH (L02N)",  # 19    44
     "GWB L02 EAST (L02E)",  # 19    45
     "GWB L03 NORTH (L03N)",  # 19    46
@@ -64,6 +67,7 @@ gwb = [
 ]
 
 wms = [
+    # default value = wms[0]
     "WMS W01 CRITICAL CARE",  # 11    50
     "WMS W02 SHORT STAY",  # 20    51
     "WMS W03 WARD",  # 27    52
@@ -72,6 +76,7 @@ wms = [
 
 nhnn = [
     # NOTE: 2022-08-07 Adding in NHNN critical care areas ONLY for now
+    # default value = nhnn[0]
     "NHNN C0 NCCU",
     "NHNN C1 NCCU",
 ]
