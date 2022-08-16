@@ -101,7 +101,11 @@ main = html.Div(
 dash_only = html.Div(
     [
         query_interval := dcc.Interval(interval=REFRESH_INTERVAL, n_intervals=0),
-        request_data := dcc.Store(id=f"{BPID}request_data"),
+        dcc.Loading(
+            request_data := dcc.Store(id=f"{BPID}request_data"),
+            fullscreen=True,
+            type="default",
+        ),
         filtered_data := dcc.Store(id=f"{BPID}filtered_data"),
     ]
 )
@@ -112,7 +116,7 @@ def layout():
         return html.Div(["Please ", dcc.Link("login", href="/login"), " to continue"])
     return html.Div(
         [
-            dcc.Loading(main, fullscreen=True, type="default"),
+            main,
             dash_only,
         ],
     )

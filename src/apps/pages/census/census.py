@@ -226,9 +226,15 @@ dash_only = html.Div(
         dcc.Interval(
             id=f"{BPID}query-interval", interval=REFRESH_INTERVAL, n_intervals=0
         ),
-        dcc.Store(id=f"{BPID}dept_data"),
-        dcc.Store(id=f"{BPID}beds_data"),
-        dcc.Store(id=f"{BPID}census_data"),
+        dcc.Loading(
+            [
+                dcc.Store(id=f"{BPID}dept_data"),
+                dcc.Store(id=f"{BPID}beds_data"),
+                dcc.Store(id=f"{BPID}census_data"),
+            ],
+            fullscreen=True,
+            type="default",
+        ),
         dcc.Store(id=f"{BPID}patients_data"),
         dcc.Store(id=f"{BPID}ward_data"),
         # Need a hidden div for the callback with no output
@@ -250,9 +256,7 @@ def layout():
                     ),
                 ]
             ),
-            dbc.Row(
-                dbc.Col([dcc.Loading(dept_table, fullscreen=True, type="default")])
-            ),
+            dbc.Row(dbc.Col([dept_table])),
             dbc.Row(dbc.Col([dept_selector])),
             dbc.Row(dbc.Col([census_table])),
             dbc.Row(

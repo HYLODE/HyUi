@@ -89,7 +89,7 @@ def layout():
         return html.Div(["Please ", dcc.Link("login", href="/login"), " to continue"])
     return html.Div(
         [
-            dcc.Loading(main, fullscreen=True, type="default"),
+            main,
             dash_only,
         ],
     )

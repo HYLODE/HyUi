@@ -212,9 +212,9 @@ dash_only = html.Div(
         dcc.Interval(
             id=f"{BPID}query-interval", interval=REFRESH_INTERVAL, n_intervals=0
         ),
+        dcc.Store(id=f"{BPID}beds_data"),
         dcc.Loading(
             [
-                dcc.Store(id=f"{BPID}beds_data"),
                 dcc.Store(id=f"{BPID}census_data"),
                 dcc.Store(id=f"{BPID}sitrep_data"),
                 dcc.Store(id=f"{BPID}hymind_icu_discharge_data"),
@@ -243,9 +243,7 @@ def layout():
                     ),
                 ]
             ),
-            dbc.Row(
-                dbc.Col([dcc.Loading(sitrep_table, fullscreen=True, type="default")])
-            ),
+            dbc.Row(dbc.Col([sitrep_table])),
             dbc.Row(
                 [
                     dbc.Col(
