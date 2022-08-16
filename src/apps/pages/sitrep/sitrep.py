@@ -212,14 +212,18 @@ dash_only = html.Div(
         dcc.Interval(
             id=f"{BPID}query-interval", interval=REFRESH_INTERVAL, n_intervals=0
         ),
-        dcc.Loading([
-            dcc.Store(id=f"{BPID}beds_data"),
-            dcc.Store(id=f"{BPID}census_data"),
-            dcc.Store(id=f"{BPID}sitrep_data"),
-            dcc.Store(id=f"{BPID}hymind_icu_discharge_data"),
-            dcc.Store(id=f"{BPID}patients_data"),
-            dcc.Store(id=f"{BPID}ward_data"),
-            ], fullscreen=True, type="default"),
+        dcc.Loading(
+            [
+                dcc.Store(id=f"{BPID}beds_data"),
+                dcc.Store(id=f"{BPID}census_data"),
+                dcc.Store(id=f"{BPID}sitrep_data"),
+                dcc.Store(id=f"{BPID}hymind_icu_discharge_data"),
+                dcc.Store(id=f"{BPID}patients_data"),
+                dcc.Store(id=f"{BPID}ward_data"),
+            ],
+            fullscreen=True,
+            type="default",
+        ),
         # Need a hidden div for the callback with no output
         html.Div(id="hidden-div-diff-table", style={"display": "none"}),
     ]

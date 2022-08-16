@@ -44,7 +44,9 @@ def store_beds(n_intervals: int, dept: str) -> list:
     """
     Stores data from census api (i.e. skeleton)
     """
-    import time; time.sleep(2)
+    import time
+
+    time.sleep(2)
     beds = get_bed_list(dept)
     beds = unpack_nested_dict(beds, f2unpack="bed_functional", subkey="value")
     beds = unpack_nested_dict(beds, f2unpack="bed_physical", subkey="value")
