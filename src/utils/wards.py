@@ -56,7 +56,7 @@ tower = [
 
 gwb = [
     # default value = gwb[0]
-    "GWB L01 CRITICAL CARE",  # 12    43 
+    "GWB L01 CRITICAL CARE",  # 12    43
     "GWB L01 ELECTIVE SURG",  # 37    42
     "GWB L02 NORTH (L02N)",  # 19    44
     "GWB L02 EAST (L02E)",  # 19    45
