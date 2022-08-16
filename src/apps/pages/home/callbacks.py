@@ -9,6 +9,8 @@ from apps.pages.home import BPID, CACHE_TIMEOUT
 from config.settings import settings
 
 COLORS = AppColors()
+BAR_SIZE = 16
+
 DEPT_T03 = "UCH T03 INTENSIVE CARE"
 DEPT_GWB = "GWB L01 CRITICAL CARE"
 DEPT_WMS = "WMS W01 CRITICAL CARE"
@@ -50,10 +52,10 @@ def gen_daq_bar_t03(data: list):
     dept = dept.squeeze()  # force to series
     bar_val = dept["patients"]
     bar_max = bar_val + dept["empties"] - dept["closed"]
-    bar_size = 10 * bar_max
+    bar_size = BAR_SIZE * bar_max
     bar_label = f"{bar_label}: {bar_val}/{bar_max} beds"
     # NOTE: this does not work? maybe a CSS thing??
-    # green, amber, red = bar_max - 10, bar_max - 5, bar_max
+    # green, amber, red = bar_max - BAR_SIZE, bar_max - 5, bar_max
     # bar_color={"gradient": True, "ranges":{"green":[0,green],"#FF851B":[green,amber],"#F012BE":[amber,red]}},
     # for debugging
     if bar_val >= bar_max - 1:
@@ -87,7 +89,7 @@ def gen_daq_bar_gwb(data: list):
     dept = dept.squeeze()  # force to series
     bar_val = dept["patients"]
     bar_max = bar_val + dept["empties"] - dept["closed"]
-    bar_size = 10 * bar_max
+    bar_size = BAR_SIZE * bar_max
     bar_label = f"{bar_label}: {bar_val}/{bar_max} beds"
     # NOTE: this does not work? maybe a CSS thing??
     # green, amber, red = bar_max - 10, bar_max - 5, bar_max

@@ -250,7 +250,9 @@ def layout():
                     ),
                 ]
             ),
-            dbc.Row(dbc.Col([dept_table])),
+            dbc.Row(
+                dbc.Col([dcc.Loading(dept_table, fullscreen=True, type="default")])
+            ),
             dbc.Row(dbc.Col([dept_selector])),
             dbc.Row(dbc.Col([census_table])),
             dbc.Row(

@@ -237,7 +237,9 @@ def layout():
                     ),
                 ]
             ),
-            dbc.Row(dbc.Col([sitrep_table])),
+            dbc.Row(
+                dbc.Col([dcc.Loading(sitrep_table, fullscreen=True, type="default")])
+            ),
             dbc.Row(
                 [
                     dbc.Col(
