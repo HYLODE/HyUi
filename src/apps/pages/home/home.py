@@ -73,16 +73,16 @@ def layout():
                                 html.Div(id=f"{BPID}daq_bar_wms"),
                             ]
                         ),
-                        dbc.Col(
-                            [
-                                html.Div(id=f"{BPID}daq_bar_nhnn0"),
-                            ]
-                        ),
-                        dbc.Col(
-                            [
-                                html.Div(id=f"{BPID}daq_bar_nhnn1"),
-                            ]
-                        ),
+                        # dbc.Col(
+                        #     [
+                        #         html.Div(id=f"{BPID}daq_bar_nhnn0"),
+                        #     ]
+                        # ),
+                        # dbc.Col(
+                        #     [
+                        #         html.Div(id=f"{BPID}daq_bar_nhnn1"),
+                        #     ]
+                        # ),
                         dash_only,
                     ]
                 ),
