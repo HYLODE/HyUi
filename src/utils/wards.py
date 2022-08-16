@@ -8,6 +8,7 @@
 tower = [
     # where n = number of distinct locations in EMAP
     #    NAME                           # n      seq
+    "UCH SDEC",
     "UCH T01 ACUTE MEDICAL",  # 86     1
     "UCH T01 ENHANCED CARE",  # 20     2
     "UCH T03 INTENSIVE CARE",  # 37     3
