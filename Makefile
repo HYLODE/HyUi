@@ -1,6 +1,8 @@
 .PHONY:
 	help
 	lint
+	conda
+	setup
 	testunit
 	teste2e
 	app
@@ -19,6 +21,10 @@
 # ---------------------------
 # hyui
 # ---------------------------
+## Environment build
+conda:
+	conda env update --file dev/steve/environment.yml
+
 ## Development setup
 setup:
 	# all work done from src
