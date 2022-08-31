@@ -69,7 +69,7 @@ COLS = [
     # {"id": "episode_slice_id", "name": "Slice", "type": "numeric"},
     {
         "id": "prediction_as_real",
-        "name": "Dischargeable",
+        "name": "Bed demand",
         "type": "numeric",
         "format": FormatTemplate.percentage(0),
     },
