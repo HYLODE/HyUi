@@ -69,7 +69,7 @@ COLS = [
     # {"id": "episode_slice_id", "name": "Slice", "type": "numeric"},
     {
         "id": "prediction_as_real",
-        "name": "Bed demand",
+        "name": "Available",
         "type": "numeric",
         "format": FormatTemplate.percentage(0),
     },
@@ -189,7 +189,7 @@ PROBABILITY_COLOUR_SCALE = [
                 f"&& {{prediction_as_real}} < {c / 10 + 0.1}"
             ),
         },
-        "backgroundColor": f"rgba(255, 65, 54, {c / 10})",
+        "backgroundColor": f"rgba(46, 204, 64, {c / 10})",
     }
     for c in range(0, 11)
 ]
