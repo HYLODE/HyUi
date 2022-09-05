@@ -10,7 +10,7 @@ from utils.api import get_caboodle_session  # type: ignore
 from mock.mock import (  # type: ignore
     make_mock_db_in_memory,
     make_mock_df,
-    path_to_hdf_file,
+    path_to_file,
 )
 
 ROUTE_NAME = "electives"
@@ -48,5 +48,5 @@ def mock_df_electives():
     """
     Use electives data as baseline exemplar for testing
     """
-    df = make_mock_df(path_to_hdf_file("electives"))
+    df = make_mock_df(path_to_file("electives", "h5"))
     return df

@@ -7,7 +7,7 @@ import requests
 from dash import Input, Output, State, callback, get_app
 from flask_caching import Cache
 
-from api.beds.model import BedsRead
+from api.census.model import CensusRead
 from apps.pages.sitrep import (
     BED_BONES_TABLE_ID,
     BEDS_KEEP_COLS,
@@ -42,8 +42,7 @@ cache = Cache(
 # not caching since this is how we update beds
 def store_beds(n_intervals: int, dept: str) -> list:
     """
-    Stores data from beds api (i.e. skeleton)
-    Confusingly census is in BedsRead which is different to BedBones
+    Stores data from census api (i.e. skeleton)
     """
     beds = get_bed_list(dept)
     beds = unpack_nested_dict(beds, f2unpack="bed_functional", subkey="value")
@@ -64,16 +63,17 @@ def store_beds(n_intervals: int, dept: str) -> list:
     Input(f"{BPID}query-interval", "n_intervals"),
     Input(f"{BPID}ward_radio", "value"),
 )
-@cache.memoize(timeout=CACHE_TIMEOUT)
+@cache.memoize(
+    timeout=CACHE_TIMEOUT
+)  # cache decorator must come between callback and function
 def store_census(n_intervals: int, dept: str) -> list:
     """
     Stores data from census api (i.e. current beds occupant)
-    Confusingly BedsRead refers to census
     """
     payload = {"departments": dept}
-    res = requests.get(f"{settings.API_URL}/beds", params=payload)
+    res = requests.get(f"{settings.API_URL}/census", params=payload)
     census = res.json()
-    census = validate_json(census, BedsRead, to_dict=True)
+    census = validate_json(census, CensusRead, to_dict=True)
     if all([not bool(i) for i in census]):
         warnings.warn("[WARN] store_census returned an empty list of dictionaries")
         return census
@@ -90,7 +90,9 @@ def store_census(n_intervals: int, dept: str) -> list:
     Input(f"{BPID}query-interval", "n_intervals"),
     Input(f"{BPID}ward_radio", "value"),
 )
-@cache.memoize(timeout=CACHE_TIMEOUT)
+@cache.memoize(
+    timeout=CACHE_TIMEOUT
+)  # cache decorator must come between callback and function
 def store_sitrep(n_intervals: int, dept: str) -> list:
     """
     Stores data from sitrep api (i.e. organ status)
@@ -114,7 +116,9 @@ def store_sitrep(n_intervals: int, dept: str) -> list:
     Input(f"{BPID}query-interval", "n_intervals"),
     Input(f"{BPID}ward_radio", "value"),
 )
-@cache.memoize(timeout=CACHE_TIMEOUT)
+@cache.memoize(
+    timeout=CACHE_TIMEOUT
+)  # cache decorator must come between callback and function
 def store_hymind_icu_discharge(n_intervals: int, dept: str) -> list:
     """
     Stores data from HyMind ICU discharge predictions
@@ -141,7 +145,9 @@ def store_hymind_icu_discharge(n_intervals: int, dept: str) -> list:
     Input(f"{BPID}sitrep_data", "data"),
     Input(f"{BPID}hymind_icu_discharge_data", "data"),
 )
-@cache.memoize(timeout=CACHE_TIMEOUT)
+@cache.memoize(
+    timeout=CACHE_TIMEOUT
+)  # cache decorator must come between callback and function
 def store_patients(census: list, sitrep: list, hymind: list) -> list:
     """
     Assembles patient level info (without beds)
@@ -208,9 +214,12 @@ def store_patients(census: list, sitrep: list, hymind: list) -> list:
     Output(f"{BPID}ward_data", "data"),
     Input(f"{BPID}beds_data", "data"),
     Input(f"{BPID}patients_data", "data"),
+    Input(f"{BPID}closed_beds_switch", "value"),
 )
-@cache.memoize(timeout=CACHE_TIMEOUT)
-def store_ward(beds: list, patients: list) -> list:
+@cache.memoize(
+    timeout=CACHE_TIMEOUT
+)  # cache decorator must come between callback and function
+def store_ward(beds: list, patients: list, closed: bool) -> list:
     """
     Merges patients onto beds
     """
@@ -238,7 +247,7 @@ def store_ward(beds: list, patients: list) -> list:
         indicator="_merge_ward",
     )
 
-    # prepare field
+    # prepare fields
     dfm["age"] = (
         pd.Timestamp.now() - dfm["date_of_birth"].apply(pd.to_datetime)
     ) / np.timedelta64(1, "Y")
@@ -246,9 +255,13 @@ def store_ward(beds: list, patients: list) -> list:
     dfm["lastname"] = dfm["lastname"].fillna("")
     dfm["sex"] = dfm["sex"].fillna("")
     dfm["name"] = dfm.apply(
-        lambda row: f"{row.firstname.title()} {row.lastname.upper()}", axis=1
+        lambda row: f"{row.lastname.upper()}, {row.firstname.title()}", axis=1
     )
     dfm["unit_order"] = dfm["unit_order"].astype(int, errors="ignore")
+    # dfm["epic_bed_request"] = dfm["pm_type"].apply(lambda x: "Ready to plan" if x == "OUTBOUND" else "")
+    # always return not closed; optionally return closed
+    if not closed:
+        dfm = dfm[dfm["closed"] == False]
 
     # if settings.VERBOSE:
     #     print(dfm.info())
@@ -258,7 +271,7 @@ def store_ward(beds: list, patients: list) -> list:
 
 
 @callback(
-    Output("hidden-div", "children"),
+    Output("hidden-div-diff-table", "children"),
     Input(f"{BPID}tbl-census", "data_timestamp"),
     State(f"{BPID}tbl-census", "data_previous"),
     State(f"{BPID}tbl-census", "data"),

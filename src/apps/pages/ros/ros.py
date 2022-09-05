@@ -8,6 +8,7 @@ import dash_bootstrap_components as dbc
 from dash import Input, Output, State, callback, register_page
 from dash import dash_table as dt
 from dash import dcc, html
+from flask_login import current_user
 
 from config.settings import settings
 from utils.dash import get_results_response
@@ -66,14 +67,17 @@ dash_only = html.Div(
 )
 
 
-layout = html.Div(
-    [
-        ward_radio_button,
-        card_table,
-        # pie_chart := dcc.Graph(),
-        dash_only,
-    ],
-)
+def layout():
+    if not current_user.is_authenticated:
+        return html.Div(["Please ", dcc.Link("login", href="/login"), " to continue"])
+    return html.Div(
+        [
+            ward_radio_button,
+            card_table,
+            # pie_chart := dcc.Graph(),
+            dash_only,
+        ],
+    )
 
 
 def format_datetime(d):

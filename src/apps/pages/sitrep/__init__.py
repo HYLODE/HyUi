@@ -4,11 +4,26 @@
 from dash.dash_table import FormatTemplate
 
 SITREP_ENV = "test"  # test (staging red) or prod
+# GREEN = TCN model
+# RED = original model
+STAGING_COLOUR = "GREEN"  # or RED or BLUE
+
+if STAGING_COLOUR == "GREEN":
+    HYCASTLE_API_PORT = 5906
+    HYMIND_API_PORT = 5907
+elif STAGING_COLOUR == "RED":
+    HYCASTLE_API_PORT = 5207
+    HYMIND_API_PORT = 5208
+# elif STAGING_COLOUR == "BLUE":
+#     HYCASTLE_API_PORT =
+#     HYMIND_API_PORT =
+else:
+    raise ValueError("STAGING not defined")
 
 BPID = "sit_"
 
 BED_BONES_TABLE_ID = 261
-CACHE_TIMEOUT = 5 * 60 * 1000
+CACHE_TIMEOUT = 5 * 60  # seconds!!!
 REFRESH_INTERVAL = 30 * 60 * 1000  # milliseconds
 DEPT2WARD_MAPPING = {
     "UCH T03 INTENSIVE CARE": "T03",
@@ -54,18 +69,19 @@ COLS = [
     # {"id": "episode_slice_id", "name": "Slice", "type": "numeric"},
     {
         "id": "prediction_as_real",
-        "name": "Discharge?",
+        "name": "Exit?",
         "type": "numeric",
         "format": FormatTemplate.percentage(0),
     },
     {
         "id": "DischargeReady",
-        "name": "D/C",
+        "name": "Discharge decision",
         "presentation": "dropdown",
         "editable": True,
     },
-    {"id": "pm_type", "name": "Request?", "type": "text"},
-    {"id": "pm_dept", "name": "Destination", "type": "text"},
+    {"id": "pm_type", "name": "Epic bed request", "type": "text"},
+    # {"id": "epic_bed_request", "name": "Epic bed request", "type": "text"},
+    {"id": "pm_dept", "name": "Bed assigned", "type": "text"},
     # {"id": "covid", "name": "COVID", "presentation": "markdown"},
 ]
 
@@ -173,7 +189,7 @@ PROBABILITY_COLOUR_SCALE = [
                 f"&& {{prediction_as_real}} < {c / 10 + 0.1}"
             ),
         },
-        "backgroundColor": f"rgba(255, 65, 54, {c / 10})",
+        "backgroundColor": f"rgba(46, 204, 64, {c / 10})",
     }
     for c in range(0, 11)
 ]

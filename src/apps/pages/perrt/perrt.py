@@ -10,6 +10,7 @@ from dash import Input, Output, callback, register_page, get_app
 from dash import dash_table as dt
 from dash import dcc, html
 from flask_caching import Cache
+from flask_login import current_user
 from pydantic import parse_obj_as
 
 from config.settings import settings
@@ -105,16 +106,24 @@ main = html.Div(
 dash_only = html.Div(
     [
         query_interval := dcc.Interval(interval=REFRESH_INTERVAL, n_intervals=0),
-        request_data := dcc.Store(id=f"{BPID}request_data"),
+        dcc.Loading(
+            request_data := dcc.Store(id=f"{BPID}request_data"),
+            fullscreen=True,
+            type="default",
+        ),
     ]
 )
 
-layout = html.Div(
-    [
-        main,
-        dash_only,
-    ],
-)
+
+def layout():
+    if not current_user.is_authenticated:
+        return html.Div(["Please ", dcc.Link("login", href="/login"), " to continue"])
+    return html.Div(
+        [
+            main,
+            dash_only,
+        ],
+    )
 
 
 @callback(

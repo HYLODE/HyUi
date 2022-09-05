@@ -13,6 +13,7 @@ from dash import Input, Output, State, callback, get_app
 from dash import dash_table as dt
 from dash import dcc, html, register_page
 from flask_caching import Cache
+from flask_login import current_user
 
 from api.electives.model import ElectivesRead
 from apps.pages.electives import (
@@ -25,7 +26,7 @@ from apps.pages.electives import (
 )
 from utils.dash import df_from_store, get_results_response
 
-CACHE_TIMEOUT = 4 * 3600 * 1000
+CACHE_TIMEOUT = 4 * 3600
 
 register_page(__name__)
 app = get_app()
@@ -100,17 +101,25 @@ main = html.Div(
 dash_only = html.Div(
     [
         query_interval := dcc.Interval(interval=REFRESH_INTERVAL, n_intervals=0),
-        request_data := dcc.Store(id=f"{BPID}request_data"),
+        dcc.Loading(
+            request_data := dcc.Store(id=f"{BPID}request_data"),
+            fullscreen=True,
+            type="default",
+        ),
         filtered_data := dcc.Store(id=f"{BPID}filtered_data"),
     ]
 )
 
-layout = html.Div(
-    [
-        main,
-        dash_only,
-    ],
-)
+
+def layout():
+    if not current_user.is_authenticated:
+        return html.Div(["Please ", dcc.Link("login", href="/login"), " to continue"])
+    return html.Div(
+        [
+            main,
+            dash_only,
+        ],
+    )
 
 
 @callback(

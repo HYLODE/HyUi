@@ -1,25 +1,23 @@
-# src/apps/pages/sitrep/widgets.py
+# src/apps/pages/census/widgets.py
 from dash import html
 import dash_bootstrap_components as dbc
-from apps.pages.sitrep import BPID
+from apps.pages.census import BPID
 
-ward_radio_button = html.Div(
+building_radio_button = html.Div(
     [
         html.Div(
             [
                 dbc.RadioItems(
-                    id=f"{BPID}ward_radio",
+                    id=f"{BPID}building_radio",
                     className="dbc d-grid d-md-flex justify-content-md-end btn-group",
                     inline=True,
                     options=[
-                        {"label": "T03", "value": "UCH T03 INTENSIVE CARE"},
-                        {"label": "T06", "value": "UCH T06 SOUTH PACU"},
-                        {"label": "GWB", "value": "GWB L01 CRITICAL CARE"},
-                        {"label": "WMS", "value": "WMS W01 CRITICAL CARE"},
-                        {"label": "NHNN0", "value": "NHNN C0 NCCU"},
-                        {"label": "NHNN1", "value": "NHNN C1 NCCU"},
+                        {"label": "Tower", "value": "tower"},
+                        {"label": "GWB", "value": "gwb"},
+                        {"label": "WMS", "value": "wms"},
+                        {"label": "NHNN", "value": "nhnn"},
                     ],
-                    value="UCH T03 INTENSIVE CARE",
+                    value="tower",
                 )
             ],
             className="dbc",

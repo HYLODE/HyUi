@@ -1,6 +1,10 @@
 # src/apps/sitrep/sitrep.py
 """
-sub-application for sitrep
+Layout sub-application for sitrep
+See for other functions
+./callbacks.py
+./widgets.py
+./wng.py
 """
 
 
@@ -10,8 +14,8 @@ import pandas as pd
 import warnings
 from dash import Input, Output, callback
 from dash import dash_table as dt
-from dash import dcc, html, register_page
-
+from dash import html, dcc, register_page
+from flask_login import current_user
 
 from apps.pages.sitrep import (
     BPID,
@@ -21,7 +25,9 @@ from apps.pages.sitrep import (
     REFRESH_INTERVAL,
     PROBABILITY_COLOUR_SCALE,
 )
-from apps.pages.sitrep.callbacks import (
+
+# switch off flake8 linting error as the callbacks must be imported
+from apps.pages.sitrep.callbacks import (  # noqa
     store_beds,
     store_ward,
     store_census,
@@ -29,7 +35,7 @@ from apps.pages.sitrep.callbacks import (
     store_sitrep,
     store_hymind_icu_discharge,
     diff_table,
-)
+)  # noqa
 from config.settings import settings
 from utils import icons
 
@@ -57,6 +63,8 @@ def gen_fancy_table(data: dict):
     dfo["room_label"] = np.where(
         dfo["room"].astype(str).str.contains("SR"), "SR", dfo["room_label"]
     )
+    # predicts bed to still be occupied so invert
+    dfo["prediction_as_real"] = 1 - dfo["prediction_as_real"]
 
     try:
 
@@ -137,7 +145,7 @@ def gen_fancy_table(data: dict):
                     "options": [
                         {"label": "READY", "value": "ready"},
                         {"label": "Review", "value": "review"},
-                        {"label": "No", "value": "No"},
+                        {"label": "-", "value": "No"},
                     ],
                     "clearable": False,
                 },
@@ -194,24 +202,57 @@ sitrep_table = dbc.Card(
     ]
 )
 
+config_footer = dbc.Card(
+    [
+        dbc.CardHeader(html.H6("Settings")),
+        dbc.CardBody(id=f"{BPID}settings", children=[widgets.closed_beds_switch]),
+    ]
+)
+
 dash_only = html.Div(
     [
         dcc.Interval(
             id=f"{BPID}query-interval", interval=REFRESH_INTERVAL, n_intervals=0
         ),
         dcc.Store(id=f"{BPID}beds_data"),
-        dcc.Store(id=f"{BPID}census_data"),
-        dcc.Store(id=f"{BPID}sitrep_data"),
-        dcc.Store(id=f"{BPID}hymind_icu_discharge_data"),
-        dcc.Store(id=f"{BPID}patients_data"),
-        dcc.Store(id=f"{BPID}ward_data"),
+        dcc.Loading(
+            [
+                dcc.Store(id=f"{BPID}census_data"),
+                dcc.Store(id=f"{BPID}sitrep_data"),
+                dcc.Store(id=f"{BPID}hymind_icu_discharge_data"),
+                dcc.Store(id=f"{BPID}patients_data"),
+                dcc.Store(id=f"{BPID}ward_data"),
+            ],
+            fullscreen=True,
+            type="default",
+        ),
+        # Need a hidden div for the callback with no output
+        html.Div(id="hidden-div-diff-table", style={"display": "none"}),
     ]
 )
 
-layout = html.Div(
-    [
-        dbc.Row(dbc.Col([widgets.ward_radio_button])),
-        dbc.Row(dbc.Col([sitrep_table])),
-        dash_only,
-    ]
-)
+
+def layout():
+    if not current_user.is_authenticated and settings.ENV != "dev":
+        return html.Div(["Please ", dcc.Link("login", href="/login"), " to continue"])
+    return html.Div(
+        [
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [widgets.ward_radio_button],
+                        width={"size": 6, "order": "last", "offset": 6},
+                    ),
+                ]
+            ),
+            dbc.Row(dbc.Col([sitrep_table])),
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [config_footer],
+                    ),
+                ]
+            ),
+            dash_only,
+        ]
+    )

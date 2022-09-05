@@ -1,6 +1,7 @@
 from typing import List
 
 import pandas as pd
+import warnings
 
 
 def _split_location_string(df: pd.DataFrame) -> pd.DataFrame:
@@ -31,53 +32,61 @@ def _remove_non_beds(
 def _aggregate_by_department(df: pd.DataFrame) -> pd.DataFrame:
     """
     Aggregation from location (bed) level to ward level
+    Generates estimates of beds likely to be closed
     """
     df["cvl_discharge"] = pd.to_datetime(df["cvl_discharge"], errors="coerce", utc=True)
+    if df["modified_at"].dt.tz is None:
+        df["modified_at"] = df["modified_at"].dt.tz_localize("UTC")
+        warnings.warn("[WARN] Forcing timezone to UTC for 'modified_at'")
+
     groups = df.groupby("department")
     # aggregate by dept
     res = groups.agg(
         beds=("location_id", "count"),
         patients=("occupied", "sum"),
-        last_dc=("cvl_discharge", lambda x: x.max(skipna=True)),
+        days_since_last_dc=("cvl_discharge", lambda x: x.max(skipna=True)),
         modified_at=("modified_at", "max"),
     )
+
     # calculate additional numbers
     res["empties"] = res["beds"] - res["patients"]
-    res["opens"] = res["empties"]  # place holder : need to subtract closed from empties
-    res["last_dc"] = (
-        (res["modified_at"] - res["last_dc"])
+    # calculate opens on the front end since this requires a separate data source
+    # res["opens"] = res["empties"]  # place holder : need to subtract closed from empties
+    res["days_since_last_dc"] = (
+        (res["modified_at"] - res["days_since_last_dc"])
         .apply(lambda x: pd.Timedelta.floor(x, "d"))
         .dt.days
     )
 
-    # defined closed: temp and perm
+    # use days since last dc and there being no patients to define if a ward
+    # appears to be closed defined closed: temp and perm
     res["closed_temp"] = pd.DataFrame(
         [
-            res["last_dc"] > 2,
-            res["last_dc"] <= 30,
+            res["days_since_last_dc"] > 2,
+            res["days_since_last_dc"] <= 30,
             res["patients"] == 0,
         ]
     ).T.all(axis="columns")
 
     res["closed_perm"] = pd.DataFrame(
         [
-            res["last_dc"] > 30,
+            res["days_since_last_dc"] > 30,
             res["patients"] == 0,
         ]
     ).T.all(axis="columns")
 
     # drop closed perm
-    mask = ~res["closed_perm"]
+    # mask = ~res["closed_perm"]
+    # res = res[mask]
 
-    res = res[mask]
     res = res[
         [
             "beds",
             "patients",
             "empties",
-            "opens",
-            "last_dc",
+            "days_since_last_dc",
             "closed_temp",
+            "closed_perm",
             "modified_at",
         ]
     ]

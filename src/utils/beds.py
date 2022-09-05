@@ -2,14 +2,13 @@
 """
 Methods for managing interaction with base row and beds bones
 """
+from typing import List, Optional
+
 import pandas as pd
 import requests
-
-from typing import List
-from config.settings import settings
-
-from typing import Optional
 from sqlmodel import SQLModel
+
+from config.settings import settings
 
 
 class BedBonesBase(SQLModel):
@@ -31,6 +30,8 @@ class BedBonesBase(SQLModel):
 
 BED_BONES_TABLE_ID = 261
 DEPARTMENT_FIELD_ID = 2041
+CLOSED_BED_FIELD_ID = 2075
+
 CORE_FIELDS = [
     "department",
     "room",
@@ -44,6 +45,54 @@ CORE_FIELDS = [
     "location_id",
     "location_string",
 ]
+
+
+def get_closed_beds(
+    table_id=BED_BONES_TABLE_ID,
+    closed_bed_field_id=CLOSED_BED_FIELD_ID,
+    fields=CORE_FIELDS,
+    api_token=settings.BASEROW_READWRITE_TOKEN,
+) -> list:
+    """
+    Queries the baserow API for a list of CLOSED beds
+
+    :returns:   closed beds
+    """
+
+    url = f"{settings.BASEROW_URL}/api/database/rows/table/{table_id}/"
+
+    if settings.VERBOSE:
+        print(url)
+
+    payload = {
+        "user_field_names": "true",
+        f"filter__field_{closed_bed_field_id}__boolean": True,
+        "include": ",".join(fields),
+    }
+    response = requests.get(
+        url,
+        headers={"Authorization": f"Token {api_token}"},
+        params=payload,
+    )
+    data = response.json()
+    results = data["results"]
+
+    # grab additional data if present NB: baserow returns the URL to the next
+    # page as 'next' if there are further results or None so the while loop only
+    # runs if there are further rows of data
+    while data["next"]:
+        response = requests.get(
+            data["next"],
+            headers={"Authorization": f"Token {api_token}"},
+        )
+        data = response.json()
+        results = results + data["results"]
+
+    if settings.VERBOSE:
+        df = pd.DataFrame.from_records(results)
+        print(df.head())
+
+    return results
 
 
 def get_bed_list(
