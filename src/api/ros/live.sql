@@ -178,19 +178,14 @@ lab_battery_ids AS
 
 -- NCOV -> Standard PCR
 -- XCOV -> Rapid PCR
+-- RFLU -> combined flu PCR
 
 icu_labs AS
 (
 	SELECT
 	  all_beds_annotated.encounter
--- 	 ,lor.order_datetime
--- 	 ,lor.lab_battery_id
 	 ,lor.lab_order_id
--- 	 ,lre.lab_result_id
--- 	 ,lre.result_last_modified_datetime
--- 	 ,lre.value_as_text
 	 ,lre.abnormal_flag
--- 	 ,lre."comment"
 	 ,lre.result_status
 
 	FROM all_beds_annotated
@@ -202,7 +197,6 @@ icu_labs AS
 
 lab_result_status AS (
 	SELECT
--- 		,lab_order,
 		lab_order_id
 		,CASE
 			WHEN 'A' = ANY(ARRAY_AGG(abnormal_flag)) THEN 'A' ELSE NULL
@@ -247,9 +241,6 @@ ros_mrsa_results AS (
 								ORDER BY labs_agg.lab_order_id DESC
 							)
 							AS ros_orders
--- 						,ARRAY_AGG(labs_agg.order_datetime ORDER BY labs_agg.lab_order_id DESC) AS ros_order_datetime
--- 						,ARRAY_AGG(labs_agg.result_status ORDER BY labs_agg.lab_order_id DESC) AS ros_result_status
--- 						,ARRAY_AGG(labs_agg.abnormal_flag ORDER BY labs_agg.lab_order_id DESC) AS ros_abnormal_flag
 				FROM labs_agg
 				WHERE lab_battery_id IN (SELECT lab_battery_id FROM lab_battery_ids WHERE test_lab_code = 'ROS')
 				GROUP BY encounter
@@ -270,8 +261,6 @@ ros_mrsa_results AS (
 								ORDER BY labs_agg.lab_order_id DESC
 							)
 							AS mrsa_orders
--- 						,ARRAY_AGG(labs_agg.result_status ORDER BY labs_agg.lab_order_id DESC) AS mrsa_result_status
--- 						,ARRAY_AGG(labs_agg.abnormal_flag ORDER BY labs_agg.lab_order_id DESC) AS mrsa_abnormal_flag
 				FROM labs_agg
 				WHERE lab_battery_id = (SELECT lab_battery_id FROM lab_battery_ids WHERE test_lab_code = 'MRSA')
 				GROUP BY encounter
@@ -293,8 +282,6 @@ ros_mrsa_results AS (
 								ORDER BY labs_agg.lab_order_id DESC
 							)
 							AS covid_orders
--- 						,ARRAY_AGG(labs_agg.result_status ORDER BY labs_agg.lab_order_id DESC) AS mrsa_result_status
--- 						,ARRAY_AGG(labs_agg.abnormal_flag ORDER BY labs_agg.lab_order_id DESC) AS mrsa_abnormal_flag
 				FROM labs_agg
 				WHERE lab_battery_id IN (SELECT lab_battery_id FROM lab_battery_ids WHERE test_lab_code IN ('NCOV', 'XCOV', 'RFLU'))
 				GROUP BY encounter
@@ -314,13 +301,7 @@ SELECT
 		,ab.hospital_admission_datetime
 		,ab.location_admission_datetime
 		,r.ros_orders
--- 		,r.ros_order_datetime
--- 		,r.ros_result_status
--- 		,r.ros_abnormal_flag
 		,r.mrsa_orders
--- 		,r.mrsa_order_datetime
--- 		,r.mrsa_result_status
--- 		,r.mrsa_abnormal_flag
 		,r.covid_orders
 	FROM all_beds_annotated ab
 	LEFT JOIN ros_mrsa_results r ON ab.encounter = r.encounter
