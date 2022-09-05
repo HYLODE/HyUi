@@ -64,7 +64,7 @@ def gen_fancy_table(data: dict):
         dfo["room"].astype(str).str.contains("SR"), "SR", dfo["room_label"]
     )
     # predicts bed to still be occupied so invert
-    dfo["prediction_as_real"] = dfo["prediction_as_real"].apply(lambda x: 1 - x)
+    dfo["prediction_as_real"] = 1 - dfo["prediction_as_real"]
 
     try:
 

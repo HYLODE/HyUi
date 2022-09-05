@@ -26,7 +26,7 @@ from apps.pages.electives import (
 )
 from utils.dash import df_from_store, get_results_response
 
-CACHE_TIMEOUT = 4 * 3600 * 1000
+CACHE_TIMEOUT = 4 * 3600
 
 register_page(__name__)
 app = get_app()
