@@ -77,10 +77,14 @@ layout = html.Div(
 
 
 def format_datetime(d):
+    if not d:
+        return ""
     return d.strftime("%d/%m/%y %H:%M")
 
 
 def from_isodate(d):
+    if not d:
+        return None
     return datetime.fromisoformat(d)
 
 

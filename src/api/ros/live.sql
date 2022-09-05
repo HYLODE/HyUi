@@ -173,7 +173,7 @@ lab_battery_ids AS
 		lbe.lab_battery_id
 		FROM star.lab_battery_element lbe
 		LEFT JOIN star.lab_test_definition ltd ON lbe.lab_test_definition_id = ltd.lab_test_definition_id
-		WHERE ltd.test_lab_code IN ('ROS', 'MRSA', 'NCOV', 'XCOV')
+		WHERE ltd.test_lab_code IN ('ROS', 'MRSA', 'NCOV', 'XCOV', 'RFLU')
 ),
 
 -- NCOV -> Standard PCR
@@ -226,6 +226,7 @@ labs_agg AS (
 		LEFT JOIN star.lab_order lor ON all_beds_annotated.hospital_visit_id = lor.hospital_visit_id
 		LEFT JOIN lab_result_status lrs ON lrs.lab_order_id = lor.lab_order_id
 		WHERE lor.lab_battery_id IN (SELECT lab_battery_id FROM lab_battery_ids)
+			AND lor.order_datetime IS NOT NULL
 ),
 
 
@@ -295,7 +296,7 @@ ros_mrsa_results AS (
 -- 						,ARRAY_AGG(labs_agg.result_status ORDER BY labs_agg.lab_order_id DESC) AS mrsa_result_status
 -- 						,ARRAY_AGG(labs_agg.abnormal_flag ORDER BY labs_agg.lab_order_id DESC) AS mrsa_abnormal_flag
 				FROM labs_agg
-				WHERE lab_battery_id IN (SELECT lab_battery_id FROM lab_battery_ids WHERE test_lab_code IN ('NCOV', 'XCOV'))
+				WHERE lab_battery_id IN (SELECT lab_battery_id FROM lab_battery_ids WHERE test_lab_code IN ('NCOV', 'XCOV', 'RFLU'))
 				GROUP BY encounter
 				ORDER BY encounter
 			) AS covid
