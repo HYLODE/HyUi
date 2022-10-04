@@ -3,7 +3,7 @@
 # ID: 138fd403232d2ddd5efb44317e38bf03
 
 # start templated
-INSTALL_PYTHON=/opt/homebrew/Caskroom/miniforge/base/envs/hyuiv4/bin/python
+INSTALL_PYTHON=/opt/homebrew/Caskroom/miniforge/base/envs/hyui/bin/python
 ARGS=(hook-impl --config=.pre-commit-config.yaml --hook-type=pre-commit)
 # end templated
 
