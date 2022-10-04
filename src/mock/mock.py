@@ -27,7 +27,7 @@ ECHO = False
 
 def path_to_file(route: str, extension: str):
     """Prep path to file based on route"""
-    assert extension in ["h5", "db"]
+    assert extension in ["h5", "db", "xls"]
     file = f"mock.{extension}"
     return Path(__file__).parents[1] / "api" / route / file
 
@@ -89,6 +89,9 @@ def df_from_file(route: str) -> pd.DataFrame:
         engine_in = create_engine(_URL)
         with engine_in.connect() as conn:
             df = pd.read_sql(route, conn)
+    elif path_to_file(route, "xls").is_file():
+        file = path_to_file(route, "xls")
+        df = pd.read_excel(file)
     else:
         raise Exception("[ERROR] Cannot find mock data either as .db or .h5")
     return df
