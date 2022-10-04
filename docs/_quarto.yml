@@ -1,0 +1,45 @@
+project:
+  type: website
+  title: "HYLODE documentation"
+  preview:
+    port: 8100
+
+
+website:
+  title: "HYLODE documentation"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - about.qmd
+  page-footer: |
+    Hyperlocal Bed Demand Forecasts  
+    A project deployed at UCLH supported by NIHR and NHS-X. (2022)
+  sidebar:
+    style: "docked"
+    contents:
+      - section: "Developer"
+        contents:
+          - developer/setup.qmd
+          - developer/workflow.qmd
+          - developer/documentation.qmd
+          - developer/synthetic-data.qmd
+          - developer/environment-variables.qmd
+      - section: "Contributing"
+        contents:
+          - contributor_guide/CODE_OF_CONDUCT.qmd
+          - contributor_guide/CONTRIBUTING.qmd
+          - contributor_guide/pre_commit_hooks.qmd
+          - contributor_guide/updating_gitignore.qmd
+  repo-url: https://github.com/hylode/hyui
+  repo-actions: [edit, issue]
+  repo-subdir: hyui
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: true
+
+
+

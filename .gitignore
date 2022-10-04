@@ -862,6 +862,11 @@ MigrationBackup/
 
 ### HyUI ###
 
+# docs (via Quarto)
+docs/.quarto/
+
+
+
 # caches
 cache-directory/*
 
