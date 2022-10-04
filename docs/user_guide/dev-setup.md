@@ -45,7 +45,7 @@ cp .env.example .env
 
 ```sh
 conda env create --file=./dev/steve/environment.yml
-conda activate hyuiv4
+conda activate hyui
 ```
 
 Then confirm your set-up is OK

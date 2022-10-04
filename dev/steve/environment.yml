@@ -1,6 +1,6 @@
 # run this file from project root
 # conda env update --file dev/steve/environment.yml --prune
-name: hyuiv4
+name: hyui
 channels:
   - conda-forge
 dependencies:
@@ -45,4 +45,4 @@ dependencies:
       - playwright # microsoft::playwright # not available for macm1
       - pytest-playwright
       - fastapi-crudrouter
-prefix: /opt/homebrew/Caskroom/miniforge/base/envs/hyuiv4
+prefix: /opt/homebrew/Caskroom/miniforge/base/envs/hyui

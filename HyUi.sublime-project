@@ -18,23 +18,23 @@
         "LSP": {
             // "LSP-pylsp": {
             //     "settings": {
-            //         "pylsp.plugins.jedi.environment": "/opt/homebrew/Caskroom/miniforge/base/envs/hyuiv4",
+            //         "pylsp.plugins.jedi.environment": "/opt/homebrew/Caskroom/miniforge/base/envs/hyui",
             //     },
             // },
                 "pylsp": {
                     "enabled": true,
                     "command": [
-                        "/opt/homebrew/Caskroom/miniforge/base/envs/hyuiv4/bin/pylsp",
+                        "/opt/homebrew/Caskroom/miniforge/base/envs/hyui/bin/pylsp",
                 ],
                     "settings": {
-                        "pylsp.plugins.flake8.executable": "/opt/homebrew/Caskroom/miniforge/base/envs/hyuiv4/bin/flake8",
+                        "pylsp.plugins.flake8.executable": "/opt/homebrew/Caskroom/miniforge/base/envs/hyui/bin/flake8",
                     },
                 },
             },
         },
         "build_systems": [
             {
-                "name": "HyUiv4",
+                "name": "HyUi",
                 "env": {
                    "SUBLIME_FOO" : "SUBLIME_BAR",
                 },
@@ -42,7 +42,7 @@
                     // adding src to PYTHONPATH for the build systems
                     // this mirrors the config for pytest in pyproject.toml
                     // b/c we expect all files to be run from either ./ or ./src
-                    "\"PYTHONPATH=src:${PYTHONPATH}\" /opt/homebrew/Caskroom/miniforge/base/envs/hyuiv4/bin/python",
+                    "\"PYTHONPATH=src:${PYTHONPATH}\" /opt/homebrew/Caskroom/miniforge/base/envs/hyui/bin/python",
                     "-u",
                     "$file"
             ],
@@ -58,7 +58,7 @@
                 "program": "${file}",
                 "request": "launch",
                 "console": "externalTerminal",
-                "python": "/opt/homebrew/Caskroom/miniforge/base/envs/hyuiv4/bin/python",
+                "python": "/opt/homebrew/Caskroom/miniforge/base/envs/hyui/bin/python",
             },
     ],
     }
