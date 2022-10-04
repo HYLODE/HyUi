@@ -44,7 +44,7 @@ cp .env.example .env
 ### Set up conda environment
 
 ```sh
-conda env create --file=./dev/steve/environment.yml
+conda env create --file=./dev/environment.yml
 conda activate hyui
 ```
 
@@ -52,6 +52,29 @@ Then confirm your set-up is OK
 
 ```sh
 pytest src/tests/smoke
+```
+
+### Direnv (optional)
+
+Automatically activate your conda environment when you `cd` into the `hyui` directory
+
+https://github.com/theskumar/python-dotenv
+installed python-dotenv
+```bash
+pip install python-dotenv
+```
+
+and https://direnv.net
+
+```bash
+brew install direnv
+touch .envrc
+direnv allow .
+```
+
+add the following to .zshrc
+```bash
+eval "$(direnv hook zsh)"
 ```
 
 ### Pre-commit
