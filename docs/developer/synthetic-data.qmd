@@ -1,4 +1,4 @@
-# Synthetic data 
+# Synthetic data
 ## Synthetic data preparation
 
 Be careful!

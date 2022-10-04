@@ -864,6 +864,7 @@ MigrationBackup/
 
 # docs (via Quarto)
 docs/.quarto/
+docs/_site/
 
 
 
@@ -887,9 +888,6 @@ data/backups/*
 !data/raw/.gitkeep
 !data/interim/.gitkeep
 !data/processed/.gitkeep
-
-# Ignore the `docs/reference/api` folder
-docs/reference/api/*
 
 # Ignore the `.secrets` file anything with secret in the name
 .secrets

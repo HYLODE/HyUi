@@ -4,6 +4,8 @@ project:
   preview:
     port: 8100
 
+execute:
+  freeze: auto
 
 website:
   title: "HYLODE documentation"
@@ -13,7 +15,7 @@ website:
         text: Home
       - about.qmd
   page-footer: |
-    Hyperlocal Bed Demand Forecasts  
+    Hyperlocal Bed Demand Forecasts
     A project deployed at UCLH supported by NIHR and NHS-X. (2022)
   sidebar:
     style: "docked"
@@ -40,6 +42,3 @@ format:
     theme: cosmo
     css: styles.css
     toc: true
-
-
-

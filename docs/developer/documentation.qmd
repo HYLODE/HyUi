@@ -6,7 +6,7 @@ Documentation in ./docs
 
 - installed basic python and jupyter extensions necessary including those for jupyter
 - installed [quarto](https://quarto.org/docs/get-started/)
-- installed the [VSCode extension](https://quarto.org/docs/get-started/hello/vscode.html) 
+- installed the [VSCode extension](https://quarto.org/docs/get-started/hello/vscode.html)
 
 Workflow
 
