@@ -35,7 +35,7 @@ website:
           - contributor_guide/updating_gitignore.qmd
   repo-url: https://github.com/hylode/hyui
   repo-actions: [edit, issue]
-  repo-subdir: hyui
+  repo-subdir: docs
 
 format:
   html:
