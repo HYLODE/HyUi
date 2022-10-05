@@ -1,6 +1,6 @@
-# Deployment
+## Deployment
 
-## Quick start
+### Quick start
 
 From the commandline of the GAE
 
@@ -14,6 +14,6 @@ pytest # OPTIONAL
 docker-compose up -d --build && docker-composes logs -f
 ```
 
-Go to [http://my-host-name:8094/docs](http://my-host-name:8094/docs) for the API
+Go to [http://my-host-name:8094/docs](http://my-host-name:8094/docs) for the API. For example for this might be [http://172.16.149.202:8094]().
 
-Go to [http://my-host-name:8095](http://my-host-name:8095) for the dashboard landing page
+Go to [http://my-host-name:8095](http://my-host-name:8095) for the dashboard landing page. For example for this might be [http://172.16.149.202:8095]().
