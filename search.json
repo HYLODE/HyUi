@@ -264,5 +264,12 @@
     "title": "HYLODE documentation",
     "section": "Debugging after deployment in the live environment",
     "text": "Debugging after deployment in the live environment\nSince we don’t have root access, then the deployment happens via docker. This means that the debugging must also happen inside a live docker container. The following seems to work.\nEnsure that your docker-compose file includes these options for the image that you wish to debug.\nIf this is your docker-compose config for the api service:\n\n  api:\n    build:\n      context: ./src\n      dockerfile: Dockerfile.api\n...\nthen add these lines\n    stdin_open: true\n    tty: true\n\nRun docker-compose up -d --build as usual.\nFind the ID of the approprite container via docker container ps | grep hyui (e.g. abc123)\nUse that ID to run docker attach abc123. Don’t be put off if nothing seems to happen.\nWhenever the python debugger is triggered (e.g. via a breakpoint import pdb; pdb.set_trace()) the container will return control to the terminal above.\nTo exit without killing the container then use CONTROL-P, CONTROL-Q instead of CONTROL-C\n\nAll this via https://blog.lucasferreira.org/howto/2017/06/03/running-pdb-with-docker-and-gunicorn.html with tips for the Python Debugger via https://realpython.com/python-debugging-pdb/."
+  },
+  {
+    "objectID": "notes/provisioning.html",
+    "href": "notes/provisioning.html",
+    "title": "HYLODE documentation",
+    "section": "",
+    "text": "Footnotes\n\n\nDifficulties in deployment are also the Achilles heel of a Trusted Research Environment. Whilst safe, these walled gardens mean that models are developed offline without the benefit of clinical testing.↩︎"
   }
 ]
