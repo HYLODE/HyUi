@@ -263,6 +263,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb1"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> docs</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> preview</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Don’t forget that changes to config (e.g.&nbsp;<code>_quarto.yml</code> may need you to rerun <code>quarto render</code> to ensure the whole site is correctly rebuilt)</p>
+<p>When you push to either <em>dev</em> or <em>main</em> branches, then a GitHub Action (see <code>.github/workflows/publish.yml</code>) will be triggered that should publish the current documentation to https://hylode.github.io/HyUi/.</p>
 
 
 </section>

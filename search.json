@@ -123,14 +123,14 @@
     "href": "developer/documentation.html",
     "title": "HYLODE documentation",
     "section": "",
-    "text": "Set up for editing and building documentation All based around Quarto Documentation in ./docs\n\ninstalled basic python and jupyter extensions necessary including those for jupyter\ninstalled quarto\ninstalled the VSCode extension\n\nWorkflow\ncd docs\nquarto preview\nDon’t forget that changes to config (e.g. _quarto.yml may need you to rerun quarto render to ensure the whole site is correctly rebuilt)"
+    "text": "Set up for editing and building documentation All based around Quarto Documentation in ./docs\n\ninstalled basic python and jupyter extensions necessary including those for jupyter\ninstalled quarto\ninstalled the VSCode extension\n\nWorkflow\ncd docs\nquarto preview\nDon’t forget that changes to config (e.g. _quarto.yml may need you to rerun quarto render to ensure the whole site is correctly rebuilt)\nWhen you push to either dev or main branches, then a GitHub Action (see .github/workflows/publish.yml) will be triggered that should publish the current documentation to https://hylode.github.io/HyUi/."
   },
   {
     "objectID": "developer/workflow.html",
     "href": "developer/workflow.html",
     "title": "HYLODE documentation",
     "section": "",
-    "text": "Note\n\n\n\nPersona = developer reading this who wants to deploy an dash app Setting: working on their own lap top with access to UCLH data and machines"
+    "text": "Note\n\n\n\n\nPersona\n\ndeveloper reading this who wants to deploy an dash app Setting\n\n\nworking on their own lap top with access to UCLH data and machines"
   },
   {
     "objectID": "developer/workflow.html#make-synthetic-version-of-the-data",
