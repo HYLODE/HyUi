@@ -93,6 +93,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
+<link href="../contributor_guide/pre_commit_hooks.html" rel="next">
+<link href="../contributor_guide/CODE_OF_CONDUCT.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -146,7 +148,17 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <a class="nav-link" href="../index.html">Home</a>
   </li>  
   <li class="nav-item">
+    <a class="nav-link" href="../vignettes/vignettes.html">Vignettes</a>
+  </li>  
+  <li class="nav-item">
     <a class="nav-link" href="../about.html">About</a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/HYLODE/HyUI"><i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+ </a>
   </li>  
 </ul>
               <div id="quarto-search" class="" title="Search"></div>
@@ -188,7 +200,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../developer/documentation.html" class="sidebar-item-text sidebar-link">Project documentation</a>
+  <a href="../developer/documentation.html" class="sidebar-item-text sidebar-link">Writing documentation</a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -271,7 +283,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>We love contributions! We’ve compiled this documentation to help you understand our contributing guidelines. <a href="mailto:doc@steveharris.me">If you still have questions, please contact us</a> and we’d be happy to help!</p>
 <section id="code-of-conduct" class="level2">
 <h2 class="anchored" data-anchor-id="code-of-conduct">Code of Conduct</h2>
-<p><a href="./CODE_OF_CONDUCT.md">Please read <code>CODE_OF_CONDUCT.md</code> before contributing</a>.</p>
+<p><a href="../contributor_guide/CODE_OF_CONDUCT.html">Please read <code>CODE_OF_CONDUCT.md</code> before contributing</a>.</p>
 </section>
 <section id="getting-started" class="level2">
 <h2 class="anchored" data-anchor-id="getting-started">Getting started</h2>
@@ -280,7 +292,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 pre-commit install</code></pre>
 <p>or the <code>make</code> command:</p>
 <pre class="shell"><code>make requirements</code></pre>
-<p>The pre-commit hooks are a security feature to ensure, for example, no secrets<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>, large data files, and Jupyter notebook outputs are accidentally committed into the repository. <a href="./pre_commit_hooks.md">For more information on pre-commit hooks see our documentation</a>.</p>
+<p>The pre-commit hooks are a security feature to ensure, for example, no secrets<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>, large data files, and Jupyter notebook outputs are accidentally committed into the repository. <a href="../contributor_guide/pre_commit_hooks.html">For more information on pre-commit hooks see our documentation</a>.</p>
 </section>
 <section id="code-conventions" class="level2">
 <h2 class="anchored" data-anchor-id="code-conventions">Code conventions</h2>
@@ -288,7 +300,7 @@ pre-commit install</code></pre>
 <section id="git-and-github" class="level3">
 <h3 class="anchored" data-anchor-id="git-and-github">Git and GitHub</h3>
 <p>We use Git to version control the source code. <a href="https://gds-way.cloudapps.digital/standards/source-code.html">Please read the GDS Way for details on Git best practice</a>. This includes how to write good commit messages, use <code>git rebase</code> for local branches and <code>git merge --no-ff</code> for merges, as well as using <code>git push --force-with-lease</code> instead of <code>git push -f</code>.</p>
-<p><a href="./updating_gitignore.md">If you want to modify the <code>.gitignore</code> files, see the template documentation</a> for further details.</p>
+<p><a href="../contributor_guide/updating_gitignore.html">If you want to modify the <code>.gitignore</code> files, see the template documentation</a> for further details.</p>
 <p>Our source code is stored on GitHub. Pull requests into <code>main</code> require at least one approved review.</p>
 </section>
 <section id="python" class="level3">
@@ -323,7 +335,7 @@ coverage html</code></pre>
 <section id="documentation" class="level2">
 <h2 class="anchored" data-anchor-id="documentation">Documentation</h2>
 <p><a href="https://myst-parser.readthedocs.io/">We write our documentation in MyST Markdown for use in Sphinx</a>. This is mainly stored in the <code>docs</code> folder, unless it’s more appropriate to store it elsewhere, like this file.</p>
-<p><a href="./writing_accessible_documentation.md">Please read our guidance on how to write accessible documentation</a>, as well as our <a href="./writing_sphinx_documentation.md">guidance on writing Sphinx documentation</a>. This allows you to build the documentation into an accessible, searchable website.</p>
+<p>[Please read our guidance on how to write accessible documentation][docs-write-accessible-documentation], as well as our [guidance on writing Sphinx documentation][docs-write-sphinx-documentation]. This allows you to build the documentation into an accessible, searchable website.</p>
 
 
 </section>
@@ -333,7 +345,7 @@ coverage html</code></pre>
 <div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
 
 <ol>
-<li id="fn1"><p><a href="./pre_commit_hooks.md#definition-of-a-secret-according-to-detect-secrets">Only secrets of specific patterns are detected by the pre-commit hooks</a>.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn1"><p><a href="../contributor_guide/pre_commit_hooks.html#definition-of-a-secret-according-to-detect-secrets">Only secrets of specific patterns are detected by the pre-commit hooks</a>.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -434,6 +446,18 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../contributor_guide/CODE_OF_CONDUCT.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Code of conduct for <code>hyui</code></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../contributor_guide/pre_commit_hooks.html" class="pagination-link">
+        <span class="nav-page-text">Pre-commit hooks</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">

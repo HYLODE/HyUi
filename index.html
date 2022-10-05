@@ -146,7 +146,17 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <a class="nav-link active" href="./index.html" aria-current="page">Home</a>
   </li>  
   <li class="nav-item">
+    <a class="nav-link" href="./vignettes/vignettes.html">Vignettes</a>
+  </li>  
+  <li class="nav-item">
     <a class="nav-link" href="./about.html">About</a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/HYLODE/HyUI"><i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+ </a>
   </li>  
 </ul>
               <div id="quarto-search" class="" title="Search"></div>
@@ -188,7 +198,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./developer/documentation.html" class="sidebar-item-text sidebar-link">Project documentation</a>
+  <a href="./developer/documentation.html" class="sidebar-item-text sidebar-link">Writing documentation</a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -251,12 +261,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <li><a href="#orchestrating-front-and-back-end" id="toc-orchestrating-front-and-back-end" class="nav-link" data-scroll-target="#orchestrating-front-and-back-end">Orchestrating front and back end</a></li>
   </ul></li>
   <li><a href="#project-structure" id="toc-project-structure" class="nav-link" data-scroll-target="#project-structure">Project structure</a></li>
-  <li><a href="#getting-started" id="toc-getting-started" class="nav-link" data-scroll-target="#getting-started">Getting started</a>
-  <ul class="collapse">
-  <li><a href="#requirements" id="toc-requirements" class="nav-link" data-scroll-target="#requirements">Requirements</a></li>
-  </ul></li>
-  <li><a href="#required-secrets-and-credentials" id="toc-required-secrets-and-credentials" class="nav-link" data-scroll-target="#required-secrets-and-credentials">Required secrets and credentials</a></li>
-  <li><a href="#licence" id="toc-licence" class="nav-link" data-scroll-target="#licence">Licence</a></li>
   <li><a href="#contributing" id="toc-contributing" class="nav-link" data-scroll-target="#contributing">Contributing</a></li>
   <li><a href="#acknowledgements" id="toc-acknowledgements" class="nav-link" data-scroll-target="#acknowledgements">Acknowledgements</a></li>
   </ul>
@@ -295,13 +299,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Set ENV=prod (rather than dev)</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ex">pytest</span> <span class="co"># OPTIONAL</span></span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ex">docker-compose</span> up <span class="at">-d</span> <span class="at">--build</span> <span class="kw">&amp;&amp;</span> <span class="ex">docker-composes</span> logs <span class="at">-f</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Go to <a href="http://my-host-name:8094/docs">http://my-host-name:8094/docs</a> for the API</p>
-<p>Go to <a href="http://my-host-name:8095">http://my-host-name:8095</a> for the dashboard landing page</p>
-<p>Refer to <a href="user_guide/deployment.md">Deployment</a> for more details.</p>
+<p>Go to <a href="http://my-host-name:8094/docs">http://my-host-name:8094/docs</a> for the API. For example for this might be <a href="">http://172.16.149.202:8094</a>.</p>
+<p>Go to <a href="http://my-host-name:8095">http://my-host-name:8095</a> for the dashboard landing page. For example for this might be <a href="">http://172.16.149.202:8095</a>.</p>
+<p>Refer to <a href="./developer/deployment.html">Deployment</a> for more details.</p>
 </section>
 <section id="development" class="level3">
 <h3 class="anchored" data-anchor-id="development">Development</h3>
-<p>Refer to <a href="user_guide/dev-setup.md">Dev Setup</a> for details on setting up development environments.</p>
+<p>Refer to <a href="./developer/setup.html">Dev Setup</a> for details on setting up development environments.</p>
 </section>
 <section id="development-hospital" class="level3">
 <h3 class="anchored" data-anchor-id="development-hospital">Development (Hospital)</h3>
@@ -361,7 +365,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 |-- synth               // Synthetic data generation for testing
     |-- work
 |-- tests
-|-- docs
+|-- docs                // this Quarto website
 |-- data
 |-- outputs
 |-- notebooks           // jupyter notebooks etc
@@ -369,60 +373,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 </code></pre>
 </section>
-<section id="getting-started" class="level2">
-<h2 class="anchored" data-anchor-id="getting-started">Getting started</h2>
-<p>To start using this project, <a href="#requirements">first make sure your system meets its requirements</a>.</p>
-<p>To be added.</p>
-<section id="requirements" class="level3">
-<h3 class="anchored" data-anchor-id="requirements">Requirements</h3>
-<p><code>{note} Requirements for contributors [Contributors have some additional requirements][contributing]!</code></p>
-<ul>
-<li>Python 3.6.1+ installed</li>
-<li>a <code>.secrets</code> file with the <a href="#required-secrets-and-credentials">required secrets and credentials</a></li>
-<li><a href="./docs/user_guide/loading_environment_variables.md">load environment variables</a> from <code>.envrc</code></li>
-</ul>
-<p>To install the Python requirements, open your terminal and enter:</p>
-<pre class="shell"><code>pip install -r requirements.txt</code></pre>
-</section>
-</section>
-<section id="required-secrets-and-credentials" class="level2">
-<h2 class="anchored" data-anchor-id="required-secrets-and-credentials">Required secrets and credentials</h2>
-<p>To run this project, <a href="./docs/user_guide/loading_environment_variables.md#storing-secrets-and-credentials">you need a <code>.secrets</code> file with secrets/credentials as environmental variables</a>. The secrets/credentials should have the following environment variable name(s):</p>
-<table class="table">
-<colgroup>
-<col style="width: 21%">
-<col style="width: 30%">
-<col style="width: 48%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Secret/credential</th>
-<th>Environment variable name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Secret 1</td>
-<td><code>SECRET_VARIABLE_1</code></td>
-<td>Plain English description of Secret 1.</td>
-</tr>
-<tr class="even">
-<td>Credential 1</td>
-<td><code>CREDENTIAL_VARIABLE_1</code></td>
-<td>Plain English description of Credential 1.</td>
-</tr>
-</tbody>
-</table>
-<p>Once you’ve added, <a href="./docs/user_guide/loading_environment_variables.md">load these environment variables using <code>.envrc</code></a>.</p>
-</section>
-<section id="licence" class="level2">
-<h2 class="anchored" data-anchor-id="licence">Licence</h2>
-<p>Unless stated otherwise, the codebase is released under the MIT License. This covers both the codebase and any sample code in the documentation. The documentation is © Crown copyright and available under the terms of the Open Government 3.0 licence.</p>
-</section>
 <section id="contributing" class="level2">
 <h2 class="anchored" data-anchor-id="contributing">Contributing</h2>
-<p><a href="./docs/contributor_guide/CONTRIBUTING.md">If you want to help us build, and improve <code>hyui</code>, view our contributing guidelines</a>.</p>
+<p><a href="./docs/contributor_guide/CONTRIBUTING.qmd">If you want to help us build, and improve <code>hyui</code>, view our contributing guidelines</a>.</p>
 </section>
 <section id="acknowledgements" class="level2">
 <h2 class="anchored" data-anchor-id="acknowledgements">Acknowledgements</h2>

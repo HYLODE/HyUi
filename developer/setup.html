@@ -93,6 +93,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
+<link href="../developer/workflow.html" rel="next">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -146,7 +147,17 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <a class="nav-link" href="../index.html">Home</a>
   </li>  
   <li class="nav-item">
+    <a class="nav-link" href="../vignettes/vignettes.html">Vignettes</a>
+  </li>  
+  <li class="nav-item">
     <a class="nav-link" href="../about.html">About</a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/HYLODE/HyUI"><i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+ </a>
   </li>  
 </ul>
               <div id="quarto-search" class="" title="Search"></div>
@@ -188,7 +199,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../developer/documentation.html" class="sidebar-item-text sidebar-link">Project documentation</a>
+  <a href="../developer/documentation.html" class="sidebar-item-text sidebar-link">Writing documentation</a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -314,9 +325,9 @@ Note
 </section>
 <section id="clone-hyui-to-your-local-machine" class="level3">
 <h3 class="anchored" data-anchor-id="clone-hyui-to-your-local-machine">Clone HyUI to your local machine</h3>
-<pre class="shell"><code>git clone https://github.com/HYLODE/HyUi.git
-cd HyUi
-cp .env.example .env</code></pre>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/HYLODE/HyUi.git</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> HyUi</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> .env.example .env</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="set-up-conda-environment" class="level3">
 <h3 class="anchored" data-anchor-id="set-up-conda-environment">Set up conda environment</h3>
@@ -476,6 +487,15 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../developer/workflow.html" class="pagination-link">
+        <span class="nav-page-text">Development workflow</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">

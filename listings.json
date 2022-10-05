@@ -1,0 +1,13 @@
+[
+  {
+    "listing": "/vignettes/vignettes.html",
+    "items": [
+      "/vignettes/beds_v3NHNN.html",
+      "/vignettes/beds_v3UCLH.html",
+      "/vignettes/icu-tap-aggregate-probs.html",
+      "/vignettes/icu-tap-elective-predictions.html",
+      "/vignettes/icu-tap-emergency-predictions.html",
+      "/vignettes/wrangle_beds.html"
+    ]
+  }
+]
