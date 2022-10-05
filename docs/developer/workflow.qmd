@@ -1,8 +1,9 @@
 :::{.callout-note}
 Persona
 : developer reading this who wants to deploy an dash app
+
 Setting
-: working on their own lap top with access to UCLH data and machines
+: working on their own laptop with access to UCLH data and machines
 :::
 
 # Development workflow

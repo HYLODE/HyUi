@@ -34,7 +34,7 @@ We assume that the majority of the development work will be on your own machine.
 
 ### Clone HyUI to your local machine
 
-```shell
+```sh
 git clone https://github.com/HYLODE/HyUi.git
 cd HyUi
 cp .env.example .env

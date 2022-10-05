@@ -112,13 +112,11 @@ documentation][docs-write-accessible-documentation], as well as our [guidance on
 writing Sphinx documentation][docs-write-sphinx-documentation]. This allows you to
 build the documentation into an accessible, searchable website.
 
-[code-of-conduct]: ./CODE_OF_CONDUCT.md
+[code-of-conduct]: ./CODE_OF_CONDUCT.qmd
 [coverage]: https://coverage.readthedocs.io/
-[docs-pre-commit-hooks]: ./pre_commit_hooks.md
-[docs-pre-commit-hooks-secrets-definition]: ./pre_commit_hooks.md#definition-of-a-secret-according-to-detect-secrets
-[docs-updating-gitignore]: ./updating_gitignore.md
-[docs-write-accessible-documentation]: ./writing_accessible_documentation.md
-[docs-write-sphinx-documentation]: ./writing_sphinx_documentation.md
+[docs-pre-commit-hooks]: ./pre_commit_hooks.qmd
+[docs-pre-commit-hooks-secrets-definition]: ./pre_commit_hooks.qmd#definition-of-a-secret-according-to-detect-secrets
+[docs-updating-gitignore]: ./updating_gitignore.qmd
 [email]: mailto:doc@steveharris.me
 [gds-way]: https://gds-way.cloudapps.digital/
 [gds-way-git]: https://gds-way.cloudapps.digital/standards/source-code.html

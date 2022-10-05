@@ -1,4 +1,4 @@
-# Project documentation
+# Writing documentation
 
 Set up for editing and building documentation
 All based around Quarto

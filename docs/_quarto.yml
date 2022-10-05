@@ -13,7 +13,14 @@ website:
     left:
       - href: index.qmd
         text: Home
+      - href: vignettes/vignettes.qmd
+        text: Vignettes
       - about.qmd
+    right:
+      - icon: github
+        href: https://github.com/HYLODE/HyUI
+        aria-label: GitHub
+  page-navigation: true  # navigate from one page to the next
   page-footer: |
     Hyperlocal Bed Demand Forecasts
     A project deployed at UCLH supported by NIHR and NHS-X. (2022)
