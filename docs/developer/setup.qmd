@@ -113,6 +113,12 @@ ENV=dev DOCKER=False python apps/app.py
 
 then navigate to [http://localhost:8093](http://localhost:8093) to view the app
 
+#### Using PyCharm to debug
+#
+- Ensure the execution envrionment is setup to use the previously created Conda hyui.
+- Use EnvFile plugin to source the `.env` file in the root directory.
+- Ensure the working directory is `src` not `src\apps`.
+
 ## Development workflow
 
 Once you're up and running, you can review the development workflow in [Development Workflow](dev-workflow.md)
@@ -120,3 +126,44 @@ Once you're up and running, you can review the development workflow in [Developm
 ## Apple Silicon notes
 
 See [Hylode HySys](https://github.com/HYLODE/HySys/tree/dev/hylode#5-development)
+
+
+# Experimental PyEnv + Virtualenv + Pip Development Workflow
+
+This is an experimental workflow designed to ultimately align the way packages are installed on development machines and in production. It is ultimately inteded to replace Conda.
+
+## Install Requirements
+
+- Install (https://github.com/pyenv/pyenv)[pyenv]
+- Install (https://github.com/pyenv/pyenv-virtualenv)[pyenv-virtualenv]
+
+## Create Required Virtual Environments
+
+```sh
+> pyenv virtualenv 3.10.7 hyui-web
+> pyenv virtualenv 3.10.7 hyui-api
+```
+
+## Activate Virtual Environment
+
+In one shell:
+
+```sh
+> pyenv virtualenv 3.10.7 hyui-web
+```
+
+In another shell:
+```sh
+> pyenv virtualenv 3.10.7 hyui-api
+```
+
+These will be the Python virtual envronments that contains all the dependencies for the Dash web app and the API backend.
+
+## Install The Website App Requirements
+
+In the `hyui-web` terminal in the root directory:
+
+```sh
+> pip install -e code/config
+> pip install -e code/web
+```

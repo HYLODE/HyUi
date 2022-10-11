@@ -869,6 +869,7 @@ docs/_site/
 
 
 # caches
+cache-directory
 cache-directory/*
 
 # Ignore the contents of the `data` folder, except for the `README.md` file

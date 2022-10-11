@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hyui-web"
+version = "0.0.1"
+dependencies = [
+    "hyui-config",
+    "dash == 2.6.2",
+    "dash-bootstrap-components == 1.2.1",
+    "Flask == 2.2.2",
+    "Flask-Login == 0.6.2",
+    "pre-commit == 2.20.0"
+]
