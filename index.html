@@ -252,12 +252,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#deployment" id="toc-deployment" class="nav-link active" data-scroll-target="#deployment">Deployment</a>
-  <ul class="collapse">
-  <li><a href="#quick-start" id="toc-quick-start" class="nav-link" data-scroll-target="#quick-start">Quick start</a></li>
-  <li><a href="#development" id="toc-development" class="nav-link" data-scroll-target="#development">Development</a></li>
+  <li><a href="#development" id="toc-development" class="nav-link active" data-scroll-target="#development">Development</a></li>
   <li><a href="#development-hospital" id="toc-development-hospital" class="nav-link" data-scroll-target="#development-hospital">Development (Hospital)</a></li>
-  <li><a href="#prod-deployment" id="toc-prod-deployment" class="nav-link" data-scroll-target="#prod-deployment">Prod deployment</a></li>
+  <li><a href="#deployment-hospital" id="toc-deployment-hospital" class="nav-link" data-scroll-target="#deployment-hospital">Deployment (hospital)</a>
+  <ul class="collapse">
   <li><a href="#orchestrating-front-and-back-end" id="toc-orchestrating-front-and-back-end" class="nav-link" data-scroll-target="#orchestrating-front-and-back-end">Orchestrating front and back end</a></li>
   </ul></li>
   <li><a href="#project-structure" id="toc-project-structure" class="nav-link" data-scroll-target="#project-structure">Project structure</a></li>
@@ -286,63 +284,32 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </header>
 
 <p>User interface for the HYLODE project Much of the project structure is based on the<a href="https://github.com/best-practice-and-impact/govcookiecutter"><code>govcookiecutter</code> template project</a> but is adapted for the development of Plotly Dash apps within a hospital environment. A template application would be split into a frontend and a backend with communication between the two via HTTP, and the project orchestrated by docker-compose.</p>
-<p>This file (<code>./readme.md</code>) is at the root of the project, but the application code including the backend is in <code>./src/api</code>, and the application itself is kept in <code>./src/apps</code>. An annotated figure of the directory structure is shown below.</p>
-<section id="deployment" class="level2">
-<h2 class="anchored" data-anchor-id="deployment">Deployment</h2>
-<section id="quick-start" class="level3">
-<h3 class="anchored" data-anchor-id="quick-start">Quick start</h3>
-<p>From the commandline of the GAE</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/HYLODE/HyUi.git</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> HyUi</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> .env.example .env</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Now hand edit the .env file with usernames/passwords</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Set ENV=prod (rather than dev)</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ex">pytest</span> <span class="co"># OPTIONAL</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ex">docker-compose</span> up <span class="at">-d</span> <span class="at">--build</span> <span class="kw">&amp;&amp;</span> <span class="ex">docker-composes</span> logs <span class="at">-f</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Go to <a href="http://my-host-name:8094/docs">http://my-host-name:8094/docs</a> for the API. For example for this might be <a href="">http://172.16.149.202:8094</a>.</p>
-<p>Go to <a href="http://my-host-name:8095">http://my-host-name:8095</a> for the dashboard landing page. For example for this might be <a href="">http://172.16.149.202:8095</a>.</p>
-<p>Refer to <a href="./developer/deployment.html">Deployment</a> for more details.</p>
-</section>
-<section id="development" class="level3">
-<h3 class="anchored" data-anchor-id="development">Development</h3>
+<p>The file (<code>./readme.md</code>) is at the root of the project, but the application code including the backend is in <code>./src/api</code>, and the application itself is kept in <code>./src/apps</code>. An annotated figure of the directory structure is shown below.</p>
+<section id="development" class="level2">
+<h2 class="anchored" data-anchor-id="development">Development</h2>
 <p>Refer to <a href="./developer/setup.html">Dev Setup</a> for details on setting up development environments.</p>
 </section>
-<section id="development-hospital" class="level3">
-<h3 class="anchored" data-anchor-id="development-hospital">Development (Hospital)</h3>
-<p>There are two tasks that <em>must</em> happen within the hospital environment: (1) preparing realistic mock data (2) deployment. The installation steps differ because here we do not have <strong>sudo</strong> (root) access (admin privileges). This means work must be performed using a combination of the default command line tools and docker.</p>
-<p><strong>YOU MUST NOW PREPARE YOUR DATA MODEL IN <code>./src/api/models.py</code></strong> This is a quality control step that ensures the data you handle is of the correct type. let’s generalise the naming so that query is matched to results which has rows and results is a pydantic / sqlmodel class by hand, specify as per … https://sqlmodel.tiangolo.com/tutorial/create-db-and-table/</p>
-<p>A simple Pandas dataframe with two string columns and a timestamp.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> df.types</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>firstname                          <span class="bu">object</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>lastname                           <span class="bu">object</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>admission_datetime                 datetime64[ns]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>The equivalent SQLModel. Note that <code>firstname</code> is optional but that <code>lastname</code> and <code>admission_datetime</code> are not.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sqlmodel <span class="im">import</span> SQLModel</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> datetime</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ResultsBase(SQLModel):</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co">    Generic results class to hold data returned from</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co">    the SQL query or the API</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    firstname: Optional[<span class="bu">str</span>]</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    lastname: <span class="bu">str</span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    admission_datetime: datetime</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>You can also use the <a href="https://pydantic-docs.helpmanual.io/usage/validators/"><code>@validator</code></a> decorator function to add additional validation.</p>
+<section id="development-hospital" class="level2">
+<h2 class="anchored" data-anchor-id="development-hospital">Development (Hospital)</h2>
+<p>There are two tasks that <em>must</em> happen within the hospital environment:</p>
+<ol type="1">
+<li>preparing realistic mock data</li>
+<li>deployment</li>
+</ol>
+<p>The installation steps differ (from local development) because here we do not have <strong>sudo</strong> (root) access (admin privileges). This means work must be performed using a combination of the default command line tools and docker.</p>
 </section>
-<section id="prod-deployment" class="level3">
-<h3 class="anchored" data-anchor-id="prod-deployment">Prod deployment</h3>
+<section id="deployment-hospital" class="level2">
+<h2 class="anchored" data-anchor-id="deployment-hospital">Deployment (hospital)</h2>
 <p>Set the environment variable to <em>prod</em>, then run <em>docker-compose</em>.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">ENV</span><span class="op">=</span>prod</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pytest</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">docker-compose</span> up <span class="at">-d</span> <span class="at">--build</span> <span class="kw">&amp;&amp;</span> <span class="ex">docker-compose</span> logs <span class="at">-f</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>You will need create a local <code>./.secrets</code> file with database credentials so preferably set the <em>ENV</em> to <code>prod</code> there.</p>
-</section>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">ENV</span><span class="op">=</span>prod</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pytest</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">docker-compose</span> up <span class="at">-d</span> <span class="at">--build</span> <span class="kw">&amp;&amp;</span> <span class="ex">docker-compose</span> logs <span class="at">-f</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>You will need create a local <code>./.env</code> file with database credentials so preferably set the <em>ENV</em> to <code>prod</code> there.</p>
 <section id="orchestrating-front-and-back-end" class="level3">
 <h3 class="anchored" data-anchor-id="orchestrating-front-and-back-end">Orchestrating front and back end</h3>
-<p><strong>IMPORTANT</strong>: ensure you have created a ./.secrets file with at least the same info as the ./.secrets.example version</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker-compose</span> down</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker-compose</span> up <span class="at">-d</span> <span class="at">--build</span> <span class="kw">&amp;&amp;</span> <span class="ex">docker-compose</span> logs <span class="at">-f</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>IMPORTANT</strong>: ensure you have created a ./.env file with at least the same info as the ./.env.example version</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker-compose</span> down</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker-compose</span> up <span class="at">-d</span> <span class="at">--build</span> <span class="kw">&amp;&amp;</span> <span class="ex">docker-compose</span> logs <span class="at">-f</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 </section>
 <section id="project-structure" class="level2">

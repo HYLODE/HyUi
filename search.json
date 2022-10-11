@@ -32,14 +32,28 @@
     "href": "index.html",
     "title": "HyUI documentation",
     "section": "",
-    "text": "User interface for the HYLODE project Much of the project structure is based on thegovcookiecutter template project but is adapted for the development of Plotly Dash apps within a hospital environment. A template application would be split into a frontend and a backend with communication between the two via HTTP, and the project orchestrated by docker-compose.\nThis file (./readme.md) is at the root of the project, but the application code including the backend is in ./src/api, and the application itself is kept in ./src/apps. An annotated figure of the directory structure is shown below."
+    "text": "User interface for the HYLODE project Much of the project structure is based on thegovcookiecutter template project but is adapted for the development of Plotly Dash apps within a hospital environment. A template application would be split into a frontend and a backend with communication between the two via HTTP, and the project orchestrated by docker-compose.\nThe file (./readme.md) is at the root of the project, but the application code including the backend is in ./src/api, and the application itself is kept in ./src/apps. An annotated figure of the directory structure is shown below."
   },
   {
-    "objectID": "index.html#deployment",
-    "href": "index.html#deployment",
+    "objectID": "index.html#development",
+    "href": "index.html#development",
     "title": "HyUI documentation",
-    "section": "Deployment",
-    "text": "Deployment\n\nQuick start\nFrom the commandline of the GAE\ngit clone https://github.com/HYLODE/HyUi.git\ncd HyUi\ncp .env.example .env\n# Now hand edit the .env file with usernames/passwords\n# Set ENV=prod (rather than dev)\npytest # OPTIONAL\ndocker-compose up -d --build && docker-composes logs -f\nGo to http://my-host-name:8094/docs for the API. For example for this might be http://172.16.149.202:8094.\nGo to http://my-host-name:8095 for the dashboard landing page. For example for this might be http://172.16.149.202:8095.\nRefer to Deployment for more details.\n\n\nDevelopment\nRefer to Dev Setup for details on setting up development environments.\n\n\nDevelopment (Hospital)\nThere are two tasks that must happen within the hospital environment: (1) preparing realistic mock data (2) deployment. The installation steps differ because here we do not have sudo (root) access (admin privileges). This means work must be performed using a combination of the default command line tools and docker.\nYOU MUST NOW PREPARE YOUR DATA MODEL IN ./src/api/models.py This is a quality control step that ensures the data you handle is of the correct type. let’s generalise the naming so that query is matched to results which has rows and results is a pydantic / sqlmodel class by hand, specify as per … https://sqlmodel.tiangolo.com/tutorial/create-db-and-table/\nA simple Pandas dataframe with two string columns and a timestamp.\n>>> df.types\nfirstname                          object\nlastname                           object\nadmission_datetime                 datetime64[ns]\nThe equivalent SQLModel. Note that firstname is optional but that lastname and admission_datetime are not.\nfrom sqlmodel import SQLModel\nfrom datetime import datetime\n\nclass ResultsBase(SQLModel):\n    \"\"\"\n    Generic results class to hold data returned from\n    the SQL query or the API\n    \"\"\"\n    firstname: Optional[str]\n    lastname: str\n    admission_datetime: datetime\nYou can also use the @validator decorator function to add additional validation.\n\n\nProd deployment\nSet the environment variable to prod, then run docker-compose.\nexport ENV=prod\npytest\ndocker-compose up -d --build && docker-compose logs -f\nYou will need create a local ./.secrets file with database credentials so preferably set the ENV to prod there.\n\n\nOrchestrating front and back end\nIMPORTANT: ensure you have created a ./.secrets file with at least the same info as the ./.secrets.example version\ndocker-compose down\ndocker-compose up -d --build && docker-compose logs -f"
+    "section": "Development",
+    "text": "Development\nRefer to Dev Setup for details on setting up development environments."
+  },
+  {
+    "objectID": "index.html#development-hospital",
+    "href": "index.html#development-hospital",
+    "title": "HyUI documentation",
+    "section": "Development (Hospital)",
+    "text": "Development (Hospital)\nThere are two tasks that must happen within the hospital environment:\n\npreparing realistic mock data\ndeployment\n\nThe installation steps differ (from local development) because here we do not have sudo (root) access (admin privileges). This means work must be performed using a combination of the default command line tools and docker."
+  },
+  {
+    "objectID": "index.html#deployment-hospital",
+    "href": "index.html#deployment-hospital",
+    "title": "HyUI documentation",
+    "section": "Deployment (hospital)",
+    "text": "Deployment (hospital)\nSet the environment variable to prod, then run docker-compose.\nexport ENV=prod\npytest\ndocker-compose up -d --build && docker-compose logs -f\nYou will need create a local ./.env file with database credentials so preferably set the ENV to prod there.\n\nOrchestrating front and back end\nIMPORTANT: ensure you have created a ./.env file with at least the same info as the ./.env.example version\ndocker-compose down\ndocker-compose up -d --build && docker-compose logs -f"
   },
   {
     "objectID": "index.html#project-structure",
@@ -165,7 +179,7 @@
     "href": "developer/deployment.html",
     "title": "HYLODE documentation",
     "section": "",
-    "text": "From the commandline of the GAE\ngit clone https://github.com/HYLODE/HyUi.git\ncd HyUi\ncp .env.example .env\n# Now hand edit the .env file with usernames/passwords\n# Set ENV=prod (rather than dev)\npytest # OPTIONAL\ndocker-compose up -d --build && docker-composes logs -f\nGo to http://my-host-name:8094/docs for the API\nGo to http://my-host-name:8095 for the dashboard landing page"
+    "text": "From the commandline of the GAE\ngit clone https://github.com/HYLODE/HyUi.git\ncd HyUi\ncp .env.example .env\n# Now hand edit the .env file with usernames/passwords\n# Set ENV=prod (rather than dev)\npytest # OPTIONAL\ndocker-compose up -d --build && docker-composes logs -f\nGo to http://my-host-name:8094/docs for the API. For example for this might be http://172.16.149.202:8094.\nGo to http://my-host-name:8095 for the dashboard landing page. For example for this might be http://172.16.149.202:8095."
   },
   {
     "objectID": "developer/setup.html",

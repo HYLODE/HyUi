@@ -264,10 +264,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 
 
-<section id="deployment" class="level1">
-<h1>Deployment</h1>
-<section id="quick-start" class="level2">
-<h2 class="anchored" data-anchor-id="quick-start">Quick start</h2>
+<section id="deployment" class="level2">
+<h2 class="anchored" data-anchor-id="deployment">Deployment</h2>
+<section id="quick-start" class="level3">
+<h3 class="anchored" data-anchor-id="quick-start">Quick start</h3>
 <p>From the commandline of the GAE</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/HYLODE/HyUi.git</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> HyUi</span>
@@ -276,8 +276,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Set ENV=prod (rather than dev)</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ex">pytest</span> <span class="co"># OPTIONAL</span></span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ex">docker-compose</span> up <span class="at">-d</span> <span class="at">--build</span> <span class="kw">&amp;&amp;</span> <span class="ex">docker-composes</span> logs <span class="at">-f</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Go to <a href="http://my-host-name:8094/docs">http://my-host-name:8094/docs</a> for the API</p>
-<p>Go to <a href="http://my-host-name:8095">http://my-host-name:8095</a> for the dashboard landing page</p>
+<p>Go to <a href="http://my-host-name:8094/docs">http://my-host-name:8094/docs</a> for the API. For example for this might be <a href="">http://172.16.149.202:8094</a>.</p>
+<p>Go to <a href="http://my-host-name:8095">http://my-host-name:8095</a> for the dashboard landing page. For example for this might be <a href="">http://172.16.149.202:8095</a>.</p>
 
 
 </section>
