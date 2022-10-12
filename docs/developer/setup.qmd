@@ -174,5 +174,24 @@ In the `hyui-web` terminal in the root directory:
 In the `hyui-api` terminal in the root directory:
 
 ```sh
+> pip install -e code/config
+> pip install -e code/utils
+> pip install -e code/models
 > pip install -e code/api
 ```
+
+## Running The Servers Manually When Developing
+
+The web server when in the `hyui-web` shell:
+
+```sh
+> env $(grep -v '^#' .env | xargs) python -m web.app
+```
+
+The API server when in the `hyui-api` shell:
+
+```sh
+> env $(grep -v '^#' .env | xargs) uvicorn api.main:app --reload
+```
+
+Ensure you replace `.env` with the correct path to your development `.env` file. The command `env $(grep -v '^#' .env | xargs)` loads the contents of the `.env` into the environment just for the current execution. The `grep -v '^#'` part excludes lines beginning with a `#` in the env file.
