@@ -1,4 +1,3 @@
-# src/utils/beds.py
 """
 Methods for managing interaction with base row and beds bones
 """

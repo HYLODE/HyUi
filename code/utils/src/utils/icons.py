@@ -1,4 +1,3 @@
-# src/utils/icons.py
 """
 Functions for icons in dash tables etc
 """

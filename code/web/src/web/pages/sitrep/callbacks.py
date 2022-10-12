@@ -1,4 +1,3 @@
-# src/apps/pages/sitrep/callbacks.py
 import warnings
 
 import numpy as np

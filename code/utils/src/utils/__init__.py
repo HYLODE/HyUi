@@ -55,7 +55,7 @@ def get_model_from_route(route: str, subclass: str = None, standalone: str = Non
     """
     if all([subclass, standalone]) is True:
         raise ValueError("Only one of subclass and standalone may be provided")
-    model_path = gen_module_path(route.lower()) + ".model"
+    model_path = gen_module_path(route.lower())
     if standalone:
         model = getattr(importlib.import_module(model_path), standalone)  # noqa
     else:

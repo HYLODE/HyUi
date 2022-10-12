@@ -149,12 +149,12 @@ This is an experimental workflow designed to ultimately align the way packages a
 In one shell:
 
 ```sh
-> pyenv virtualenv 3.10.7 hyui-web
+> pyenv activate hyui-web
 ```
 
 In another shell:
 ```sh
-> pyenv virtualenv 3.10.7 hyui-api
+> pyenv activate hyui-api
 ```
 
 These will be the Python virtual envronments that contains all the dependencies for the Dash web app and the API backend.
@@ -168,4 +168,11 @@ In the `hyui-web` terminal in the root directory:
 > pip install -e code/utils
 > pip install -e code/models
 > pip install -e code/web
+```
+
+## Install The API Requirements
+In the `hyui-api` terminal in the root directory:
+
+```sh
+> pip install -e code/api
 ```

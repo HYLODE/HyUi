@@ -85,7 +85,7 @@ class Settings(BaseSettings):
     BASEROW_PORT: Optional[str]
     PORT_DOCKER_BASEROW: Optional[str]
 
-    MODULE_ROOT: str = "api"  # for building paths to modules e.g. ./src/api
+    MODULE_ROOT: str = "models"  # for building paths to modules e.g. ./src/api
     ROUTES = ModuleNames = ModuleNames._member_names_
 
     BASE_URL_DOCKER_APP: str = "http://apps"
