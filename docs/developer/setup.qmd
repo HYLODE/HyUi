@@ -165,5 +165,7 @@ In the `hyui-web` terminal in the root directory:
 
 ```sh
 > pip install -e code/config
+> pip install -e code/utils
+> pip install -e code/models
 > pip install -e code/web
 ```
