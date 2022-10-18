@@ -1,5 +1,5 @@
 from collections import namedtuple
-from typing import List, Union, Any
+from typing import Any
 
 import pandas as pd
 import sqlalchemy as sa
@@ -7,25 +7,23 @@ from fastapi import APIRouter, Depends, Query
 from pydantic import parse_obj_as
 from sqlmodel import Session
 
-from utils import get_model_from_route, prepare_query
+from models.census import CensusRead, CensusDepartments
+from utils import prepare_query
 from utils.api import get_emap_session
 from utils.wards import departments_missing_beds, wards
 
-from .wrangle import aggregate_by_department
+from api.census.wrangle import aggregate_by_department
 
 router = APIRouter(
     prefix="/census",
 )
 
-CensusRead = get_model_from_route("Census", "Read")
-CensusDepartments = get_model_from_route("Census", "Departments")
 
-
-@router.get("/beds", response_model=List[CensusRead])  # type: ignore
+@router.get("/beds", response_model=list[CensusRead])
 def read_beds(
     session: Session = Depends(get_emap_session),
-    departments: Union[List[str], None] = Query(default=wards),
-    locations: Union[List[str], None] = Query(default=[]),
+    departments: list[str] = Query(default=wards),
+    locations: list[str] = Query(default=[]),
 ):
     """
     Returns beds data class populated by query-live/mock
@@ -35,7 +33,7 @@ def read_beds(
     for d in departments:
         if d in departments_missing_beds.keys():
             locations_to_add = departments_missing_beds[d]
-            [locations.append(i) for i in locations_to_add]
+            locations.extend(locations_to_add)
 
     qtext = prepare_query("census")
     qtext = sa.text(qtext)
@@ -133,7 +131,7 @@ def read_bed_list():
     }
 
 
-@router.get("/departments", response_model=List[CensusDepartments])  # type: ignore
+@router.get("/departments", response_model=list[CensusDepartments])
 def read_departments(session: Session = Depends(get_emap_session)):
     """
     Run the beds query then aggregate
@@ -149,7 +147,7 @@ def read_departments(session: Session = Depends(get_emap_session)):
     for d in departments:
         if d in departments_missing_beds.keys():
             locations_to_add = departments_missing_beds[d]
-            [locations.append(i) for i in locations_to_add]
+            locations.extend(locations_to_add)
 
     qtext = prepare_query("census")
     qtext = sa.text(qtext)
@@ -168,7 +166,7 @@ def read_departments(session: Session = Depends(get_emap_session)):
     # round trip from dataframe to dictionary to records back to dataframe
     # just to use the data validation properties of pydantic!
     l_of_d = df.to_dict(orient="records")
-    l_of_r = parse_obj_as(List[CensusRead], l_of_d)
+    l_of_r = parse_obj_as(list[CensusRead], l_of_d)
     df = pd.DataFrame.from_dict([r.dict() for r in l_of_r])
 
     res = aggregate_by_department(df).to_dict(orient="records")

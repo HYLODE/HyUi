@@ -8,7 +8,7 @@ router = APIRouter(
 
 
 @router.get("/beds")
-def read_beds() -> list[dict[str:Any]]:
+def read_beds() -> dict[str, Any]:
     return {
         "count": 1,
         "next": None,
