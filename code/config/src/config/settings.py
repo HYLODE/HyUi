@@ -1,5 +1,3 @@
-# ./src/api/settings_src.py
-# project wide settings are loaded via ./.envrc and ./.secrets
 from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, Optional
@@ -101,7 +99,6 @@ class Settings(BaseSettings):
     CABOODLE_URL: Optional[str]
     CLARITY_URL: Optional[str]
 
-    BASE_URL: Optional[str]
     API_URL: Optional[str]
     APP_URL: Optional[str]
 
