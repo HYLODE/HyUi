@@ -4,17 +4,16 @@ from typing import List
 from fastapi import APIRouter, Depends
 from sqlmodel import Session
 
-from utils import get_model_from_route, prepare_query
+from models.consults import ConsultsRead
+from utils import prepare_query
 from utils.api import get_emap_session
 
 router = APIRouter(
     prefix="/consults",
 )
 
-ConsultsRead = get_model_from_route("Consults", "Read")
 
-
-@router.get("/", response_model=List[ConsultsRead])  # type: ignore
+@router.get("/", response_model=List[ConsultsRead])
 def read_consults(session: Session = Depends(get_emap_session)):
     """
     Returns Consults data class populated by query-live/mock
