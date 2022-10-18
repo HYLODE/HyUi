@@ -1,6 +1,8 @@
 from datetime import datetime
 from typing import Optional
 
+import arrow
+from pydantic import BaseModel
 from sqlmodel import Field, SQLModel
 
 
@@ -95,3 +97,8 @@ class ElTap(SQLModel, table=True):
     run_id: str
     horizon_dt: datetime
     inputs: Optional[str]
+
+
+class EmElTapPostBody(BaseModel):
+    horizon_dt: datetime = arrow.now().shift(days=1).format("YYYY-MM-DDTHH:mm:ss")
+    department: str = "tower"

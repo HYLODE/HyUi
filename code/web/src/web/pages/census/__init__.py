@@ -1,7 +1,10 @@
 from config.settings import settings
 
+
 BPID = "CENSUS_"
-CENSUS_API_URL = f"{settings.API_URL}/census/"
+CENSUS_API_URL = f"{settings.API_URL}/census/beds"
+CLOSED_BEDS_API_URL = f"{settings.API_URL}/census/beds/closed"
+BED_LIST_API_URL = f"{settings.API_URL}/census/beds/list"
 DEPARTMENTS_API_URL = f"{settings.API_URL}/census/departments"
 
 MINUTES = 60 * 1000  # milliseconds

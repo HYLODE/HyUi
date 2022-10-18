@@ -4,7 +4,6 @@ use the base row API to create a skeleton bed table for any ward
 """
 
 
-import warnings
 from collections import OrderedDict
 
 import utils
@@ -89,38 +88,44 @@ def store_data(n_intervals: int, ward_radio_value: str) -> list:
     """
     Read data from API then store as JSON
     """
+
+    return requests.get(f"{settings.API_URL}/bedbones/beds").json()["results"]
+
     # Get Rows
-    API_URL = f"{BASEROW_API_URL}/database/rows/table/261/"
+    # API_URL = f"{BASEROW_API_URL}/database/rows/table/261/"
+    #
+    # try:
+    #     response = requests.get(
+    #         url=API_URL,
+    #         params={
+    #             "user_field_names": "true",
+    #             "filter__field_2051__equal": ward_radio_value,
+    #             "include": (
+    #                 "location_id,location_string,closed,unit_order,"
+    #                 "DepartmentName,room,bed,bed_physical,"
+    #                 "bed_functional,covid,LocationName"
+    #             ),
+    #             "include": (
+    #                 "location_id,location_string,closed,unit_order,"
+    #                 "DepartmentName,room,bed,bed_physical,"
+    #                 "bed_functional,covid,LocationName"
+    #             ),
+    #         },
+    #         headers={
+    #             "Authorization": f"Token {settings.BASEROW_READWRITE_TOKEN}",
+    #         },
+    #     )
+    # except requests.exceptions.RequestException:
+    #     warnings.warn("HTTP Request failed")
 
-    try:
-        response = requests.get(
-            url=API_URL,
-            params={
-                "user_field_names": "true",
-                "filter__field_2051__equal": ward_radio_value,
-                "include": (
-                    "location_id,location_string,closed,unit_order,"
-                    "DepartmentName,room,bed,bed_physical,"
-                    "bed_functional,covid,LocationName"
-                ),
-                "include": (
-                    "location_id,location_string,closed,unit_order,"
-                    "DepartmentName,room,bed,bed_physical,"
-                    "bed_functional,covid,LocationName"
-                ),
-            },
-            headers={
-                "Authorization": f"Token {settings.BASEROW_READWRITE_TOKEN}",
-            },
-        )
-    except requests.exceptions.RequestException:
-        warnings.warn("HTTP Request failed")
+    # content = response.json()
 
-    content = response.json()
-    if not content["count"]:
-        warnings.warn(f"No data found at URL {API_URL}")
-    data = content["results"]
-    return data
+    # requests.get(API_URL)
+    #
+    # if not content["count"]:
+    #     warnings.warn(f"No data found at URL {API_URL}")
+    # data = content["results"]
+    # return data
 
 
 @callback(
@@ -144,7 +149,7 @@ def gen_bed_table(data: dict):
         }
     )
     df = df[COLS.keys()]
-    df["unit_order"] = df["unit_order"].astype(int)
+    df["unit_order"] = df["unit_order"].astype(int, errors="ignore")
     df["closed"] = df["closed"].astype(str)
     df["covid"] = df["covid"].astype(str)
 

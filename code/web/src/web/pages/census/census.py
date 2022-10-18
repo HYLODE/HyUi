@@ -12,6 +12,8 @@ from dash import dash_table as dt
 from dash import html, dcc, register_page
 from flask_login import current_user
 
+import web.pages.census.callbacks  # noqa: F401
+
 from web.pages.census import (
     BPID,
     CENSUS_COLS,
@@ -94,8 +96,10 @@ def gen_census_table(data: dict):
     if settings.VERBOSE and len(dfo):
         print(dfo.iloc[0])
 
-    dfo["bed_label"] = dfo["bed"].str.split(pat="-", expand=True).iloc[:, 1]
-    dfo["bed_label"] = dfo["bed_label"].apply(lambda x: "".join(filter(str.isdigit, x)))
+    # TODO: Fix this.
+    # dfo["bed_label"] = dfo["bed"].str.split(pat="-", expand=True).iloc[:, 1]
+    # dfo["bed_label"] = dfo["bed_label"].apply(
+    #   lambda x: "".join(filter(str.isdigit, x)))
     # TODO: abstract this out into a function
     dfo["room_label"] = dfo["room"]
     dfo["room_label"] = np.where(

@@ -1,5 +1,5 @@
 from collections import namedtuple
-from typing import List, Union
+from typing import List, Union, Any
 
 import pandas as pd
 import sqlalchemy as sa
@@ -21,7 +21,7 @@ CensusRead = get_model_from_route("Census", "Read")
 CensusDepartments = get_model_from_route("Census", "Departments")
 
 
-@router.get("/", response_model=List[CensusRead])  # type: ignore
+@router.get("/beds", response_model=List[CensusRead])  # type: ignore
 def read_beds(
     session: Session = Depends(get_emap_session),
     departments: Union[List[str], None] = Query(default=wards),
@@ -55,6 +55,82 @@ def read_beds(
     Record = namedtuple("Record", results.keys())  # type: ignore
     records = [Record(*r) for r in results.fetchall()]
     return records
+
+
+@router.get("/beds/closed", response_model=dict)
+def read_closed_beds():
+    return {
+        "count": 2,
+        "next": None,
+        "previous": None,
+        "results": [
+            {
+                "department": "UCH T01 ACUTE MEDICAL",
+                "closed": False,
+            },
+            {
+                "department": "UCH T01 ACUTE MEDICAL",
+                "closed": True,
+            },
+        ],
+    }
+
+
+@router.get("/beds/list", response_model=dict[str, Any])
+def read_bed_list():
+    return {
+        "count": 1,
+        "next": None,
+        "previous": None,
+        "results": [
+            {
+                "BedEpicId": "6959",
+                "BedInCensus": "0",
+                "BedName": "Lounge",
+                "DepartmentExternalName": "UCH Tower 6th Floor Gynaecology (T06G)",
+                "DepartmentKey": "31146",
+                "DepartmentLevelOfCareGrouper": "Surgical",
+                "DepartmentName": "UCH T06 GYNAE (T06G)",
+                "DepartmentServiceGrouper": "Gynaecology",
+                "DepartmentSpecialty": "Gynaecology - General",
+                "DepartmentType": "HOD",
+                "DischargeReady": "No",
+                "IsBed": "1",
+                "IsCareArea": "0",
+                "IsDepartment": "0",
+                "IsRoom": "0",
+                "LocationName": "UNIVERSITY COLLEGE HOSPITAL CAMPUS",
+                "Name": "Lounge",
+                "ParentLocationName": "UCLH PARENT HOSPITAL",
+                "RoomName": "Patient Lounge",
+                "_CreationInstant": "47:26.0",
+                "_LastUpdatedInstant": "06:27.0",
+                "_merge": "both",
+                "bed": "Lounge",
+                "bed_functional": [],
+                "bed_id": "332107431",
+                "bed_physical": [],
+                "closed": False,
+                "covid": False,
+                "department": "UCH T06 GYNAE (T06G)",
+                "department_id": "331969463",
+                "dept": "T06G",
+                "id": 1,
+                "loc2merge": (
+                    "gynaecology - general __ uch t06 "
+                    "gynae (t06g) __ patient lounge __ lounge"
+                ),
+                "location_id": "332107428",
+                "location_string": "T06G^PATIENT LOUNGE^Lounge",
+                "order": "1.00000000000000000000",
+                "room": "Patient Lounge",
+                "room_hl7": "PATIENT LOUNGE",
+                "room_id": "332107429",
+                "speciality": "Gynaecology - General",
+                "unit_order": None,
+            },
+        ],
+    }
 
 
 @router.get("/departments", response_model=List[CensusDepartments])  # type: ignore

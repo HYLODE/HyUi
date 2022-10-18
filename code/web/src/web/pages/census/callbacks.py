@@ -1,5 +1,6 @@
 import importlib
 import warnings
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -16,12 +17,12 @@ from web.pages.census import (
     CENSUS_KEEP_COLS,
     DEPARTMENTS_API_URL,
     DEPT_KEEP_COLS,
+    CLOSED_BEDS_API_URL,
+    BED_LIST_API_URL,
 )
 from config.settings import settings
 from utils.beds import (
     BedBonesBase,
-    get_bed_list,
-    get_closed_beds,
     unpack_nested_dict,
 )
 from utils.dash import validate_json
@@ -62,6 +63,14 @@ def gen_dept_dropdown(building: str) -> list:
     )
 
 
+def _get_closed_beds() -> list[dict[str, Any]]:
+    return requests.get(CLOSED_BEDS_API_URL).json()["results"]
+
+
+def _get_bed_list(department: str) -> list[dict[str, Any]]:
+    return requests.get(BED_LIST_API_URL).json()["results"]
+
+
 def store_depts_fn(n_intervals: int, building: str) -> list:
     """
     Stores data from census api (i.e. skeleton)
@@ -79,7 +88,9 @@ def store_depts_fn(n_intervals: int, building: str) -> list:
         df = df[df["department"].isin(dept_list)]
 
     # Now update with closed beds from bed_bones
-    df_closed = pd.DataFrame.from_records(get_closed_beds())
+    closed_beds_json = _get_closed_beds()
+    df_closed = pd.DataFrame.from_records(closed_beds_json)
+    # df_closed = pd.DataFrame.from_records(get_closed_beds())
     closed = df_closed.groupby("department")["closed"].sum()
     df = df.merge(closed, on="department", how="left")
     df["closed"].fillna(0, inplace=True)
@@ -113,7 +124,7 @@ def store_beds(n_intervals: int, dept: str) -> list:
     """
     Stores data from census api (i.e. skeleton)
     """
-    beds = get_bed_list(dept)
+    beds = _get_bed_list(dept)
     beds = unpack_nested_dict(beds, f2unpack="bed_functional", subkey="value")
     beds = unpack_nested_dict(beds, f2unpack="bed_physical", subkey="value")
     beds = validate_json(beds, BedBonesBase, to_dict=True)
@@ -140,8 +151,8 @@ def store_census(n_intervals: int, dept: str) -> list:
     """
     Stores data from census api (i.e. current beds occupant)
     """
-    payload = {"departments": dept}
-    res = requests.get(CENSUS_API_URL, params=payload)
+
+    res = requests.get(CENSUS_API_URL, params={"departments": dept})
     census = res.json()
     census = validate_json(census, CensusRead, to_dict=True)
     if all([not bool(i) for i in census]):
@@ -198,13 +209,14 @@ def store_ward(beds: list, patients: list, closed: bool) -> list:
     """
     Merges patients onto beds
     """
-    df_beds = pd.DataFrame.from_records(beds)
-    if len(df_beds) == 0:
+    if not beds:
         warnings.warn("[WARN] store_beds returned an empty list of dictionaries")
-        return [{}]
+        return []
+    df_beds = pd.DataFrame.from_records(beds)
 
-    df_pats = pd.DataFrame.from_records(patients)
-    if len(df_pats) == 0:
+    if patients:
+        df_pats = pd.DataFrame.from_records(patients)
+    else:
         warnings.warn("[WARN] NO patients found for these beds")
         # prepare empty dataframe so the remainder of the function can run
         cols = CENSUS_KEEP_COLS

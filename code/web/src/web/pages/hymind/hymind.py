@@ -1,9 +1,6 @@
-"""
-Factor out callbacks
-"""
-
 import arrow
 import plotly.graph_objects as go
+import requests
 from dash import Input, Output, callback, dcc, get_app, register_page
 from flask_caching import Cache
 
@@ -63,6 +60,11 @@ def store_em_tap(n_intervals: int, building: str = "tower"):
     prevent_initial_callback=True,
 )
 def em_tap_fig(data: dict):
+
+    # TODO: Figure out why an empty dictionary is being returned.
+    if len(data) == 1 and not data[0]:
+        return None
+
     df = df_from_store(data, em_tap_model)
     # fig = px.bar(df, x="bed_count", y="probability")
     fig = go.Figure()
@@ -91,18 +93,19 @@ def em_tap_fig(data: dict):
 )
 @cache.memoize(timeout=CACHE_TIMEOUT)
 def store_el_tap(n_intervals: int, building: str = "tower"):
-    """
-    { item_description }
-    """
     building = building.lower()
     assert building in ["tower", "gwb", "wms"]
-    payload = dict(
-        horizon_dt=arrow.now().shift(days=1).format("YYYY-MM-DDTHH:mm:ss"),
-        department=building,
-    )
+
     # import ipdb; ipdb.set_trace()
-    predictions = get_results_response(el_tap_url, "POST", json=payload)
-    return predictions
+    resp = requests.get(
+        el_tap_url,
+        params={
+            "horizon_dt": arrow.now().shift(days=1).format("YYYY-MM-DDTHH:mm:ss"),
+            "department": building,
+        },
+    )
+    # predictions = get_results_response(el_tap_url, "POST", json=payload)
+    return resp
 
 
 @callback(
@@ -111,6 +114,11 @@ def store_el_tap(n_intervals: int, building: str = "tower"):
     prevent_initial_callback=True,
 )
 def el_tap_fig(data: dict):
+
+    # TODO: Figure out why an empty dictionary is being returned.
+    if len(data) == 1 and not data[0]:
+        return None
+
     df = df_from_store(data, el_tap_model)
     # fig = px.bar(df, x="bed_count", y="probability")
     fig = go.Figure()

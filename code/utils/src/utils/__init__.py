@@ -19,7 +19,7 @@ def prepare_query(module: str, env: str = settings.ENV) -> str:
     :rtype:     str
     """
     choice = {"prod": "LIVE", "dev": "MOCK"}
-    module_path = gen_module_path(module)
+    module_path = gen_module_path(module, "api")
     query_name = f"QUERY_{choice[env]}_PATH"
     try:
         q = getattr(importlib.import_module(module_path), query_name)

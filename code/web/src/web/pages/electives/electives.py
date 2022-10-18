@@ -2,12 +2,12 @@
 sub-application for electives
 """
 
-
 from typing import List
 
 import dash_bootstrap_components as dbc
 import pandas as pd
 import plotly.express as px
+import requests
 from dash import Input, Output, State, callback, get_app
 from dash import dash_table as dt
 from dash import dcc, html, register_page
@@ -23,7 +23,7 @@ from web.pages.electives import (
     SPECIALTY_SHORTNAMES,
     STYLE_CELL_CONDITIONAL,
 )
-from utils.dash import df_from_store, get_results_response
+from utils.dash import df_from_store
 
 CACHE_TIMEOUT = 4 * 3600
 
@@ -99,7 +99,6 @@ main = html.Div(
     ]
 )
 
-
 dash_only = html.Div(
     [
         query_interval := dcc.Interval(interval=REFRESH_INTERVAL, n_intervals=0),
@@ -134,8 +133,10 @@ def store_data(n_intervals: int, days_ahead: int) -> dict:
     """
     Read data from API then store as JSON
     """
-    data = get_results_response(API_URL, params={"days_ahead": days_ahead})
-    return data  # type: ignore
+    # data = get_results_response(API_URL, params={"days_ahead": days_ahead})
+    data = requests.get(API_URL, params={"days_ahead": days_ahead})
+    return data.json()
+    # return data  # type: ignore
 
 
 @callback(
@@ -143,13 +144,18 @@ def store_data(n_intervals: int, days_ahead: int) -> dict:
     Input(service_picker, "value"),
     Input(pacu_checklist, "value"),
     Input(request_data, "data"),
-    prevent_initial_call=True,
+    prevent_initial_call=True,  # Can probably remove as this function is called anyway.
 )
-def filter_data(service: List[str], pacu: List[bool], data: dict) -> dict:
+def filter_data(service: List[str], pacu: List[bool], data: list) -> dict:
     """
     Update data based on picker
     """
-    # import ipdb; ipdb.set_trace()
+
+    # Dash seems to send a list with an empty dict if there is no data.
+    # TODO: Figure out why an empty dict is arriving here.
+    if len(data) == 1 and not data[0]:
+        return {}
+
     data = [row for row in data if row["pacu"] in pacu]  # type: ignore
     if service:
         data = [row for row in data if row["SurgicalService"] in service]
@@ -189,7 +195,6 @@ def gen_surgeries_over_time(n_intervals: int, data: dict):
     prevent_initial_call=True,
 )
 def gen_table_consults(modified: int, data: dict):
-
     if len(data) == 0:
         return html.H2("No data to tabulate")
     dfo = pd.DataFrame.from_records(data)
@@ -257,6 +262,11 @@ def gen_table_consults(modified: int, data: dict):
     Input(request_data, "data"),
     prevent_initial_call=True,
 )
-def update_service_dropdown(data: dict):
+def update_service_dropdown(data: list):
+
+    # TODO: Figure out why an empty dict is arriving here.
+    if len(data) == 1 and not data[0]:
+        return []
+
     df = df_from_store(data, ElectivesRead)
     return df["SurgicalService"].sort_values().unique()
