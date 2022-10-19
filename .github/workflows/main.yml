@@ -23,5 +23,6 @@ jobs:
           pip install -e "code/api[test]"
       - name: Test with pytest
         working-directory: ./code
+        # Ideally we should not need all the environment variables to test.
         run: |
-          env $(grep -v '^#' .env | xargs) pytest
+          env $(grep -v '^#' .env.example | xargs) pytest
