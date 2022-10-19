@@ -4,9 +4,7 @@ from fastapi import APIRouter, Depends
 from sqlmodel import Session
 
 from models.ros import RosRead
-from api.db import prepare_query
-from utils.api import get_emap_session
-
+from api.db import prepare_query, get_emap_session
 
 router = APIRouter(
     prefix="/ros",

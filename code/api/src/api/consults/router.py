@@ -1,19 +1,17 @@
 from collections import namedtuple
-from typing import List
 
 from fastapi import APIRouter, Depends
 from sqlmodel import Session
 
 from models.consults import ConsultsRead
-from api.db import prepare_query
-from utils.api import get_emap_session
+from api.db import prepare_query, get_emap_session
 
 router = APIRouter(
     prefix="/consults",
 )
 
 
-@router.get("/", response_model=List[ConsultsRead])
+@router.get("/", response_model=list[ConsultsRead])
 def read_consults(session: Session = Depends(get_emap_session)):
     """
     Returns Consults data class populated by query-live/mock

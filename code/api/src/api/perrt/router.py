@@ -1,5 +1,4 @@
 from collections import namedtuple
-from typing import List
 
 from fastapi import APIRouter, Depends, Query, Body
 from sqlmodel import Session
@@ -9,8 +8,7 @@ import pickle
 from pathlib import Path
 
 from models.perrt import AdmissionPrediction, PerrtRaw, PerrtRead
-from api.db import prepare_query
-from utils.api import get_emap_session
+from api.db import prepare_query, get_emap_session
 
 from api.perrt.wrangle import wrangle
 
@@ -19,7 +17,7 @@ router = APIRouter(
 )
 
 
-@router.get("/raw", response_model=List[PerrtRaw])
+@router.get("/raw", response_model=list[PerrtRaw])
 def read_perrt_table(
     session: Session = Depends(get_emap_session),
     offset: int = 0,
@@ -39,7 +37,7 @@ def read_perrt_table(
     return records
 
 
-@router.get("/", response_model=List[PerrtRead])
+@router.get("/", response_model=list[PerrtRead])
 def read_perrt(session: Session = Depends(get_emap_session)):
     """
     Returns PerrtRead data class post wrangling
@@ -65,9 +63,9 @@ def read_perrt(session: Session = Depends(get_emap_session)):
     return recw
 
 
-@router.post("/admission_predictions", response_model=List[AdmissionPrediction])
+@router.post("/admission_predictions", response_model=list[AdmissionPrediction])
 def get_predictions(
-    hospital_visit_ids: List[str] = Body(), session: Session = Depends(get_emap_session)
+    hospital_visit_ids: list[str] = Body(), session: Session = Depends(get_emap_session)
 ):
 
     predictions_filepath = Path(

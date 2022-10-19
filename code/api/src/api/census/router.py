@@ -8,8 +8,7 @@ from pydantic import parse_obj_as
 from sqlmodel import Session
 
 from models.census import CensusRead, CensusDepartments
-from api.db import prepare_query
-from utils.api import get_emap_session
+from api.db import prepare_query, get_emap_session
 from utils.wards import departments_missing_beds, wards
 
 from api.census.wrangle import aggregate_by_department
