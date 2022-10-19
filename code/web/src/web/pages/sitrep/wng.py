@@ -1,5 +1,3 @@
-# wrangling and other functions for the sitrep page
-# just so the logic in the main page is clearer
 from web.pages.sitrep import (
     SITREP_ENV,
     HYCASTLE_API_PORT,

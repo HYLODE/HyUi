@@ -9,9 +9,7 @@ from sqlmodel import Session
 
 from config.settings import settings
 from models.electives import ElectivesRead, ElectivesPod, ElectivesPreassess
-from utils.api import (
-    pydantic_dataframe,
-)
+from api.validate import pydantic_dataframe
 
 from api.electives.wrangle import prepare_electives
 from api.db import get_caboodle_session, get_clarity_session

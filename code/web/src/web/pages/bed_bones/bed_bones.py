@@ -20,7 +20,7 @@ from config.settings import settings
 
 register_page(__name__)
 BPID = "BONES_"
-BASEROW_API_URL = f"{settings.BASE_URL}:{settings.BASEROW_PORT}/api"
+# BASEROW_API_URL = f"{settings.BASE_URL}:{settings.BASEROW_PORT}/api"
 
 # Caboodle data so refresh only needs to happen first thing
 REFRESH_INTERVAL = 1 * 60 * 60 * 1000  # milliseconds
@@ -84,7 +84,7 @@ layout = html.Div(
     Input(query_interval, "n_intervals"),
     Input(ward_radio, "value"),
 )
-def store_data(n_intervals: int, ward_radio_value: str) -> list:
+def store_data(n_intervals: int, ward_radio_value: str):
     """
     Read data from API then store as JSON
     """

@@ -1,5 +1,4 @@
 import warnings
-from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -21,7 +20,7 @@ from web.pages.sitrep import (
     BED_LIST_API_URL,
 )
 from config.settings import settings
-from utils.beds import BedBonesBase, unpack_nested_dict, update_bed_row
+from utils.beds import BedBonesBase, unpack_nested_dict
 from utils.dash import get_results_response, validate_json
 
 app = get_app()
@@ -34,7 +33,7 @@ cache = Cache(
 )
 
 
-def _get_bed_list(department: str) -> list[dict[str, Any]]:
+def _get_bed_list(department: str):
     return requests.get(BED_LIST_API_URL).json()
 
 
@@ -45,7 +44,7 @@ def _get_bed_list(department: str) -> list[dict[str, Any]]:
 )
 # @cache.memoize(timeout=CACHE_TIMEOUT)
 # not caching since this is how we update beds
-def store_beds(n_intervals: int, dept: str) -> list:
+def store_beds(n_intervals: int, dept: str):
     """
     Stores data from census api (i.e. skeleton)
     """
@@ -71,7 +70,7 @@ def store_beds(n_intervals: int, dept: str) -> list:
 @cache.memoize(
     timeout=CACHE_TIMEOUT
 )  # cache decorator must come between callback and function
-def store_census(n_intervals: int, dept: str) -> list:
+def store_census(n_intervals: int, dept: str):
     """
     Stores data from census api (i.e. current beds occupant)
     """
@@ -98,7 +97,7 @@ def store_census(n_intervals: int, dept: str) -> list:
 @cache.memoize(
     timeout=CACHE_TIMEOUT
 )  # cache decorator must come between callback and function
-def store_sitrep(n_intervals: int, dept: str) -> list:
+def store_sitrep(n_intervals: int, dept: str):
     """
     Stores data from sitrep api (i.e. organ status)
     """
@@ -124,7 +123,7 @@ def store_sitrep(n_intervals: int, dept: str) -> list:
 @cache.memoize(
     timeout=CACHE_TIMEOUT
 )  # cache decorator must come between callback and function
-def store_hymind_icu_discharge(n_intervals: int, dept: str) -> list:
+def store_hymind_icu_discharge(n_intervals: int, dept: str):
     """
     Stores data from HyMind ICU discharge predictions
     """
@@ -153,7 +152,7 @@ def store_hymind_icu_discharge(n_intervals: int, dept: str) -> list:
 @cache.memoize(
     timeout=CACHE_TIMEOUT
 )  # cache decorator must come between callback and function
-def store_patients(census: list, sitrep: list, hymind: list) -> list:
+def store_patients(census: list, sitrep: list, hymind: list):
     """
     Assembles patient level info (without beds)
 
@@ -313,6 +312,14 @@ def diff_table(time, prev_data, data):
         row_id = x["id"]
         row_data = {"DischargeReady": x["DischargeReady"]}
 
-        update_bed_row(BED_BONES_TABLE_ID, row_id, row_data)
+        # TODO: This needs to get working.
+        requests.patch(
+            "updatebedrowURL",
+            params={
+                "table_id": BED_BONES_TABLE_ID,
+                "row_id": row_id,
+                "data": row_data,
+            },
+        )
 
     return ""

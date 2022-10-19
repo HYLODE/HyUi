@@ -5,7 +5,7 @@ from fastapi import APIRouter
 
 from config.settings import settings
 from models.hymind import EmElTapPostBody, IcuDischarge, EmTap, ElTap
-from utils.api import pydantic_dataframe
+from api.validate import pydantic_dataframe
 
 MOCK_ICU_DISCHARGE_DATA = (
     Path(__file__).resolve().parent / "data" / "mock_icu_discharge.json"
