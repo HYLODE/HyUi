@@ -9,7 +9,7 @@ import pickle
 from pathlib import Path
 
 from models.perrt import AdmissionPrediction, PerrtRaw, PerrtRead
-from utils import prepare_query
+from api.db import prepare_query
 from utils.api import get_emap_session
 
 from api.perrt.wrangle import wrangle

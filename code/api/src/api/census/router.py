@@ -8,7 +8,7 @@ from pydantic import parse_obj_as
 from sqlmodel import Session
 
 from models.census import CensusRead, CensusDepartments
-from utils import prepare_query
+from api.db import prepare_query
 from utils.api import get_emap_session
 from utils.wards import departments_missing_beds, wards
 
@@ -40,7 +40,7 @@ def read_beds(
     # necessary if working with mock data from sqlite rather than postgres
     if session.get_bind().name == "sqlite":
         # as per https://stackoverflow.com/a/56382828/992999
-        qtext = qtext.bindparams(
+        qtext = qtext.bindparams(  # type: ignore
             sa.bindparam("departments", expanding=True),
             sa.bindparam("locations", expanding=True),
         )
@@ -154,7 +154,7 @@ def read_departments(session: Session = Depends(get_emap_session)):
     # necessary if working with mock data from sqlite rather than postgres
     if session.get_bind().name == "sqlite":
         # as per https://stackoverflow.com/a/56382828/992999
-        qtext = qtext.bindparams(
+        qtext = qtext.bindparams(  # type: ignore
             sa.bindparam("departments", expanding=True),
             sa.bindparam("locations", expanding=True),
         )
