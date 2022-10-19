@@ -9,6 +9,8 @@ from flask_login import current_user
 from web.pages.home import BPID, REFRESH_INTERVAL
 from config.settings import settings
 
+from web.pages.home import callbacks  # noqa
+
 register_page(__name__, path="/", name="Home")
 
 

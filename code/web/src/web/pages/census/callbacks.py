@@ -1,6 +1,5 @@
 import importlib
 import warnings
-from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -42,7 +41,7 @@ cache = Cache(
     Output(f"{BPID}dept_dropdown_div", "children"),
     Input(f"{BPID}building_radio", "value"),
 )
-def gen_dept_dropdown(building: str) -> list:
+def gen_dept_dropdown(building: str):
     """
     Dynamically build department picker list
 
@@ -63,15 +62,15 @@ def gen_dept_dropdown(building: str) -> list:
     )
 
 
-def _get_closed_beds() -> list[dict[str, Any]]:
+def _get_closed_beds():
     return requests.get(CLOSED_BEDS_API_URL).json()["results"]
 
 
-def _get_bed_list(department: str) -> list[dict[str, Any]]:
+def _get_bed_list(department: str):
     return requests.get(BED_LIST_API_URL).json()["results"]
 
 
-def store_depts_fn(n_intervals: int, building: str) -> list:
+def store_depts_fn(n_intervals: int, building: str):
     """
     Stores data from census api (i.e. skeleton)
     Also reaches out to bed_bones and pulls in additional closed beds
@@ -120,7 +119,7 @@ def store_depts(*args, **kwargs):
 )
 # @cache.memoize(timeout=CACHE_TIMEOUT)
 # not caching since this is how we update beds
-def store_beds(n_intervals: int, dept: str) -> list:
+def store_beds(n_intervals: int, dept: str):
     """
     Stores data from census api (i.e. skeleton)
     """
@@ -147,7 +146,7 @@ def store_beds(n_intervals: int, dept: str) -> list:
 @cache.memoize(
     timeout=CACHE_TIMEOUT
 )  # cache decorator must come between callback and function
-def store_census(n_intervals: int, dept: str) -> list:
+def store_census(n_intervals: int, dept: str):
     """
     Stores data from census api (i.e. current beds occupant)
     """
@@ -174,7 +173,7 @@ def store_census(n_intervals: int, dept: str) -> list:
 @cache.memoize(
     timeout=CACHE_TIMEOUT
 )  # cache decorator must come between callback and function
-def store_patients(census: list) -> list:
+def store_patients(census: list):
     """
     Assembles patient level info (without beds)
 

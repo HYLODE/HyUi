@@ -3,9 +3,9 @@ import pandas as pd
 from dash import Input, Output, callback, get_app, html
 from flask_caching import Cache
 
-from apps import AppColors
-from apps.pages.census.callbacks import store_depts_fn
-from apps.pages.home import BPID, CACHE_TIMEOUT
+from web.style import AppColors
+from web.pages.census.callbacks import store_depts_fn
+from web.pages.home import BPID, CACHE_TIMEOUT
 
 COLORS = AppColors()
 BAR_SIZE = 16
