@@ -81,7 +81,7 @@ nhnn = [
     "NHNN C1 NCCU",
 ]
 
+all = tower + gwb + wms + nhnn
+
 # beds that don't have a department and needed to be added in by hand
 departments_missing_beds = {"UCH T06 CENTRAL (T06C)": ["T06C^T06C BY08^BY08-36"]}
-
-wards = tower + gwb + wms + nhnn

@@ -1,4 +1,3 @@
-import importlib
 import warnings
 
 import numpy as np
@@ -51,7 +50,10 @@ def gen_dept_dropdown(building: str):
     :returns:   { description_of_the_return_value }
     :rtype:     list
     """
-    dept_list = getattr(importlib.import_module("utils.wards"), building)
+
+    # TODO: Fix this.
+    dept_list = requests.get("/hospital/wards").json()["building"]
+
     default_value = dept_list[0]
     return dcc.Dropdown(
         id=f"{BPID}dept_dropdown",
@@ -83,7 +85,8 @@ def store_depts_fn(n_intervals: int, building: str):
         return depts
     df = pd.DataFrame.from_records(depts)
     if building:
-        dept_list = getattr(importlib.import_module("utils.wards"), building)
+        # TODO: Fix this.
+        dept_list = requests.get("/hospital/wards").json()["building"]
         df = df[df["department"].isin(dept_list)]
 
     # Now update with closed beds from bed_bones

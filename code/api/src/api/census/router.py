@@ -9,9 +9,9 @@ from sqlmodel import Session
 
 from models.census import CensusRead, CensusDepartments
 from api.db import prepare_query, get_emap_session
-from utils.wards import departments_missing_beds, wards
 
 from api.census.wrangle import aggregate_by_department
+from api.hospital import wards
 
 router = APIRouter(
     prefix="/census",
@@ -21,7 +21,7 @@ router = APIRouter(
 @router.get("/beds", response_model=list[CensusRead])
 def read_beds(
     session: Session = Depends(get_emap_session),
-    departments: list[str] = Query(default=wards),
+    departments: list[str] = Query(default=wards.all),
     locations: list[str] = Query(default=[]),
 ):
     """
@@ -30,8 +30,8 @@ def read_beds(
     mock data in dev and live data in prod
     """
     for d in departments:
-        if d in departments_missing_beds.keys():
-            locations_to_add = departments_missing_beds[d]
+        if d in wards.departments_missing_beds.keys():
+            locations_to_add = wards.departments_missing_beds[d]
             locations.extend(locations_to_add)
 
     qtext = prepare_query("census")
@@ -136,7 +136,7 @@ def read_departments(session: Session = Depends(get_emap_session)):
     Run the beds query then aggregate
     """
     locations = []
-    departments = wards.copy()
+    departments = wards.all.copy()
     # this 'duplicates' functionality above but the alternative is to swap out
     # Query/Depends etc from the function b/c when called directly without the
     # decorator then all the types are wrong
@@ -144,8 +144,8 @@ def read_departments(session: Session = Depends(get_emap_session)):
     # add in locations without departments
     # TODO: need to use this info to add the department into the results
     for d in departments:
-        if d in departments_missing_beds.keys():
-            locations_to_add = departments_missing_beds[d]
+        if d in wards.departments_missing_beds.keys():
+            locations_to_add = wards.departments_missing_beds[d]
             locations.extend(locations_to_add)
 
     qtext = prepare_query("census")
