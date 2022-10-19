@@ -10,12 +10,11 @@ from sqlmodel import Session
 from config.settings import settings
 from models.electives import ElectivesRead, ElectivesPod, ElectivesPreassess
 from utils.api import (
-    get_caboodle_session,
-    get_clarity_session,
     pydantic_dataframe,
 )
 
-from .wrangle import prepare_electives
+from api.electives.wrangle import prepare_electives
+from api.db import get_caboodle_session, get_clarity_session
 
 router = APIRouter(
     prefix="/electives",
