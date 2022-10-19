@@ -126,7 +126,7 @@ class Settings(BaseSettings):
     @validator("STAR_URL")
     def assemble_db_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
         if values.get("ENV") == "dev":
-            db_path = Path(__file__).parents[4] / "src" / "mock" / "mock.db"
+            db_path = Path(__file__).parents[0] / "resources" / "mock.db"
             return f"sqlite:///{db_path}"
 
         return PostgresDsn.build(
@@ -143,7 +143,7 @@ class Settings(BaseSettings):
         cls, v: Optional[str], values: Dict[str, Any]
     ) -> str:
         if values.get("ENV") == "dev":
-            db_path = Path(__file__).parents[4] / "src" / "mock" / "mock.db"
+            db_path = Path(__file__).parents[0] / "resources" / "mock.db"
             return f"sqlite:///{db_path}"
 
         # Construct the MSSQL connection
@@ -162,7 +162,7 @@ class Settings(BaseSettings):
         cls, v: Optional[str], values: Dict[str, Any]
     ) -> str:
         if values.get("ENV") == "dev":
-            db_path = Path(__file__).parents[4] / "src" / "mock" / "mock.db"
+            db_path = Path(__file__).parents[0] / "resources" / "mock.db"
             return f"sqlite:///{db_path}"
 
         # Construct the MSSQL connection

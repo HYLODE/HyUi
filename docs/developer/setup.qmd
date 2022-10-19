@@ -188,7 +188,7 @@ In the `hyui-api` terminal in the root directory:
 The web server when in the `hyui-web` shell:
 
 ```sh
-> env $(grep -v '^#' .env | xargs) python -m web.app
+> env $(grep -v '^#' .env | xargs) python -m web.main
 ```
 
 The API server when in the `hyui-api` shell:

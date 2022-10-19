@@ -23,6 +23,9 @@ test = [
   "pytest == 7.1.3"
 ]
 
+[tool.setuptools.package-data]
+"*" = ["*.sql", "*.json"]
+
 [tool.pytest.ini_options]
 minversion = "7.1.3"
 testpaths = [
