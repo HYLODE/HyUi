@@ -1,0 +1,34 @@
+x-http-proxy: &http-proxy ${HTTP_PROXY}
+x-https-proxy: &https-proxy ${HTTPS_PROXY}
+x-no-proxy: &no-proxy localhost,127.0.0.1,uclvlddpragae07,uclvlddpragae08,api,web
+
+x-proxy-common: &proxy-common
+  HTTP_PROXY: *http-proxy
+  http_proxy: *http-proxy
+  HTTPS_PROXY: *https-proxy
+  https_proxy: *https-proxy
+  NO_PROXY: *no-proxy
+  no_proxy: *no-proxy
+
+x-build-args-common: &build-args-common
+  <<: *proxy-common
+  HYLODE_UID: ${HYLODE_UID}
+
+services:
+  api:
+    build:
+      dockerfile: Dockerfile.api
+      args:
+        <<: *build-args-common
+    env_file: .env
+    ports:
+      - ${API_PORT}:8000
+
+  web:
+    build:
+      dockerfile: Dockerfile.web
+      args:
+        <<: *build-args-common
+    env_file: .env
+    ports:
+      - ${WEB_PORT}:8000
