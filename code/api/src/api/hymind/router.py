@@ -4,8 +4,7 @@ import pandas as pd
 from fastapi import APIRouter
 
 from config.settings import settings
-from models.hymind import EmElTapPostBody
-from utils import get_model_from_route
+from models.hymind import EmElTapPostBody, IcuDischarge, EmTap, ElTap
 from utils.api import pydantic_dataframe
 
 MOCK_ICU_DISCHARGE_DATA = (
@@ -21,10 +20,6 @@ MOCK_TAP_ELECTIVE_DATA = (
 router = APIRouter(
     prefix="/hymind",
 )
-
-IcuDischarge = get_model_from_route("Hymind", standalone="IcuDischarge")
-EmTap = get_model_from_route("Hymind", standalone="EmTap")
-ElTap = get_model_from_route("Hymind", standalone="ElTap")
 
 
 def read_query(file_live: str, table_mock: str):
@@ -45,7 +40,7 @@ def read_query(file_live: str, table_mock: str):
     return query
 
 
-@router.get("/icu/discharge")  # type: ignore
+@router.get("/icu/discharge")
 def read_icu_discharge(ward: str):
     """ """
     if settings.ENV == "dev":
@@ -72,7 +67,7 @@ def read_icu_discharge(ward: str):
 # do the validating in the function and the model is nested as {data:
 # List[Model]} which I cannot encode
 # @router.post("/icu/tap/emergency", response_model=EmTap)  # type: ignore
-@router.post("/icu/tap/emergency")  # type: ignore
+@router.post("/icu/tap/emergency")
 def read_tap_emergency(data: EmElTapPostBody):
     """ """
     if settings.ENV == "dev":

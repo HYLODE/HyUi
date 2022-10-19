@@ -1,10 +1,10 @@
 from collections import namedtuple
-from typing import List
 
 from fastapi import APIRouter, Depends
 from sqlmodel import Session
 
-from utils import get_model_from_route, prepare_query
+from models.ros import RosRead
+from utils import prepare_query
 from utils.api import get_emap_session
 
 
@@ -12,10 +12,8 @@ router = APIRouter(
     prefix="/ros",
 )
 
-RosRead = get_model_from_route("Ros", "Read")
 
-
-@router.get("/", response_model=List[RosRead])  # type: ignore
+@router.get("/", response_model=list[RosRead])
 def read_ros(session: Session = Depends(get_emap_session)):
     """
     Returns Ros data

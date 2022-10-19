@@ -8,8 +8,8 @@ import pandas as pd
 import pickle
 from pathlib import Path
 
-from models.perrt import AdmissionPrediction
-from utils import get_model_from_route, prepare_query
+from models.perrt import AdmissionPrediction, PerrtRaw, PerrtRead
+from utils import prepare_query
 from utils.api import get_emap_session
 
 from api.perrt.wrangle import wrangle
@@ -18,11 +18,8 @@ router = APIRouter(
     prefix="/perrt",
 )
 
-PerrtRaw = get_model_from_route("Perrt", "Raw")
-PerrtRead = get_model_from_route("Perrt", "Read")
 
-
-@router.get("/raw", response_model=List[PerrtRaw])  # type: ignore
+@router.get("/raw", response_model=List[PerrtRaw])
 def read_perrt_table(
     session: Session = Depends(get_emap_session),
     offset: int = 0,
@@ -42,7 +39,7 @@ def read_perrt_table(
     return records
 
 
-@router.get("/", response_model=List[PerrtRead])  # type: ignore
+@router.get("/", response_model=List[PerrtRead])
 def read_perrt(session: Session = Depends(get_emap_session)):
     """
     Returns PerrtRead data class post wrangling

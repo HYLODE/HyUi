@@ -4,13 +4,13 @@ import requests
 from dash import Input, Output, callback, dcc, get_app, register_page
 from flask_caching import Cache
 
+from models.hymind import EmTap, ElTap
 from web.pages.hymind import (
     BPID,
     CACHE_TIMEOUT,
     layout,
     wng,
 )
-from utils import get_model_from_route
 from utils.dash import df_from_store, get_results_response
 
 register_page(__name__)
@@ -23,11 +23,8 @@ cache = Cache(
     },
 )
 
-
-em_tap_model = get_model_from_route("HyMind", standalone="EmTap")
 em_tap_url = wng.build_emergency_tap_url()
 
-el_tap_model = get_model_from_route("HyMind", standalone="ElTap")
 el_tap_url = wng.build_elective_tap_url()
 
 layout = layout.layout()
@@ -65,7 +62,7 @@ def em_tap_fig(data: dict):
     if len(data) == 1 and not data[0]:
         return None
 
-    df = df_from_store(data, em_tap_model)
+    df = df_from_store(data, EmTap)
     # fig = px.bar(df, x="bed_count", y="probability")
     fig = go.Figure()
     fig.add_trace(
@@ -119,7 +116,7 @@ def el_tap_fig(data: dict):
     if len(data) == 1 and not data[0]:
         return None
 
-    df = df_from_store(data, el_tap_model)
+    df = df_from_store(data, ElTap)
     # fig = px.bar(df, x="bed_count", y="probability")
     fig = go.Figure()
     fig.add_trace(

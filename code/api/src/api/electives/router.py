@@ -8,7 +8,7 @@ from fastapi import APIRouter, Depends
 from sqlmodel import Session
 
 from config.settings import settings
-from utils import get_model_from_route
+from models.electives import ElectivesRead, ElectivesPod, ElectivesPreassess
 from utils.api import (
     get_caboodle_session,
     get_clarity_session,
@@ -20,10 +20,6 @@ from .wrangle import prepare_electives
 router = APIRouter(
     prefix="/electives",
 )
-
-CasesRead = get_model_from_route("Electives", "Read")
-PodRead = get_model_from_route("Electives", "Pod")  # pod=post-op destination
-PreassessRead = get_model_from_route("Electives", "Preassess")  # preassess info
 
 
 def read_query(file_live: str, table_mock: str):
@@ -44,7 +40,7 @@ def read_query(file_live: str, table_mock: str):
     return query
 
 
-@router.get("/", response_model=List[CasesRead])  # type: ignore
+@router.get("/", response_model=List[ElectivesRead])
 def read_electives(
     days_ahead: int = 3,
     session_caboodle: Session = Depends(get_caboodle_session),
@@ -59,19 +55,19 @@ def read_electives(
     qtext = sa.text(query)
     params = {"days_ahead": days_ahead}
     dfcases = pd.read_sql(qtext, session_caboodle.connection(), params=params)
-    dfcases = pydantic_dataframe(dfcases, CasesRead)
+    dfcases = pydantic_dataframe(dfcases, ElectivesRead)
 
     query = read_query("live_pod.sql", "electivespodmock")
     qtext = sa.text(query)
     params = {"days_ahead": days_ahead}
     dfpod = pd.read_sql(qtext, session_clarity.connection(), params=params)
-    dfpod = pydantic_dataframe(dfpod, PodRead)
+    dfpod = pydantic_dataframe(dfpod, ElectivesPod)
 
     query = read_query("live_preassess.sql", "electivespreassessmock")
     qtext = sa.text(query)
     params = {"days_ahead": days_ahead}
     dfpreassess = pd.read_sql(qtext, session_caboodle.connection(), params=params)
-    dfpreassess = pydantic_dataframe(dfpreassess, PreassessRead)
+    dfpreassess = pydantic_dataframe(dfpreassess, ElectivesPreassess)
 
     df = prepare_electives(dfcases, dfpod, dfpreassess)
 
@@ -80,38 +76,38 @@ def read_electives(
     return df.to_dict(orient="records")
 
 
-@router.get("/cases", response_model=List[CasesRead])  # type: ignore
+@router.get("/cases", response_model=List[ElectivesRead])
 def read_cases(session: Session = Depends(get_caboodle_session)):
     """
     Returns Electives data class populated by query-live/mock
     Limited to just surgical case info
     """
     query = read_query("live_case.sql", "electivesmock")
-    results = session.exec(query)  # type: ignore
+    results = session.exec(query)
     Record = namedtuple("Record", results.keys())  # type: ignore
     records = [Record(*r) for r in results.fetchall()]
     return records
 
 
-@router.get("/pod", response_model=List[PodRead])  # type: ignore
+@router.get("/pod", response_model=List[ElectivesPod])
 def read_pod(session: Session = Depends(get_clarity_session)):
     """
     Returns clarity periop destination query
     """
     query = read_query("live_pod.sql", "electivespodmock")
-    results = session.exec(query)  # type: ignore
+    results = session.exec(query)
     Record = namedtuple("Record", results.keys())  # type: ignore
     records = [Record(*r) for r in results.fetchall()]
     return records
 
 
-@router.get("/preassess", response_model=List[PreassessRead])  # type: ignore
+@router.get("/preassess", response_model=List[ElectivesPreassess])
 def read_preassess(session: Session = Depends(get_caboodle_session)):
     """
     Returns pre-assesment caboodle query
     """
     query = read_query("live_preassess.sql", "electivespreassessmock")
-    results = session.exec(query)  # type: ignore
+    results = session.exec(query)
     Record = namedtuple("Record", results.keys())  # type: ignore
     records = [Record(*r) for r in results.fetchall()]
     return records

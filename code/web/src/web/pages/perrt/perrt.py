@@ -1,8 +1,3 @@
-"""
-sub-application for perrt
-"""
-
-
 import dash_bootstrap_components as dbc
 import plotly.express as px
 from dash import Input, Output, callback, register_page, get_app
@@ -13,7 +8,7 @@ from flask_login import current_user
 from pydantic import parse_obj_as
 
 from config.settings import settings
-from utils import get_model_from_route
+from models.perrt import PerrtRead
 from utils.dash import get_results_response, df_from_store
 
 CACHE_TIMEOUT = 5 * 60 * 1000
@@ -28,9 +23,6 @@ cache = Cache(
         "CACHE_DIR": "cache-directory",
     },
 )
-
-
-PerrtRead = get_model_from_route("Perrt", "Read")
 
 API_URL = f"{settings.API_URL}/perrt/"
 ADMISSION_PREDICTION_URL = f"{API_URL}admission_predictions"
@@ -130,7 +122,7 @@ def layout():
     Input(query_interval, "n_intervals"),
 )
 @cache.memoize(timeout=CACHE_TIMEOUT)
-def store_data(n_intervals: int) -> dict:
+def store_data(n_intervals: int):
     """
     Read data from API then store as JSON
     """
