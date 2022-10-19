@@ -3,10 +3,11 @@
 # built by hand reviewing the tower flow map July 2022
 # then adding in WMS
 # ward names represent department names in star.departments
+from types import MappingProxyType
 
 # NB: the first item will be the default in the list picker
 
-tower = [
+TOWER = (
     # where n = number of distinct locations in EMAP
     #    NAME                           # n      seq
     # default value = tower[0]
@@ -52,9 +53,9 @@ tower = [
     "UCH T16 NORTH (T16N)",  # 19    39
     "UCH T16 SOUTH (T16S)",  # 18    40
     "UCH T16 SOUTH WINTER",  # 17    41
-]
+)
 
-gwb = [
+GWB = (
     # default value = gwb[0]
     "GWB L01 CRITICAL CARE",  # 12    43
     "GWB L01 ELECTIVE SURG",  # 37    42
@@ -64,24 +65,26 @@ gwb = [
     "GWB L03 EAST (L03E)",  # 19    47
     "GWB L04 NORTH (L04N)",  # 20    48
     "GWB L04 EAST (L04E)",  # 17    49
-]
+)
 
-wms = [
+WMS = (
     # default value = wms[0]
     "WMS W01 CRITICAL CARE",  # 11    50
     "WMS W02 SHORT STAY",  # 20    51
     "WMS W03 WARD",  # 27    52
     "WMS W04 WARD",  # 28    53
-]
+)
 
-nhnn = [
+NHNN = (
     # NOTE: 2022-08-07 Adding in NHNN critical care areas ONLY for now
     # default value = nhnn[0]
     "NHNN C0 NCCU",
     "NHNN C1 NCCU",
-]
+)
 
-all = tower + gwb + wms + nhnn
+ALL = TOWER + GWB + WMS + NHNN
 
 # beds that don't have a department and needed to be added in by hand
-departments_missing_beds = {"UCH T06 CENTRAL (T06C)": ["T06C^T06C BY08^BY08-36"]}
+DEPARTMENTS_MISSING_BEDS = MappingProxyType(
+    {"UCH T06 CENTRAL (T06C)": ("T06C^T06C BY08^BY08-36")}
+)

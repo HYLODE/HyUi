@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from api.hospital.wards import tower, gwb, wms, nhnn
+from api import wards
 
 router = APIRouter(
     prefix="/hospital",
@@ -8,5 +8,10 @@ router = APIRouter(
 
 
 @router.get("/wards")
-def get_wards() -> dict[str, list[str]]:
-    return {"tower": tower, "gwb": gwb, "wms": wms, "nhnn": nhnn}
+def get_wards() -> dict[str, tuple[str, ...]]:
+    return {
+        "tower": wards.TOWER,
+        "gwb": wards.GWB,
+        "wms": wards.WMS,
+        "nhnn": wards.NHNN,
+    }
