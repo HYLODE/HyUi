@@ -1,6 +1,6 @@
 from functools import lru_cache
 
-from pydantic import BaseSettings, SecretStr, HttpUrl
+from pydantic import BaseSettings, SecretStr, AnyHttpUrl
 
 
 class Settings(BaseSettings):
@@ -9,9 +9,9 @@ class Settings(BaseSettings):
     secret_key: SecretStr
 
     # The port to use when running in development mode.
-    development_port: str = "8000"
+    development_port: str = "8001"
 
-    api_url: HttpUrl
+    api_url: AnyHttpUrl
 
     class Config:
         env_prefix = "web_"

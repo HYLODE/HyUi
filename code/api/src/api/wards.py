@@ -86,5 +86,5 @@ ALL = TOWER + GWB + WMS + NHNN
 
 # beds that don't have a department and needed to be added in by hand
 DEPARTMENTS_MISSING_BEDS = MappingProxyType(
-    {"UCH T06 CENTRAL (T06C)": ("T06C^T06C BY08^BY08-36")}
+    {"UCH T06 CENTRAL (T06C)": ("T06C^T06C BY08^BY08-36",)}
 )

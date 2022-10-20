@@ -52,7 +52,7 @@ app = Dash(
 
 # Updating the Flask Server configuration with Secret Key to encrypt the user
 # session cookie.
-server.config.update(SECRET_KEY=get_settings().secret_key)
+server.config.update(SECRET_KEY=get_settings().secret_key.get_secret_value())
 
 # Login manager object will be used to login / logout users
 login_manager = LoginManager()
@@ -102,7 +102,10 @@ def login_button_click(
 
     settings = get_settings()
 
-    if settings.web_username != username or settings.web_password != password:
+    if (
+        settings.username != username
+        or settings.password.get_secret_value() != password
+    ):
         return "Invalid username or password"
 
     login_user(User(username))

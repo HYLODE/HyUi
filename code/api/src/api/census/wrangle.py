@@ -1,5 +1,3 @@
-from typing import List
-
 import pandas as pd
 import warnings
 
@@ -8,25 +6,22 @@ def _split_location_string(df: pd.DataFrame) -> pd.DataFrame:
     """
     Splits a location string into dept/room/bed
     """
-    temp = (
+    split_locations_df = (
         df["location_string"]
         .str.split("^", expand=True)
         .rename(columns={0: "dept", 1: "room", 2: "bed"})
     )
-    for s in ["dept", "room", "bed"]:
-        df[s] = temp[s]
-    return df
+    return pd.concat((df, split_locations_df), axis="columns")
 
 
 def _remove_non_beds(
-    df: pd.DataFrame, nonbeds: List[str] = ["null", "wait", "proc rm"]
+    df: pd.DataFrame, non_beds: tuple[str, str, str] = ("null", "wait", "proc rm")
 ) -> pd.DataFrame:
     """
     Removes non beds e.g. null, wait
     """
-    mask = df["bed"].str.lower().isin(nonbeds)
-    df = df[~mask]
-    return df
+    mask = df["bed"].str.lower().isin(non_beds)
+    return df[~mask]
 
 
 def _aggregate_by_department(df: pd.DataFrame) -> pd.DataFrame:
@@ -103,5 +98,4 @@ def aggregate_by_department(df: pd.DataFrame) -> pd.DataFrame:
     """
     df = _split_location_string(df)
     df = _remove_non_beds(df)
-    df = _aggregate_by_department(df)
-    return df
+    return _aggregate_by_department(df)
