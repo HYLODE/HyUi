@@ -1,5 +1,3 @@
-# src/api/perrt/admission_probability/predictions_script.py
-
 # Ignore xgboost import, it's required for pickled file
 import xgboost  # noqa: F401
 import pickle
@@ -9,21 +7,14 @@ import os
 import re
 import sched
 import time
-from config.settings import settings
 from sqlalchemy import create_engine
-from functions import run_pipeline
+from functions import run_pipeline  # type: ignore
+from web.config import get_settings
 
 
 def get_emapdb_engine():
-    uds_user = settings.EMAP_DB_USER
-    uds_passwd = settings.EMAP_DB_PASSWORD
-    uds_host = settings.EMAP_DB_HOST
-    uds_name = settings.EMAP_DB_NAME
-    uds_port = "5432"
-
-    return create_engine(
-        f"postgresql://{uds_user}:{uds_passwd}@{uds_host}:{uds_port}/{uds_name}"
-    )
+    get_settings().star_dsn
+    return create_engine(get_settings().star_dsn)
 
 
 def get_predictions(dataset):
@@ -69,14 +60,15 @@ def run_prediction_pipeline(db_engine, scheduler, interval):
     )
 
 
-# functions.py relies on specific, relative paths
-dir_path = os.path.dirname(os.path.realpath(__file__))
-os.chdir(dir_path)
+if __name__ == "__main__":
+    # functions.py relies on specific, relative paths
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    os.chdir(dir_path)
 
-scheduler = sched.scheduler(time.time, time.sleep)
+    scheduler = sched.scheduler(time.time, time.sleep)
 
-emapdb_engine = get_emapdb_engine()
+    emapdb_engine = get_emapdb_engine()
 
-run_prediction_pipeline(emapdb_engine, scheduler, interval=1800)
+    run_prediction_pipeline(emapdb_engine, scheduler, interval=1800)
 
-scheduler.run()
+    scheduler.run()

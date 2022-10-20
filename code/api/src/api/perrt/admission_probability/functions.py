@@ -1,6 +1,6 @@
-#!/usr/bin/env python3
-
+# type: ignore
 ### D Stein ICU Prediction Processing Pipeline - functions
+# TODO: This file needs to be cleaned up and linting reinstated.
 
 # Ignore linting for the moment
 # flake8: noqa
