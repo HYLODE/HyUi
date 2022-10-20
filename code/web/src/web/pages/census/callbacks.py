@@ -7,18 +7,15 @@ from dash import Input, Output, callback, dcc, get_app
 from flask_caching import Cache
 
 from models.census import CensusDepartments, CensusRead
+from web.config import get_settings
 from web.pages.census import (
     BEDS_KEEP_COLS,
     BPID,
     CACHE_TIMEOUT,
-    CENSUS_API_URL,
     CENSUS_KEEP_COLS,
-    DEPARTMENTS_API_URL,
     DEPT_KEEP_COLS,
-    CLOSED_BEDS_API_URL,
-    BED_LIST_API_URL,
 )
-from config.settings import settings
+
 from utils.beds import (
     BedBonesBase,
     unpack_nested_dict,
@@ -65,11 +62,13 @@ def gen_dept_dropdown(building: str):
 
 
 def _get_closed_beds():
-    return requests.get(CLOSED_BEDS_API_URL).json()["results"]
+    return requests.get(f"{get_settings().api_url}/census/beds/closed").json()[
+        "results"
+    ]
 
 
 def _get_bed_list(department: str):
-    return requests.get(BED_LIST_API_URL).json()["results"]
+    return requests.get(f"{get_settings().api_url}/census/beds/list").json()["results"]
 
 
 def store_depts_fn(n_intervals: int, building: str):
@@ -77,7 +76,7 @@ def store_depts_fn(n_intervals: int, building: str):
     Stores data from census api (i.e. skeleton)
     Also reaches out to bed_bones and pulls in additional closed beds
     """
-    res = requests.get(DEPARTMENTS_API_URL)
+    res = requests.get(f"{get_settings().api_url}/census/departments")
     depts = res.json()
     depts = validate_json(depts, CensusDepartments, to_dict=True)
     if all([not bool(i) for i in depts]):
@@ -154,7 +153,9 @@ def store_census(n_intervals: int, dept: str):
     Stores data from census api (i.e. current beds occupant)
     """
 
-    res = requests.get(CENSUS_API_URL, params={"departments": dept})
+    res = requests.get(
+        f"{get_settings().api_url}/census/beds", params={"departments": dept}
+    )
     census = res.json()
     census = validate_json(census, CensusRead, to_dict=True)
     if all([not bool(i) for i in census]):
@@ -192,8 +193,6 @@ def store_patients(census: list):
     else:
         df = df_census.copy()
 
-    if settings.VERBOSE:
-        print(df.iloc[0])
     return df.to_dict(orient="records")
 
 
@@ -250,9 +249,6 @@ def store_ward(beds: list, patients: list, closed: bool) -> list:
     # always return not closed; optionally return closed
     if not closed:
         dfm = dfm[~dfm["closed"]]
-
-    # if settings.VERBOSE:
-    #     print(dfm.info())
 
     data = dfm.to_dict("records")
     return data  # type: ignore

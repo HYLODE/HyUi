@@ -15,8 +15,8 @@ from flask_caching import Cache
 from flask_login import current_user
 
 from models.electives import ElectivesRead
+from web.config import get_settings
 from web.pages.electives import (
-    API_URL,
     BPID,
     COLS,
     REFRESH_INTERVAL,
@@ -129,14 +129,15 @@ def layout():
     Input(days_ahead_slider, "value"),
 )
 @cache.memoize(timeout=CACHE_TIMEOUT)
-def store_data(n_intervals: int, days_ahead: int) -> dict:
+def store_data(n_intervals: int, days_ahead: int):
     """
     Read data from API then store as JSON
     """
     # data = get_results_response(API_URL, params={"days_ahead": days_ahead})
-    data = requests.get(API_URL, params={"days_ahead": days_ahead})
+    data = requests.get(
+        f"{get_settings().api_url}/electives", params={"days_ahead": days_ahead}
+    )
     return data.json()
-    # return data  # type: ignore
 
 
 @callback(
@@ -146,7 +147,7 @@ def store_data(n_intervals: int, days_ahead: int) -> dict:
     Input(request_data, "data"),
     prevent_initial_call=True,  # Can probably remove as this function is called anyway.
 )
-def filter_data(service: List[str], pacu: List[bool], data: list) -> dict:
+def filter_data(service: List[str], pacu: List[bool], data: list):
     """
     Update data based on picker
     """

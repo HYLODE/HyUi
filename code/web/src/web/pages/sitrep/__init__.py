@@ -1,14 +1,9 @@
-# set the sitrep level of maturity/development here as this is a sub-app
-# rather than in the main app settings
 from dash.dash_table import FormatTemplate
 
-from config.settings import settings
 
 SITREP_ENV = "test"  # test (staging red) or prod
 # GREEN = TCN model
 # RED = original model
-
-BED_LIST_API_URL = f"{settings.API_URL}/sitrep/beds/list"
 
 STAGING_COLOUR = "RED"  # or RED or BLUE
 

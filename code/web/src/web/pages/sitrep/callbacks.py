@@ -7,6 +7,7 @@ from dash import Input, Output, State, callback, get_app
 from flask_caching import Cache
 
 from models.census import CensusRead
+from web.config import get_settings
 from web.pages.sitrep import (
     BED_BONES_TABLE_ID,
     BEDS_KEEP_COLS,
@@ -17,9 +18,7 @@ from web.pages.sitrep import (
     HYMIND_ICU_DISCHARGE_COLS,
     SITREP_KEEP_COLS,
     wng,
-    BED_LIST_API_URL,
 )
-from config.settings import settings
 from utils.beds import BedBonesBase, unpack_nested_dict
 from utils.dash import get_results_response, validate_json
 
@@ -34,7 +33,7 @@ cache = Cache(
 
 
 def _get_bed_list(department: str):
-    return requests.get(BED_LIST_API_URL).json()
+    return requests.get(f"{get_settings().api_url}/sitrep/beds/list").json()
 
 
 @callback(
@@ -75,7 +74,7 @@ def store_census(n_intervals: int, dept: str):
     Stores data from census api (i.e. current beds occupant)
     """
     payload = {"departments": dept}
-    res = requests.get(f"{settings.API_URL}/census/beds", params=payload)
+    res = requests.get(f"{get_settings().api_url}/census/beds", params=payload)
     census = res.json()
     census = validate_json(census, CensusRead, to_dict=True)
     if all([not bool(i) for i in census]):
@@ -209,8 +208,6 @@ def store_patients(census: list, sitrep: list, hymind: list):
             "[WARN] hymind data available but did NOT MATCH sitrep for store_patients"
         )
 
-    if settings.VERBOSE:
-        print(df.iloc[0])
     return df.to_dict(orient="records")
 
 

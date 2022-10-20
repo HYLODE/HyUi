@@ -16,7 +16,7 @@ from dash import dash_table as dt
 from dash import dcc, html, register_page
 from dash.dash_table.Format import Format, Scheme
 
-from config.settings import settings
+from web.config import get_settings
 
 register_page(__name__)
 BPID = "BONES_"
@@ -89,7 +89,7 @@ def store_data(n_intervals: int, ward_radio_value: str):
     Read data from API then store as JSON
     """
 
-    return requests.get(f"{settings.API_URL}/bedbones/beds").json()["results"]
+    return requests.get(f"{get_settings().api_url}/bedbones/beds").json()["results"]
 
     # Get Rows
     # API_URL = f"{BASEROW_API_URL}/database/rows/table/261/"

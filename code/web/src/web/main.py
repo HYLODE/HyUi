@@ -5,7 +5,7 @@ from dash import Dash, Input, Output, State, dcc, html, page_container, page_reg
 from flask import Flask
 from flask_login import LoginManager, UserMixin, current_user, login_user
 
-from config.settings import settings
+from web.config import get_settings
 
 
 class NavbarDropdown(NamedTuple):
@@ -19,9 +19,6 @@ CORE_PAGES = ["Sitrep", "Electives", "PERRT"]
 ADMIN_PAGES = ["Home", "Login", "Logout"]
 HIDDEN_PAGES: list[str] = []
 ED_PAGE_URL = "http://uclvlddpragae08:5212/"
-# Keep this out of source code repository - save in a file or a database
-#  passwords should be encrypted
-VALID_USERNAME_PASSWORD = {settings.HYUI_USER: settings.HYUI_PASSWORD}
 
 dropdown_more = [
     NavbarDropdown("Additional reports", "", header=True),
@@ -55,7 +52,7 @@ app = Dash(
 
 # Updating the Flask Server configuration with Secret Key to encrypt the user
 # session cookie.
-server.config.update(SECRET_KEY=settings.SECRET_KEY)
+server.config.update(SECRET_KEY=get_settings().secret_key)
 
 # Login manager object will be used to login / logout users
 login_manager = LoginManager()
@@ -97,14 +94,19 @@ def update_authentication_status(_):
     State("pwd-box", "value"),
     prevent_initial_call=True,
 )
-def login_button_click(n_clicks, username, password):
-    if n_clicks > 0:
-        if VALID_USERNAME_PASSWORD.get(username) is None:
-            return "Invalid username"
-        if VALID_USERNAME_PASSWORD.get(username) == password:
-            login_user(User(username))
-            return dcc.Location(pathname="/", id="not_in_use_01")
-        return "Incorrect  password"
+def login_button_click(
+    n_clicks: int, username: str, password: str
+) -> dcc.Location | str:
+    if n_clicks <= 0:
+        return ""
+
+    settings = get_settings()
+
+    if settings.web_username != username or settings.web_password != password:
+        return "Invalid username or password"
+
+    login_user(User(username))
+    return dcc.Location(pathname="/", id="not_in_use_01")
 
 
 def header_pages_dropdown():
@@ -182,8 +184,5 @@ app.layout = dbc.Container(
 server = app.server
 
 
-# this is the application run in development
-# cd ./src/
-# python apps/app.py
 if __name__ == "__main__":
-    app.run_server(host="0.0.0.0", port=settings.PORT_COMMANDLINE_APP, debug=True)
+    app.run_server(host="0.0.0.0", port=get_settings().development_port, debug=True)

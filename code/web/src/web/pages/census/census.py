@@ -22,7 +22,6 @@ from web.pages.census import (
     widgets,
 )
 
-from config.settings import settings
 from utils import icons
 
 register_page(__name__)
@@ -39,8 +38,6 @@ def gen_dept_table(data: dict):
     if len(dfo) == 0:
         warnings.warn("[WARN] No data provided for department/ward table")
         return html.H2("No data found for department/ward table")
-    if settings.VERBOSE and len(dfo):
-        print(dfo.iloc[0])
 
     dto = (
         dt.DataTable(
@@ -73,13 +70,12 @@ def gen_dept_table(data: dict):
     )
 
     # wrap in container
-    dto = [
+    return (
         dbc.Container(
             dto,
             className="dbc",
-        )
-    ]
-    return dto
+        ),
+    )
 
 
 @callback(
@@ -93,8 +89,6 @@ def gen_census_table(data: dict):
     if len(dfo) == 0:
         warnings.warn("[WARN] No data provided for table")
         return html.H2("No data found for table")
-    if settings.VERBOSE and len(dfo):
-        print(dfo.iloc[0])
 
     # TODO: Fix this.
     # dfo["bed_label"] = dfo["bed"].str.split(pat="-", expand=True).iloc[:, 1]
@@ -182,13 +176,12 @@ def gen_census_table(data: dict):
     )
 
     # wrap in container
-    dto = [
+    return (
         dbc.Container(
             dto,
             className="dbc",
-        )
-    ]
-    return dto
+        ),
+    )
 
 
 dept_selector = dbc.Card(
@@ -242,8 +235,9 @@ dash_only = html.Div(
 
 
 def layout():
-    if not current_user.is_authenticated and settings.ENV != "dev":
+    if not current_user.is_authenticated:
         return html.Div(["Please ", dcc.Link("login", href="/login"), " to continue"])
+
     return html.Div(
         [
             dbc.Row(

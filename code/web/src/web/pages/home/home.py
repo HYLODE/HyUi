@@ -7,7 +7,6 @@ from dash import dcc, html, register_page
 from flask_login import current_user
 
 from web.pages.home import BPID, REFRESH_INTERVAL
-from config.settings import settings
 
 from web.pages.home import callbacks  # noqa
 
@@ -54,7 +53,7 @@ dash_only = html.Div(
 
 
 def layout():
-    if current_user.is_authenticated or settings.ENV == "dev":
+    if current_user.is_authenticated:
         return html.Div(
             [
                 dbc.Row(

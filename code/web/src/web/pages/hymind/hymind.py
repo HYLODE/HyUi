@@ -5,11 +5,11 @@ from dash import Input, Output, callback, dcc, get_app, register_page
 from flask_caching import Cache
 
 from models.hymind import EmTap, ElTap
+from web.config import get_settings
 from web.pages.hymind import (
     BPID,
     CACHE_TIMEOUT,
     layout,
-    wng,
 )
 from utils.dash import df_from_store, get_results_response
 
@@ -22,10 +22,6 @@ cache = Cache(
         "CACHE_DIR": "cache-directory",
     },
 )
-
-em_tap_url = wng.build_emergency_tap_url()
-
-el_tap_url = wng.build_elective_tap_url()
 
 layout = layout.layout()
 
@@ -47,7 +43,9 @@ def store_em_tap(n_intervals: int, building: str = "tower"):
         department=building,
     )
     # import ipdb; ipdb.set_trace()
-    predictions = get_results_response(em_tap_url, "POST", json=payload)
+    predictions = get_results_response(
+        f"{get_settings().api_url}/hymind/icu/tap/emergency", "POST", json=payload
+    )
     return predictions
 
 
@@ -95,7 +93,7 @@ def store_el_tap(n_intervals: int, building: str = "tower"):
 
     # import ipdb; ipdb.set_trace()
     resp = requests.get(
-        el_tap_url,
+        f"{get_settings().api_url}/hymind/icu/tap/electives",
         params={
             "horizon_dt": arrow.now().shift(days=1).format("YYYY-MM-DDTHH:mm:ss"),
             "department": building,

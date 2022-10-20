@@ -7,9 +7,9 @@ from flask_caching import Cache
 from flask_login import current_user
 from pydantic import parse_obj_as
 
-from config.settings import settings
 from models.perrt import PerrtRead
 from utils.dash import get_results_response, df_from_store
+from web.config import get_settings
 
 CACHE_TIMEOUT = 5 * 60 * 1000
 BPID = "PERRT_"
@@ -23,9 +23,6 @@ cache = Cache(
         "CACHE_DIR": "cache-directory",
     },
 )
-
-API_URL = f"{settings.API_URL}/perrt/"
-ADMISSION_PREDICTION_URL = f"{API_URL}admission_predictions"
 
 REFRESH_INTERVAL = 10 * 60 * 1000  # milliseconds
 
@@ -126,12 +123,17 @@ def store_data(n_intervals: int):
     """
     Read data from API then store as JSON
     """
-    data = [dict(parse_obj_as(PerrtRead, i)) for i in get_results_response(API_URL)]
+    data = [
+        dict(parse_obj_as(PerrtRead, i))
+        for i in get_results_response(f"{get_settings().api_url}/perrt/")
+    ]
 
     hospital_visit_ids = [perrt_entry["hospital_visit_id"] for perrt_entry in data]
 
     predictions_list = get_results_response(
-        ADMISSION_PREDICTION_URL, "POST", json=hospital_visit_ids
+        f"{get_settings().api_url}/perrt/admission_predictions",
+        "POST",
+        json=hospital_visit_ids,
     )
 
     predictions_map = {

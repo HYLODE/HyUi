@@ -1,7 +1,7 @@
 """
 sub-application for consults
 """
-
+from typing import Any, cast
 
 import dash_bootstrap_components as dbc
 import plotly.express as px
@@ -12,28 +12,12 @@ from dash import dcc, html
 from flask_login import current_user
 
 from models.consults import ConsultsRead
-from config.settings import settings
 from utils.dash import df_from_store
+from web.config import get_settings
 
 register_page(__name__)
 BPID = "CON_"
 
-# APP to define URL
-# maybe run by HyUi API backend or maybe external
-# e.g
-#
-# HyUi API backend ...
-# API_URL = f"{settings.API_URL}/consults/"
-#
-# External (HySys) backend ..
-# API_URL = http://172.16.149.205:5006/icu/live/{ward}/ui
-#
-# External (gov.uk) backend ...
-# API_URL = f"https://coronavirus.data.gov.uk/api/v2/data?areaType=nhsTrust ...
-#
-# the latter two are defined as constants here
-
-API_URL = f"{settings.API_URL}/consults/"
 
 REFRESH_INTERVAL = 5 * 60 * 1000  # milliseconds
 
@@ -99,26 +83,27 @@ def layout():
     Output(request_data, "data"),
     Input(query_interval, "n_intervals"),
 )
-def store_data(n_intervals: int) -> dict:
+def store_data(n_intervals: int) -> dict[str, Any]:
     """
     Read data from API then store as JSON
     """
-    return requests.get(API_URL).json()
+    response = requests.get(f"{get_settings().api_url}/consults/")
+    return cast(dict[str, Any], response.json())
 
 
+# TODO: This function and its types are probably wrong.
 @callback(
     Output(filtered_data, "data"),
     Input(department_picker, "value"),
     State(request_data, "data"),
     prevent_initial_call=True,
 )
-def filter_data(val: str, data: dict) -> dict:
+def filter_data(val: str | None, data: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """
     Update data based on picker
     """
     if val:
-        print(val)
-        return [row for row in data if row["dept_name"] == val]  # type: ignore
+        return [row for row in data if row["dept_name"] == val]
     else:
         return data
 

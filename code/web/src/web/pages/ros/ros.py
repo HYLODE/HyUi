@@ -1,7 +1,7 @@
 """
 sub-application for ros
 """
-
+from typing import Any
 
 import dash_bootstrap_components as dbc
 from dash import Input, Output, State, callback, register_page
@@ -9,15 +9,15 @@ from dash import dash_table as dt
 from dash import dcc, html
 from flask_login import current_user
 
-from config.settings import settings
 from utils.dash import get_results_response
 
 from datetime import datetime, date, timedelta
 
+from web.config import get_settings
+
 register_page(__name__, name="ROS")
 BPID = "ROS_"
 
-API_URL = f"{settings.API_URL}/ros"
 
 # Caboodle data so refresh only needs to happen first thing
 REFRESH_INTERVAL = 6 * 60 * 60 * 1000  # milliseconds
@@ -99,13 +99,15 @@ def create_and_format_date(st):
     Output(request_data, "data"),
     Input(query_interval, "n_intervals"),
 )
-def store_data(n_intervals: int) -> dict:
+def store_data(n_intervals: int) -> dict[str, Any]:
     """
     Read data from API then store as JSON
     """
-    data = get_results_response(API_URL)
+    data = get_results_response(f"{get_settings().api_url}/ros")
 
-    pts_by_department = dict()  # stores the patient lists keyed on the department name
+    pts_by_department: dict[
+        str, Any
+    ] = dict()  # stores the patient lists keyed on the department name
 
     for row in data:
         # Format admission date for table
@@ -219,7 +221,9 @@ def store_data(n_intervals: int) -> dict:
         # Add data to the individual department list
         dept_list = pts_by_department.get(row["department"], [])
         dept_list.append(row)
-        dept_list = sorted(dept_list, key=lambda d: d["bed_name"])
+
+        # TODO: Must fix typing here.
+        dept_list = sorted(dept_list, key=lambda d: d["bed_name"])  # type: ignore
         pts_by_department[row["department"]] = dept_list
 
     return pts_by_department

@@ -6,7 +6,6 @@ build-backend = "setuptools.build_meta"
 name = "hyui-web"
 version = "0.0.1"
 dependencies = [
-    "hyui-config",
     "hyui-models",
     "dash == 2.6.2",
     "dash-bootstrap-components == 1.2.1",

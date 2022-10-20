@@ -1,7 +1,5 @@
-from config.settings import settings
-
 BPID = "ELE_"
-API_URL = f"{settings.API_URL}/electives"
+
 # Caboodle data so refresh only needs to happen first thing
 REFRESH_INTERVAL = 6 * 60 * 60 * 1000  # milliseconds
 
