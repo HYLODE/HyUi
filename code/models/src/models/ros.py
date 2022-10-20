@@ -3,8 +3,6 @@ from typing import Optional
 
 from sqlmodel import Field, SQLModel
 
-from config.settings import settings
-
 
 # define the data model that you're expecting from your query
 class RosBase(SQLModel):
@@ -26,15 +24,16 @@ class RosBase(SQLModel):
     covid_orders: Optional[str]
 
 
-class RosMock(RosBase, table=True):
+class RosMock(RosBase, table=True):  # type: ignore
     """
     The table version of the pydantic class
     Used for creating tables via SQLModel
     """
 
     # only set schema if in postgres
-    if "postgres" in settings.STAR_URL:
-        __table_args__ = {"schema": settings.DB_POSTGRES_SCHEMA}
+    # TODO: Figure out how to fix this.
+    # if "postgres" in settings.STAR_URL:
+    #     __table_args__ = {"schema": settings.DB_POSTGRES_SCHEMA}
     id: Optional[int] = Field(default=None, primary_key=True)
 
 

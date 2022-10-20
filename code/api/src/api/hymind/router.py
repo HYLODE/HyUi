@@ -1,9 +1,9 @@
 from pathlib import Path
 
 import pandas as pd
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
-from config.settings import settings
+from api.config import get_settings
 from models.hymind import EmElTapPostBody, IcuDischarge, EmTap, ElTap
 from api.validate import pydantic_dataframe
 
@@ -22,28 +22,28 @@ router = APIRouter(
 )
 
 
-def read_query(file_live: str, table_mock: str):
-    """
-    generates a query based on the environment
-
-    :param      file_live:   The file live
-                             e.g. live_case.sql
-    :param      table_mock:  The table mock
-                             e.g. electivesmock
-    returns a string containing a SQL query
-    """
-    if settings.ENV == "dev":
-        query = f"SELECT * FROM {table_mock}"
-    else:
-        sql_file = Path(__file__).resolve().parent / file_live
-        query = Path(sql_file).read_text()
-    return query
+# def read_query(file_live: str, table_mock: str):
+#     """
+#     generates a query based on the environment
+#
+#     :param      file_live:   The file live
+#                              e.g. live_case.sql
+#     :param      table_mock:  The table mock
+#                              e.g. electivesmock
+#     returns a string containing a SQL query
+#     """
+#     if settings.ENV == "dev":
+#         query = f"SELECT * FROM {table_mock}"
+#     else:
+#         sql_file = Path(__file__).resolve().parent / file_live
+#         query = Path(sql_file).read_text()
+#     return query
 
 
 @router.get("/icu/discharge")
-def read_icu_discharge(ward: str):
+def read_icu_discharge(ward: str, settings=Depends(get_settings)):
     """ """
-    if settings.ENV == "dev":
+    if settings.env == "dev":
 
         # import ipdb; ipdb.set_trace()
         _ = pd.read_json(MOCK_ICU_DISCHARGE_DATA)
@@ -68,9 +68,9 @@ def read_icu_discharge(ward: str):
 # List[Model]} which I cannot encode
 # @router.post("/icu/tap/emergency", response_model=EmTap)  # type: ignore
 @router.post("/icu/tap/emergency")
-def read_tap_emergency(data: EmElTapPostBody):
+def read_tap_emergency(data: EmElTapPostBody, settings=Depends(get_settings)):
     """ """
-    if settings.ENV == "dev":
+    if settings.env == "dev":
 
         # import ipdb; ipdb.set_trace()
         _ = pd.read_json(MOCK_TAP_EMERGENCY_DATA)
@@ -87,9 +87,9 @@ def read_tap_emergency(data: EmElTapPostBody):
     return response
 
 
-@router.get("/icu/tap/electives")  # type: ignore
-def read_tap_electives(data: EmElTapPostBody):
-    if settings.ENV == "dev":
+@router.get("/icu/tap/electives")
+def read_tap_electives(data: EmElTapPostBody, settings=Depends(get_settings)):
+    if settings.env == "dev":
 
         # import ipdb; ipdb.set_trace()
         _ = pd.read_json(MOCK_TAP_ELECTIVE_DATA)

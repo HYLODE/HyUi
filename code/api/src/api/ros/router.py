@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends
 from sqlmodel import Session
 
 from models.ros import RosRead
-from api.db import prepare_query, get_emap_session
+from api.db import prepare_query, get_star_session
 
 router = APIRouter(
     prefix="/ros",
@@ -12,7 +12,7 @@ router = APIRouter(
 
 
 @router.get("/", response_model=list[RosRead])
-def read_ros(session: Session = Depends(get_emap_session)):
+def read_ros(session: Session = Depends(get_star_session)):
     """
     Returns Ros data
     """

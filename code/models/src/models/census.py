@@ -14,8 +14,6 @@ import pandas as pd
 from pydantic import validator
 from sqlmodel import Field, SQLModel
 
-from config.settings import settings  # type: ignore
-
 
 # define the data model that you're expecting from your query
 class CensusBase(SQLModel):
@@ -109,15 +107,16 @@ class CensusBase(SQLModel):
             return v
 
 
-class CensusMock(CensusBase, table=True):
+class CensusMock(CensusBase, table=True):  # type: ignore
     """
     The table version of the pydantic class
     Used for creating tables via SQLModel
     """
 
     # only set schema if in postgres
-    if "postgres" in settings.STAR_URL:
-        __table_args__ = {"schema": settings.DB_POSTGRES_SCHEMA}
+    # TODO: Determine how to fix this.
+    # if "postgres" in settings.STAR_URL:
+    #     __table_args__ = {"schema": settings.DB_POSTGRES_SCHEMA}
     beds_id: Optional[int] = Field(default=None, primary_key=True)
 
 

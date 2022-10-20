@@ -8,7 +8,7 @@ import pickle
 from pathlib import Path
 
 from models.perrt import AdmissionPrediction, PerrtRaw, PerrtRead
-from api.db import prepare_query, get_emap_session
+from api.db import prepare_query, get_star_session
 
 from api.perrt.wrangle import wrangle
 
@@ -19,7 +19,7 @@ router = APIRouter(
 
 @router.get("/raw", response_model=list[PerrtRaw])
 def read_perrt_table(
-    session: Session = Depends(get_emap_session),
+    session: Session = Depends(get_star_session),
     offset: int = 0,
     limit: int = Query(default=100, lte=100),
 ):
@@ -38,7 +38,7 @@ def read_perrt_table(
 
 
 @router.get("/", response_model=list[PerrtRead])
-def read_perrt(session: Session = Depends(get_emap_session)):
+def read_perrt(session: Session = Depends(get_star_session)):
     """
     Returns PerrtRead data class post wrangling
 
@@ -65,7 +65,7 @@ def read_perrt(session: Session = Depends(get_emap_session)):
 
 @router.post("/admission_predictions", response_model=list[AdmissionPrediction])
 def get_predictions(
-    hospital_visit_ids: list[str] = Body(), session: Session = Depends(get_emap_session)
+    hospital_visit_ids: list[str] = Body(),
 ):
 
     predictions_filepath = Path(

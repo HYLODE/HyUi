@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from sqlmodel import Field, SQLModel
 
 
-class IcuDischarge(SQLModel, table=True):
+class IcuDischarge(SQLModel, table=True):  # type: ignore
     """
     HyMind API ICU discharge predictions
     e.g.
@@ -28,7 +28,7 @@ class IcuDischarge(SQLModel, table=True):
     predict_dt: datetime
 
 
-class EmTap(SQLModel, table=True):
+class EmTap(SQLModel, table=True):  # type: ignore
     """
      Hymind Emergency Taps
      e.g.
@@ -62,7 +62,7 @@ class EmTap(SQLModel, table=True):
     horizon_dt: datetime
 
 
-class ElTap(SQLModel, table=True):
+class ElTap(SQLModel, table=True):  # type: ignore
     """
     Hymind Elective Tap
     e.g.

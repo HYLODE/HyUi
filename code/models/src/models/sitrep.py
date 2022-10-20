@@ -16,8 +16,6 @@ import arrow
 from pydantic import validator
 from sqlmodel import Field, SQLModel
 
-from config.settings import settings  # type: ignore
-
 
 # define the data model that you're expecting from your query
 class SitrepBase(SQLModel):
@@ -63,15 +61,16 @@ class SitrepBase(SQLModel):
         return v
 
 
-class SitrepMock(SitrepBase, table=True):
+class SitrepMock(SitrepBase, table=True):  # type: ignore
     """
     The table version of the pydantic class
     Used for creating tables via SQLModel
     """
 
+    # TODO: Cater for removal of this dependency.
     # only set schema if in postgres
-    if "postgres" in settings.STAR_URL:
-        __table_args__ = {"schema": settings.DB_POSTGRES_SCHEMA}
+    # if "postgres" in settings.STAR_URL:
+    #     __table_args__ = {"schema": settings.DB_POSTGRES_SCHEMA}
     id: Optional[int] = Field(default=None, primary_key=True)
 
 

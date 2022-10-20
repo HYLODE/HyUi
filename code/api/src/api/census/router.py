@@ -8,7 +8,7 @@ from pydantic import parse_obj_as
 from sqlmodel import Session
 
 from models.census import CensusRead, CensusDepartments
-from api.db import prepare_query, get_emap_session
+from api.db import prepare_query, get_star_session
 
 from api.census.wrangle import aggregate_by_department
 from api import wards
@@ -20,7 +20,7 @@ router = APIRouter(
 
 @router.get("/beds", response_model=list[CensusRead])
 def read_beds(
-    session: Session = Depends(get_emap_session),
+    session: Session = Depends(get_star_session),
     departments: list[str] = Query(default=wards.ALL),
     locations: list[str] = Query(default=[]),
 ):
@@ -131,7 +131,7 @@ def read_bed_list():
 
 
 @router.get("/departments", response_model=list[CensusDepartments])
-def read_departments(session: Session = Depends(get_emap_session)):
+def read_departments(session: Session = Depends(get_star_session)):
     """
     Run the beds query then aggregate
     """

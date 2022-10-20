@@ -12,8 +12,6 @@ import arrow
 from pydantic import validator
 from sqlmodel import Field, SQLModel
 
-from config.settings import settings  # type: ignore
-
 
 # define the data model that you're expecting from your query
 class ConsultsBase(SQLModel):
@@ -48,15 +46,16 @@ class ConsultsBase(SQLModel):
         return v
 
 
-class ConsultsMock(ConsultsBase, table=True):
+class ConsultsMock(ConsultsBase, table=True):  # type: ignore
     """
     The table version of the pydantic class
     Used for creating tables via SQLModel
     """
 
     # only set schema if in postgres
-    if "postgres" in settings.STAR_URL:
-        __table_args__ = {"schema": settings.DB_POSTGRES_SCHEMA}
+    # if "postgres" in settings.STAR_URL:
+    #     __table_args__ = {"schema": settings.DB_POSTGRES_SCHEMA}
+    # TODO: Determine how to fix this.
     consultation_request_id: Optional[int] = Field(default=None, primary_key=True)
 
 

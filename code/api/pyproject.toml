@@ -6,7 +6,6 @@ build-backend = "setuptools.build_meta"
 name = "hyui-api"
 version = "0.0.1"
 dependencies = [
-    "hyui-config",
     "hyui-models",
     "hyui-utils",
     "arrow == 1.2.3",

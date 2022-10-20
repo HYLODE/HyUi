@@ -99,7 +99,7 @@ class ElectivesBase(SQLModel):
             return v
 
 
-class ElectivesMock(ElectivesBase, table=True):
+class ElectivesMock(ElectivesBase, table=True):  # type: ignore
     """
     The table version of the pydantic class
     Used for creating tables via SQLModel
@@ -160,7 +160,7 @@ class ElectivesPreassess(SQLModel):
             return v
 
 
-class ElectivesPreassessMock(ElectivesPreassess, table=True):
+class ElectivesPreassessMock(ElectivesPreassess, table=True):  # type: ignore
 
     id: Optional[int] = Field(default=None, primary_key=True)
 
@@ -198,7 +198,7 @@ class ElectivesPod(SQLModel):
             return v
 
 
-class ElectivesPodMock(ElectivesPod, table=True):
+class ElectivesPodMock(ElectivesPod, table=True):  # type: ignore
     """
     This class describes an electives clarity base.
     Post-op destination (pod) from clarity

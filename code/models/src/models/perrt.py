@@ -17,8 +17,6 @@ import pandas as pd
 from pydantic import validator, BaseModel
 from sqlmodel import Field, SQLModel
 
-from config.settings import settings  # type: ignore
-
 
 # define the data model that you're expecting from your query
 class PerrtRaw(SQLModel):
@@ -86,15 +84,17 @@ class PerrtRaw(SQLModel):
         return v
 
 
-class PerrtMock(PerrtRaw, table=True):
+class PerrtMock(PerrtRaw, table=True):  # type: ignore
     """
     The table version of the pydantic class
     Used for creating tables via SQLModel for mocking
     """
 
     # only set schema if in postgres
-    if "postgres" in settings.STAR_URL:
-        __table_args__ = {"schema": settings.DB_POSTGRES_SCHEMA}
+
+    # TODO: Figure out how to fix this.
+    # if "postgres" in settings.STAR_URL:
+    #     __table_args__ = {"schema": settings.DB_POSTGRES_SCHEMA}
     Perrt_id: Optional[int] = Field(default=None, primary_key=True)
 
 
