@@ -31,9 +31,6 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH:/opt/mssql-tools/bin"
 
 RUN pip install --no-cache-dir -U pip
 
-COPY --chown=hyui:root ./config /app/config
-RUN pip install --no-cache-dir /app/config && rm -r /app/config
-
 COPY --chown=hyui:root ./utils /app/utils
 RUN pip install --no-cache-dir /app/utils && rm -r /app/utils
 
