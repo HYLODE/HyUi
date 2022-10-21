@@ -84,7 +84,16 @@ NHNN = (
 
 ALL = TOWER + GWB + WMS + NHNN
 
-# beds that don't have a department and needed to be added in by hand
-DEPARTMENTS_MISSING_BEDS = MappingProxyType(
+# Departments that have locations (beds) which incorrectly don't show up in
+# Epic as part of that department.
+MISSING_DEPARTMENT_LOCATIONS = MappingProxyType(
     {"UCH T06 CENTRAL (T06C)": ("T06C^T06C BY08^BY08-36",)}
 )
+
+# The inverse of the above dictionary; locations that aren't attached to a
+# department but should be.
+MISSING_LOCATION_DEPARTMENTS = {
+    location: department
+    for department, locations in MISSING_DEPARTMENT_LOCATIONS.items()
+    for location in locations
+}

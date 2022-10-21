@@ -3,8 +3,8 @@ import pandas as pd
 from dash import Input, Output, callback, get_app, html
 from flask_caching import Cache
 
+from web.census import fetch_department_census
 from web.style import AppColors
-from web.pages.census.callbacks import store_depts_fn
 from web.pages.home import BPID, CACHE_TIMEOUT
 
 COLORS = AppColors()
@@ -33,9 +33,8 @@ cache = Cache(
     # Input(f"{BPID}building_radio", "value"),
 )
 @cache.memoize(timeout=CACHE_TIMEOUT)
-def store_depts(*args, **kwargs):
-    args = args + ("",)  # pass empty string as building arg
-    return store_depts_fn(*args, **kwargs)
+def store_departments(*args, **kwargs):
+    return fetch_department_census()
 
 
 @callback(

@@ -1,4 +1,3 @@
-from collections import namedtuple
 from pathlib import Path
 from typing import Any
 
@@ -6,9 +5,10 @@ import pandas as pd
 from fastapi import APIRouter, Depends, Query
 
 from sqlalchemy import create_engine, text, bindparam
-from sqlmodel import Session
+from sqlalchemy.orm import Session
 
-from models.census import CensusRead, CensusDepartments
+from api.wards import MISSING_LOCATION_DEPARTMENTS, MISSING_DEPARTMENT_LOCATIONS
+from models.census import CensusDepartment, CensusRow, ClosedBed
 from api.db import get_star_session
 
 from api.census.wrangle import aggregate_by_department
@@ -23,68 +23,9 @@ mock_router = APIRouter(
 )
 
 
-def _mock_census_query_text():
-    query_text = text(
-        """SELECT *
-        FROM census
-        WHERE department IN :departments
-        OR location_string IN :locations"""
-    )
-
-    return query_text.bindparams(  # type: ignore
-        bindparam("departments", expanding=True),
-        bindparam("locations", expanding=True),
-    )
-
-
-@mock_router.get("/beds", response_model=list[CensusRead])
-def read_mock_beds(
-    departments: list[str] = Query(default=wards.ALL),
-    locations: list[str] = Query(default=[]),
-):
-    for d in departments:
-        if missing_locations := wards.DEPARTMENTS_MISSING_BEDS.get(d):
-            locations.extend(missing_locations)
-
-    engine = create_engine(f"sqlite:///{Path(__file__).parent}/mock.db")
-    query_text = _mock_census_query_text()
-
-    params = {"departments": departments, "locations": locations}
-
-    results = engine.execute(query_text, params)
-
-    Record = namedtuple("Record", results.keys())  # type: ignore
-    return [Record(*r) for r in results.fetchall()]
-
-
-@router.get("/beds", response_model=list[CensusRead])
-def read_beds(
-    session: Session = Depends(get_star_session),
-    departments: list[str] = Query(default=wards.ALL),
-    locations: list[str] = Query(default=[]),
-):
-    """
-    Returns beds data class populated by query-live/mock
-    query preparation depends on the environment so will return
-    mock data in dev and live data in prod
-    """
-    for d in departments:
-        if missing_locations := wards.DEPARTMENTS_MISSING_BEDS.get(d):
-            locations.extend(missing_locations)
-
-    query_text = text((Path(__file__).parent / "live.sql").read_text())
-    params = {"departments": departments, "locations": locations}
-    # NOTE: this fails with sqlmodel.exec / works with sa.execute
-    # import pdb; pdb.set_trace()
-    results = session.execute(query_text, params)
-
-    Record = namedtuple("Record", results.keys())  # type: ignore
-    return [Record(*r) for r in results.fetchall()]
-
-
-@mock_router.get("/beds/closed", response_model=dict)
-def read_closed_beds():
-    return {
+@mock_router.get("/beds/closed", response_model=list[ClosedBed])
+def get_mock_closed_beds():
+    data = {
         "count": 2,
         "next": None,
         "previous": None,
@@ -99,9 +40,10 @@ def read_closed_beds():
             },
         ],
     }
+    return [ClosedBed.parse_obj(row) for row in data["results"]]
 
 
-@router.get("/beds/list", response_model=dict[str, Any])
+@mock_router.get("/beds/list", response_model=dict[str, Any])
 def read_bed_list():
     return {
         "count": 1,
@@ -158,47 +100,96 @@ def read_bed_list():
     }
 
 
-def read_mock_census(departments: list[str], beds: list[str]) -> pd.DataFrame:
-    engine = create_engine(f"sqlite:///{Path(__file__).parent}/mock.db")
+def _fetch_census(
+    session: Session, query: Any, departments: list[str], locations: list[str]
+) -> list[CensusRow]:
 
-    query_text = _mock_census_query_text()
+    all_locations = locations.copy()
 
-    df = pd.read_sql(
-        query_text,
-        engine,
-        params={
-            "departments": departments,
-            "locations": beds,
-        },
+    # Some departments have locations (beds) that are missing. This adds them
+    # in.
+    for department in departments:
+        if missing_locations := MISSING_DEPARTMENT_LOCATIONS.get(department):
+            all_locations.extend(missing_locations)
+
+    census_rows: list[CensusRow] = []
+
+    result = session.execute(
+        query, {"departments": departments, "locations": all_locations}
+    )
+    for row in result:
+        census_row = CensusRow.parse_obj(row)
+
+        # Add erroneously missing departments.
+        if not census_row.department:
+            census_row.department = MISSING_LOCATION_DEPARTMENTS.get(
+                census_row.location_string
+            )
+
+        census_rows.append(census_row)
+
+    return census_rows
+
+
+def fetch_mock_census(departments: list[str], locations: list[str]) -> list[CensusRow]:
+    engine = create_engine(f"sqlite:///{Path(__file__).parent}/mock.db", future=True)
+
+    query = text(
+        """SELECT *
+        FROM census
+        WHERE department IN :departments
+        OR location_string IN :locations"""
+    ).bindparams(  # type: ignore
+        bindparam("departments", expanding=True),
+        bindparam("locations", expanding=True),
     )
 
-    # Correct types to aid further testing.
-    df["cvl_admission"] = pd.to_datetime(df["cvl_admission"])
-    df["cvl_discharge"] = pd.to_datetime(df["cvl_discharge"])
-    df["modified_at"] = pd.to_datetime(df["modified_at"])
-
-    return df
+    with Session(engine) as session:
+        return _fetch_census(session, query, departments, locations)
 
 
-@mock_router.get("/departments", response_model=list[CensusDepartments])
-def mock_read_departments():
-    beds = tuple(wards.DEPARTMENTS_MISSING_BEDS.values())
-    census_df = read_mock_census(wards.ALL, beds)
-    return aggregate_by_department(census_df).to_dict(orient="records")
+@mock_router.get("/departments", response_model=list[CensusDepartment])
+def get_mock_departments() -> list[CensusDepartment]:
+
+    census_rows = fetch_mock_census(list(wards.ALL), [])
+    census_df = pd.DataFrame((row.dict() for row in census_rows))
+    departments_df = aggregate_by_department(census_df)
+
+    return [
+        CensusDepartment.parse_obj(row)
+        for row in departments_df.to_dict(orient="records")
+    ]
 
 
-@router.get("/departments", response_model=list[CensusDepartments])
-def read_departments(session: Session = Depends(get_star_session)):
-    """
-    Run the beds query then aggregate
-    """
-    query_text = text((Path(__file__).parent / "live.sql").read_text())
+@router.get("/departments", response_model=list[CensusDepartment])
+def get_departments(
+    session: Session = Depends(get_star_session),
+) -> list[CensusDepartment]:
 
-    params = {
-        "departments": wards.ALL,
-        "locations": tuple(wards.DEPARTMENTS_MISSING_BEDS.values()),
-    }
+    query = text((Path(__file__).parent / "live.sql").read_text())
+    census_rows = _fetch_census(session, query, list(wards.ALL), [])
+    census_df = pd.DataFrame((row.dict() for row in census_rows))
+    departments_df = aggregate_by_department(census_df)
 
-    census_df = pd.read_sql(query_text, session.connection(), params=params)
+    return [
+        CensusDepartment.parse_obj(row)
+        for row in departments_df.to_dict(orient="records")
+    ]
 
-    return aggregate_by_department(census_df).to_dict(orient="records")
+
+@mock_router.get("/beds", response_model=list[CensusRow])
+def get_mock_beds(
+    departments: list[str] = Query(default=wards.ALL),
+    locations: list[str] = Query(default=[]),
+) -> list[CensusRow]:
+    return fetch_mock_census(departments, locations)
+
+
+@router.get("/beds", response_model=list[CensusRow])
+def get_beds(
+    session: Session = Depends(get_star_session),
+    departments: list[str] = Query(default=wards.ALL),
+    locations: list[str] = Query(default=[]),
+) -> list[CensusRow]:
+    query = text((Path(__file__).parent / "live.sql").read_text())
+    return _fetch_census(session, query, departments, locations)

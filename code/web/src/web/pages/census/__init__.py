@@ -108,18 +108,6 @@ CENSUS_STYLE_CELL_CONDITIONAL = [
     # {"if": {"column_id": "DischargeReady"}, "textAlign": "left"},
 ]
 
-DEPT_KEEP_COLS = [
-    "department",
-    "beds",
-    "patients",
-    "empties",
-    "days_since_last_dc",
-    "closed_temp",
-    "closed_perm",
-    "modified_at",
-    "closed",  # only exists after merging with bed_bones
-]
-
 BEDS_KEEP_COLS = [
     "id",  # needed for merge on discharge status
     "location_id",
@@ -134,25 +122,4 @@ BEDS_KEEP_COLS = [
     "bed_physical",
     "DischargeReady",
     "closed",  # only exists after merging with bed_bones
-]
-
-CENSUS_KEEP_COLS = [
-    "location_string",
-    "location_id",
-    "ovl_admission",
-    "ovl_hv_id",
-    "cvl_discharge",
-    "occupied",
-    "ovl_ghost",
-    "mrn",
-    "encounter",
-    "date_of_birth",
-    "lastname",
-    "firstname",
-    "sex",
-    "planned_move",
-    "pm_datetime",
-    "pm_type",
-    "pm_dept",
-    "pm_location_string",
 ]

@@ -15,7 +15,7 @@ def _split_location_string(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def _remove_non_beds(
-    df: pd.DataFrame, non_beds: tuple[str, str, str] = ("null", "wait", "proc rm")
+    df: pd.DataFrame, non_beds: tuple[str, ...] = ("null", "wait", "proc rm")
 ) -> pd.DataFrame:
     """
     Removes non beds e.g. null, wait

@@ -9,11 +9,23 @@ from api.consults.router import router as consults_router
 from api.perrt.router import router as perrt_router
 from api.ros.router import router as ros_router
 from api.hymind.router import router as hymind_router
+from api.hospital.router import (
+    router as hospital_router,
+    mock_router as mock_hospital_router,
+)
 
 
 app = FastAPI(default_response_class=ORJSONResponse)
+mock_router = APIRouter(
+    prefix="/mock",
+)
+
+app.include_router(hospital_router)
+mock_router.include_router(mock_hospital_router)
 
 app.include_router(census_router)
+mock_router.include_router(mock_census_router)
+
 app.include_router(bedbones_router)
 app.include_router(consults_router)
 app.include_router(electives_router)
@@ -21,11 +33,6 @@ app.include_router(perrt_router)
 app.include_router(sitrep_router)
 app.include_router(ros_router)
 app.include_router(hymind_router)
-
-mock_router = APIRouter(
-    prefix="/mock",
-)
-mock_router.include_router(mock_census_router)
 
 app.include_router(mock_router)
 

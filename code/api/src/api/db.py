@@ -5,7 +5,8 @@ from pathlib import Path
 from fastapi import Depends
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
-from sqlmodel import Session
+from sqlalchemy.orm import Session
+
 from api.config import get_settings
 
 

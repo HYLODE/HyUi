@@ -6,14 +6,15 @@ import requests
 from dash import Input, Output, callback, dcc, get_app
 from flask_caching import Cache
 
-from models.census import CensusDepartments, CensusRead
+from models.census import CensusRow
 from web.config import get_settings
+from web.census import fetch_department_census
+from web.convert import to_data_frame
+from web.hospital import get_building_departments
 from web.pages.census import (
     BEDS_KEEP_COLS,
     BPID,
     CACHE_TIMEOUT,
-    CENSUS_KEEP_COLS,
-    DEPT_KEEP_COLS,
 )
 
 from utils.beds import (
@@ -21,6 +22,27 @@ from utils.beds import (
     unpack_nested_dict,
 )
 from utils.dash import validate_json
+
+CENSUS_KEEP_COLS = [
+    "location_string",
+    "location_id",
+    "ovl_admission",
+    "ovl_hv_id",
+    "cvl_discharge",
+    "occupied",
+    "ovl_ghost",
+    "mrn",
+    "encounter",
+    "date_of_birth",
+    "lastname",
+    "firstname",
+    "sex",
+    "planned_move",
+    "pm_datetime",
+    "pm_type",
+    "pm_dept",
+    "pm_location_string",
+]
 
 # this structure is necessary for flask_cache
 app = get_app()
@@ -48,59 +70,25 @@ def gen_dept_dropdown(building: str):
     :rtype:     list
     """
 
-    # TODO: Fix this.
-    dept_list = requests.get("/hospital/wards").json()["building"]
+    building_departments = get_building_departments()
+    departments: list[str] = []
+    for bd in building_departments:
+        if bd.building == building:
+            departments.extend(bd.departments)
+            break
 
-    default_value = dept_list[0]
+    default_value = departments[0]
     return dcc.Dropdown(
         id=f"{BPID}dept_dropdown",
         value=default_value,
-        options=[{"label": v, "value": v} for v in dept_list],
+        options=[{"label": v, "value": v} for v in departments],
         placeholder="Pick a department",
         multi=False,
     )
 
 
-def _get_closed_beds():
-    return requests.get(f"{get_settings().api_url}/census/beds/closed").json()[
-        "results"
-    ]
-
-
 def _get_bed_list(department: str):
     return requests.get(f"{get_settings().api_url}/census/beds/list").json()["results"]
-
-
-def store_depts_fn(n_intervals: int, building: str):
-    """
-    Stores data from census api (i.e. skeleton)
-    Also reaches out to bed_bones and pulls in additional closed beds
-    """
-    res = requests.get(f"{get_settings().api_url}/census/departments")
-    depts = res.json()
-    depts = validate_json(depts, CensusDepartments, to_dict=True)
-    if all([not bool(i) for i in depts]):
-        warnings.warn("[WARN] store_census returned an empty list of dictionaries")
-        return depts
-    df = pd.DataFrame.from_records(depts)
-    if building:
-        # TODO: Fix this.
-        dept_list = requests.get("/hospital/wards").json()["building"]
-        df = df[df["department"].isin(dept_list)]
-
-    # Now update with closed beds from bed_bones
-    closed_beds_json = _get_closed_beds()
-    df_closed = pd.DataFrame.from_records(closed_beds_json)
-    # df_closed = pd.DataFrame.from_records(get_closed_beds())
-    closed = df_closed.groupby("department")["closed"].sum()
-    df = df.merge(closed, on="department", how="left")
-    df["closed"].fillna(0, inplace=True)
-
-    # Then update empties
-    df["empties"] = df["empties"] - df["closed"]
-
-    df = df[DEPT_KEEP_COLS]
-    return df.to_dict(orient="records")
 
 
 @callback(
@@ -110,7 +98,7 @@ def store_depts_fn(n_intervals: int, building: str):
 )
 @cache.memoize(timeout=CACHE_TIMEOUT)
 def store_depts(*args, **kwargs):
-    return store_depts_fn(*args, **kwargs)
+    return fetch_department_census()
 
 
 @callback(
@@ -139,6 +127,13 @@ def store_beds(n_intervals: int, dept: str):
     return df.to_dict(orient="records")
 
 
+def _get_census(department: str) -> list[CensusRow]:
+    response = requests.get(
+        f"{get_settings().api_url}/census/beds", params={"departments": [department]}
+    )
+    return [CensusRow.parse_obj(row) for row in response.json()]
+
+
 @callback(
     Output(f"{BPID}census_data", "data"),
     Input(f"{BPID}query-interval", "n_intervals"),
@@ -148,25 +143,18 @@ def store_beds(n_intervals: int, dept: str):
 @cache.memoize(
     timeout=CACHE_TIMEOUT
 )  # cache decorator must come between callback and function
-def store_census(n_intervals: int, dept: str):
+def store_census(n_intervals: int, department: str):
     """
     Stores data from census api (i.e. current beds occupant)
     """
 
-    res = requests.get(
-        f"{get_settings().api_url}/census/beds", params={"departments": dept}
-    )
-    census = res.json()
-    census = validate_json(census, CensusRead, to_dict=True)
-    if all([not bool(i) for i in census]):
-        warnings.warn("[WARN] store_census returned an empty list of dictionaries")
-        return census
-    df = pd.DataFrame.from_records(census)
-    df = df[CENSUS_KEEP_COLS]
-    # scrub ghosts
-    mask = df["occupied"]
-    df = df[mask]
-    return df.to_dict(orient="records")
+    census = _get_census(department)
+    census_df = to_data_frame(census)
+
+    census_df = census_df[CENSUS_KEEP_COLS]
+
+    # Scrub ghosts with the occupied mask.
+    return census_df[census_df["occupied"]].to_dict(orient="records")
 
 
 @callback(
