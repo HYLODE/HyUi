@@ -74,7 +74,7 @@ class CensusBase(SQLModel):
     with pending inpatient consults
     """
 
-    modified_at: datetime
+    modified_at: Optional[datetime]
     location_id: int
     department: Optional[str]
     location_string: str

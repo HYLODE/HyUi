@@ -1,21 +1,120 @@
 from collections import namedtuple
+from datetime import date
 
 import requests
 from fastapi import APIRouter, Depends
 from sqlmodel import Session
 
 from api.config import get_settings
-from models.sitrep import SitrepRead
+from models.sitrep import (
+    SitrepRead,
+    SitrepRow,
+    IndividualDischargePrediction,
+    BedRow,
+    CensusRow,
+)
 from api.db import prepare_query, get_star_session
+
+CORE_FIELDS = [
+    "department",
+    "room",
+    "bed",
+    "unit_order",
+    "closed",
+    "covid",
+    "bed_functional",
+    "bed_physical",
+    "DischargeReady",
+    "location_id",
+    "location_string",
+]
 
 router = APIRouter(
     prefix="/sitrep",
 )
 
+mock_router = APIRouter(
+    prefix="/sitrep",
+)
 
-@router.get("/beds/list", response_model=list[dict])
-def read_bed_list():
-    # TODO: Look at utils.beds.py to see how this is implemented.
+
+@router.get("/beds/", response_model=list[dict])
+def get_beds():
+    # TODO: Add these to settings.
+    table_id = "261"
+    department_field_id = "2041"
+    ward = "UCH T03 INTENSIVE CARE"
+
+    return requests.get(
+        f"{get_settings().baserow_url}/api/database/rows/table/{table_id}/",
+        headers={"Authorization": f"Token {get_settings().baserow_read_write_token}"},
+        params={
+            "user_field_names": "true",
+            f"filter__field_{department_field_id}__equal": ward,
+            "include": ",".join(CORE_FIELDS),
+        },
+    ).json()["results"]
+
+
+@mock_router.get("/beds/", response_model=list[BedRow])
+def get_mock_beds() -> list[BedRow]:
+    return [
+        BedRow(
+            location_string="location_a",
+            bed_functional=[],
+            bed_physical=[],
+            unit_order=3,
+            closed=False,
+            bed="a-b",
+            bed_label="1bed-2label",
+            room="SR-room",
+            covid=False,
+        )
+    ]
+
+
+@router.get("/census/", response_model=list[CensusRow])
+def get_census() -> list[BedRow]:
+    # TODO: Could redirect to the census API endpoint.
+    raise NotImplementedError()
+
+
+@mock_router.get("/census/", response_model=list[CensusRow])
+def get_mock_census() -> list[BedRow]:
+    return [
+        CensusRow(
+            encounter=1,
+            location_string="location_a",
+            date_of_birth=date(2001, 2, 3),
+            mrn="abc",
+            firstname="Firstname",
+            lastname="Lastname",
+        )
+    ]
+
+
+@mock_router.get("/live/{ward}/ui", response_model=list[SitrepRow])
+def get_mock_live_ward_ui(ward: str) -> list[SitrepRow]:
+    return [
+        SitrepRow(
+            csn=1,
+            episode_slice_id=1,
+            n_inotropes_1_4h=2,
+            had_rrt_1_4h=True,
+            vent_type_1_4h="oxygen",
+        )
+    ]
+    # engine = create_engine(f"sqlite:///{Path(__file__).parent}/mock.db", future=True)
+    #
+    # query = text("SELECT * FROM sitrep")
+    #
+    # with Session(engine) as session:
+    #     result = session.exec(query)
+    #     return [SitrepRow.parse_obj(row) for row in result]
+
+
+@router.get("/live/{ward}/ui", response_model=list[SitrepRow])
+def get_live_ward_ui(ward: str) -> list[SitrepRow]:
     return []
 
 
@@ -48,3 +147,23 @@ def update_bed_row(
         },
         json=data,
     )
+
+
+@router.get(
+    "/predictions/discharge/individual/{ward}",
+    response_model=list[IndividualDischargePrediction],
+)
+def get_individual_discharge_predictions(
+    ward: str,
+) -> list[IndividualDischargePrediction]:
+    raise NotImplementedError("Need to call API endpoint.")
+
+
+@mock_router.get(
+    "/predictions/discharge/individual/{ward}",
+    response_model=list[IndividualDischargePrediction],
+)
+def get_mock_individual_discharge_predictions(
+    ward: str,
+) -> list[IndividualDischargePrediction]:
+    return [IndividualDischargePrediction(episode_slice_id=1, prediction=0.4)]

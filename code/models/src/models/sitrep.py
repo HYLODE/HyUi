@@ -1,20 +1,48 @@
-"""
-Results from Sitrep API
-eg.
-
-http://172.16.149.205:5006/icu/live/{ward}/ui
-
-The developer should specify the data models here
-and follow the **same** naming convention such that
-the module.classname can be reliably used for access
-"""
-
 from datetime import date, datetime
 from typing import Optional
 
 import arrow
-from pydantic import validator
+from pydantic import validator, BaseModel
 from sqlmodel import Field, SQLModel
+
+
+class BedRow(BaseModel):
+    location_string: str
+    bed_functional: list[str]
+    bed_physical: list[str]
+    unit_order: int | None
+    closed: bool
+    covid: bool
+    bed: str
+    bed_label: str
+    room: str
+
+
+class CensusRow(BaseModel):
+    encounter: int
+    mrn: str
+    location_string: str
+    date_of_birth: date
+    firstname: str | None
+    lastname: str | None
+    sex: str | None
+
+
+class SitrepRow(BaseModel):
+    csn: int
+    episode_slice_id: int
+    # bay_code: str
+    # bed_code: str
+    # discharge_ready_1_4h: bool
+    n_inotropes_1_4h: int
+    had_rrt_1_4h: bool
+    vent_type_1_4h: str
+    # wim_1: int
+
+
+class IndividualDischargePrediction(BaseModel):
+    episode_slice_id: int
+    prediction: float
 
 
 # define the data model that you're expecting from your query

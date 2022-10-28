@@ -143,8 +143,8 @@ This is an experimental workflow designed to ultimately align the way packages a
 ### Create Required Virtual Environments
 
 ```sh
-> pyenv virtualenv 3.10.7 hyui-web
-> pyenv virtualenv 3.10.7 hyui-api
+> pyenv virtualenv 3.11.0 hyui-web
+> pyenv virtualenv 3.11.0 hyui-api
 ```
 
 ### Activate Virtual Environment
