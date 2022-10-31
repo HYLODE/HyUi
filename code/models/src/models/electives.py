@@ -49,7 +49,7 @@ class GetElectiveRow(BaseModel):
     surgical_case_epic_id: int
     canceled: bool
     surgical_service: str | None
-    most_recent_pod_dt: str | None
+    most_recent_pod_dt: datetime | None
     pod_preassessment: str | None
     most_recent_asa: str | None
     most_recent_mets: str | None
