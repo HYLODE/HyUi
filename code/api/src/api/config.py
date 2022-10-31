@@ -13,6 +13,7 @@ class Settings(BaseSettings):
 
     class Config:
         env_prefix = "api_"
+        frozen = True  # So Settings can be hashable and cachable
 
 
 @lru_cache()

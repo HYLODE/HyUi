@@ -15,6 +15,7 @@ class Settings(BaseSettings):
 
     class Config:
         env_prefix = "web_"
+        frozen = True  # So Settings can be hashable and cachable
 
 
 @lru_cache()

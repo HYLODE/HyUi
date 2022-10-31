@@ -179,7 +179,7 @@ def get_departments(
 
 @mock_router.get("/beds", response_model=list[CensusRow])
 def get_mock_beds(
-    departments: list[str] = Query(default=wards.ALL),
+    departments: list[str] = Query(default=wards.ALL[:3]),
     locations: list[str] = Query(default=[]),
 ) -> list[CensusRow]:
     return fetch_mock_census(departments, locations)
@@ -188,7 +188,7 @@ def get_mock_beds(
 @router.get("/beds", response_model=list[CensusRow])
 def get_beds(
     session: Session = Depends(get_star_session),
-    departments: list[str] = Query(default=wards.ALL),
+    departments: list[str] = Query(default=wards.ALL[:3]),
     locations: list[str] = Query(default=[]),
 ) -> list[CensusRow]:
     query = text((Path(__file__).parent / "live.sql").read_text())
