@@ -1,6 +1,6 @@
 from functools import lru_cache
 
-from pydantic import BaseSettings, PostgresDsn, AnyUrl, HttpUrl
+from pydantic import BaseSettings, PostgresDsn, AnyUrl, AnyHttpUrl
 
 
 class Settings(BaseSettings):
@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     caboodle_dsn: AnyUrl
     clarity_dsn: AnyUrl
 
-    baserow_url: HttpUrl
+    baserow_url: AnyHttpUrl
     baserow_read_write_token: str
 
     class Config:
