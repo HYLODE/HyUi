@@ -11,9 +11,6 @@ class Settings(BaseSettings):
     baserow_url: HttpUrl | None
     baserow_read_write_token: str | None
 
-    # TODO: Remove this when refactoring is done.
-    env = "dev"
-
     class Config:
         env_prefix = "api_"
 

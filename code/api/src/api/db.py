@@ -41,7 +41,7 @@ def get_clarity_session(engine=Depends(_clarity_engine)) -> Session:
 
 
 # TODO: Remove this function and env.
-def prepare_query(module: str, env: str = get_settings().env) -> str:
+def prepare_query(module: str, env: str) -> str:
     """
     Returns a string version of the query as defined in the module
 
