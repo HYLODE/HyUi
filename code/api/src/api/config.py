@@ -10,6 +10,7 @@ class Settings(BaseSettings):
 
     baserow_url: AnyHttpUrl
     baserow_read_write_token: str
+    baserow_beds_table_id: int
 
     class Config:
         env_prefix = "api_"

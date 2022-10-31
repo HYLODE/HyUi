@@ -2,11 +2,13 @@ from pathlib import Path
 from typing import Any
 
 import pandas as pd
+import requests
 from fastapi import APIRouter, Depends, Query
 
 from sqlalchemy import create_engine, text, bindparam
 from sqlalchemy.orm import Session
 
+from api.config import get_settings
 from api.wards import MISSING_LOCATION_DEPARTMENTS, MISSING_DEPARTMENT_LOCATIONS
 from models.census import CensusDepartment, CensusRow, ClosedBed
 from api.db import get_star_session
@@ -43,8 +45,61 @@ def get_mock_closed_beds():
     return [ClosedBed.parse_obj(row) for row in data["results"]]
 
 
+def _get_field_ids(baserow_url: str, token: str, table_id: int) -> dict[str, int]:
+    url = f"{baserow_url}/api/database/fields/table/{table_id}/"
+    headers = {"Authorization": f"Token {token}"}
+    response = requests.get(url, headers=headers)
+    return {row["name"]: row["id"] for row in response.json()}
+
+
+def _get_all_table_rows(
+    baserow_url: str, token: str, table_id: int, params: dict
+) -> list[dict]:
+    """
+    Baserow only returns 200 rows at the most. This function pages through an
+    endpoint until all rows are returned.
+    """
+    rows_url = f"{baserow_url}/api/database/rows/table/{table_id}"
+    headers = {"Authorization": f"Token {token}"}
+
+    params["page"] = 0
+
+    rows = []
+    while True:
+
+        params["page"] = params["page"] + 1
+        response = requests.get(rows_url, headers=headers, params=params).json()
+        rows.extend(response["results"])
+
+        if not response["next"]:
+            break
+
+    return rows
+
+
+@router.get("/beds/list", response_model=list[dict])
+def get_beds_list(ward: str, settings=Depends(get_settings)):
+    baserow_url = settings.baserow_url
+    token = settings.baserow_read_write_token
+    beds_table_id = settings.baserow_beds_table_id
+
+    field_ids = _get_field_ids(baserow_url, token, beds_table_id)
+
+    department_field_id = field_ids["department"]
+
+    params = {
+        "size": 200,  # The maximum size of a page.
+        "user_field_names": "true",
+        f"filter__field_{department_field_id}__equal": ward,
+    }
+
+    rows = _get_all_table_rows(baserow_url, token, beds_table_id, params)
+
+    return rows
+
+
 @mock_router.get("/beds/list", response_model=dict[str, Any])
-def read_bed_list():
+def get_mock_beds_list():
     return {
         "count": 1,
         "next": None,
@@ -178,7 +233,7 @@ def get_departments(
 
 
 @mock_router.get("/beds", response_model=list[CensusRow])
-def get_mock_beds(
+def get_mock_census(
     departments: list[str] = Query(default=wards.ALL[:3]),
     locations: list[str] = Query(default=[]),
 ) -> list[CensusRow]:
@@ -186,7 +241,7 @@ def get_mock_beds(
 
 
 @router.get("/beds", response_model=list[CensusRow])
-def get_beds(
+def get_census(
     session: Session = Depends(get_star_session),
     departments: list[str] = Query(default=wards.ALL[:3]),
     locations: list[str] = Query(default=[]),
