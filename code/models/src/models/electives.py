@@ -11,8 +11,51 @@ from datetime import date, datetime
 from typing import Optional
 
 import pandas as pd
-from pydantic import validator
+from pydantic import validator, BaseModel
 from sqlmodel import Field, SQLModel
+
+
+def _to_camel(member: str) -> str:
+    return "".join(word.capitalize() for word in member.split("_"))
+
+
+class ElectiveRow(BaseModel):
+    patient_durable_key: str
+    surgical_case_epic_id: int
+    canceled: bool
+    surgical_service: str | None
+
+    class Config:
+        alias_generator = _to_camel
+
+
+class ElectivePostOpDestinationRow(BaseModel):
+    pod_orc: str
+    or_case_id: int
+
+
+class ElectivePreassessRow(BaseModel):
+    patient_durable_key: str
+    name: str
+    creation_instant: datetime
+    string_value: str
+
+    class Config:
+        alias_generator = _to_camel
+
+
+class GetElectiveRow(BaseModel):
+    patient_durable_key: str
+    surgical_case_epic_id: int
+    canceled: bool
+    surgical_service: str | None
+    most_recent_pod_dt: str | None
+    pod_preassessment: str | None
+    most_recent_asa: str | None
+    most_recent_mets: str | None
+    pod_orc: str | None
+    or_case_id: str | None
+    pacu: bool
 
 
 # define the data model that you're expecting from your query

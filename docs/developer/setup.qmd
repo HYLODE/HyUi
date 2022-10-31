@@ -167,7 +167,6 @@ These will be the Python virtual envronments that contains all the dependencies 
 In the `hyui-web` terminal in the root directory:
 
 ```sh
-> pip install -e "code/config[test]"
 > pip install -e "code/utils[test]"
 > pip install -e "code/models[test]"
 > pip install -e "code/web[test]"
@@ -177,7 +176,6 @@ In the `hyui-web` terminal in the root directory:
 In the `hyui-api` terminal in the root directory:
 
 ```sh
-> pip install -e "code/config[test]"
 > pip install -e "code/utils[test]"
 > pip install -e "code/models[test]"
 > pip install -e "code/api[test]"

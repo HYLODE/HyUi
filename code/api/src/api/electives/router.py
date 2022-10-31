@@ -5,11 +5,21 @@ from typing import List
 import pandas as pd
 import sqlalchemy as sa
 from fastapi import APIRouter, Depends
+from sqlalchemy import create_engine, text
 from sqlmodel import Session
 
 from api.config import get_settings, Settings
+from api.convert import to_data_frame
 from api.db import get_caboodle_session, get_clarity_session
-from models.electives import ElectivesRead, ElectivesPod, ElectivesPreassess
+from models.electives import (
+    ElectivesRead,
+    ElectivesPod,
+    ElectivesPreassess,
+    ElectiveRow,
+    ElectivePostOpDestinationRow,
+    ElectivePreassessRow,
+    GetElectiveRow,
+)
 from api.validate import pydantic_dataframe
 
 from api.electives.wrangle import prepare_electives
@@ -17,6 +27,8 @@ from api.electives.wrangle import prepare_electives
 router = APIRouter(
     prefix="/electives",
 )
+
+mock_router = APIRouter(prefix="/electives")
 
 
 def read_query(file_live: str, table_mock: str, env: str):
@@ -38,7 +50,7 @@ def read_query(file_live: str, table_mock: str, env: str):
 
 
 @router.get("/", response_model=List[ElectivesRead])
-def read_electives(
+def get_electives(
     days_ahead: int = 3,
     settings: Settings = Depends(get_settings),
     session_caboodle: Session = Depends(get_caboodle_session),
@@ -74,6 +86,41 @@ def read_electives(
     return df.to_dict(orient="records")
 
 
+@mock_router.get("/", response_model=list[GetElectiveRow])
+def get_mock_electives(
+    days_ahead: int = 3,
+):
+    """
+    Returns Electives data class populated by query-live/mock
+    Includes
+    - post op destination info
+    """
+
+    engine = create_engine(f"sqlite:///{Path(__file__).parent}/mock.db", future=True)
+
+    with Session(engine) as session:
+        result = session.exec(text("""SELECT * FROM electivesmock"""))
+        electives = (ElectiveRow.parse_obj(row) for row in result)
+        electives_df = to_data_frame(electives, ElectiveRow)
+
+    with Session(engine) as session:
+        result = session.exec(text("SELECT * FROM electivespodmock"))
+        post_op_destinations = (
+            ElectivePostOpDestinationRow.parse_obj(row) for row in result
+        )
+        post_op_destinations_df = to_data_frame(
+            post_op_destinations, ElectivePostOpDestinationRow
+        )
+
+    with Session(engine) as session:
+        result = session.exec(text("SELECT * FROM electivespreassessmock"))
+        preassess = (ElectivePreassessRow.parse_obj(row) for row in result)
+        preassess_df = to_data_frame(preassess, ElectivePreassessRow)
+
+    df = prepare_electives(electives_df, post_op_destinations_df, preassess_df)
+    return [GetElectiveRow.parse_obj(row) for row in df.to_dict(orient="records")]
+
+
 @router.get("/cases", response_model=List[ElectivesRead])
 def read_cases(
     settings: Settings = Depends(get_settings),
@@ -83,7 +130,7 @@ def read_cases(
     Returns Electives data class populated by query-live/mock
     Limited to just surgical case info
     """
-    query = read_query("live_case.sql", "electivesmock", settings.dev)
+    query = read_query("live_case.sql", "electives", settings.dev)
     results = session.exec(query)
     Record = namedtuple("Record", results.keys())  # type: ignore
     records = [Record(*r) for r in results.fetchall()]
@@ -98,7 +145,7 @@ def read_pod(
     """
     Returns clarity periop destination query
     """
-    query = read_query("live_pod.sql", "electivespodmock", settings.dev)
+    query = read_query("live_pod.sql", "electivespod", settings.dev)
     results = session.exec(query)
     Record = namedtuple("Record", results.keys())  # type: ignore
     records = [Record(*r) for r in results.fetchall()]

@@ -12,11 +12,11 @@ def _get_most_recent_value(name: str, preassess_data: pd.DataFrame) -> pd.DataFr
     :type       preassess_data:  { type_description }
     """
 
-    pod_data = preassess_data[preassess_data["Name"] == name]
+    pod_data = preassess_data[preassess_data["name"] == name]
 
     idx = (
-        pod_data.groupby("PatientDurableKey")["CreationInstant"].transform(max)
-        == pod_data["CreationInstant"]
+        pod_data.groupby("patient_durable_key")["creation_instant"].transform(max)
+        == pod_data["creation_instant"]
     )
 
     data = pod_data[idx]
@@ -25,7 +25,8 @@ def _get_most_recent_value(name: str, preassess_data: pd.DataFrame) -> pd.DataFr
 
 
 def process_join_preassess_data(
-    preassess_data: pd.DataFrame, future_cases: pd.DataFrame
+    electives_df: pd.DataFrame,
+    preassess_df: pd.DataFrame,
 ) -> pd.DataFrame:
     """
     Merge the preassessment data with the cases
@@ -51,79 +52,84 @@ def process_join_preassess_data(
     preassess_data - derived from preassment query against caboodle
     """
 
-    pod_data = _get_most_recent_value("POST-OP DESTINATION", preassess_data)
+    pod_data = _get_most_recent_value("POST-OP DESTINATION", preassess_df)
     asa_data = _get_most_recent_value(
-        "WORKFLOW - ANAESTHESIA - ASA STATUS", preassess_data
+        "WORKFLOW - ANAESTHESIA - ASA STATUS", preassess_df
     )
     mets_data = _get_most_recent_value(
-        "SYMPTOMS - CARDIOVASCULAR - EXERCISE TOLERANCE", preassess_data
+        "SYMPTOMS - CARDIOVASCULAR - EXERCISE TOLERANCE", preassess_df
     )
 
-    pod_data = pod_data[["PatientDurableKey", "CreationInstant", "StringValue"]]
+    pod_data = pod_data[["patient_durable_key", "creation_instant", "string_value"]]
     pod_data = pod_data.rename(
         columns={
-            "CreationInstant": "most_recent_pod_dt",
-            "StringValue": "pod_preassessment",
+            "creation_instant": "most_recent_pod_dt",
+            "string_value": "pod_preassessment",
         }
     )
 
-    asa_data = asa_data[["PatientDurableKey", "StringValue"]]
-    asa_data = asa_data.rename(columns={"StringValue": "most_recent_ASA"})
+    asa_data = asa_data[["patient_durable_key", "string_value"]]
+    asa_data = asa_data.rename(columns={"string_value": "most_recent_asa"})
 
-    mets_data = mets_data[["PatientDurableKey", "StringValue"]]
-    mets_data = mets_data.rename(columns={"StringValue": "most_recent_METs"})
+    mets_data = mets_data[["patient_durable_key", "string_value"]]
+    mets_data = mets_data.rename(columns={"string_value": "most_recent_mets"})
 
-    future_cases = future_cases.merge(pod_data, on="PatientDurableKey", how="left")
-    future_cases = future_cases.merge(asa_data, on="PatientDurableKey", how="left")
-    future_cases = future_cases.merge(mets_data, on="PatientDurableKey", how="left")
+    electives_df = electives_df.merge(pod_data, on="patient_durable_key", how="left")
+    electives_df = electives_df.merge(asa_data, on="patient_durable_key", how="left")
+    electives_df = electives_df.merge(mets_data, on="patient_durable_key", how="left")
 
-    return future_cases
+    return electives_df
 
 
 def prepare_electives(
-    dfcases: pd.DataFrame, dfpod: pd.DataFrame, dfpreassess: pd.DataFrame
+    electives_df: pd.DataFrame,
+    post_op_destinations_df: pd.DataFrame,
+    preassess_df: pd.DataFrame,
 ) -> pd.DataFrame:
     """
     Prepare elective case list
 
-    :param      dfcases:  dataframe with surgical cases
-    :param      dfpod:    dataframe with postop destination
-    :param      dfpreassess:    dataframe with preassessment info
+    :param      electives_df:  dataframe with surgical cases
+    :param      post_op_destinations_df:    dataframe with postop destination
+    :param      preassess_df:    dataframe with preassessment info
 
     :returns:   merged dataframe
     """
 
     # Prepare copies of each data frame
     # --------------------------
-    dfc = dfcases.copy()
-    dfp = dfpod.copy()
-    # dfp.drop(['id'], axis=1, inplace=True)
-    dfa = dfpreassess.copy()
+    # dfc = electives_df.copy()
+    # dfp = post_op_destinations_df.copy()
+    # # dfp.drop(['id'], axis=1, inplace=True)
+    # dfa = preassess_df.copy()
     # dfa.drop(['id'], axis=1, inplace=True)
 
     # PREASSESSMENT JOIN TO CASES
     # ---------------------------
     # import ipdb; ipdb.set_trace()
     # drop duplicate columns to avoid suffix after merge
-    dfc.drop(
-        [
-            "most_recent_pod_dt",
-            "pod_preassessment",
-            "most_recent_METs",
-            "most_recent_ASA",
-        ],
-        axis=1,
-        inplace=True,
-    )
-    dfca = process_join_preassess_data(dfa, dfc)
+    # dfc.drop(
+    #     [
+    #         "most_recent_pod_dt",
+    #         "pod_preassessment",
+    #         "most_recent_METs",
+    #         "most_recent_ASA",
+    #     ],
+    #     axis=1,
+    #     inplace=True,
+    # )
+    dfca = process_join_preassess_data(electives_df, preassess_df)
 
     # Post-op destination from case booking (clarity) join
     # ----------------------------------------------------
     # drop duplicate columns to avoid suffix after merge
-    dfca.drop(["pod_orc", "SurgeryDateClarity"], axis=1, inplace=True)
+    # dfca.drop(["pod_orc", "SurgeryDateClarity"], axis=1, inplace=True)
     # dfp.drop(['id'], axis=1, inplace=True)
     df = dfca.merge(
-        dfp, left_on="SurgicalCaseEpicId", right_on="or_case_id", how="left"
+        post_op_destinations_df,
+        left_on="surgical_case_epic_id",
+        right_on="or_case_id",
+        how="left",
     )
 
     # Can't drop b/c it breaks the pydantic model
@@ -156,6 +162,6 @@ def prepare_electives(
     )
 
     # drop cancellations
-    df = df[~(df["Canceled"] == 1)]
+    df = df[~(df["canceled"] == 1)]
 
     return df

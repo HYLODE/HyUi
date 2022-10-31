@@ -14,8 +14,9 @@ from dash import dcc, html, register_page
 from flask_caching import Cache
 from flask_login import current_user
 
-from models.electives import ElectivesRead
+from models.electives import GetElectiveRow
 from web.config import get_settings
+from web.convert import parse_to_data_frame
 from web.pages.electives import (
     BPID,
     COLS,
@@ -134,10 +135,10 @@ def store_data(n_intervals: int, days_ahead: int):
     Read data from API then store as JSON
     """
     # data = get_results_response(API_URL, params={"days_ahead": days_ahead})
-    data = requests.get(
+    response = requests.get(
         f"{get_settings().api_url}/electives", params={"days_ahead": days_ahead}
     )
-    return data.json()
+    return [GetElectiveRow.parse_obj(row).dict() for row in response.json()]
 
 
 @callback(
@@ -175,7 +176,7 @@ def gen_surgeries_over_time(n_intervals: int, data: dict):
     """
     if len(data) == 0:
         return html.H2("No data to plot")
-    df = df_from_store(data, ElectivesRead)
+    df = df_from_store(data, GetElectiveRow)
     df = (
         df.groupby("SurgicalService")
         .resample("24H", on="PlannedOperationStartInstant")
@@ -269,5 +270,5 @@ def update_service_dropdown(data: list):
     if len(data) == 1 and not data[0]:
         return []
 
-    df = df_from_store(data, ElectivesRead)
-    return df["SurgicalService"].sort_values().unique()
+    df = parse_to_data_frame(data, GetElectiveRow)
+    return df["surgical_service"].sort_values().unique()

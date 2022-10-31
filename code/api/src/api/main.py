@@ -3,8 +3,11 @@ from fastapi.responses import ORJSONResponse
 
 from api.census.router import router as census_router, mock_router as mock_census_router
 from api.sitrep.router import router as sitrep_router, mock_router as mock_sitrep_router
+from api.electives.router import (
+    router as electives_router,
+    mock_router as mock_electives_router,
+)
 from api.bedbones.router import router as bedbones_router
-from api.electives.router import router as electives_router
 from api.consults.router import router as consults_router
 from api.perrt.router import router as perrt_router
 from api.ros.router import router as ros_router
@@ -29,9 +32,12 @@ mock_router.include_router(mock_census_router)
 app.include_router(sitrep_router)
 mock_router.include_router(mock_sitrep_router)
 
+app.include_router(electives_router)
+mock_router.include_router(mock_electives_router)
+
 app.include_router(bedbones_router)
 app.include_router(consults_router)
-app.include_router(electives_router)
+
 app.include_router(perrt_router)
 app.include_router(ros_router)
 app.include_router(hymind_router)

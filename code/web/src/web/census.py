@@ -21,11 +21,11 @@ def fetch_department_census():
     Also reaches out to bed_bones and pulls in additional closed beds
     """
     departments = _get_department_census()
-    departments_df = to_data_frame(departments)
+    departments_df = to_data_frame(departments, CensusDepartment)
 
     # Now update with closed beds from bed_bones
     closed_beds = _get_closed_beds()
-    closed_beds_df = to_data_frame(closed_beds)
+    closed_beds_df = to_data_frame(closed_beds, ClosedBed)
 
     closed = closed_beds_df.groupby("department")["closed"].sum()
     departments_df = departments_df.merge(closed, on="department", how="left")
