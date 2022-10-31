@@ -4,12 +4,12 @@ from pydantic import BaseSettings, PostgresDsn, AnyUrl, HttpUrl
 
 
 class Settings(BaseSettings):
-    star_dsn: PostgresDsn | None
-    caboodle_dsn: AnyUrl | None
-    clarity_dsn: AnyUrl | None
+    star_dsn: PostgresDsn
+    caboodle_dsn: AnyUrl
+    clarity_dsn: AnyUrl
 
-    baserow_url: HttpUrl | None
-    baserow_read_write_token: str | None
+    baserow_url: HttpUrl
+    baserow_read_write_token: str
 
     class Config:
         env_prefix = "api_"
@@ -17,4 +17,8 @@ class Settings(BaseSettings):
 
 @lru_cache()
 def get_settings() -> Settings:
+    """
+    This function allows Settings to be lazily instantiated so that testing
+    can be done without having to set environment variables.
+    """
     return Settings()

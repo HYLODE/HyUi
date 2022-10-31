@@ -23,5 +23,4 @@ jobs:
       - name: Test with pytest
         working-directory: ./code
         # Ideally we should not need all the environment variables to test.
-        run: |
-          env $(grep -v '^#' .env.example | xargs) pytest
+        run: pytest
