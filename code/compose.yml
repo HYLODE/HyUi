@@ -20,6 +20,8 @@ services:
       dockerfile: Dockerfile.api
       args:
         <<: *build-args-common
+    environment:
+      <<: *proxy-common
     env_file: .env
     ports:
       - ${API_PORT}:8000
@@ -29,6 +31,8 @@ services:
       dockerfile: Dockerfile.web
       args:
         <<: *build-args-common
+    environment:
+      <<: *proxy-common
     env_file: .env
     ports:
       - ${WEB_PORT}:8000
