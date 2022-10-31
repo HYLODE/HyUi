@@ -18,7 +18,6 @@ BPID = "app_"
 CORE_PAGES = ["Sitrep", "Electives", "PERRT"]
 ADMIN_PAGES = ["Home", "Login", "Logout"]
 HIDDEN_PAGES: list[str] = []
-ED_PAGE_URL = "http://uclvlddpragae08:5212/"
 
 dropdown_more = [
     NavbarDropdown("Additional reports", "", header=True),
@@ -116,12 +115,9 @@ def header_pages_dropdown():
     """Filters and sorts pages from registry for display in main navbar"""
     pp = {page["name"]: page["path"] for page in page_registry.values()}
 
-    ll = [dbc.NavItem(dbc.NavLink(page, href=pp[page.title()])) for page in CORE_PAGES]
-
-    # ED page placeholder
-    ll.append(dbc.NavItem(dbc.NavLink("ED", href=ED_PAGE_URL, target="_blank")))
-
-    return ll
+    return [
+        dbc.NavItem(dbc.NavLink(page, href=pp[page.title()])) for page in CORE_PAGES
+    ]
 
 
 def more_list():
