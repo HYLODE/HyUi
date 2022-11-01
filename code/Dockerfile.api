@@ -31,13 +31,17 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH:/opt/mssql-tools/bin"
 
 RUN pip install --no-cache-dir -U pip
 
-COPY --chown=hyui:root ./utils /app/utils
-RUN pip install --no-cache-dir /app/utils && rm -r /app/utils
+COPY --chown=hyui:root ./utils/pyproject.toml /app/utils/
+RUN pip install --no-cache-dir /app/utils
 
-COPY --chown=hyui:root ./models /app/models
-RUN pip install --no-cache-dir /app/models && rm -r /app/models
+COPY --chown=hyui:root ./models/pyproject.toml /app/models/
+RUN pip install --no-cache-dir /app/models
 
-COPY --chown=hyui:root ./api /app/api
-RUN pip install --no-cache-dir /app/api && rm -r /app/api
+COPY --chown=hyui:root ./api/pyproject.toml /app/api/
+RUN pip install --no-cache-dir /app/api
+
+COPY --chown=hyui:root ./utils/src/utils /app/utils
+COPY --chown=hyui:root ./models/src/models /app/models
+COPY --chown=hyui:root ./api/src/api /app/api
 
 ENTRYPOINT ["uvicorn", "api.main:app", "--host", "0.0.0.0"]
