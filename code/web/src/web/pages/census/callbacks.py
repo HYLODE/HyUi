@@ -88,7 +88,9 @@ def gen_dept_dropdown(building: str):
 
 
 def _get_bed_list(department: str):
-    return requests.get(f"{get_settings().api_url}/census/beds/list").json()["results"]
+    return requests.get(
+        f"{get_settings().api_url}/census/beds/", params={"department": department}
+    ).json()
 
 
 @callback(
@@ -129,7 +131,7 @@ def store_beds(n_intervals: int, dept: str):
 
 def _get_census(department: str) -> list[CensusRow]:
     response = requests.get(
-        f"{get_settings().api_url}/census/beds/", params={"departments": [department]}
+        f"{get_settings().api_url}/census/", params={"departments": [department]}
     )
     return [CensusRow.parse_obj(row) for row in response.json()]
 

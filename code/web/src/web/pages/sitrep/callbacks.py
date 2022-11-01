@@ -24,12 +24,16 @@ cache = Cache(
 
 
 def _get_beds(department: str) -> list[BedRow]:
-    response = requests.get(f"{get_settings().api_url}/sitrep/beds/")
+    response = requests.get(
+        f"{get_settings().api_url}/sitrep/beds/", params={"ward": department}
+    )
     return [BedRow.parse_obj(row) for row in response.json()]
 
 
 def _get_census(department: str) -> list[CensusRow]:
-    response = requests.get(f"{get_settings().api_url}/sitrep/census/")
+    response = requests.get(
+        f"{get_settings().api_url}/sitrep/census/", params={"department": [department]}
+    )
     return [CensusRow.parse_obj(row) for row in response.json()]
 
 

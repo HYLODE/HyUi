@@ -1,8 +1,10 @@
 from collections import namedtuple
 from datetime import date
+from urllib.parse import urlencode
 
 import requests
 from fastapi import APIRouter, Depends
+from fastapi.responses import RedirectResponse
 from sqlmodel import Session
 
 from api.config import get_settings
@@ -73,14 +75,14 @@ def get_mock_beds() -> list[BedRow]:
     ]
 
 
-@router.get("/census/", response_model=list[CensusRow])
-def get_census() -> list[BedRow]:
-    # TODO: Could redirect to the census API endpoint.
-    raise NotImplementedError()
+@router.get("/census/", response_class=RedirectResponse)
+def get_census(department: str) -> str:
+    params = urlencode({"department": department})
+    return f"/census/?{params}"
 
 
 @mock_router.get("/census/", response_model=list[CensusRow])
-def get_mock_census() -> list[BedRow]:
+def get_mock_census(department: str) -> list[CensusRow]:
     return [
         CensusRow(
             encounter=1,
@@ -125,7 +127,8 @@ def read_sitrep(session: Session = Depends(get_star_session)):
     query preparation depends on the environment so will return
     mock data in dev and live (from the API itself)\n\n
     """
-    q = prepare_query("sitrep")
+    # TODO: Fix this. Ideally remove prepare_query.
+    q = prepare_query("sitrep", "FIX")
     results = session.exec(q)
     Record = namedtuple("Record", results.keys())  # type: ignore
     records = [Record(*r) for r in results.fetchall()]
