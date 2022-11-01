@@ -9,7 +9,7 @@ from sqlmodel import Session
 
 from api.config import get_settings
 
-from code.api.src.api.baserow import get_fields, get_rows
+from api.baserow import get_fields, get_rows
 from models.sitrep import (
     SitrepRead,
     SitrepRow,
