@@ -33,16 +33,16 @@ def test_get_mock_departments():
     assert len(census_departments) > 0
 
 
-def test_get_mock_beds():
-    response = client.get("/mock/census/beds")
+def test_get_mock_census():
+    response = client.get("/mock/census/")
     assert response.status_code == 200
 
     census_rows = [CensusRow.parse_obj(row) for row in response.json()]
     assert len(census_rows) > 0
 
 
-def test_get_mock_closed_beds():
-    response = client.get("/mock/census/beds/closed")
+def test_get_mock_beds_closed():
+    response = client.get("/mock/census/beds/closed/")
     assert response.status_code == 200
 
     closed_beds_rows = [ClosedBed.parse_obj(row) for row in response.json()]

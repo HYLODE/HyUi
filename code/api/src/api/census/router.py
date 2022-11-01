@@ -55,7 +55,7 @@ def get_mock_closed_beds():
             "closed": True,
         },
     ]
-    return [ClosedBed.parse_obj(row) for row in data["results"]]
+    return [ClosedBed.parse_obj(row) for row in data]
 
 
 @router.get("/beds/", response_model=list[dict])
