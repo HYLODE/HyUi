@@ -2,6 +2,7 @@ from collections import namedtuple
 from pathlib import Path
 from typing import List
 
+import numpy as np
 import pandas as pd
 import sqlalchemy as sa
 from fastapi import APIRouter, Depends
@@ -118,6 +119,7 @@ def get_mock_electives(
         preassess_df = to_data_frame(preassess, ElectivePreassessRow)
 
     df = prepare_electives(electives_df, post_op_destinations_df, preassess_df)
+    df = df.replace({np.nan: None})
     return [GetElectiveRow.parse_obj(row) for row in df.to_dict(orient="records")]
 
 
