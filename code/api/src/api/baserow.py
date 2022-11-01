@@ -6,7 +6,7 @@ def get_rows(baserow_url: str, token: str, table_id: int, params: dict) -> list[
     Baserow only returns 200 rows at the most. This function pages through an
     endpoint until all rows are returned.
     """
-    rows_url = f"{baserow_url}/api/database/rows/table/{table_id}"
+    rows_url = f"{baserow_url}/api/database/rows/table/{table_id}/"
     headers = {"Authorization": f"Token {token}"}
 
     params["page"] = 0
