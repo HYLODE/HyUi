@@ -129,7 +129,7 @@ def store_beds(n_intervals: int, dept: str):
 
 def _get_census(department: str) -> list[CensusRow]:
     response = requests.get(
-        f"{get_settings().api_url}/census/beds", params={"departments": [department]}
+        f"{get_settings().api_url}/census/beds/", params={"departments": [department]}
     )
     return [CensusRow.parse_obj(row) for row in response.json()]
 
@@ -149,7 +149,7 @@ def store_census(n_intervals: int, department: str):
     """
 
     census = _get_census(department)
-    census_df = to_data_frame(census)
+    census_df = to_data_frame(census, CensusRow)
 
     census_df = census_df[CENSUS_KEEP_COLS]
 
