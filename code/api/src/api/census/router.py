@@ -25,23 +25,36 @@ mock_router = APIRouter(
 )
 
 
+@router.get("/beds/closed/", response_model=list[ClosedBed])
+def get_closed_beds(settings=Depends(get_settings)):
+    baserow_url = settings.baserow_url
+    token = settings.baserow_read_write_token
+    beds_table_id = settings.baserow_beds_table_id
+    field_ids = get_fields(baserow_url, token, beds_table_id)
+
+    closed_field_id = field_ids["closed"]
+
+    params = {
+        "size": 200,  # The maximum size of a page.
+        "user_field_names": "true",
+        f"filter__field_{closed_field_id}__boolean": True,
+    }
+
+    return get_rows(baserow_url, token, beds_table_id, params)
+
+
 @mock_router.get("/beds/closed/", response_model=list[ClosedBed])
 def get_mock_closed_beds():
-    data = {
-        "count": 2,
-        "next": None,
-        "previous": None,
-        "results": [
-            {
-                "department": "UCH T01 ACUTE MEDICAL",
-                "closed": False,
-            },
-            {
-                "department": "UCH T01 ACUTE MEDICAL",
-                "closed": True,
-            },
-        ],
-    }
+    data = [
+        {
+            "department": "UCH T01 ACUTE MEDICAL",
+            "closed": False,
+        },
+        {
+            "department": "UCH T01 ACUTE MEDICAL",
+            "closed": True,
+        },
+    ]
     return [ClosedBed.parse_obj(row) for row in data["results"]]
 
 
@@ -61,9 +74,7 @@ def get_beds_list(department: str, settings=Depends(get_settings)):
         f"filter__field_{department_field_id}__equal": department,
     }
 
-    rows = get_rows(baserow_url, token, beds_table_id, params)
-
-    return rows
+    return get_rows(baserow_url, token, beds_table_id, params)
 
 
 @mock_router.get("/beds/", response_model=list[dict])

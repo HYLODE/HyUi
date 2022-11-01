@@ -8,6 +8,8 @@ from fastapi.responses import RedirectResponse
 from sqlmodel import Session
 
 from api.config import get_settings
+
+from code.api.src.api.baserow import get_fields, get_rows
 from models.sitrep import (
     SitrepRead,
     SitrepRow,
@@ -41,21 +43,23 @@ mock_router = APIRouter(
 
 
 @router.get("/beds/", response_model=list[dict])
-def get_beds():
-    # TODO: Add these to settings.
-    table_id = "261"
-    department_field_id = "2041"
-    ward = "UCH T03 INTENSIVE CARE"
+def get_beds(settings=Depends(get_settings)):
+    department = "UCH T03 INTENSIVE CARE"
+    baserow_url = settings.baserow_url
+    token = settings.baserow_read_write_token
+    beds_table_id = settings.baserow_beds_table_id
 
-    return requests.get(
-        f"{get_settings().baserow_url}/api/database/rows/table/{table_id}/",
-        headers={"Authorization": f"Token {get_settings().baserow_read_write_token}"},
-        params={
-            "user_field_names": "true",
-            f"filter__field_{department_field_id}__equal": ward,
-            "include": ",".join(CORE_FIELDS),
-        },
-    ).json()["results"]
+    field_ids = get_fields(baserow_url, token, beds_table_id)
+
+    department_field_id = field_ids["department"]
+
+    params = {
+        "size": 200,  # The maximum size of a page.
+        "user_field_names": "true",
+        f"filter__field_{department_field_id}__equal": department,
+    }
+
+    return get_rows(baserow_url, token, beds_table_id, params)
 
 
 @mock_router.get("/beds/", response_model=list[BedRow])

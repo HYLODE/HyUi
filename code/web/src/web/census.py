@@ -6,12 +6,12 @@ from web.convert import to_data_frame
 
 
 def _get_closed_beds() -> list[ClosedBed]:
-    response = requests.get(f"{get_settings().api_url}/census/beds/closed")
+    response = requests.get(f"{get_settings().api_url}/census/beds/closed/")
     return [ClosedBed.parse_obj(row) for row in response.json()]
 
 
 def _get_department_census() -> list[CensusDepartment]:
-    response = requests.get(f"{get_settings().api_url}/census/departments")
+    response = requests.get(f"{get_settings().api_url}/census/departments/")
     return [CensusDepartment.parse_obj(row) for row in response.json()]
 
 
