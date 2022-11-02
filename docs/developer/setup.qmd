@@ -195,6 +195,10 @@ In the `hyui-api` terminal in the root directory:
 > pip install -e "code/api[test]"
 ```
 
+### Configuring Environment Variables
+
+An example environment variable file can be found at `code/.env.example`. The environment variables for each app are documented in the Pydantic Settings classes in `code/web/src/web/config.py` and `code/api/src/api/config.py`. An important one for development and production is the `WEB_API_URL` variable. This should be set to the host and port of your `code/api` server so most likely something like `http://api:8000` for running in Docker or `http://localhost:[port]/mock` for development. Note that in development a `/mock` path has been added. This allows the Dash web app to use all the mock endpoints instead of the live endpoints.
+
 ### Running The Servers Manually When Developing
 
 The web server when in the `hyui-web` shell:
