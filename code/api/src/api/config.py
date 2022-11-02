@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     baserow_read_write_token: str
     baserow_beds_table_id: int
 
-    hymind_url: AnyHttpUrl
+    hycastle_url: AnyHttpUrl
 
     class Config:
         env_prefix = "api_"
