@@ -158,4 +158,4 @@ def get_individual_discharge_predictions(
 def get_mock_individual_discharge_predictions(
     ward: str,
 ) -> list[IndividualDischargePrediction]:
-    return [IndividualDischargePrediction(episode_slice_id=1, prediction=0.4)]
+    return [IndividualDischargePrediction(episode_slice_id=1, prediction_as_real=0.4)]
