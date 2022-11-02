@@ -49,7 +49,7 @@ def _get_sitrep(department: str) -> list[SitrepRow]:
 def _get_discharge_predictions(department: str) -> list[IndividualDischargePrediction]:
     ward = DEPT2WARD_MAPPING[department]
     response = requests.get(
-        f"{get_settings().api_url}/sitrep/predictions/discharge/individual/{ward}"
+        f"{get_settings().api_url}/sitrep/predictions/discharge/individual/{ward}/"
     )
     return [IndividualDischargePrediction.parse_obj(row) for row in response.json()]
 
