@@ -1,10 +1,11 @@
-from collections import namedtuple
 from datetime import date, datetime
+from pathlib import Path
 from urllib.parse import urlencode
 
 import requests
 from fastapi import APIRouter, Depends
 from fastapi.responses import RedirectResponse
+from sqlalchemy import create_engine
 from sqlmodel import Session
 
 from api.config import get_settings
@@ -14,12 +15,10 @@ from api.baserow import get_fields, get_rows
 # TODO: Give sitrep its own CensusRow model so we do not have interdependencies.
 from models.census import CensusRow
 from models.sitrep import (
-    SitrepRead,
     SitrepRow,
     IndividualDischargePrediction,
     BedRow,
 )
-from api.db import prepare_query, get_star_session
 
 CORE_FIELDS = [
     "department",
@@ -106,43 +105,18 @@ def get_mock_census(department: str) -> list[CensusRow]:
 
 
 @mock_router.get("/live/{ward}/ui", response_model=list[SitrepRow])
-def get_mock_live_ward_ui(ward: str) -> list[SitrepRow]:
-    return [
-        SitrepRow(
-            csn=1,
-            episode_slice_id=1,
-            n_inotropes_1_4h=2,
-            had_rrt_1_4h=True,
-            vent_type_1_4h="oxygen",
-        )
-    ]
-    # engine = create_engine(f"sqlite:///{Path(__file__).parent}/mock.db", future=True)
-    #
-    # query = text("SELECT * FROM sitrep")
-    #
-    # with Session(engine) as session:
-    #     result = session.exec(query)
-    #     return [SitrepRow.parse_obj(row) for row in result]
+def get_mock_live_ui(ward: str) -> list[SitrepRow]:
+    engine = create_engine(f"sqlite:///{Path(__file__).parent}/mock.db", future=True)
+
+    with Session(engine) as session:
+        result = session.execute("SELECT * FROM sitrep")
+        return [SitrepRow.parse_obj(row) for row in result]
 
 
 @router.get("/live/{ward}/ui", response_model=list[SitrepRow])
-def get_live_ward_ui(ward: str) -> list[SitrepRow]:
-    return []
-
-
-@router.get("/", response_model=list[SitrepRead])
-def read_sitrep(session: Session = Depends(get_star_session)):
-    """
-    Returns Sitrep data class populated by query-live/mock
-    query preparation depends on the environment so will return
-    mock data in dev and live (from the API itself)\n\n
-    """
-    # TODO: Fix this. Ideally remove prepare_query.
-    q = prepare_query("sitrep", "FIX")
-    results = session.exec(q)
-    Record = namedtuple("Record", results.keys())  # type: ignore
-    records = [Record(*r) for r in results.fetchall()]
-    return records
+def get_live_ui(ward: str, settings=Depends(get_settings)) -> list[SitrepRow]:
+    response = requests.get(f"{settings.hymind_url}/live/icu/{ward}/ui")
+    return [SitrepRow.parse_obj(row) for row in response.json()]
 
 
 @router.patch("/beds")

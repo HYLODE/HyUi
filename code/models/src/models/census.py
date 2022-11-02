@@ -36,7 +36,7 @@ class CensusRow(BaseModel):
     patient_class: str | None
 
     mrn: str | None
-    encounter: int | None
+    encounter: str | None
     date_of_birth: date | None
     lastname: str | None
     firstname: str | None

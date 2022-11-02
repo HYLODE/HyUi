@@ -16,9 +16,6 @@ def test_get_mock_electives():
     response = client.get("/mock/electives")
     assert response.status_code == 200
 
-    # census_departments = [CensusDepartment.parse_obj(row) for row in response.json()]
-    # assert len(census_departments) > 0
-
 
 def test_prepare_electives():
     # This is currently just a placeholder test to ensure all the correct
