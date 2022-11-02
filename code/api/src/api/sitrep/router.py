@@ -116,7 +116,8 @@ def get_mock_live_ui(ward: str) -> list[SitrepRow]:
 @router.get("/live/{ward}/ui", response_model=list[SitrepRow])
 def get_live_ui(ward: str, settings=Depends(get_settings)) -> list[SitrepRow]:
     response = requests.get(f"{settings.hycastle_url}/live/icu/{ward}/ui")
-    return [SitrepRow.parse_obj(row) for row in response.json()]
+    rows = response.json()["data"]
+    return [SitrepRow.parse_obj(row) for row in rows]
 
 
 @router.patch("/beds")
