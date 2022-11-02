@@ -8,13 +8,12 @@ from sqlmodel import Field, SQLModel
 
 class BedRow(BaseModel):
     location_string: str
-    bed_functional: list[str]
-    bed_physical: list[str]
+    bed_functional: list[dict[str, str]]
+    bed_physical: list[dict[str, str]]
     unit_order: int | None
     closed: bool
     covid: bool
     bed: str
-    bed_label: str
     room: str
 
 
