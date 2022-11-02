@@ -42,9 +42,9 @@ mock_router = APIRouter(
 )
 
 
-@router.get("/beds/", response_model=list[dict])
-def get_beds(settings=Depends(get_settings)):
-    department = "UCH T03 INTENSIVE CARE"
+@router.get("/beds/", response_model=list[BedRow])
+def get_beds(department: str, settings=Depends(get_settings)):
+
     baserow_url = settings.baserow_url
     token = settings.baserow_read_write_token
     beds_table_id = settings.baserow_beds_table_id
@@ -59,11 +59,12 @@ def get_beds(settings=Depends(get_settings)):
         f"filter__field_{department_field_id}__equal": department,
     }
 
-    return get_rows(baserow_url, token, beds_table_id, params)
+    rows = get_rows(baserow_url, token, beds_table_id, params)
+    return [BedRow.parse_obj(row) for row in rows]
 
 
 @mock_router.get("/beds/", response_model=list[BedRow])
-def get_mock_beds() -> list[BedRow]:
+def get_mock_beds(department: str) -> list[BedRow]:
     return [
         BedRow(
             location_string="location_a",

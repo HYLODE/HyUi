@@ -25,7 +25,7 @@ cache = Cache(
 
 def _get_beds(department: str) -> list[BedRow]:
     response = requests.get(
-        f"{get_settings().api_url}/sitrep/beds/", params={"ward": department}
+        f"{get_settings().api_url}/sitrep/beds/", params={"department": department}
     )
     return [BedRow.parse_obj(row) for row in response.json()]
 
