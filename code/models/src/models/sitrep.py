@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class BedRow(BaseModel):
@@ -22,4 +22,4 @@ class SitrepRow(BaseModel):
 
 class IndividualDischargePrediction(BaseModel):
     episode_slice_id: int
-    prediction: float
+    prediction: float = Field(..., alias="prediction_as_real")
