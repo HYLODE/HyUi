@@ -1,5 +1,5 @@
 from collections import namedtuple
-from datetime import date
+from datetime import date, datetime
 from urllib.parse import urlencode
 
 import requests
@@ -10,12 +10,14 @@ from sqlmodel import Session
 from api.config import get_settings
 
 from api.baserow import get_fields, get_rows
+
+# TODO: Give sitrep its own CensusRow model so we do not have interdependencies.
+from models.census import CensusRow
 from models.sitrep import (
     SitrepRead,
     SitrepRow,
     IndividualDischargePrediction,
     BedRow,
-    CensusRow,
 )
 from api.db import prepare_query, get_star_session
 
@@ -96,6 +98,9 @@ def get_mock_census(department: str) -> list[CensusRow]:
             mrn="abc",
             firstname="Firstname",
             lastname="Lastname",
+            modified_at=datetime(2022, 1, 2, 3, 4),
+            location_id=2,
+            department="My Department",
         )
     ]
 

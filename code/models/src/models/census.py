@@ -19,7 +19,7 @@ class CensusRow(BaseModel):
 
     modified_at: datetime
     location_id: int
-    department: str | None
+    department: str
     location_string: str
 
     ovl_admission: datetime | None

@@ -4,7 +4,10 @@ import requests
 from dash import Input, Output, State, callback, get_app
 from flask_caching import Cache
 
-from models.sitrep import SitrepRow, IndividualDischargePrediction, BedRow, CensusRow
+from models.sitrep import SitrepRow, IndividualDischargePrediction, BedRow
+
+# TODO: Give the SitRep module its own CensusRow model.
+from models.census import CensusRow
 from web.config import get_settings
 from web.convert import to_data_frame
 from web.pages.sitrep import (

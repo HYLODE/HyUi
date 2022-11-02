@@ -17,16 +17,6 @@ class BedRow(BaseModel):
     room: str
 
 
-class CensusRow(BaseModel):
-    encounter: int
-    mrn: str
-    location_string: str
-    date_of_birth: date
-    firstname: str | None
-    lastname: str | None
-    sex: str | None
-
-
 class SitrepRow(BaseModel):
     csn: int
     episode_slice_id: int
