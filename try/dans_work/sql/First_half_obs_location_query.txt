@@ -1,0 +1,17 @@
+-- D Stein Oct 2021
+
+-- Query to pull obs from adult inpatients currently on the wards
+-- Adapted from S Harris example obs query
+-- Next steps would be adding a column to show who was in ICU
+
+SELECT
+  	-- observation details
+	ob.visit_observation_id,
+  	ob.hospital_visit_id,
+  	ob.observation_datetime,
+
+  	--,ob.visit_observation_type_id
+  	--,ot.id_in_application
+
+  	-- label nicely
+  	CASE

@@ -1,0 +1,112 @@
+{
+  "data": [
+    {
+      "bed_count": 0,
+      "probability": 0.018392433908071763,
+      "predict_dt": "2022-08-08T07:48:24.757274+01:00",
+      "model_name": "tap_nonelective_tower",
+      "model_version": 1,
+      "run_id": "1e44565aa34e4b16970d1e5598b9a028",
+      "horizon_dt": "2022-08-08T00:00:00+01:00"
+    },
+    {
+      "bed_count": 1,
+      "probability": 0.07349277984187765,
+      "predict_dt": "2022-08-08T07:48:24.757274+01:00",
+      "model_name": "tap_nonelective_tower",
+      "model_version": 1,
+      "run_id": "1e44565aa34e4b16970d1e5598b9a028",
+      "horizon_dt": "2022-08-08T00:00:00+01:00"
+    },
+    {
+      "bed_count": 2,
+      "probability": 0.14683180909831386,
+      "predict_dt": "2022-08-08T07:48:24.757274+01:00",
+      "model_name": "tap_nonelective_tower",
+      "model_version": 1,
+      "run_id": "1e44565aa34e4b16970d1e5598b9a028",
+      "horizon_dt": "2022-08-08T00:00:00+01:00"
+    },
+    {
+      "bed_count": 3,
+      "probability": 0.19557095911979286,
+      "predict_dt": "2022-08-08T07:48:24.757274+01:00",
+      "model_name": "tap_nonelective_tower",
+      "model_version": 1,
+      "run_id": "1e44565aa34e4b16970d1e5598b9a028",
+      "horizon_dt": "2022-08-08T00:00:00+01:00"
+    },
+    {
+      "bed_count": 4,
+      "probability": 0.1953663869868249,
+      "predict_dt": "2022-08-08T07:48:24.757274+01:00",
+      "model_name": "tap_nonelective_tower",
+      "model_version": 1,
+      "run_id": "1e44565aa34e4b16970d1e5598b9a028",
+      "horizon_dt": "2022-08-08T00:00:00+01:00"
+    },
+    {
+      "bed_count": 5,
+      "probability": 0.15612962307315506,
+      "predict_dt": "2022-08-08T07:48:24.757274+01:00",
+      "model_name": "tap_nonelective_tower",
+      "model_version": 1,
+      "run_id": "1e44565aa34e4b16970d1e5598b9a028",
+      "horizon_dt": "2022-08-08T00:00:00+01:00"
+    },
+    {
+      "bed_count": 6,
+      "probability": 0.10397753837856674,
+      "predict_dt": "2022-08-08T07:48:24.757274+01:00",
+      "model_name": "tap_nonelective_tower",
+      "model_version": 1,
+      "run_id": "1e44565aa34e4b16970d1e5598b9a028",
+      "horizon_dt": "2022-08-08T00:00:00+01:00"
+    },
+    {
+      "bed_count": 7,
+      "probability": 0.059353585864633907,
+      "predict_dt": "2022-08-08T07:48:24.757274+01:00",
+      "model_name": "tap_nonelective_tower",
+      "model_version": 1,
+      "run_id": "1e44565aa34e4b16970d1e5598b9a028",
+      "horizon_dt": "2022-08-08T00:00:00+01:00"
+    },
+    {
+      "bed_count": 8,
+      "probability": 0.02964575026188604,
+      "predict_dt": "2022-08-08T07:48:24.757274+01:00",
+      "model_name": "tap_nonelective_tower",
+      "model_version": 1,
+      "run_id": "1e44565aa34e4b16970d1e5598b9a028",
+      "horizon_dt": "2022-08-08T00:00:00+01:00"
+    },
+    {
+      "bed_count": 9,
+      "probability": 0.01316210669460789,
+      "predict_dt": "2022-08-08T07:48:24.757274+01:00",
+      "model_name": "tap_nonelective_tower",
+      "model_version": 1,
+      "run_id": "1e44565aa34e4b16970d1e5598b9a028",
+      "horizon_dt": "2022-08-08T00:00:00+01:00"
+    },
+    {
+      "bed_count": 10,
+      "probability": 0.005259335520230413,
+      "predict_dt": "2022-08-08T07:48:24.757274+01:00",
+      "model_name": "tap_nonelective_tower",
+      "model_version": 1,
+      "run_id": "1e44565aa34e4b16970d1e5598b9a028",
+      "horizon_dt": "2022-08-08T00:00:00+01:00"
+    },
+    {
+      "bed_count": 11,
+      "probability": 0.0019104851357246483,
+      "predict_dt": "2022-08-08T07:48:24.757274+01:00",
+      "model_name": "tap_nonelective_tower",
+      "model_version": 1,
+      "run_id": "1e44565aa34e4b16970d1e5598b9a028",
+      "horizon_dt": "2022-08-08T00:00:00+01:00"
+    }
+  ]
+}

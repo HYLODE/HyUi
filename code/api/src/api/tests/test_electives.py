@@ -1,0 +1,56 @@
+from api.convert import to_data_frame
+from api.electives.wrangle import prepare_electives
+from api.main import app
+from fastapi.testclient import TestClient
+
+from models.electives import (
+    ElectiveRow,
+    ElectivePostOpDestinationRow,
+    ElectivePreassessRow,
+)
+
+client = TestClient(app)
+
+
+def test_get_mock_electives():
+    response = client.get("/mock/electives")
+    assert response.status_code == 200
+
+    # census_departments = [CensusDepartment.parse_obj(row) for row in response.json()]
+    # assert len(census_departments) > 0
+
+
+def test_prepare_electives():
+    # This is currently just a placeholder test to ensure all the correct
+    # columns are described.
+    # TODO: Improve these tests.
+    electives = [
+        ElectiveRow.parse_obj(
+            {"PatientDurableKey": "keya", "SurgicalCaseEpicId": 1, "Canceled": 0}
+        )
+    ]
+    electives_df = to_data_frame(electives, ElectiveRow)
+
+    post_op_destinations = [
+        ElectivePostOpDestinationRow.parse_obj(
+            {"pod_orc": "pod_orc_a", "or_case_id": 1}
+        )
+    ]
+    post_op_destinations_df = to_data_frame(
+        post_op_destinations, ElectivePostOpDestinationRow
+    )
+
+    preassess = [
+        ElectivePreassessRow.parse_obj(
+            {
+                "PatientDurableKey": "keya",
+                "Name": "name",
+                "CreationInstant": "2022-07-22 15:04:39.000000",
+                "StringValue": "Inpatient Ward",
+            }
+        )
+    ]
+    preassess_df = to_data_frame(preassess, ElectivePreassessRow)
+
+    merged_df = prepare_electives(electives_df, post_op_destinations_df, preassess_df)
+    assert len(merged_df.index) > 0
