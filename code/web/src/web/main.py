@@ -1,11 +1,24 @@
+import tempfile
 from typing import NamedTuple
 
 import dash_bootstrap_components as dbc
-from dash import Dash, Input, Output, State, dcc, html, page_container, page_registry
+from dash import (
+    Dash,
+    Input,
+    Output,
+    State,
+    dcc,
+    html,
+    page_container,
+    page_registry,
+    DiskcacheManager,
+)
 from flask import Flask
 from flask_login import LoginManager, UserMixin, current_user, login_user
 
 from web.config import get_settings
+
+import diskcache
 
 
 class NavbarDropdown(NamedTuple):
@@ -36,6 +49,9 @@ dropdown_dev = [
 # Exposing the Flask Server to enable configuring it for logging in
 # https://github.com/AnnMarieW/dash-flask-login
 server = Flask(__name__)
+
+cache = diskcache.Cache(tempfile.TemporaryDirectory().name)
+
 app = Dash(
     __name__,
     server=server,
@@ -47,6 +63,7 @@ app = Dash(
     ],
     suppress_callback_exceptions=True,
     use_pages=True,
+    background_callback_manager=DiskcacheManager(cache),
 )
 
 # Updating the Flask Server configuration with Secret Key to encrypt the user
