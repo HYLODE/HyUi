@@ -7,7 +7,7 @@ and follow the **same** naming convention such that
 the module.classname can be reliably used for access
 """
 
-from datetime import datetime
+from datetime import datetime, date
 
 from pydantic import BaseModel
 
@@ -18,9 +18,18 @@ def _to_camel(member: str) -> str:
 
 class ElectiveRow(BaseModel):
     patient_durable_key: str
+    primary_mrn: str
     surgical_case_epic_id: int
     canceled: bool
     surgical_service: str | None
+    age_in_years: int
+    sex: str
+    first_name: str
+    last_name: str
+    room_name: str
+    surgery_date: date
+    patient_friendly_name: str
+    planned_operation_start_instant: datetime
 
     class Config:
         alias_generator = _to_camel
@@ -43,6 +52,7 @@ class ElectivePreassessRow(BaseModel):
 
 class GetElectiveRow(BaseModel):
     patient_durable_key: str
+    primary_mrn: str
     surgical_case_epic_id: int
     canceled: bool
     surgical_service: str | None
@@ -53,3 +63,11 @@ class GetElectiveRow(BaseModel):
     pod_orc: str | None
     or_case_id: str | None
     pacu: bool
+    age_in_years: int
+    sex: str
+    first_name: str
+    last_name: str
+    room_name: str
+    surgery_date: date
+    patient_friendly_name: str
+    planned_operation_start_instant: datetime
