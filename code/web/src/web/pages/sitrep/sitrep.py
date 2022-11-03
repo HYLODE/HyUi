@@ -11,7 +11,6 @@ from web.pages.sitrep import (
     STYLE_CELL_CONDITIONAL,
     widgets,
     COLS,
-    REFRESH_INTERVAL,
     PROBABILITY_COLOUR_SCALE,
 )
 
@@ -188,9 +187,6 @@ config_footer = dbc.Card(
 
 dash_only = html.Div(
     [
-        dcc.Interval(
-            id=f"{BPID}query-interval", interval=REFRESH_INTERVAL, n_intervals=0
-        ),
         dcc.Store(id=f"{BPID}beds_data"),
         dcc.Loading(
             [

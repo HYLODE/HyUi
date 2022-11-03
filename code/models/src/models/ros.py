@@ -1,11 +1,11 @@
 from datetime import date, datetime
 from typing import Optional
 
-from sqlmodel import Field, SQLModel
+from pydantic import BaseModel
 
 
 # define the data model that you're expecting from your query
-class RosBase(SQLModel):
+class RosBase(BaseModel):
 
     department: str
     bed_name: str
@@ -24,7 +24,7 @@ class RosBase(SQLModel):
     covid_orders: Optional[str]
 
 
-class RosMock(RosBase, table=True):  # type: ignore
+class RosMock(RosBase):  # , table=True):  # type: ignore
     """
     The table version of the pydantic class
     Used for creating tables via SQLModel
@@ -34,7 +34,7 @@ class RosMock(RosBase, table=True):  # type: ignore
     # TODO: Figure out how to fix this.
     # if "postgres" in settings.STAR_URL:
     #     __table_args__ = {"schema": settings.DB_POSTGRES_SCHEMA}
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: Optional[int]  # = Field(default=None, primary_key=True)
 
 
 class RosRead(RosBase):

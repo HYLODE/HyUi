@@ -11,9 +11,10 @@ from dash import dash_table as dt
 from dash import dcc, html
 from flask_login import current_user
 
-from models.consults import ConsultsRead
-from utils.dash import df_from_store
+from models.consults import Consults
+
 from web.config import get_settings
+from web.convert import parse_to_data_frame
 
 register_page(__name__)
 BPID = "CON_"
@@ -114,11 +115,11 @@ def filter_data(val: str | None, data: list[dict[str, Any]]) -> list[dict[str, A
     State(filtered_data, "data"),
     prevent_initial_call=True,
 )
-def gen_consults_over_time(n_intervals: int, data: dict):
+def gen_consults_over_time(n_intervals: int, data: list[dict]):
     """
     Plot stacked bar
     """
-    df = df_from_store(data, ConsultsRead)
+    df = parse_to_data_frame(data, Consults)
     df = (
         df.groupby("name")
         .resample("6H", on="scheduled_datetime")
@@ -162,6 +163,7 @@ def gen_table_consults(modified: int, data: dict):
     Input(request_data, "data"),
     prevent_initial_call=True,
 )
-def update_dept_dropdown(data: dict):
-    df = df_from_store(data, ConsultsRead)
+def update_dept_dropdown(data: list[dict]):
+    # df = df_from_store(data, ConsultsRead)
+    df = parse_to_data_frame(data, Consults)
     return df["dept_name"].sort_values().unique()

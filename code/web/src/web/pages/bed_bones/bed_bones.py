@@ -20,7 +20,7 @@ from web.config import get_settings
 
 register_page(__name__)
 BPID = "BONES_"
-# BASEROW_API_URL = f"{settings.BASE_URL}:{settings.BASEROW_PORT}/api"
+
 
 # Caboodle data so refresh only needs to happen first thing
 REFRESH_INTERVAL = 1 * 60 * 60 * 1000  # milliseconds

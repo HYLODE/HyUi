@@ -3,7 +3,7 @@ from collections import namedtuple
 from fastapi import APIRouter, Depends
 from sqlmodel import Session
 
-from models.consults import ConsultsRead
+from models.consults import Consults
 from api.db import prepare_query, get_star_session
 
 router = APIRouter(
@@ -11,8 +11,8 @@ router = APIRouter(
 )
 
 
-@router.get("/", response_model=list[ConsultsRead])
-def read_consults(session: Session = Depends(get_star_session)):
+@router.get("/", response_model=list[Consults])
+def get_consults(session: Session = Depends(get_star_session)):
     """
     Returns Consults data class populated by query-live/mock
     query preparation depends on the environment so will return

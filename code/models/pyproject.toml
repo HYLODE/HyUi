@@ -7,7 +7,7 @@ name = "hyui-models"
 version = "0.0.1"
 dependencies = [
     "arrow == 1.2.3",
-    "sqlmodel == 0.0.8"
+    "pydantic == 1.10.2",
 ]
 
 [project.optional-dependencies]

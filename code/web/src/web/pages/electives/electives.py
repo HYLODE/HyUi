@@ -24,7 +24,6 @@ from web.pages.electives import (
     SPECIALTY_SHORTNAMES,
     STYLE_CELL_CONDITIONAL,
 )
-from utils.dash import df_from_store
 
 CACHE_TIMEOUT = 4 * 3600
 
@@ -170,13 +169,13 @@ def filter_data(service: List[str], pacu: List[bool], data: list):
     State(filtered_data, "data"),
     prevent_initial_call=True,
 )
-def gen_surgeries_over_time(n_intervals: int, data: dict):
+def gen_surgeries_over_time(n_intervals: int, data: list[dict]):
     """
     Plot stacked bar
     """
     if len(data) == 0:
         return html.H2("No data to plot")
-    df = df_from_store(data, GetElectiveRow)
+    df = parse_to_data_frame(data, GetElectiveRow)
     df = (
         df.groupby("SurgicalService")
         .resample("24H", on="PlannedOperationStartInstant")

@@ -4,15 +4,15 @@ sub-application for ros
 from typing import Any
 
 import dash_bootstrap_components as dbc
+import requests
 from dash import Input, Output, State, callback, register_page
 from dash import dash_table as dt
 from dash import dcc, html
 from flask_login import current_user
 
-from utils.dash import get_results_response
-
 from datetime import datetime, date, timedelta
 
+from models.ros import RosRead
 from web.config import get_settings
 
 register_page(__name__, name="ROS")
@@ -103,7 +103,9 @@ def store_data(n_intervals: int) -> dict[str, Any]:
     """
     Read data from API then store as JSON
     """
-    data = get_results_response(f"{get_settings().api_url}/ros")
+
+    response = requests.get(f"{get_settings().api_url}/ros/")
+    data = [RosRead.parse_obj(row) for row in response.json()]
 
     pts_by_department: dict[
         str, Any

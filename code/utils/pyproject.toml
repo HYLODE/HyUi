@@ -6,6 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "hyui-utils"
 version = "0.0.1"
 dependencies = [
+    "pydantic == 1.10.2",
 ]
 
 [project.optional-dependencies]
