@@ -31,7 +31,7 @@ def _get_census(department: str) -> list[CensusRow]:
 
 def _get_sitrep(department: str) -> list[SitrepRow]:
     ward = DEPT2WARD_MAPPING[department]
-    response = requests.get(f"{get_settings().api_url}/sitrep/live/{ward}/ui")
+    response = requests.get(f"{get_settings().api_url}/sitrep/live/{ward}/ui/")
     return [SitrepRow.parse_obj(row) for row in response.json()]
 
 

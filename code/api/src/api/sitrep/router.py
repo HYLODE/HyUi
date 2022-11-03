@@ -69,8 +69,8 @@ def get_mock_beds(department: str) -> list[BedRow]:
     return [
         BedRow(
             location_string="location_a",
-            bed_functional=[],
-            bed_physical=[],
+            bed_functional=[{"id": 1, "value": "Option", "color": "light-blue"}],
+            bed_physical=[{"id": 1, "value": "Option", "color": "light-blue"}],
             unit_order=3,
             closed=False,
             bed="a-b",

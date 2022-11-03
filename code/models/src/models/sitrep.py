@@ -3,8 +3,8 @@ from pydantic import BaseModel, Field
 
 class BedRow(BaseModel):
     location_string: str
-    bed_functional: list[dict[str, str]]
-    bed_physical: list[dict[str, str]]
+    bed_functional: list[dict[str, str | int]]
+    bed_physical: list[dict[str, str | int]]
     unit_order: int | None
     closed: bool
     covid: bool
