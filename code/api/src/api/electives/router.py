@@ -78,12 +78,12 @@ def get_mock_electives(
     engine = create_engine(f"sqlite:///{Path(__file__).parent}/mock.db", future=True)
 
     with Session(engine) as session:
-        result = session.exec(text("""SELECT * FROM electivesmock"""))
+        result = session.exec(text("SELECT * FROM electives"))
         electives = (ElectiveRow.parse_obj(row) for row in result)
         electives_df = to_data_frame(electives, ElectiveRow)
 
     with Session(engine) as session:
-        result = session.exec(text("SELECT * FROM electivespodmock"))
+        result = session.exec(text("SELECT * FROM electivespod"))
         post_op_destinations = (
             ElectivePostOpDestinationRow.parse_obj(row) for row in result
         )
@@ -92,7 +92,7 @@ def get_mock_electives(
         )
 
     with Session(engine) as session:
-        result = session.exec(text("SELECT * FROM electivespreassessmock"))
+        result = session.exec(text("SELECT * FROM electivespreassess"))
         preassess = (ElectivePreassessRow.parse_obj(row) for row in result)
         preassess_df = to_data_frame(preassess, ElectivePreassessRow)
 
