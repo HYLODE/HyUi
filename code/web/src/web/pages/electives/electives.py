@@ -202,9 +202,9 @@ def gen_table_consults(data: list[dict]):
         dt.DataTable(
             id=f"{BPID}_data_table",
             columns=[
-                {"id": "surgey_date", "name": "Date"},
+                {"id": "surgery_date", "name": "Date"},
                 {"id": "pacu", "name": "pacu"},
-                {"id": "surical_service", "name": "Specialty"},
+                {"id": "surgical_service", "name": "Specialty"},
                 {"id": "room_name", "name": "Theatre"},
                 {"id": "age_sex", "name": ""},
                 {"id": "name", "name": "Full Name"},
