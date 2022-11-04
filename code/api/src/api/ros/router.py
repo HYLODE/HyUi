@@ -16,7 +16,7 @@ def read_ros(session: Session = Depends(get_star_session)):
     """
     Returns Ros data
     """
-    q = prepare_query("ros")
+    q = prepare_query("ros", "FIXME")
     results = session.exec(q)  # type: ignore
     Record = namedtuple("Record", results.keys())  # type: ignore
     records = [Record(*r) for r in results.fetchall()]

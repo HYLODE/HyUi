@@ -1,15 +1,17 @@
+import json
+
 import dash_bootstrap_components as dbc
 import plotly.express as px
+import requests
 from dash import Input, Output, callback, register_page, get_app
 from dash import dash_table as dt
 from dash import dcc, html
 from flask_caching import Cache
 from flask_login import current_user
-from pydantic import parse_obj_as
 
 from models.perrt import PerrtRead
-from utils.dash import get_results_response, df_from_store
 from web.config import get_settings
+from web.convert import parse_to_data_frame
 
 CACHE_TIMEOUT = 5 * 60 * 1000
 BPID = "PERRT_"
@@ -123,18 +125,15 @@ def store_data(n_intervals: int):
     """
     Read data from API then store as JSON
     """
-    data = [
-        dict(parse_obj_as(PerrtRead, i))
-        for i in get_results_response(f"{get_settings().api_url}/perrt/")
-    ]
+    response = requests.get(f"{get_settings().api_url}/perrt/")
+    data = [PerrtRead.parse_obj(row) for row in response.json()]
 
     hospital_visit_ids = [perrt_entry["hospital_visit_id"] for perrt_entry in data]
 
-    predictions_list = get_results_response(
-        f"{get_settings().api_url}/perrt/admission_predictions",
-        "POST",
-        json=hospital_visit_ids,
-    )
+    predictions_list = requests.post(
+        f"{get_settings().api_url}/perrt/admission_predictions/",
+        data=json.dumps(hospital_visit_ids),
+    ).json()
 
     predictions_map = {
         p["hospital_visit_id"]: p["admission_probability"] for p in predictions_list
@@ -153,9 +152,10 @@ def store_data(n_intervals: int):
     Input(request_data, "data"),
     prevent_initial_call=True,
 )
-def gen_simple_fig(data: dict):
+def gen_simple_fig(data: list[dict]):
     # TODO: move data validation to store
-    df = df_from_store(data, PerrtRead)
+
+    df = parse_to_data_frame(data, PerrtRead)
     df = df[["dept_name", "news_scale_1_max", "mrn"]]
     df = df.groupby(["dept_name", "news_scale_1_max"], as_index=False).count()
     df["news_scale_1_max"] = df["news_scale_1_max"].astype(int).astype(str)

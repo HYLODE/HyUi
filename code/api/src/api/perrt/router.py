@@ -29,7 +29,7 @@ def read_perrt_table(
     Query preparation depends on the environment via arg get_emap_session so
     will return mock data in dev and live (from the API itself)
     """
-    q = prepare_query("perrt")
+    q = prepare_query("perrt", "FIXME")
     results = session.exec(q)  # type: ignore
     Record = namedtuple("Record", results.keys())  # type: ignore
     records = [Record(*r) for r in results.fetchall()]
@@ -46,7 +46,7 @@ def read_perrt(session: Session = Depends(get_star_session)):
     :type       session:  Session
     """
     # Run the 'raw query'
-    q = prepare_query("perrt")
+    q = prepare_query("perrt", "FIXME")
     results = session.exec(q)  # type: ignore
     # Validate the raw query using the SQLModel (Pydantic model)
     rec = [parse_obj_as(PerrtRaw, r) for r in results.fetchall()]

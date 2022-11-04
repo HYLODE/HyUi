@@ -2,7 +2,6 @@
 sub-application for census (i.e. Department Census)
 """
 
-
 import dash_bootstrap_components as dbc
 import numpy as np
 import pandas as pd
@@ -16,7 +15,6 @@ import web.pages.census.callbacks  # noqa: F401
 
 from web.pages.census import (
     BPID,
-    CENSUS_COLS,
     DEPT_COLS,
     REFRESH_INTERVAL,
     widgets,
@@ -122,7 +120,6 @@ def gen_census_table(data: dict):
     dfo["bed_icons"] = ""
     llist = []
     for t in dfo.itertuples(index=False):
-
         closed = icons.closed(t.closed)
         covid = icons.covid(t.covid)
 
@@ -141,7 +138,14 @@ def gen_census_table(data: dict):
     dto = (
         dt.DataTable(
             id=f"{BPID}tbl-census",
-            columns=CENSUS_COLS,
+            columns=[
+                {"id": "bed_icons", "name": "", "presentation": "markdown"},
+                {"id": "bed_label", "name": "Bed", "type": "text"},
+                {"id": "room_label", "name": ""},
+                {"id": "age_sex", "name": ""},
+                {"id": "name", "name": "Full Name"},
+                {"id": "mrn", "name": "MRN", "type": "text"},
+            ],
             data=dfo.to_dict("records"),
             editable=True,
             # fixed_columns={},

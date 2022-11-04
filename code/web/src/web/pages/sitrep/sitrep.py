@@ -11,7 +11,6 @@ from web.pages.sitrep import (
     STYLE_CELL_CONDITIONAL,
     widgets,
     COLS,
-    REFRESH_INTERVAL,
     PROBABILITY_COLOUR_SCALE,
 )
 
@@ -37,8 +36,12 @@ def gen_fancy_table(data: dict):
     df["room_label"] = np.where(
         df["room"].astype(str).str.contains("SR"), "SR", df["room_label"]
     )
-    df["bed_functional"] = df["bed_functional"].apply(lambda row: "|".join(row))
-    df["bed_physical"] = df["bed_physical"].apply(lambda row: "|".join(row))
+    df["bed_functional"] = df["bed_functional"].apply(
+        lambda rows: "|".join([row.get("keyA", "") for row in rows])
+    )
+    df["bed_physical"] = df["bed_physical"].apply(
+        lambda rows: "|".join([row.get("keyA", "") for row in rows])
+    )
 
     # predicts bed to still be occupied so invert
     # 2022-10-11 reverting back
@@ -188,9 +191,6 @@ config_footer = dbc.Card(
 
 dash_only = html.Div(
     [
-        dcc.Interval(
-            id=f"{BPID}query-interval", interval=REFRESH_INTERVAL, n_intervals=0
-        ),
         dcc.Store(id=f"{BPID}beds_data"),
         dcc.Loading(
             [

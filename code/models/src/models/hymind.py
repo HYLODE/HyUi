@@ -3,10 +3,9 @@ from typing import Optional
 
 import arrow
 from pydantic import BaseModel
-from sqlmodel import Field, SQLModel
 
 
-class IcuDischarge(SQLModel, table=True):  # type: ignore
+class IcuDischarge(BaseModel):
     """
     HyMind API ICU discharge predictions
     e.g.
@@ -20,7 +19,7 @@ class IcuDischarge(SQLModel, table=True):  # type: ignore
     }
     """
 
-    prediction_id: int = Field(primary_key=True)
+    prediction_id: int  # = Field(primary_key=True)
     episode_slice_id: int
     model_name: str
     model_version: int
@@ -28,7 +27,7 @@ class IcuDischarge(SQLModel, table=True):  # type: ignore
     predict_dt: datetime
 
 
-class EmTap(SQLModel, table=True):  # type: ignore
+class EmTap(BaseModel):  # , table=True):  # type: ignore
     """
      Hymind Emergency Taps
      e.g.
@@ -53,7 +52,7 @@ class EmTap(SQLModel, table=True):  # type: ignore
      ```
     """
 
-    bed_count: int = Field(primary_key=True)
+    bed_count: int  # = Field(primary_key=True)
     probability: float
     predict_dt: datetime
     model_name: str
@@ -62,7 +61,7 @@ class EmTap(SQLModel, table=True):  # type: ignore
     horizon_dt: datetime
 
 
-class ElTap(SQLModel, table=True):  # type: ignore
+class ElTap(BaseModel):  # , table=True):  # type: ignore
     """
     Hymind Elective Tap
     e.g.
@@ -89,7 +88,7 @@ class ElTap(SQLModel, table=True):  # type: ignore
 
     # you could go further and specify the nested dictionary model
     # https://stackoverflow.com/a/63259907/992999
-    bed_count: int = Field(primary_key=True)
+    bed_count: int  # = Field(primary_key=True)
     probability: float
     predict_dt: datetime
     model_name: str

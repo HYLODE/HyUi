@@ -1,25 +1,13 @@
-"""
-Model for ward patients at risk of deterioration
-Not linked to Dan's work (for now)
-Should always follow the naming pattern
-
-ModuleModel (e.g. PerrtEMAP, PerrtRead)
-
-where Module alone returns the base model
-
-"""
-
 from datetime import date, datetime
 from typing import Optional
 
 import arrow
 import pandas as pd
 from pydantic import validator, BaseModel
-from sqlmodel import Field, SQLModel
 
 
 # define the data model that you're expecting from your query
-class PerrtRaw(SQLModel):
+class PerrtRaw(BaseModel):
     """
     Raw data
     Perrt class to hold data returned from the Perrt query
@@ -84,7 +72,7 @@ class PerrtRaw(SQLModel):
         return v
 
 
-class PerrtMock(PerrtRaw, table=True):  # type: ignore
+class PerrtMock(PerrtRaw):
     """
     The table version of the pydantic class
     Used for creating tables via SQLModel for mocking
@@ -95,11 +83,11 @@ class PerrtMock(PerrtRaw, table=True):  # type: ignore
     # TODO: Figure out how to fix this.
     # if "postgres" in settings.STAR_URL:
     #     __table_args__ = {"schema": settings.DB_POSTGRES_SCHEMA}
-    Perrt_id: Optional[int] = Field(default=None, primary_key=True)
+    Perrt_id: int | None  # Optional[int] = Field(default=None, primary_key=True)
 
 
 # define the data model that you're expecting from your query
-class PerrtBase(SQLModel):
+class PerrtBase(BaseModel):
     """
     Wrangled data
     Perrt class to hold data returned from the Perrt query

@@ -18,10 +18,8 @@ from web.pages.census import (
 )
 
 from utils.beds import (
-    BedBonesBase,
     unpack_nested_dict,
 )
-from utils.dash import validate_json
 
 CENSUS_KEEP_COLS = [
     "location_string",
@@ -118,7 +116,7 @@ def store_beds(n_intervals: int, dept: str):
     beds = _get_bed_list(dept)
     beds = unpack_nested_dict(beds, f2unpack="bed_functional", subkey="value")
     beds = unpack_nested_dict(beds, f2unpack="bed_physical", subkey="value")
-    beds = validate_json(beds, BedBonesBase, to_dict=True)
+
     if all([not bool(i) for i in beds]):
         warnings.warn("[WARN] store_beds returned an empty list of dictionaries")
         return beds

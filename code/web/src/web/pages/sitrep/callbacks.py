@@ -1,31 +1,23 @@
 import numpy as np
 import pandas as pd
 import requests
-from dash import Input, Output, State, callback, get_app
-from flask_caching import Cache
+from dash import Input, Output, State, callback
 
-from models.sitrep import SitrepRow, IndividualDischargePrediction, BedRow, CensusRow
+from models.sitrep import SitrepRow, IndividualDischargePrediction, BedRow
+
+# TODO: Give the SitRep module its own CensusRow model.
+from models.census import CensusRow
 from web.config import get_settings
 from web.convert import to_data_frame
 from web.pages.sitrep import (
     BPID,
-    CACHE_TIMEOUT,
     DEPT2WARD_MAPPING,
-)
-
-app = get_app()
-cache = Cache(
-    app.server,
-    config={
-        "CACHE_TYPE": "filesystem",
-        "CACHE_DIR": "cache-directory",
-    },
 )
 
 
 def _get_beds(department: str) -> list[BedRow]:
     response = requests.get(
-        f"{get_settings().api_url}/sitrep/beds/", params={"ward": department}
+        f"{get_settings().api_url}/sitrep/beds/", params={"department": department}
     )
     return [BedRow.parse_obj(row) for row in response.json()]
 
@@ -39,14 +31,14 @@ def _get_census(department: str) -> list[CensusRow]:
 
 def _get_sitrep(department: str) -> list[SitrepRow]:
     ward = DEPT2WARD_MAPPING[department]
-    response = requests.get(f"{get_settings().api_url}/sitrep/live/{ward}/ui")
+    response = requests.get(f"{get_settings().api_url}/sitrep/live/{ward}/ui/")
     return [SitrepRow.parse_obj(row) for row in response.json()]
 
 
 def _get_discharge_predictions(department: str) -> list[IndividualDischargePrediction]:
     ward = DEPT2WARD_MAPPING[department]
     response = requests.get(
-        f"{get_settings().api_url}/sitrep/predictions/discharge/individual/{ward}"
+        f"{get_settings().api_url}/sitrep/predictions/discharge/individual/{ward}/"
     )
     return [IndividualDischargePrediction.parse_obj(row) for row in response.json()]
 
@@ -77,16 +69,14 @@ def _merge_patients(
 
 
 @callback(
-    Output(f"{BPID}ward_data", "data"),
-    Input(f"{BPID}query-interval", "n_intervals"),
-    Input(f"{BPID}ward_radio", "value"),
-    Input(f"{BPID}closed_beds_switch", "value"),
+    output=Output(f"{BPID}ward_data", "data"),
+    inputs=[
+        Input(f"{BPID}ward_radio", "value"),
+        Input(f"{BPID}closed_beds_switch", "value"),
+    ],
+    background=True,
 )
-@cache.memoize(
-    timeout=CACHE_TIMEOUT
-)  # cache decorator must come between callback and function
-# def store_ward(beds: list, patients: list, closed: bool) -> list:
-def store_ward(n_intervals: int, department: str, closed: bool):
+def store_ward(department: str, closed: bool):
     """
     Merges patients onto beds
     """

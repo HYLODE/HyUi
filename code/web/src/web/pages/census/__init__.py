@@ -20,57 +20,6 @@ DEPT_COLS = [
     {"id": "modified_at", "name": "modified_at"},
 ]
 
-CENSUS_COLS = [
-    # {"id": "unit_order", "name": "", "type": "numeric"},
-    # {"id": "ward_code", "name": "Ward"},
-    # {"id": "bay_code", "name": "Bay"},
-    # {"id": "bed_code", "name": "Bed code"},
-    # {"id": "room", "name": ""},
-    # {"id": "bed", "name": "Bed"},
-    # ROOM STATUS
-    # {"id": "open", "name": "", "presentation": "markdown"},
-    {"id": "bed_icons", "name": "", "presentation": "markdown"},
-    {"id": "bed_label", "name": "Bed", "type": "text"},
-    {"id": "room_label", "name": ""},
-    # {"id": "closed", "name": "Closed"},
-    # {"id": "sideroom", "name": ""},
-    # {"id": "admission_dt", "name": "Admission"},
-    # {"id": "elapsed_los_td", "name": "LoS"},
-    # DEMOGRAPHICS
-    {"id": "age_sex", "name": ""},
-    {"id": "name", "name": "Full Name"},
-    {"id": "mrn", "name": "MRN", "type": "text"},
-    # {"id": "admission_age_years", "name": "Age"},
-    # {"id": "sex", "name": "Sex"},
-    # {"id": "dob", "name": "DoB"},
-    # {"id": "bed_empty", "name": "Empty"},
-    # {"id": "team", "name": "Side"},
-    # PHYSIOLOGY
-    # {"id": "vent_type_1_4h", "name": "Ventilation"},
-    # {"id": "n_inotropes_1_4h", "name": "Cardiovascular"},
-    # {"id": "had_rrt_1_4h", "name": "Renal"},
-    # {"id": "organ_icons", "name": "Organ Support", "presentation": "markdown"},
-    # {"id": "wim_1", "name": "WIM", "type": "numeric"},
-    # DISCHARGE
-    # {"id": "episode_slice_id", "name": "Slice", "type": "numeric"},
-    # {
-    #     "id": "prediction_as_real",
-    #     "name": "Dischargeable",
-    #     "type": "numeric",
-    #     "format": FormatTemplate.percentage(0),
-    # },
-    # {
-    #     "id": "DischargeReady",
-    #     "name": "Discharge decision",
-    #     "presentation": "dropdown",
-    #     "editable": True,
-    # },
-    # {"id": "pm_type", "name": "Epic bed request", "type": "text"},
-    # {"id": "epic_bed_request", "name": "Epic bed request", "type": "text"},
-    # {"id": "pm_dept", "name": "Bed assigned", "type": "text"},
-    # {"id": "covid", "name": "COVID", "presentation": "markdown"},
-]
-
 CENSUS_STYLE_CELL_CONDITIONAL = [
     {
         "if": {"column_id": "bed_label"},

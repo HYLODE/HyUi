@@ -1,23 +1,24 @@
-from collections import namedtuple
-from datetime import date
+from datetime import date, datetime
+from pathlib import Path
 from urllib.parse import urlencode
 
 import requests
 from fastapi import APIRouter, Depends
 from fastapi.responses import RedirectResponse
+from sqlalchemy import create_engine
 from sqlmodel import Session
 
 from api.config import get_settings
 
 from api.baserow import get_fields, get_rows
+
+# TODO: Give sitrep its own CensusRow model so we do not have interdependencies.
+from models.census import CensusRow
 from models.sitrep import (
-    SitrepRead,
     SitrepRow,
     IndividualDischargePrediction,
     BedRow,
-    CensusRow,
 )
-from api.db import prepare_query, get_star_session
 
 CORE_FIELDS = [
     "department",
@@ -42,9 +43,9 @@ mock_router = APIRouter(
 )
 
 
-@router.get("/beds/", response_model=list[dict])
-def get_beds(settings=Depends(get_settings)):
-    department = "UCH T03 INTENSIVE CARE"
+@router.get("/beds/", response_model=list[BedRow])
+def get_beds(department: str, settings=Depends(get_settings)):
+
     baserow_url = settings.baserow_url
     token = settings.baserow_read_write_token
     beds_table_id = settings.baserow_beds_table_id
@@ -59,16 +60,17 @@ def get_beds(settings=Depends(get_settings)):
         f"filter__field_{department_field_id}__equal": department,
     }
 
-    return get_rows(baserow_url, token, beds_table_id, params)
+    rows = get_rows(baserow_url, token, beds_table_id, params)
+    return [BedRow.parse_obj(row) for row in rows]
 
 
 @mock_router.get("/beds/", response_model=list[BedRow])
-def get_mock_beds() -> list[BedRow]:
+def get_mock_beds(department: str) -> list[BedRow]:
     return [
         BedRow(
             location_string="location_a",
-            bed_functional=[],
-            bed_physical=[],
+            bed_functional=[{"id": 1, "value": "Option", "color": "light-blue"}],
+            bed_physical=[{"id": 1, "value": "Option", "color": "light-blue"}],
             unit_order=3,
             closed=False,
             bed="a-b",
@@ -95,48 +97,27 @@ def get_mock_census(department: str) -> list[CensusRow]:
             mrn="abc",
             firstname="Firstname",
             lastname="Lastname",
+            modified_at=datetime(2022, 1, 2, 3, 4),
+            location_id=2,
+            department="My Department",
         )
     ]
 
 
 @mock_router.get("/live/{ward}/ui", response_model=list[SitrepRow])
-def get_mock_live_ward_ui(ward: str) -> list[SitrepRow]:
-    return [
-        SitrepRow(
-            csn=1,
-            episode_slice_id=1,
-            n_inotropes_1_4h=2,
-            had_rrt_1_4h=True,
-            vent_type_1_4h="oxygen",
-        )
-    ]
-    # engine = create_engine(f"sqlite:///{Path(__file__).parent}/mock.db", future=True)
-    #
-    # query = text("SELECT * FROM sitrep")
-    #
-    # with Session(engine) as session:
-    #     result = session.exec(query)
-    #     return [SitrepRow.parse_obj(row) for row in result]
+def get_mock_live_ui(ward: str) -> list[SitrepRow]:
+    engine = create_engine(f"sqlite:///{Path(__file__).parent}/mock.db", future=True)
+
+    with Session(engine) as session:
+        result = session.execute("SELECT * FROM sitrep")
+        return [SitrepRow.parse_obj(row) for row in result]
 
 
 @router.get("/live/{ward}/ui", response_model=list[SitrepRow])
-def get_live_ward_ui(ward: str) -> list[SitrepRow]:
-    return []
-
-
-@router.get("/", response_model=list[SitrepRead])
-def read_sitrep(session: Session = Depends(get_star_session)):
-    """
-    Returns Sitrep data class populated by query-live/mock
-    query preparation depends on the environment so will return
-    mock data in dev and live (from the API itself)\n\n
-    """
-    # TODO: Fix this. Ideally remove prepare_query.
-    q = prepare_query("sitrep", "FIX")
-    results = session.exec(q)
-    Record = namedtuple("Record", results.keys())  # type: ignore
-    records = [Record(*r) for r in results.fetchall()]
-    return records
+def get_live_ui(ward: str, settings=Depends(get_settings)) -> list[SitrepRow]:
+    response = requests.get(f"{settings.hycastle_url}/live/icu/{ward}/ui")
+    rows = response.json()["data"]
+    return [SitrepRow.parse_obj(row) for row in rows]
 
 
 @router.patch("/beds")
@@ -157,20 +138,24 @@ def update_bed_row(
 
 
 @router.get(
-    "/predictions/discharge/individual/{ward}",
+    "/predictions/discharge/individual/{ward}/",
     response_model=list[IndividualDischargePrediction],
 )
 def get_individual_discharge_predictions(
-    ward: str,
+    ward: str, settings=Depends(get_settings)
 ) -> list[IndividualDischargePrediction]:
-    raise NotImplementedError("Need to call API endpoint.")
+    response = requests.get(
+        f"{settings.hymind_url}/predictions/icu/discharge", params={"ward": ward}
+    )
+    rows = response.json()["data"]
+    return [IndividualDischargePrediction.parse_obj(row) for row in rows]
 
 
 @mock_router.get(
-    "/predictions/discharge/individual/{ward}",
+    "/predictions/discharge/individual/{ward}/",
     response_model=list[IndividualDischargePrediction],
 )
 def get_mock_individual_discharge_predictions(
     ward: str,
 ) -> list[IndividualDischargePrediction]:
-    return [IndividualDischargePrediction(episode_slice_id=1, prediction=0.4)]
+    return [IndividualDischargePrediction(episode_slice_id=1, prediction_as_real=0.4)]

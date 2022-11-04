@@ -1,3 +1,5 @@
+from datetime import date, datetime
+
 from api.convert import to_data_frame
 from api.electives.wrangle import prepare_electives
 from api.main import app
@@ -16,9 +18,6 @@ def test_get_mock_electives():
     response = client.get("/mock/electives")
     assert response.status_code == 200
 
-    # census_departments = [CensusDepartment.parse_obj(row) for row in response.json()]
-    # assert len(census_departments) > 0
-
 
 def test_prepare_electives():
     # This is currently just a placeholder test to ensure all the correct
@@ -26,7 +25,21 @@ def test_prepare_electives():
     # TODO: Improve these tests.
     electives = [
         ElectiveRow.parse_obj(
-            {"PatientDurableKey": "keya", "SurgicalCaseEpicId": 1, "Canceled": 0}
+            {
+                "PatientDurableKey": "keya",
+                "PrimaryMrn": "mrn",
+                "SurgicalCaseEpicId": 1,
+                "Canceled": False,
+                "SurgicalService": "service",
+                "AgeInYears": 23,
+                "Sex": "Male",
+                "FirstName": "Joe",
+                "LastName": "Blogs",
+                "RoomName": "Room1",
+                "SurgeryDate": date(2002, 2, 3),
+                "PatientFriendlyName": "BIG SCARY OP",
+                "PlannedOperationStartInstant": datetime(2022, 2, 3, 10, 0, 0),
+            }
         )
     ]
     electives_df = to_data_frame(electives, ElectiveRow)

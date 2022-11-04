@@ -12,6 +12,9 @@ class Settings(BaseSettings):
     baserow_read_write_token: str
     baserow_beds_table_id: int
 
+    hycastle_url: AnyHttpUrl
+    hymind_url: AnyHttpUrl
+
     class Config:
         env_prefix = "api_"
         frozen = True  # So Settings can be hashable and cachable

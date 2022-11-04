@@ -1,3 +1,5 @@
+import json
+
 import arrow
 import plotly.graph_objects as go
 import requests
@@ -6,12 +8,12 @@ from flask_caching import Cache
 
 from models.hymind import EmTap, ElTap
 from web.config import get_settings
+from web.convert import parse_to_data_frame
 from web.pages.hymind import (
     BPID,
     CACHE_TIMEOUT,
     layout,
 )
-from utils.dash import df_from_store, get_results_response
 
 register_page(__name__)
 app = get_app()
@@ -42,11 +44,11 @@ def store_em_tap(n_intervals: int, building: str = "tower"):
         horizon_dt=arrow.now().shift(days=1).format("YYYY-MM-DDTHH:mm:ss"),
         department=building,
     )
-    # import ipdb; ipdb.set_trace()
-    predictions = get_results_response(
-        f"{get_settings().api_url}/hymind/icu/tap/emergency", "POST", json=payload
-    )
-    return predictions
+
+    return requests.post(
+        f"{get_settings().api_url}/hymind/icu/tap/emergency",
+        data=json.dumps(payload),
+    ).json()
 
 
 @callback(
@@ -54,13 +56,14 @@ def store_em_tap(n_intervals: int, building: str = "tower"):
     Input(f"{BPID}em_tap_data", "data"),
     prevent_initial_callback=True,
 )
-def em_tap_fig(data: dict):
+def em_tap_fig(data: list[dict]):
 
     # TODO: Figure out why an empty dictionary is being returned.
     if len(data) == 1 and not data[0]:
         return None
 
-    df = df_from_store(data, EmTap)
+    df = parse_to_data_frame(data, EmTap)
+
     # fig = px.bar(df, x="bed_count", y="probability")
     fig = go.Figure()
     fig.add_trace(
@@ -108,13 +111,13 @@ def store_el_tap(n_intervals: int, building: str = "tower"):
     Input(f"{BPID}el_tap_data", "data"),
     prevent_initial_callback=True,
 )
-def el_tap_fig(data: dict):
+def el_tap_fig(data: list[dict]):
 
     # TODO: Figure out why an empty dictionary is being returned.
     if len(data) == 1 and not data[0]:
         return None
 
-    df = df_from_store(data, ElTap)
+    df = parse_to_data_frame(data, ElTap)
     # fig = px.bar(df, x="bed_count", y="probability")
     fig = go.Figure()
     fig.add_trace(

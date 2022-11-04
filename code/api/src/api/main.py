@@ -11,6 +11,7 @@ from api.ed.router import (
     router as ed_router,
     mock_router as mock_ed_router,
 )
+
 from api.bedbones.router import router as bedbones_router
 from api.consults.router import router as consults_router
 from api.perrt.router import router as perrt_router

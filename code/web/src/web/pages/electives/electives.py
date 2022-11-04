@@ -1,17 +1,9 @@
-"""
-sub-application for electives
-"""
-
-from typing import List
-
 import dash_bootstrap_components as dbc
-import pandas as pd
 import plotly.express as px
 import requests
-from dash import Input, Output, State, callback, get_app
+from dash import Input, Output, callback
 from dash import dash_table as dt
 from dash import dcc, html, register_page
-from flask_caching import Cache
 from flask_login import current_user
 
 from models.electives import GetElectiveRow
@@ -19,24 +11,11 @@ from web.config import get_settings
 from web.convert import parse_to_data_frame
 from web.pages.electives import (
     BPID,
-    COLS,
-    REFRESH_INTERVAL,
     SPECIALTY_SHORTNAMES,
     STYLE_CELL_CONDITIONAL,
 )
-from utils.dash import df_from_store
-
-CACHE_TIMEOUT = 4 * 3600
 
 register_page(__name__)
-app = get_app()
-cache = Cache(
-    app.server,
-    config={
-        "CACHE_TYPE": "filesystem",
-        "CACHE_DIR": "cache-directory",
-    },
-)
 
 card_fig = dbc.Card(
     [
@@ -58,7 +37,7 @@ card_fig = dbc.Card(
                 ),
                 html.Div(
                     service_picker := dcc.Dropdown(
-                        value="",
+                        value=[],
                         placeholder="Pick a surgical specialty",
                         multi=True,
                     )
@@ -102,7 +81,6 @@ main = html.Div(
 
 dash_only = html.Div(
     [
-        query_interval := dcc.Interval(interval=REFRESH_INTERVAL, n_intervals=0),
         dcc.Loading(
             request_data := dcc.Store(id=f"{BPID}request_data"),
             fullscreen=True,
@@ -126,17 +104,11 @@ def layout():
 
 @callback(
     Output(request_data, "data"),
-    Input(query_interval, "n_intervals"),
     Input(days_ahead_slider, "value"),
 )
-@cache.memoize(timeout=CACHE_TIMEOUT)
-def store_data(n_intervals: int, days_ahead: int):
-    """
-    Read data from API then store as JSON
-    """
-    # data = get_results_response(API_URL, params={"days_ahead": days_ahead})
+def store_data(days_ahead: int):
     response = requests.get(
-        f"{get_settings().api_url}/electives", params={"days_ahead": days_ahead}
+        f"{get_settings().api_url}/electives/", params={"days_ahead": days_ahead}
     )
     return [GetElectiveRow.parse_obj(row).dict() for row in response.json()]
 
@@ -146,88 +118,101 @@ def store_data(n_intervals: int, days_ahead: int):
     Input(service_picker, "value"),
     Input(pacu_checklist, "value"),
     Input(request_data, "data"),
-    prevent_initial_call=True,  # Can probably remove as this function is called anyway.
 )
-def filter_data(service: List[str], pacu: List[bool], data: list):
+def filter_data(service: list[str], pacu: list[bool], data: list[dict]):
     """
     Update data based on picker
     """
 
-    # Dash seems to send a list with an empty dict if there is no data.
-    # TODO: Figure out why an empty dict is arriving here.
-    if len(data) == 1 and not data[0]:
-        return {}
-
-    data = [row for row in data if row["pacu"] in pacu]  # type: ignore
+    # TODO: Fix this.
+    # data = [row for row in data if row["pacu"] in pacu]
     if service:
-        data = [row for row in data if row["SurgicalService"] in service]
+        return [row for row in data if row["surgical_service"] in service]
     return data
 
 
 @callback(
     Output(fig_electives, "children"),
-    Input(filtered_data, "modified_timestamp"),
-    State(filtered_data, "data"),
+    Input(filtered_data, "data"),
     prevent_initial_call=True,
 )
-def gen_surgeries_over_time(n_intervals: int, data: dict):
+def gen_surgeries_over_time(data: list[dict]):
     """
     Plot stacked bar
     """
-    if len(data) == 0:
+    if not data:
         return html.H2("No data to plot")
-    df = df_from_store(data, GetElectiveRow)
+
+    df = parse_to_data_frame(data, GetElectiveRow)
     df = (
-        df.groupby("SurgicalService")
-        .resample("24H", on="PlannedOperationStartInstant")
-        .agg({"PatientKey": "size"})
+        df.groupby("surgical_service")
+        .resample("24H", on="planned_operation_start_instant")
+        .agg({"patient_durable_key": "size"})
     )
     df.reset_index(inplace=True)
     # print(df)
     fig = px.bar(
-        df, x="PlannedOperationStartInstant", y="PatientKey", color="SurgicalService"
+        df,
+        x="planned_operation_start_instant",
+        y="patient_durable_key",
+        color="surgical_service",
     )
     return dcc.Graph(id=f"{BPID}fig", figure=fig)
 
 
 @callback(
     Output(table_electives, "children"),
-    Input(filtered_data, "modified_timestamp"),
-    State(filtered_data, "data"),
-    prevent_initial_call=True,
+    Input(filtered_data, "data"),
 )
-def gen_table_consults(modified: int, data: dict):
-    if len(data) == 0:
+def gen_table_consults(data: list[dict]):
+    if not data:
         return html.H2("No data to tabulate")
-    dfo = pd.DataFrame.from_records(data)
+
+    dfo = parse_to_data_frame(data, GetElectiveRow)
+
     dfo["pacu"] = dfo["pacu"].apply(lambda x: "PACU" if x else "")
     dfo["age_sex"] = dfo.apply(
-        lambda row: f"{row['AgeInYears']:.0f}{row['Sex'][:1]} ",
+        lambda row: f"{row['age_in_years']:.0f}{row['sex'][:1]} ",
         axis=1,
     )
 
-    dfo["name"] = dfo.apply(
-        lambda row: f"{row.FirstName.title()} {row.LastName.upper()}", axis=1
-    )
-    dfo["RoomName"] = dfo["RoomName"].fillna("")
-    dfo["RoomName"] = dfo["RoomName"].apply(
+    def _display_name(row):
+        first_name = row["first_name"].title()
+        last_name = row["last_name"].upper()
+        return f"{first_name} {last_name}"
+
+    dfo["name"] = dfo.apply(_display_name, axis="columns")
+
+    dfo["room_name"] = dfo["room_name"].fillna("")
+    dfo["room_name"] = dfo["room_name"].apply(
         lambda x: "" if "Not Applicable" in x else x
     )
-    dfo["SurgicalService"] = dfo["SurgicalService"].fillna("")
-    dfo["SurgicalService"] = dfo["SurgicalService"].apply(
+    dfo["surgical_service"] = dfo["surgical_service"].fillna("")
+    dfo["surgical_service"] = dfo["surgical_service"].apply(
         lambda x: x.replace("Surgery", "" if x else "")
     )
-    dfo["SurgicalService"] = dfo["SurgicalService"].apply(
+    dfo["surgical_service"] = dfo["surgical_service"].apply(
         lambda x: SPECIALTY_SHORTNAMES.get(x, x)
     )
     # Sort into unit order / displayed tables will NOT be sortable
     # ------------------------------------------------------------
-    dfo.sort_values(by="SurgeryDate", ascending=True, inplace=True)
+    dfo.sort_values(by="surgery_date", ascending=True, inplace=True)
 
     return [
         dt.DataTable(
             id=f"{BPID}_data_table",
-            columns=COLS,
+            columns=[
+                {"id": "surgery_date", "name": "Date"},
+                {"id": "pacu", "name": "pacu"},
+                {"id": "surgical_service", "name": "Specialty"},
+                {"id": "room_name", "name": "Theatre"},
+                {"id": "age_sex", "name": ""},
+                {"id": "name", "name": "Full Name"},
+                {"id": "primary_mrn", "name": "MRN"},
+                {"id": "patient_friendly_name", "name": "Procedure"},
+                {"id": "most_recent_asa", "name": "ASA"},
+                {"id": "most_recent_mets", "name": "METS"},
+            ],
             data=dfo.to_dict("records"),
             style_table={"width": "100%", "minWidth": "100%", "maxWidth": "100%"},
             style_as_list_view=True,  # remove col lines
@@ -264,11 +249,7 @@ def gen_table_consults(modified: int, data: dict):
     Input(request_data, "data"),
     prevent_initial_call=True,
 )
-def update_service_dropdown(data: list):
-
-    # TODO: Figure out why an empty dict is arriving here.
-    if len(data) == 1 and not data[0]:
-        return []
+def update_service_dropdown(data: list[dict]):
 
     df = parse_to_data_frame(data, GetElectiveRow)
     return df["surgical_service"].sort_values().unique()
