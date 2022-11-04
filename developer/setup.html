@@ -289,7 +289,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <li><a href="#activate-virtual-environment" id="toc-activate-virtual-environment" class="nav-link" data-scroll-target="#activate-virtual-environment">Activate Virtual Environment</a></li>
   <li><a href="#install-the-website-app-requirements" id="toc-install-the-website-app-requirements" class="nav-link" data-scroll-target="#install-the-website-app-requirements">Install The Website App Requirements</a></li>
   <li><a href="#install-the-api-requirements" id="toc-install-the-api-requirements" class="nav-link" data-scroll-target="#install-the-api-requirements">Install The API Requirements</a></li>
+  <li><a href="#configuring-environment-variables" id="toc-configuring-environment-variables" class="nav-link" data-scroll-target="#configuring-environment-variables">Configuring Environment Variables</a></li>
   <li><a href="#running-the-servers-manually-when-developing" id="toc-running-the-servers-manually-when-developing" class="nav-link" data-scroll-target="#running-the-servers-manually-when-developing">Running The Servers Manually When Developing</a></li>
+  <li><a href="#running-in-pycharm" id="toc-running-in-pycharm" class="nav-link" data-scroll-target="#running-in-pycharm">Running in PyCharm</a></li>
   </ul></li>
   <li><a href="#deployment" id="toc-deployment" class="nav-link" data-scroll-target="#deployment">Deployment</a>
   <ul class="collapse">
@@ -480,6 +482,10 @@ Note
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> pip <span class="fu">install</span> <span class="at">-e</span> <span class="st">"code/models[test]"</span></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> pip <span class="fu">install</span> <span class="at">-e</span> <span class="st">"code/api[test]"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
+<section id="configuring-environment-variables" class="level3">
+<h3 class="anchored" data-anchor-id="configuring-environment-variables">Configuring Environment Variables</h3>
+<p>An example environment variable file can be found at <code>code/.env.example</code>. The environment variables for each app are documented in the Pydantic Settings classes in <code>code/web/src/web/config.py</code> and <code>code/api/src/api/config.py</code>. An important one for development and production is the <code>WEB_API_URL</code> variable. This should be set to the host and port of your <code>code/api</code> server so most likely something like <code>http://api:8000</code> for running in Docker or <code>http://localhost:[port]/mock</code> for development. Note that in development a <code>/mock</code> path has been added. This allows the Dash web app to use all the mock endpoints instead of the live endpoints.</p>
+</section>
 <section id="running-the-servers-manually-when-developing" class="level3">
 <h3 class="anchored" data-anchor-id="running-the-servers-manually-when-developing">Running The Servers Manually When Developing</h3>
 <p>The web server when in the <code>hyui-web</code> shell:</p>
@@ -487,6 +493,10 @@ Note
 <p>The API server when in the <code>hyui-api</code> shell:</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> env <span class="va">$(</span><span class="fu">grep</span> <span class="at">-v</span> <span class="st">'^#'</span> .env <span class="kw">|</span> <span class="fu">xargs</span><span class="va">)</span> uvicorn api.main:app <span class="at">--reload</span> <span class="at">--port</span> 8092</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Ensure you replace <code>.env</code> with the correct path to your development <code>.env</code> file. The command <code>env $(grep -v '^#' .env | xargs)</code> loads the contents of the <code>.env</code> into the environment just for the current execution. The <code>grep -v '^#'</code> part excludes lines beginning with a <code>#</code> in the env file.</p>
+</section>
+<section id="running-in-pycharm" class="level3">
+<h3 class="anchored" data-anchor-id="running-in-pycharm">Running in PyCharm</h3>
+<p>On MacOS you will likely need to add the environment variable <code>OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES</code> to the <code>code/web</code> debugging process to stop a crash. This is due to a bug in the way the Dash background callback system works.</p>
 </section>
 </section>
 <section id="deployment" class="level2">
