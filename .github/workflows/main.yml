@@ -16,11 +16,11 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -e "code/utils[test]"
-          pip install -e "code/models[test]"
-          pip install -e "code/web[test]"
-          pip install -e "code/api[test]"
+          pip install -e "utils[test]"
+          pip install -e "models[test]"
+          pip install -e "web[test]"
+          pip install -e "api[test]"
       - name: Test with pytest
-        working-directory: ./code
+        working-directory: ./
         # Ideally we should not need all the environment variables to test.
         run: pytest
