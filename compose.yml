@@ -25,7 +25,8 @@ services:
     env_file: .env
     ports:
       - ${API_PORT}:8000
-
+    networks:
+      - hyui
   web:
     build:
       dockerfile: docker/web/Dockerfile
@@ -36,3 +37,10 @@ services:
     env_file: .env
     ports:
       - ${WEB_PORT}:8000
+    depends_on:
+      - api
+    networks:
+      - hyui
+
+networks:
+  hyui:
