@@ -135,16 +135,16 @@ This is an experimental workflow designed to ultimately align the way packages a
 
 ## Architecture
 
-The `code` directory contains all the libraries that are used to power the HyUi dashboards.
+The root directory contains all the libraries that are used to power the HyUi dashboards.
 
-- `code/api`: This is a FastAPI app that does all the data wrangling and accessing of external sources such as to databases and web services. For each route there should be an equivalent mock route that allows this app to serve mock data when run in development. For example, if there is a `/census/` endpoint then there should be a corresponding `/mock/census` endpoint that only serves mock data.
-- `code/web`: This is contains the Plotly Dash web server code. It should *only* communicate with the `code/api` service. This allows the `code/api` service to provide mock data seamlessly when developing without needing to spin up other services to help development.
-- `code/models`: This contains all the Pydantic models that are used to share data between the `code/api` and `code/web`.
+- `api`: This is a FastAPI app that does all the data wrangling and accessing of external sources such as to databases and web services. For each route there should be an equivalent mock route that allows this app to serve mock data when run in development. For example, if there is a `/census/` endpoint then there should be a corresponding `/mock/census` endpoint that only serves mock data.
+- `web`: This is contains the Plotly Dash web server code. It should *only* communicate with the `api` service. This allows the `api` service to provide mock data seamlessly when developing without needing to spin up other services to help development.
+- `models`: This contains all the Pydantic models that are used to share data between the `api` and `web`.
 
 ### Architecture Ideals
-- `code/web` should only communicate with `code/api` for data. This allows us to entirely mock data for `code/web` when developing.
-- Communication between `code/web` and `code/api` should only be done in a defined way using models described in `code/models`. `code/models` is the only shared code between `code/api` and `code/web`.
-- Pages in `code/web/src/web/pages` should be independent of each other so there is minimal/no sharing between two sets of pages. Common code can be put in a separate module or package in `code/web`.
+- `web` should only communicate with `api` for data. This allows us to entirely mock data for `web` when developing.
+- Communication between `web` and `api` should only be done in a defined way using models described in `models`. `models` is the only shared code between `api` and `web`.
+- Pages in `web/src/web/pages` should be independent of each other so there is minimal/no sharing between two sets of pages. Common code can be put in a separate module or package in `web`.
 
 
 ## Development
@@ -174,30 +174,30 @@ In another shell:
 > pyenv activate hyui-api
 ```
 
-These will be the Python virtual envronments that contains all the dependencies for the Dash web app and the API backend.
+These will be the Python virtual environments that contains all the dependencies for the Dash web app and the API backend.
 
 ### Install The Website App Requirements
 
 In the `hyui-web` terminal in the root directory:
 
 ```sh
-> pip install -e "code/utils[test]"
-> pip install -e "code/models[test]"
-> pip install -e "code/web[test]"
+> pip install -e "utils[test]"
+> pip install -e "models[test]"
+> pip install -e "web[test]"
 ```
 
 ### Install The API Requirements
 In the `hyui-api` terminal in the root directory:
 
 ```sh
-> pip install -e "code/utils[test]"
-> pip install -e "code/models[test]"
-> pip install -e "code/api[test]"
+> pip install -e "utils[test]"
+> pip install -e "models[test]"
+> pip install -e "api[test]"
 ```
 
 ### Configuring Environment Variables
 
-An example environment variable file can be found at `code/.env.example`. The environment variables for each app are documented in the Pydantic Settings classes in `code/web/src/web/config.py` and `code/api/src/api/config.py`. An important one for development and production is the `WEB_API_URL` variable. This should be set to the host and port of your `code/api` server so most likely something like `http://api:8000` for running in Docker or `http://localhost:[port]/mock` for development. Note that in development a `/mock` path has been added. This allows the Dash web app to use all the mock endpoints instead of the live endpoints.
+An example environment variable file can be found at `.env.example`. The environment variables for each app are documented in the Pydantic Settings classes in `web/src/web/config.py` and `api/src/api/config.py`. An important one for development and production is the `WEB_API_URL` variable. This should be set to the host and port of your `api` server so most likely something like `http://api:8000` for running in Docker or `http://localhost:[port]/mock` for development. Note that in development a `/mock` path has been added. This allows the Dash web app to use all the mock endpoints instead of the live endpoints.
 
 ### Running The Servers Manually When Developing
 
@@ -217,11 +217,11 @@ Ensure you replace `.env` with the correct path to your development `.env` file.
 
 ### Running in PyCharm
 
-On MacOS you will likely need to add the environment variable `OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES` to the `code/web` debugging process to stop a crash. This is due to a bug in the way the Dash background callback system works.
+On MacOS you will likely need to add the environment variable `OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES` to the `web` debugging process to stop a crash. This is due to a bug in the way the Dash background callback system works.
 
 ## Deployment
 
-First create a `code/.env` file and ensure it is correct.
+First create a `.env` file and ensure it is correct.
 
 ### Build the Docker Compose services.
 
