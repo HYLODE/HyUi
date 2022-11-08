@@ -1,4 +1,4 @@
-FROM python:3.11.0
+FROM python:3.10.7
 
 SHELL ["/bin/bash", "-o", "pipefail", "-e", "-u", "-x", "-c"]
 
@@ -10,7 +10,7 @@ RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
 RUN export DEBIAN_FRONTEND=noninteractive && \
     export ACCEPT_EULA=Y && \
     apt-get update && \
-    apt-get install --yes --no-install-recommends unixodbc-dev msodbcsql17 mssql-tools vim
+    apt-get install --yes --no-install-recommends unixodbc-dev msodbcsql18 mssql-tools18 vim
 
 # Clean up after building.
 RUN  apt-get autoremove && apt-get clean && rm -rf /var/lib/apt/lists/*
