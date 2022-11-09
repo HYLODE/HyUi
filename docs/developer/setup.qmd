@@ -1,134 +1,4 @@
-# Developing for HyUI
-
-Read this if
-
-- you are able to code in Python
-- you already have access to data at UCLH (e.g. EMAP databases or a HYLODE API)
-- you want to build a data visualisation using Plotly Dash
-
-## Development environments
-
-There are 2 primary environments needed for development: local machine and a live machine
-
-### Local machine
-
-Your own laptop etc. without access to personally identifiable information (PII) etc.
-You wish to be able to build and run applications with test data.
-
-### Live machine
-
-An NHS machine or similar within sensitive environment with access to PII.
-You wish to be able to deploy the actual application or generate synthetic data to use in a local environment.
-
-## Setting up your local development environment
-
-### Requirements
-
-- Python 3.6.1+ installed
-- Install `direnv`, [following these instructions](loading_environment_variables.md#installing-direnv)
-- Install `conda miniforge` (e.g. `brew install miniforge`)
-
-:::{.callout-note}
-We assume that the majority of the development work will be on your own machine. You will therefore need to set-up your own dev environment. I have been using [conda miniforge](https://github.com/conda-forge/miniforge) because this has the best compatibility with the ARM processor on the Mac. I think it should also work on other machines but I have not tested this.
-:::
-
-### Clone HyUI to your local machine
-
-```sh
-git clone https://github.com/HYLODE/HyUi.git
-cd HyUi
-cp .env.example .env
-```
-
-### Set up conda environment
-
-```sh
-conda env create --file=./dev/environment.yml
-conda activate hyui
-```
-
-Then confirm your set-up is OK
-
-```sh
-pytest -m smoke src/tests/smoke
-```
-
-### Direnv (optional)
-
-Automatically activate your conda environment when you `cd` into the `hyui` directory
-
-https://github.com/theskumar/python-dotenv
-installed python-dotenv
-```bash
-pip install python-dotenv
-```
-
-and https://direnv.net
-
-```bash
-brew install direnv
-touch .envrc
-direnv allow .
-```
-
-add the following to .zshrc
-```bash
-eval "$(direnv hook zsh)"
-```
-
-### Pre-commit
-see docs/contributor_guide/pre_commit_hooks.md
-need to run this by hand the first time
-```sh
-pre-commit install
-pre-commit run
-```
-
-### Running the backend and frontend
-
-Depending on your dev computer, you may not want to run HyUI using Docker (e.g. Apple Silicon laptops experience very high memory use when running docker.)
-
-#### Docker
-
-Run `docker-compose up -d` to stand up both backend and frontend services using docker.
-
-*WARNING*: you may need `docker compose` rather than `docker-compose` depending on your docker version
-*WARNING*: docker services depend on a valid `.env` file (specifically to hold the postgres credentials)
-
-#### Backend services without Docker
-
-```sh
-cd ./src
-uvicorn api.main:app --reload --workers 4 --host 0.0.0.0 --port 8092
-```
-
-then navigate to [http://localhost:8092/docs](http://localhost:8092/docs) to view the API documentation
-
-#### Fronend service without Docker
-
-```sh
-cd ./src
-ENV=dev DOCKER=False python apps/app.py
-```
-
-then navigate to [http://localhost:8093](http://localhost:8093) to view the app
-
-#### Using PyCharm to debug
-#
-- Ensure the execution envrionment is setup to use the previously created Conda hyui.
-- Use EnvFile plugin to source the `.env` file in the root directory.
-- Ensure the working directory is `src` not `src\apps`.
-
-## Development workflow
-
-Once you're up and running, you can review the development workflow in [Development Workflow](dev-workflow.md)
-
-## Apple Silicon notes
-
-See [Hylode HySys](https://github.com/HYLODE/HySys/tree/dev/hylode#5-development)
-
-
-# Experimental PyEnv + Virtualenv + Pip Workflow
+# Developing For HyUi
 
 ## Overview
 This is an experimental workflow designed to ultimately align the way packages are installed on development machines and in production. It is ultimately intended to replace Conda.
@@ -157,8 +27,8 @@ The root directory contains all the libraries that are used to power the HyUi da
 ### Create Required Virtual Environments
 
 ```sh
-> pyenv virtualenv 3.11.0 hyui-web
-> pyenv virtualenv 3.11.0 hyui-api
+pyenv virtualenv 3.11.0 hyui-web
+pyenv virtualenv 3.11.0 hyui-api
 ```
 
 ### Activate Virtual Environment
@@ -166,12 +36,12 @@ The root directory contains all the libraries that are used to power the HyUi da
 In one shell:
 
 ```sh
-> pyenv activate hyui-web
+pyenv activate hyui-web
 ```
 
 In another shell:
 ```sh
-> pyenv activate hyui-api
+pyenv activate hyui-api
 ```
 
 These will be the Python virtual environments that contains all the dependencies for the Dash web app and the API backend.
@@ -181,18 +51,26 @@ These will be the Python virtual environments that contains all the dependencies
 In the `hyui-web` terminal in the root directory:
 
 ```sh
-> pip install -e "utils[test]"
-> pip install -e "models[test]"
-> pip install -e "web[test]"
+pip install -e "utils[test]"
+pip install -e "models[test]"
+pip install -e "web[test]"
 ```
 
 ### Install The API Requirements
 In the `hyui-api` terminal in the root directory:
 
 ```sh
-> pip install -e "utils[test]"
-> pip install -e "models[test]"
-> pip install -e "api[test]"
+pip install -e "utils[test]"
+pip install -e "models[test]"
+pip install -e "api[test]"
+```
+
+### Install The pre-commit Hooks
+
+In your shell (`hyui-api` or `hyui-web`) runn the following command:
+
+```sh
+pre-commit install
 ```
 
 ### Configuring Environment Variables
