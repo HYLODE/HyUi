@@ -3,7 +3,7 @@ name: Unit Test Packages
 on: [push]
 
 jobs:
-  build:
+  continuous-integration:
 
     runs-on: ubuntu-latest
 
