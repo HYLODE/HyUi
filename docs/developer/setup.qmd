@@ -27,8 +27,8 @@ The root directory contains all the libraries that are used to power the HyUi da
 ### Create Required Virtual Environments
 
 ```sh
-> pyenv virtualenv 3.11.0 hyui-web
-> pyenv virtualenv 3.11.0 hyui-api
+pyenv virtualenv 3.11.0 hyui-web
+pyenv virtualenv 3.11.0 hyui-api
 ```
 
 ### Activate Virtual Environment
@@ -36,12 +36,12 @@ The root directory contains all the libraries that are used to power the HyUi da
 In one shell:
 
 ```sh
-> pyenv activate hyui-web
+pyenv activate hyui-web
 ```
 
 In another shell:
 ```sh
-> pyenv activate hyui-api
+pyenv activate hyui-api
 ```
 
 These will be the Python virtual environments that contains all the dependencies for the Dash web app and the API backend.
@@ -51,18 +51,26 @@ These will be the Python virtual environments that contains all the dependencies
 In the `hyui-web` terminal in the root directory:
 
 ```sh
-> pip install -e "utils[test]"
-> pip install -e "models[test]"
-> pip install -e "web[test]"
+pip install -e "utils[test]"
+pip install -e "models[test]"
+pip install -e "web[test]"
 ```
 
 ### Install The API Requirements
 In the `hyui-api` terminal in the root directory:
 
 ```sh
-> pip install -e "utils[test]"
-> pip install -e "models[test]"
-> pip install -e "api[test]"
+pip install -e "utils[test]"
+pip install -e "models[test]"
+pip install -e "api[test]"
+```
+
+### Install The pre-commit Hooks
+
+In your shell (`hyui-api` or `hyui-web`) runn the following command:
+
+```sh
+pre-commit install
 ```
 
 ### Configuring Environment Variables
