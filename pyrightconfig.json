@@ -1,5 +1,0 @@
-{
-	// Install LSP-json to get validation and autocompletion in this file. # noqa
-	"venvPath": "/opt/homebrew/Caskroom/miniforge/base/envs",
-	"venv": "hyui"
-}

@@ -1,122 +1,124 @@
-# Developing for HyUI
+# Developing For HyUi
 
-Read this if
+## Overview
+This is an experimental workflow designed to ultimately align the way packages are installed on development machines and in production. It is ultimately intended to replace Conda.
 
-- you are able to code in Python
-- you already have access to data at UCLH (e.g. EMAP databases or a HYLODE API)
-- you want to build a data visualisation using Plotly Dash
+## Architecture
 
-## Development environments
+The root directory contains all the libraries that are used to power the HyUi dashboards.
 
-There are 2 primary environments needed for development: local machine and a live machine
+- `api`: This is a FastAPI app that does all the data wrangling and accessing of external sources such as to databases and web services. For each route there should be an equivalent mock route that allows this app to serve mock data when run in development. For example, if there is a `/census/` endpoint then there should be a corresponding `/mock/census` endpoint that only serves mock data.
+- `web`: This is contains the Plotly Dash web server code. It should *only* communicate with the `api` service. This allows the `api` service to provide mock data seamlessly when developing without needing to spin up other services to help development.
+- `models`: This contains all the Pydantic models that are used to share data between the `api` and `web`.
 
-### Local machine
+### Architecture Ideals
+- `web` should only communicate with `api` for data. This allows us to entirely mock data for `web` when developing.
+- Communication between `web` and `api` should only be done in a defined way using models described in `models`. `models` is the only shared code between `api` and `web`.
+- Pages in `web/src/web/pages` should be independent of each other so there is minimal/no sharing between two sets of pages. Common code can be put in a separate module or package in `web`.
 
-Your own laptop etc. without access to personally identifiable information (PII) etc.
-You wish to be able to build and run applications with test data.
 
-### Live machine
+## Development
 
-An NHS machine or similar within sensitive environment with access to PII.
-You wish to be able to deploy the actual application or generate synthetic data to use in a local environment.
+### Install Requirements
 
-## Setting up your local development environment
+- Install (https://github.com/pyenv/pyenv)[pyenv]
+- Install (https://github.com/pyenv/pyenv-virtualenv)[pyenv-virtualenv]
 
-### Requirements
-
-- Python 3.6.1+ installed
-- Install `direnv`, [following these instructions](loading_environment_variables.md#installing-direnv)
-- Install `conda miniforge` (e.g. `brew install miniforge`)
-
-:::{.callout-note}
-We assume that the majority of the development work will be on your own machine. You will therefore need to set-up your own dev environment. I have been using [conda miniforge](https://github.com/conda-forge/miniforge) because this has the best compatibility with the ARM processor on the Mac. I think it should also work on other machines but I have not tested this.
-:::
-
-### Clone HyUI to your local machine
+### Create Required Virtual Environments
 
 ```sh
-git clone https://github.com/HYLODE/HyUi.git
-cd HyUi
-cp .env.example .env
+pyenv virtualenv 3.11.0 hyui-web
+pyenv virtualenv 3.11.0 hyui-api
 ```
 
-### Set up conda environment
+### Activate Virtual Environment
+
+In one shell:
 
 ```sh
-conda env create --file=./dev/environment.yml
-conda activate hyui
+pyenv activate hyui-web
 ```
 
-Then confirm your set-up is OK
+In another shell:
+```sh
+pyenv activate hyui-api
+```
+
+These will be the Python virtual environments that contains all the dependencies for the Dash web app and the API backend.
+
+### Install The Website App Requirements
+
+In the `hyui-web` terminal in the root directory:
 
 ```sh
-pytest -m smoke src/tests/smoke
+pip install -e "utils[test]"
+pip install -e "models[test]"
+pip install -e "web[test]"
 ```
 
-### Direnv (optional)
+### Install The API Requirements
+In the `hyui-api` terminal in the root directory:
 
-Automatically activate your conda environment when you `cd` into the `hyui` directory
-
-https://github.com/theskumar/python-dotenv
-installed python-dotenv
-```bash
-pip install python-dotenv
+```sh
+pip install -e "utils[test]"
+pip install -e "models[test]"
+pip install -e "api[test]"
 ```
 
-and https://direnv.net
+### Install The pre-commit Hooks
 
-```bash
-brew install direnv
-touch .envrc
-direnv allow .
-```
+In your shell (`hyui-api` or `hyui-web`) runn the following command:
 
-add the following to .zshrc
-```bash
-eval "$(direnv hook zsh)"
-```
-
-### Pre-commit
-see docs/contributor_guide/pre_commit_hooks.md
-need to run this by hand the first time
 ```sh
 pre-commit install
-pre-commit run
 ```
 
-### Running the backend and frontend
+### Configuring Environment Variables
 
-Depending on your dev computer, you may not want to run HyUI using Docker (e.g. Apple Silicon laptops experience very high memory use when running docker.)
+An example environment variable file can be found at `.env.example`. The environment variables for each app are documented in the Pydantic Settings classes in `web/src/web/config.py` and `api/src/api/config.py`. An important one for development and production is the `WEB_API_URL` variable. This should be set to the host and port of your `api` server so most likely something like `http://api:8000` for running in Docker or `http://localhost:[port]/mock` for development. Note that in development a `/mock` path has been added. This allows the Dash web app to use all the mock endpoints instead of the live endpoints.
 
-#### Docker
+### Running The Servers Manually When Developing
 
-Run `docker-compose up -d` to stand up both backend and frontend services using docker.
-
-*WARNING*: you may need `docker compose` rather than `docker-compose` depending on your docker version
-*WARNING*: docker services depend on a valid `.env` file (specifically to hold the postgres credentials)
-
-#### Backend services without Docker
+The web server when in the `hyui-web` shell:
 
 ```sh
-cd ./src
-uvicorn api.main:app --reload --workers 4 --host 0.0.0.0 --port 8092
+env $(grep -v '^#' .env | xargs) python -m web.main
 ```
 
-then navigate to [http://localhost:8092/docs](http://localhost:8092/docs) to view the API documentation
-
-#### Fronend service without Docker
+The API server when in the `hyui-api` shell:
 
 ```sh
-cd ./src
-ENV=dev DOCKER=False python apps/app.py
+env $(grep -v '^#' .env | xargs) uvicorn api.main:app --reload --port 8092
 ```
 
-then navigate to [http://localhost:8093](http://localhost:8093) to view the app
+Ensure you replace `.env` with the correct path to your development `.env` file. The command `env $(grep -v '^#' .env | xargs)` loads the contents of the `.env` into the environment just for the current execution. The `grep -v '^#'` part excludes lines beginning with a `#` in the env file.
 
-## Development workflow
+### Running in PyCharm
 
-Once you're up and running, you can review the development workflow in [Development Workflow](dev-workflow.md)
+On MacOS you will likely need to add the environment variable `OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES` to the `web` debugging process to stop a crash. This is due to a bug in the way the Dash background callback system works.
 
-## Apple Silicon notes
+## Deployment
 
-See [Hylode HySys](https://github.com/HYLODE/HySys/tree/dev/hylode#5-development)
+First create a `.env` file and ensure it is correct. Decide on a `prefix` that does not clash with others if you are running multiple instances on the same machine. If the prefixes clash then you will be building and running other peoples containers.
+
+### Build the Docker Compose services.
+
+In the `code` directory:
+
+```sh
+docker compose -p [prefix] build
+```
+
+### Run the Docker Compose services
+
+In the `code` directory:
+
+```sh
+docker compose -p [prefix] up
+```
+
+### Stop And Remove Docker Containers
+
+```sh
+docker compose -p [prefix] down
+```
