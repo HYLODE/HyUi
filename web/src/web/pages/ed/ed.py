@@ -24,7 +24,6 @@ def patient_count(census_data: Any) -> str:
 @callback(
     Output("decision-to-admit-count", "children"),
     Input("individual-data", "data"),
-    background=True,
 )
 def decision_to_admit_count(census_data: Any) -> str:
     count = 3
@@ -39,6 +38,7 @@ def _get_individual_patients() -> list[EmergencyDepartmentPatient]:
 @callback(
     Output("individual-predictions-table", "data"),
     Input("title", "children"),
+    background=True,
 )
 def individual_predictions_table(title: Any) -> Any:
     patients = _get_individual_patients()
