@@ -56,8 +56,7 @@ def layout():
                     )
                 )
             ),
-            dbc.Row(dbc.Col(html.H2("Overview"))),
-            dbc.Row(dbc.Col(html.H2("Predicted Admissions"))),
+            dbc.Row(dbc.Col(html.H2("Aggregate Predictions"))),
             dbc.Row(
                 dbc.Col(
                     """

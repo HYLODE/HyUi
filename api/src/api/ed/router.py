@@ -106,22 +106,24 @@ def adjust_for_model_specific_times(t: datetime) -> datetime:
     input parameter. This function rounds down t to the closest acceptable time
     of day.
     """
-    if t > t.replace(hour=22, minute=30, second=0, microsecond=0):
-        return t.replace(hour=22, minute=30, second=0, microsecond=0)
+    t = t.replace(second=0, microsecond=0)
 
-    if t > t.replace(hour=15, minute=30, second=0, microsecond=0):
-        return t.replace(hour=15, minute=30, second=0, microsecond=0)
+    if t > t.replace(hour=22, minute=30):
+        return t.replace(hour=22, minute=30)
 
-    if t > t.replace(hour=12, minute=0, second=0, microsecond=0):
-        return t.replace(hour=12, minute=0, second=0, microsecond=0)
+    if t > t.replace(hour=15, minute=30):
+        return t.replace(hour=15, minute=30)
 
-    if t > t.replace(hour=9, minute=0, second=0, microsecond=0):
-        return t.replace(hour=9, minute=0, second=0, microsecond=0)
+    if t > t.replace(hour=12, minute=0):
+        return t.replace(hour=12, minute=0)
 
-    if t > t.replace(hour=6, minute=30, second=0, microsecond=0):
-        return t.replace(hour=6, minute=30, second=0, microsecond=0)
+    if t > t.replace(hour=9, minute=0):
+        return t.replace(hour=9, minute=0)
 
-    return (t - timedelta(days=1)).replace(hour=22, minute=30, second=0, microsecond=0)
+    if t > t.replace(hour=6, minute=30):
+        return t.replace(hour=6, minute=30)
+
+    return (t - timedelta(days=1)).replace(hour=22, minute=30)
 
 
 @router.get("/aggregate/", response_model=list[AggregateAdmissionRow])
@@ -140,5 +142,5 @@ def get_aggregate_admission_rows(settings=Depends(get_settings)):
     # {"specialty": "medical", beds_allocated": 2 ...}.
     return [
         AggregateAdmissionRow.parse_obj(dict({"speciality": row[0]}, **row[1]))
-        for row in response.json()
+        for row in response.json().items()
     ]
