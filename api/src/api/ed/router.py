@@ -3,7 +3,7 @@ from datetime import datetime, date
 import pandas as pd
 import requests
 from fastapi import APIRouter, Depends
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from api.config import get_settings
 from api.convert import parse_to_data_frame
@@ -37,12 +37,12 @@ class Census(BaseModel):
     csn: str
     mrn: str
     name: str
-    dob: date
+    date_of_birth: date = Field(..., alias="dob")
     sex: str
-    admission_dt: datetime
-    bed_code: str
-    bay_code: str
-    ward_code: str
+    arrival_datetime: datetime = Field(..., alias="admission_dt")
+    bed: str = Field(..., alias="bed_code")
+    bay: str = Field(..., alias="bay_code")
+    ward: str = Field(..., alias="ward_code")
 
 
 def _get_census(hycastle_url: str) -> pd.DataFrame:
