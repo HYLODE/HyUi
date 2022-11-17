@@ -24,6 +24,7 @@ def patient_count(census_data: Any) -> str:
 @callback(
     Output("decision-to-admit-count", "children"),
     Input("individual-data", "data"),
+    background=True,
 )
 def decision_to_admit_count(census_data: Any) -> str:
     count = 3
