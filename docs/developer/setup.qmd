@@ -67,7 +67,7 @@ pip install -e "api[test]"
 
 ### Install The pre-commit Hooks
 
-In your shell (`hyui-api` or `hyui-web`) runn the following command:
+In your shell (`hyui-api` or `hyui-web`) run the following command:
 
 ```sh
 pre-commit install
