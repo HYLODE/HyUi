@@ -12,24 +12,6 @@ from web.config import get_settings
 register_page(__name__, name="ED Admissions")
 
 
-@callback(
-    Output("patient-count", "children"),
-    Input("individual-data", "data"),
-)
-def patient_count(census_data: Any) -> str:
-    count = 2
-    return f"Patients in the department: {count}."
-
-
-@callback(
-    Output("decision-to-admit-count", "children"),
-    Input("individual-data", "data"),
-)
-def decision_to_admit_count(census_data: Any) -> str:
-    count = 3
-    return f"Patients with decisions to admit: {count}."
-
-
 def _get_individual_patients() -> list[EmergencyDepartmentPatient]:
     response = requests.get(f"{get_settings().api_url}/ed/individual/")
     return [EmergencyDepartmentPatient.parse_obj(row) for row in response.json()]
@@ -53,6 +35,7 @@ def _get_aggregations() -> list[AggregateAdmissionRow]:
 @callback(
     Output("beds-required", "data"),
     Input("title", "children"),
+    background=True,
 )
 def beds_required(title: Any) -> Any:
     aggregations = _get_aggregations()
@@ -74,8 +57,6 @@ def layout():
                 )
             ),
             dbc.Row(dbc.Col(html.H2("Overview"))),
-            dbc.Row(dbc.Col(id="patient-count")),
-            dbc.Row(dbc.Col(id="decision-to-admit-count")),
             dbc.Row(dbc.Col(html.H2("Predicted Admissions"))),
             dbc.Row(
                 dbc.Col(
