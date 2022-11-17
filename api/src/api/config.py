@@ -14,6 +14,7 @@ class Settings(BaseSettings):
 
     hycastle_url: AnyHttpUrl
     hymind_url: AnyHttpUrl
+    towermail_url: AnyHttpUrl
 
     class Config:
         env_prefix = "api_"

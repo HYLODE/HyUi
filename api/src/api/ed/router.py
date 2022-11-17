@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 
 import pandas as pd
 import requests
@@ -100,16 +100,45 @@ def get_mock_aggregate_admission_rows():
     ]
 
 
+def adjust_for_model_specific_times(t: datetime) -> datetime:
+    """
+    The current aggregation model only accepts specific times of the day as an
+    input parameter. This function rounds down t to the closest acceptable time
+    of day.
+    """
+    if t > t.replace(hour=22, minute=30, second=0, microsecond=0):
+        return t.replace(hour=22, minute=30, second=0, microsecond=0)
+
+    if t > t.replace(hour=15, minute=30, second=0, microsecond=0):
+        return t.replace(hour=15, minute=30, second=0, microsecond=0)
+
+    if t > t.replace(hour=12, minute=0, second=0, microsecond=0):
+        return t.replace(hour=12, minute=0, second=0, microsecond=0)
+
+    if t > t.replace(hour=9, minute=0, second=0, microsecond=0):
+        return t.replace(hour=9, minute=0, second=0, microsecond=0)
+
+    if t > t.replace(hour=6, minute=30, second=0, microsecond=0):
+        return t.replace(hour=6, minute=30, second=0, microsecond=0)
+
+    return (t - timedelta(days=1)).replace(hour=22, minute=30, second=0, microsecond=0)
+
+
 @router.get("/aggregate/", response_model=list[AggregateAdmissionRow])
-def get_aggregate_admission_rows():
+def get_aggregate_admission_rows(settings=Depends(get_settings)):
+    horizon_dt = datetime.now()
+
+    response = requests.get(
+        f"{settings.towermail_url}/aggregations/",
+        params={
+            "horizon_dt": adjust_for_model_specific_times(horizon_dt),
+        },
+    )
+
+    # Use dict({"speciality":row[0]}, **row[1]) to turn
+    # {"medical": {"beds_allocated: 2, ...}} into
+    # {"specialty": "medical", beds_allocated": 2 ...}.
     return [
-        AggregateAdmissionRow(
-            speciality="medical",
-            beds_allocated=5,
-            beds_not_allocated=2,
-            without_decision_to_admit_seventy_percent=6,
-            without_decision_to_admit_ninety_percent=4,
-            yet_to_arrive_seventy_percent=10,
-            yet_to_arrive_ninety_percent=6,
-        )
+        AggregateAdmissionRow.parse_obj(dict({"speciality": row[0]}, **row[1]))
+        for row in response.json()
     ]
