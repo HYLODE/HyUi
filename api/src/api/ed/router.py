@@ -142,8 +142,8 @@ def adjust_for_model_specific_times(t: datetime) -> datetime:
     if t > t.replace(hour=12, minute=0):
         return t.replace(hour=12, minute=0)
 
-    if t > t.replace(hour=9, minute=0):
-        return t.replace(hour=9, minute=0)
+    if t > t.replace(hour=9, minute=30):
+        return t.replace(hour=9, minute=30)
 
     if t > t.replace(hour=6, minute=30):
         return t.replace(hour=6, minute=30)
