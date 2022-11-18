@@ -103,10 +103,10 @@ def layout():
                                 "type": "numeric",
                                 "format": FormatTemplate.percentage(0),
                             },
-                            # {
-                            #     "name": "Decision To Admit?",
-                            #     "id": "decision_to_admit_str",
-                            # },
+                            {
+                                "name": "Next Location",
+                                "id": "next_location",
+                            },
                         ],
                         sort_action="native",
                         sort_mode="multi",

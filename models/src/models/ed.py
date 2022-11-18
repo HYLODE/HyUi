@@ -11,6 +11,7 @@ class EmergencyDepartmentPatient(BaseModel):
     sex: str
     date_of_birth: date
     admission_probability: float | None
+    next_location: str | None
 
 
 class AggregateAdmissionRow(BaseModel):

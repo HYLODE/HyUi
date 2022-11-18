@@ -1,4 +1,5 @@
 from datetime import datetime, date, timedelta
+from typing import cast
 
 import pandas as pd
 import requests
@@ -6,7 +7,9 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 
 from api.config import get_settings
-from api.convert import parse_to_data_frame
+from api.convert import parse_to_data_frame, to_data_frame
+from api.db import get_star_session
+from api.movement import next_locations, NextLocation
 from models.ed import EmergencyDepartmentPatient, AggregateAdmissionRow
 
 router = APIRouter(
@@ -70,14 +73,33 @@ def _get_individual_predictions(hymind_url: str) -> pd.DataFrame:
     return parse_to_data_frame(response.json()["data"], IndividualPrediction)
 
 
+def _set_next_location_text(row: pd.Series) -> str | None:
+    if pd.isnull(row["event_datetime"]):
+        return None
+
+    if pd.isnull(row["next_location"]):
+        return "Possibly Ward"
+
+    return cast(str, row["next_location"])
+
+
 @router.get("/individual/", response_model=list[EmergencyDepartmentPatient])
-def get_individual_admission_rows(settings=Depends(get_settings)):
+def get_individual_admission_rows(
+    settings=Depends(get_settings), star_session=Depends(get_star_session)
+):
     census_df = _get_census(settings.hycastle_url)
     features_df = _get_features(settings.hycastle_url)
     predictions_df = _get_individual_predictions(settings.hymind_url)
 
+    csns = census_df["csn"].tolist()
+    next_locations_df = to_data_frame(next_locations(star_session, csns), NextLocation)
+
     output_df = pd.merge(census_df, features_df, on="csn", how="left")
     output_df = pd.merge(output_df, predictions_df, on="episode_slice_id", how="left")
+    output_df = pd.merge(output_df, next_locations_df, on="csn", how="left")
+    output_df["next_location"] = output_df.apply(
+        _set_next_location_text, axis="columns"
+    )
     output_df = output_df.rename(
         columns={"prediction_as_real": "admission_probability"}
     )
