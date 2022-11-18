@@ -78,7 +78,9 @@ def get_individual_admission_rows(settings=Depends(get_settings)):
 
     output_df = pd.merge(census_df, features_df, on="csn", how="left")
     output_df = pd.merge(output_df, predictions_df, on="episode_slice_id", how="left")
-    output_df = output_df.rename({"prediction_as_real": "admission_probability"})
+    output_df = output_df.rename(
+        columns={"prediction_as_real": "admission_probability"}
+    )
 
     return [
         EmergencyDepartmentPatient.parse_obj(row)
