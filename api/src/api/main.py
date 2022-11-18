@@ -41,7 +41,7 @@ app.include_router(electives_router)
 mock_router.include_router(mock_electives_router)
 
 app.include_router(ed_router)
-app.include_router(mock_ed_router)
+mock_router.include_router(mock_ed_router)
 
 app.include_router(bedbones_router)
 app.include_router(consults_router)
@@ -50,6 +50,7 @@ app.include_router(perrt_router)
 app.include_router(ros_router)
 app.include_router(hymind_router)
 
+# Finally include the mock router.
 app.include_router(mock_router)
 
 

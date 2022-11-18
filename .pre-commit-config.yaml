@@ -34,7 +34,7 @@ repos:
       - id: black
         name: black - consistent Python code formatting (auto-fixes)
         language_version: python3.10
-  - repo: https://gitlab.com/pycqa/flake8.git
+  - repo: https://github.com/pycqa/flake8
     rev: 5.0.4
     hooks:
       - id: flake8
