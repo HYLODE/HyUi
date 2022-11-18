@@ -28,7 +28,7 @@ def next_locations(star_session: Session, csns: list[str]) -> list[NextLocation]
         SELECT DISTINCT ON (hv.encounter) hv.encounter AS csn,
             l.location_string AS next_location,
             d.speciality AS next_speciality,
-            pm.event_datetime AS event_dt
+            pm.event_datetime
         FROM star.planned_movement pm
         INNER JOIN star.hospital_visit hv
             ON hv.hospital_visit_id = pm.hospital_visit_id
