@@ -34,7 +34,6 @@ RUN pip install --no-cache-dir /app/models
 COPY --chown=hyui:root ./web/pyproject.toml /app/web/
 RUN pip install --no-cache-dir /app/web
 
-COPY --chown=hyui:root ./utils/src/utils /app/utils
 COPY --chown=hyui:root ./models/src/models /app/models
 COPY --chown=hyui:root ./web/src/web /app/web
 
