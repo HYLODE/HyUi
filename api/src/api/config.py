@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     towermail_url: AnyHttpUrl
 
     class Config:
+        # the prefix below prioritises and scopes the .env variables
         env_prefix = "api_"
         frozen = True  # So Settings can be hashable and cachable
 

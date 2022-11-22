@@ -1,7 +1,8 @@
 # Developing For HyUi
 
 ## Overview
-This is an experimental workflow designed to ultimately align the way packages are installed on development machines and in production. It is ultimately intended to replace Conda.
+
+This is the recommended workflow designed to ultimately align the way packages are installed on development machines and in production. It is ultimately intended to replace Conda.
 
 ## Architecture
 
@@ -19,10 +20,16 @@ The root directory contains all the libraries that are used to power the HyUi da
 
 ## Development
 
+Clone the HyUi repository to your local machine.
+
+```sh
+git clone https://github.com/HYLODE/HyUi.git
+```
+
 ### Install Requirements
 
-- Install (https://github.com/pyenv/pyenv)[pyenv]
-- Install (https://github.com/pyenv/pyenv-virtualenv)[pyenv-virtualenv]
+- Install [https://github.com/pyenv/pyenv](pyenv)
+- Install [https://github.com/pyenv/pyenv-virtualenv](pyenv-virtualenv)
 
 ### Create Required Virtual Environments
 
@@ -46,7 +53,7 @@ pyenv activate hyui-api
 
 These will be the Python virtual environments that contains all the dependencies for the Dash web app and the API backend.
 
-### Install The Website App Requirements
+### Install the Website app requirements
 
 In the `hyui-web` terminal in the root directory:
 
@@ -55,7 +62,7 @@ pip install -e "models[test]"
 pip install -e "web[test]"
 ```
 
-### Install The API Requirements
+### Install the API requirements
 In the `hyui-api` terminal in the root directory:
 
 ```sh
@@ -74,6 +81,8 @@ pre-commit install
 ### Configuring Environment Variables
 
 An example environment variable file can be found at `.env.example`. The environment variables for each app are documented in the Pydantic Settings classes in `web/src/web/config.py` and `api/src/api/config.py`. An important one for development and production is the `WEB_API_URL` variable. This should be set to the host and port of your `api` server so most likely something like `http://api:8000` for running in Docker or `http://localhost:[port]/mock` for development. Note that in development a `/mock` path has been added. This allows the Dash web app to use all the mock endpoints instead of the live endpoints.
+
+The environment variables are _required_, and the application will fail if any of these are missing when it attempts to run.
 
 ### Running The Servers Manually When Developing
 
