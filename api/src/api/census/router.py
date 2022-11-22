@@ -214,7 +214,7 @@ def get_mock_census(
 @router.get("/", response_model=list[CensusRow])
 def get_census(
     session: Session = Depends(get_star_session),
-    departments: list[str] = Query(default=wards.ALL[:3]),
+    departments: list[str] = Query(default=[]),
     locations: list[str] = Query(default=[]),
 ) -> list[CensusRow]:
     query = text((Path(__file__).parent / "live.sql").read_text())
