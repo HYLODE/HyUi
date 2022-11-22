@@ -83,7 +83,7 @@ def get_mock_beds(department: str) -> list[BedRow]:
 
 @router.get("/census/", response_class=RedirectResponse)
 def get_census(department: str) -> str:
-    params = urlencode({"department": department})
+    params = urlencode({"departments": department})
     return f"/census/?{params}"
 
 
@@ -104,7 +104,7 @@ def get_mock_census(department: str) -> list[CensusRow]:
     ]
 
 
-@mock_router.get("/live/{ward}/ui", response_model=list[SitrepRow])
+@mock_router.get("/live/{ward}/ui/", response_model=list[SitrepRow])
 def get_mock_live_ui(ward: str) -> list[SitrepRow]:
     engine = create_engine(f"sqlite:///{Path(__file__).parent}/mock.db", future=True)
 
@@ -113,7 +113,7 @@ def get_mock_live_ui(ward: str) -> list[SitrepRow]:
         return [SitrepRow.parse_obj(row) for row in result]
 
 
-@router.get("/live/{ward}/ui", response_model=list[SitrepRow])
+@router.get("/live/{ward}/ui/", response_model=list[SitrepRow])
 def get_live_ui(ward: str, settings=Depends(get_settings)) -> list[SitrepRow]:
     response = requests.get(f"{settings.hycastle_url}/live/icu/{ward}/ui")
     rows = response.json()["data"]
