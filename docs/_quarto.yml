@@ -33,7 +33,6 @@ website:
           - developer/workflow.qmd
           - developer/documentation.qmd
           - developer/synthetic-data.qmd
-          - developer/environment-variables.qmd
       - section: "Contributing"
         contents:
           - contributor_guide/CODE_OF_CONDUCT.qmd

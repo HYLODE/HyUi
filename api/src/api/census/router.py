@@ -205,7 +205,7 @@ def get_departments(
 
 @mock_router.get("/", response_model=list[CensusRow])
 def get_mock_census(
-    departments: list[str] = Query(default=wards.ALL[:3]),
+    departments: list[str] = Query(default=[]),
     locations: list[str] = Query(default=[]),
 ) -> list[CensusRow]:
     return fetch_mock_census(departments, locations)
