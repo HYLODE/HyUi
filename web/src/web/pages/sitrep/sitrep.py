@@ -14,7 +14,7 @@ from web.pages.sitrep import (
 
 import web.pages.sitrep.callbacks  # noqa
 
-from utils import icons
+from web import icons
 
 register_page(__name__)
 
@@ -52,7 +52,7 @@ STYLE_CELL_CONDITIONAL = [
     },
     {"if": {"column_id": "organ_icons"}, "textAlign": "left"},
     {"if": {"column_id": "name"}, "fontWeight": "bold"},
-    {"if": {"column_id": "DischargeReady"}, "textAlign": "left"},
+    {"if": {"column_id": "discharge_ready"}, "textAlign": "left"},
 ]
 
 
@@ -153,8 +153,8 @@ def gen_fancy_table(data: dict):
                     "format": FormatTemplate.percentage(0),
                 },
                 {
-                    "id": "DischargeReady",
-                    "name": "Discharge decision",
+                    "id": "discharge_ready",
+                    "name": "Discharge Decision",
                     "presentation": "dropdown",
                     "editable": True,
                 },
@@ -165,11 +165,11 @@ def gen_fancy_table(data: dict):
             editable=True,
             style_table={"width": "100%", "minWidth": "100%", "maxWidth": "100%"},
             dropdown={
-                "DischargeReady": {
+                "discharge_ready": {
                     "options": [
-                        {"label": "READY", "value": "ready"},
+                        {"label": "Ready", "value": "ready"},
                         {"label": "Review", "value": "review"},
-                        {"label": "-", "value": "No"},
+                        {"label": "Not Ready", "value": "no"},
                     ],
                     "clearable": False,
                 },

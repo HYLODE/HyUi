@@ -2,11 +2,9 @@
 sub-application for Bed Bones
 use the base row API to create a skeleton bed table for any ward
 """
-
-
+import collections
 from collections import OrderedDict
 
-import utils
 import dash_bootstrap_components as dbc
 import pandas as pd
 import requests
@@ -77,6 +75,40 @@ layout = html.Div(
         dash_only,
     ],
 )
+
+
+def deep_update(source, overrides):
+    """
+    Update a nested dictionary or similar mapping.
+    Modify ``source`` in place.
+    via https://stackoverflow.com/a/30655448/992999
+    """
+    for key, value in overrides.items():
+        if isinstance(value, collections.abc.Mapping) and value:
+            # note recursive
+            returned = deep_update(source.get(key, {}), value)
+            source[key] = returned
+        else:
+            source[key] = overrides[key]
+    return source
+
+
+def get_dict_from_list(llist, kkey, vval):
+    """
+    Given a list of dictionaries, and a key:value pair, will return the matching
+    dictionary
+    """
+    matches = 0
+    for ddict in llist:
+        if ddict[kkey] == vval:
+            res = ddict
+            matches += 1
+    if matches == 0:
+        return {}
+    elif matches == 1:
+        return res
+    else:
+        raise ValueError(f"{matches} matches for {kkey}={vval}; expected only 1")
 
 
 @callback(
@@ -156,12 +188,12 @@ def gen_bed_table(data: dict):
     # Prep columns with ids and names
     COL_DICT = [{"name": v, "id": k} for k, v in COLS.items() if k in COLS]
 
-    utils.deep_update(
-        utils.get_dict_from_list(COL_DICT, "id", "unit_order"),
+    deep_update(
+        get_dict_from_list(COL_DICT, "id", "unit_order"),
         dict(type="numeric"),
     )
-    utils.deep_update(
-        utils.get_dict_from_list(COL_DICT, "id", "unit_order"),
+    deep_update(
+        get_dict_from_list(COL_DICT, "id", "unit_order"),
         dict(format=Format(precision=0, scheme=Scheme.fixed)),
     )
 

@@ -17,10 +17,6 @@ from web.pages.census import (
     CACHE_TIMEOUT,
 )
 
-from utils.beds import (
-    unpack_nested_dict,
-)
-
 CENSUS_KEEP_COLS = [
     "location_string",
     "location_id",
@@ -51,6 +47,34 @@ cache = Cache(
         "CACHE_DIR": "cache-directory",
     },
 )
+
+
+def _unpack_nested_dict(
+    rows: list[dict],
+    f2unpack: str,
+    subkey: str,
+    new_name: str = "",
+) -> list[dict]:
+    """
+    Unpack fields with nested dictionaries
+
+    :param      rows:  The rows
+    :param      f2unpack:  field to unpack
+    :param      subkey:  key within nested dictionary to use
+    :param      new_name: new name for field else overwrite if None
+
+    :returns:   { description_of_the_return_value }
+    """
+    for row in rows:
+        i2unpack = row.get(f2unpack, [])
+        vals = [i.get(subkey, "") for i in i2unpack]
+        vals_str = "|".join(vals)
+        if new_name:
+            row[new_name] = vals_str
+        else:
+            row.pop(f2unpack, None)
+            row[f2unpack] = vals_str
+    return rows
 
 
 @callback(
@@ -114,8 +138,8 @@ def store_beds(n_intervals: int, dept: str):
     Stores data from census api (i.e. skeleton)
     """
     beds = _get_bed_list(dept)
-    beds = unpack_nested_dict(beds, f2unpack="bed_functional", subkey="value")
-    beds = unpack_nested_dict(beds, f2unpack="bed_physical", subkey="value")
+    beds = _unpack_nested_dict(beds, f2unpack="bed_functional", subkey="value")
+    beds = _unpack_nested_dict(beds, f2unpack="bed_physical", subkey="value")
 
     if all([not bool(i) for i in beds]):
         warnings.warn("[WARN] store_beds returned an empty list of dictionaries")
