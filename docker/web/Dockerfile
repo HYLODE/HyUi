@@ -28,16 +28,12 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH:/opt/mssql-tools/bin"
 
 RUN pip install --no-cache-dir -U pip
 
-COPY --chown=hyui:root ./utils/pyproject.toml /app/utils/
-RUN pip install --no-cache-dir /app/utils
-
 COPY --chown=hyui:root ./models/pyproject.toml /app/models/
 RUN pip install --no-cache-dir /app/models
 
 COPY --chown=hyui:root ./web/pyproject.toml /app/web/
 RUN pip install --no-cache-dir /app/web
 
-COPY --chown=hyui:root ./utils/src/utils /app/utils
 COPY --chown=hyui:root ./models/src/models /app/models
 COPY --chown=hyui:root ./web/src/web /app/web
 

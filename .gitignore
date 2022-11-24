@@ -905,6 +905,7 @@ synth/.home/*
 docs/_linkcheck/
 
 # Ignore sublime artifacts
+*.sublime-project
 *.sublime-workspace
 *.code-workspace
 ./sftp-config.json

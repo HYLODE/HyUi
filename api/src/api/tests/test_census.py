@@ -34,7 +34,9 @@ def test_get_mock_departments():
 
 
 def test_get_mock_census():
-    response = client.get("/mock/census/")
+    response = client.get(
+        "/mock/census/", params={"departments": "UCH T03 INTENSIVE CARE"}
+    )
     assert response.status_code == 200
 
     census_rows = [CensusRow.parse_obj(row) for row in response.json()]

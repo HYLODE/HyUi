@@ -20,7 +20,7 @@ from web.pages.census import (
     widgets,
 )
 
-from utils import icons
+from web import icons
 
 register_page(__name__)
 

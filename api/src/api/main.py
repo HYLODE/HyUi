@@ -12,7 +12,10 @@ from api.ed.router import (
     mock_router as mock_ed_router,
 )
 
-from api.bedbones.router import router as bedbones_router
+from api.bedbones.router import (
+    router as bedbones_router,
+    mock_router as mock_bedbones_router,
+)
 from api.consults.router import router as consults_router
 from api.perrt.router import router as perrt_router
 from api.ros.router import router as ros_router
@@ -44,6 +47,8 @@ app.include_router(ed_router)
 mock_router.include_router(mock_ed_router)
 
 app.include_router(bedbones_router)
+mock_router.include_router(mock_bedbones_router)
+
 app.include_router(consults_router)
 
 app.include_router(perrt_router)
