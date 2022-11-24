@@ -210,11 +210,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <a href="../developer/synthetic-data.html" class="sidebar-item-text sidebar-link">Synthetic data</a>
   </div>
 </li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../developer/environment-variables.html" class="sidebar-item-text sidebar-link">Environment variables</a>
-  </div>
-</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -258,7 +253,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <ul>
   <li><a href="#developing-for-hyui" id="toc-developing-for-hyui" class="nav-link active" data-scroll-target="#developing-for-hyui">Developing For HyUi</a>
   <ul class="collapse">
-  <li><a href="#overview" id="toc-overview" class="nav-link" data-scroll-target="#overview">Overview</a></li>
   <li><a href="#architecture" id="toc-architecture" class="nav-link" data-scroll-target="#architecture">Architecture</a>
   <ul class="collapse">
   <li><a href="#architecture-ideals" id="toc-architecture-ideals" class="nav-link" data-scroll-target="#architecture-ideals">Architecture Ideals</a></li>
@@ -268,18 +262,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <li><a href="#install-requirements" id="toc-install-requirements" class="nav-link" data-scroll-target="#install-requirements">Install Requirements</a></li>
   <li><a href="#create-required-virtual-environments" id="toc-create-required-virtual-environments" class="nav-link" data-scroll-target="#create-required-virtual-environments">Create Required Virtual Environments</a></li>
   <li><a href="#activate-virtual-environment" id="toc-activate-virtual-environment" class="nav-link" data-scroll-target="#activate-virtual-environment">Activate Virtual Environment</a></li>
-  <li><a href="#install-the-website-app-requirements" id="toc-install-the-website-app-requirements" class="nav-link" data-scroll-target="#install-the-website-app-requirements">Install The Website App Requirements</a></li>
-  <li><a href="#install-the-api-requirements" id="toc-install-the-api-requirements" class="nav-link" data-scroll-target="#install-the-api-requirements">Install The API Requirements</a></li>
+  <li><a href="#install-the-website-app-requirements" id="toc-install-the-website-app-requirements" class="nav-link" data-scroll-target="#install-the-website-app-requirements">Install the Website app requirements</a></li>
+  <li><a href="#install-the-api-requirements" id="toc-install-the-api-requirements" class="nav-link" data-scroll-target="#install-the-api-requirements">Install the API requirements</a></li>
   <li><a href="#install-the-pre-commit-hooks" id="toc-install-the-pre-commit-hooks" class="nav-link" data-scroll-target="#install-the-pre-commit-hooks">Install The pre-commit Hooks</a></li>
   <li><a href="#configuring-environment-variables" id="toc-configuring-environment-variables" class="nav-link" data-scroll-target="#configuring-environment-variables">Configuring Environment Variables</a></li>
   <li><a href="#running-the-servers-manually-when-developing" id="toc-running-the-servers-manually-when-developing" class="nav-link" data-scroll-target="#running-the-servers-manually-when-developing">Running The Servers Manually When Developing</a></li>
-  <li><a href="#running-in-pycharm" id="toc-running-in-pycharm" class="nav-link" data-scroll-target="#running-in-pycharm">Running in PyCharm</a></li>
-  </ul></li>
-  <li><a href="#deployment" id="toc-deployment" class="nav-link" data-scroll-target="#deployment">Deployment</a>
-  <ul class="collapse">
-  <li><a href="#build-the-docker-compose-services." id="toc-build-the-docker-compose-services." class="nav-link" data-scroll-target="#build-the-docker-compose-services.">Build the Docker Compose services.</a></li>
-  <li><a href="#run-the-docker-compose-services" id="toc-run-the-docker-compose-services" class="nav-link" data-scroll-target="#run-the-docker-compose-services">Run the Docker Compose services</a></li>
-  <li><a href="#stop-and-remove-docker-containers" id="toc-stop-and-remove-docker-containers" class="nav-link" data-scroll-target="#stop-and-remove-docker-containers">Stop And Remove Docker Containers</a></li>
+  <li><a href="#tips-and-tricks" id="toc-tips-and-tricks" class="nav-link" data-scroll-target="#tips-and-tricks">Tips And Tricks</a></li>
   </ul></li>
   </ul></li>
   </ul>
@@ -292,10 +280,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <section id="developing-for-hyui" class="level1">
 <h1>Developing For HyUi</h1>
-<section id="overview" class="level2">
-<h2 class="anchored" data-anchor-id="overview">Overview</h2>
-<p>This is an experimental workflow designed to ultimately align the way packages are installed on development machines and in production. It is ultimately intended to replace Conda.</p>
-</section>
 <section id="architecture" class="level2">
 <h2 class="anchored" data-anchor-id="architecture">Architecture</h2>
 <p>The root directory contains all the libraries that are used to power the HyUi dashboards.</p>
@@ -315,80 +299,74 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </section>
 <section id="development" class="level2">
 <h2 class="anchored" data-anchor-id="development">Development</h2>
+<p>Clone the HyUi repository to your local machine.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/HYLODE/HyUi.git</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <section id="install-requirements" class="level3">
 <h3 class="anchored" data-anchor-id="install-requirements">Install Requirements</h3>
 <ul>
-<li>Install (https://github.com/pyenv/pyenv)[pyenv]</li>
-<li>Install (https://github.com/pyenv/pyenv-virtualenv)[pyenv-virtualenv]</li>
+<li>Install <a href="pyenv">https://github.com/pyenv/pyenv</a></li>
+<li>Install <a href="pyenv-virtualenv">https://github.com/pyenv/pyenv-virtualenv</a></li>
 </ul>
 </section>
 <section id="create-required-virtual-environments" class="level3">
 <h3 class="anchored" data-anchor-id="create-required-virtual-environments">Create Required Virtual Environments</h3>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pyenv</span> virtualenv 3.11.0 hyui-web</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pyenv</span> virtualenv 3.11.0 hyui-api</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pyenv</span> virtualenv 3.11.0 hyui-web</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pyenv</span> virtualenv 3.11.0 hyui-api</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="activate-virtual-environment" class="level3">
 <h3 class="anchored" data-anchor-id="activate-virtual-environment">Activate Virtual Environment</h3>
 <p>In one shell:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pyenv</span> activate hyui-web</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pyenv</span> activate hyui-web</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>In another shell:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pyenv</span> activate hyui-api</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pyenv</span> activate hyui-api</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>These will be the Python virtual environments that contains all the dependencies for the Dash web app and the API backend.</p>
 </section>
 <section id="install-the-website-app-requirements" class="level3">
-<h3 class="anchored" data-anchor-id="install-the-website-app-requirements">Install The Website App Requirements</h3>
+<h3 class="anchored" data-anchor-id="install-the-website-app-requirements">Install the Website app requirements</h3>
 <p>In the <code>hyui-web</code> terminal in the root directory:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="at">-e</span> <span class="st">"utils[test]"</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="at">-e</span> <span class="st">"models[test]"</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="at">-e</span> <span class="st">"web[test]"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="at">-e</span> <span class="st">"models[test]"</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="at">-e</span> <span class="st">"web[test]"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="install-the-api-requirements" class="level3">
-<h3 class="anchored" data-anchor-id="install-the-api-requirements">Install The API Requirements</h3>
+<h3 class="anchored" data-anchor-id="install-the-api-requirements">Install the API requirements</h3>
 <p>In the <code>hyui-api</code> terminal in the root directory:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="at">-e</span> <span class="st">"utils[test]"</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="at">-e</span> <span class="st">"models[test]"</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="at">-e</span> <span class="st">"api[test]"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="at">-e</span> <span class="st">"models[test]"</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="at">-e</span> <span class="st">"api[test]"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="install-the-pre-commit-hooks" class="level3">
 <h3 class="anchored" data-anchor-id="install-the-pre-commit-hooks">Install The pre-commit Hooks</h3>
 <p>In your shell (<code>hyui-api</code> or <code>hyui-web</code>) run the following command:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pre-commit</span> install</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pre-commit</span> install</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="configuring-environment-variables" class="level3">
 <h3 class="anchored" data-anchor-id="configuring-environment-variables">Configuring Environment Variables</h3>
 <p>An example environment variable file can be found at <code>.env.example</code>. The environment variables for each app are documented in the Pydantic Settings classes in <code>web/src/web/config.py</code> and <code>api/src/api/config.py</code>. An important one for development and production is the <code>WEB_API_URL</code> variable. This should be set to the host and port of your <code>api</code> server so most likely something like <code>http://api:8000</code> for running in Docker or <code>http://localhost:[port]/mock</code> for development. Note that in development a <code>/mock</code> path has been added. This allows the Dash web app to use all the mock endpoints instead of the live endpoints.</p>
+<p>The environment variables are <em>required</em>, and the application will fail if any of these are missing when it attempts to run.</p>
 </section>
 <section id="running-the-servers-manually-when-developing" class="level3">
 <h3 class="anchored" data-anchor-id="running-the-servers-manually-when-developing">Running The Servers Manually When Developing</h3>
 <p>The web server when in the <code>hyui-web</code> shell:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">env</span> <span class="va">$(</span><span class="fu">grep</span> <span class="at">-v</span> <span class="st">'^#'</span> .env <span class="kw">|</span> <span class="fu">xargs</span><span class="va">)</span> python <span class="at">-m</span> web.main</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">env</span> <span class="va">$(</span><span class="fu">grep</span> <span class="at">-v</span> <span class="st">'^#'</span> .env <span class="kw">|</span> <span class="fu">xargs</span><span class="va">)</span> python <span class="at">-m</span> web.main</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>The API server when in the <code>hyui-api</code> shell:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">env</span> <span class="va">$(</span><span class="fu">grep</span> <span class="at">-v</span> <span class="st">'^#'</span> .env <span class="kw">|</span> <span class="fu">xargs</span><span class="va">)</span> uvicorn api.main:app <span class="at">--reload</span> <span class="at">--port</span> 8092</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">env</span> <span class="va">$(</span><span class="fu">grep</span> <span class="at">-v</span> <span class="st">'^#'</span> .env <span class="kw">|</span> <span class="fu">xargs</span><span class="va">)</span> uvicorn api.main:app <span class="at">--reload</span> <span class="at">--port</span> 8092</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Ensure you replace <code>.env</code> with the correct path to your development <code>.env</code> file. The command <code>env $(grep -v '^#' .env | xargs)</code> loads the contents of the <code>.env</code> into the environment just for the current execution. The <code>grep -v '^#'</code> part excludes lines beginning with a <code>#</code> in the env file.</p>
 </section>
-<section id="running-in-pycharm" class="level3">
-<h3 class="anchored" data-anchor-id="running-in-pycharm">Running in PyCharm</h3>
-<p>On MacOS you will likely need to add the environment variable <code>OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES</code> to the <code>web</code> debugging process to stop a crash. This is due to a bug in the way the Dash background callback system works.</p>
+<section id="tips-and-tricks" class="level3">
+<h3 class="anchored" data-anchor-id="tips-and-tricks">Tips And Tricks</h3>
+<section id="debugging-from-within-the-nhs-network" class="level4">
+<h4 class="anchored" data-anchor-id="debugging-from-within-the-nhs-network">Debugging From Within The NHS Network</h4>
+<p>Sometimes it can be difficult to debug your staging services from within the NHS’s firewall on live data. You can log into the <code>hyui-web</code> or <code>hyui-api</code> services from a terminal within the <code>HyUi</code> directory using the following:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> compose <span class="at">--project-name</span> [project name] exec hyui-web bash</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> compose <span class="at">--project-name</span> [project name] exec hyui-api bash</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>You can then change the code using vim or open a python console and debug from there. It may be useful to edit the <code>docker/api/Dockerfile</code> or <code>docker/web/Dockerfile</code> and add a <code>--reload</code> flag to the <code>ENTRYPOINT</code> so that code changes from within the container are reloaded automatically. <code>ENTRYPOINT ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--reload"]</code> instead of <code>ENTRYPOINT ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--reload"]</code>.</p>
+<p>If you prefer not to use vim then Visual Studio can SSH into the running containers somehow.</p>
 </section>
-</section>
-<section id="deployment" class="level2">
-<h2 class="anchored" data-anchor-id="deployment">Deployment</h2>
-<p>First create a <code>.env</code> file and ensure it is correct. Decide on a <code>prefix</code> that does not clash with others if you are running multiple instances on the same machine. If the prefixes clash then you will be building and running other peoples containers.</p>
-<section id="build-the-docker-compose-services." class="level3">
-<h3 class="anchored" data-anchor-id="build-the-docker-compose-services.">Build the Docker Compose services.</h3>
-<p>In the <code>code</code> directory:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> compose <span class="at">-p</span> [prefix] build</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="run-the-docker-compose-services" class="level3">
-<h3 class="anchored" data-anchor-id="run-the-docker-compose-services">Run the Docker Compose services</h3>
-<p>In the <code>code</code> directory:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> compose <span class="at">-p</span> [prefix] up</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="stop-and-remove-docker-containers" class="level3">
-<h3 class="anchored" data-anchor-id="stop-and-remove-docker-containers">Stop And Remove Docker Containers</h3>
-<div class="sourceCode" id="cb11"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> compose <span class="at">-p</span> [prefix] down</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="debugging-on-your-local-machine" class="level4">
+<h4 class="anchored" data-anchor-id="debugging-on-your-local-machine">Debugging On Your Local Machine</h4>
+<p>If you are using PyCharm or another IDE then ensure that the environment variables in <code>.env</code> are loaded. PyCharm has a plugin that can load these when unit testing with <code>pytest</code> or running the main application.</p>
 
 
+</section>
 </section>
 </section>
 </section>
