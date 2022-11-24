@@ -12,7 +12,7 @@ from api.config import get_settings
 
 @lru_cache()
 def _caboodle_engine(settings=Depends(get_settings)) -> Engine:
-    return create_engine(settings.caboodle_dsn, echo=False, future=True)
+    return create_engine(settings.caboodle_dsn, echo=settings.echo_sql, future=True)
 
 
 def get_caboodle_session(engine=Depends(_caboodle_engine)) -> Session:
@@ -22,7 +22,7 @@ def get_caboodle_session(engine=Depends(_caboodle_engine)) -> Session:
 
 @lru_cache()
 def _star_engine(settings=Depends(get_settings)) -> Engine:
-    return create_engine(settings.star_dsn, echo=False, future=True)
+    return create_engine(settings.star_dsn, echo=settings.echo_sql, future=True)
 
 
 def get_star_session(engine=Depends(_star_engine)) -> Session:
@@ -32,7 +32,7 @@ def get_star_session(engine=Depends(_star_engine)) -> Session:
 
 @lru_cache()
 def _clarity_engine(settings=Depends(get_settings)) -> Engine:
-    return create_engine(settings.clarity_dsn, echo=False, future=True)
+    return create_engine(settings.clarity_dsn, echo=settings.echo_sql, future=True)
 
 
 def get_clarity_session(engine=Depends(_clarity_engine)) -> Session:
