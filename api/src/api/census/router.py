@@ -47,7 +47,7 @@ def get_closed_beds(settings=Depends(get_settings)):
 def get_mock_closed_beds():
     data = [
         {
-            "department": "UCH T01 ACUTE MEDICAL",
+            "department": "UCH T03 INTENSIVE CARE",
             "closed": False,
         },
         {

@@ -91,12 +91,12 @@ def get_census(department: str) -> str:
 def get_mock_census(department: str) -> list[CensusRow]:
     return [
         CensusRow(
-            encounter=1,
+            encounter=1013378594,
             location_string="location_a",
             date_of_birth=date(2001, 2, 3),
             mrn="abc",
-            firstname="Firstname",
-            lastname="Lastname",
+            firstname="Santa",
+            lastname="Claus",
             modified_at=datetime(2022, 1, 2, 3, 4),
             location_id=2,
             department="My Department",
