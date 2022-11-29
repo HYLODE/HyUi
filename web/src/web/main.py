@@ -193,7 +193,7 @@ app.layout = dbc.Container(
 )
 
 
-# standalone apps : please use ports fastapi 8092 and dash 8093
+# standalone apps : please use ports fastapi 8200 and dash 8201
 # this is the callable object run by gunicorn
 # cd ./src/
 # gunicorn -w 4 --bind 0.0.0.0:8093 apps.app:server
