@@ -1,4 +1,4 @@
-FROM varnish:6.0.11
+FROM varnish:stable
 
 SHELL ["/bin/bash", "-o", "pipefail", "-e", "-u", "-x", "-c"]
 
@@ -21,9 +21,17 @@ RUN mkdir /app && \
 RUN chown -R hyui:root /etc/varnish
 RUN chown -R hyui:root /var/lib/varnish/
 
+COPY --chown=hyui:root ./cache/default.vcl /etc/varnish/default.vcl
+COPY --chown=hyui:root ./docker/cache/docker-entrypoint.sh /app
+
+ENV VARNISH_CONFIG /etc/varnish/default.vcl
+ENV VARNISH_STORAGE malloc,2048m
+ENV VARNISH_LISTEN :6081
+ENV VARNISH_MANAGEMENT_LISTEN :6082
+EXPOSE 6081
+EXPOSE 6082
+
 WORKDIR /app
 USER hyui
 
-
-
-#COPY --chown hyui:root ./cache/default.vcl /etc/varnish/
+ENTRYPOINT ["/bin/bash", "./docker-entrypoint.sh"]

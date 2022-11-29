@@ -50,7 +50,8 @@ services:
       <<: *proxy-common
     env_file: .env
     ports:
-      - "${CACHE_PORT}:80"
+      - "${CACHE_PORT}:6081"
+      - "${CACHE_MGMT_PORT}:6082"
     command: "-p default_keep=300"
     depends_on:
       - api
