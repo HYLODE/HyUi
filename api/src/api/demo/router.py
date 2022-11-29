@@ -33,5 +33,5 @@ def get_demo_rows(session: Session = Depends(get_clarity_session), days_ahead: i
     """
     query = text((Path(__file__).parent / "live.sql").read_text())
     params = {"days_ahead": days_ahead}
-    df = pd.read_sql(query, session, params=params)
+    df = pd.read_sql(query, session.connection(), params=params)
     return [ClarityOrCase.parse_obj(row) for row in df.to_dict(orient="records")]
