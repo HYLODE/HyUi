@@ -7,6 +7,20 @@ Set up run configurations
 - https://www.jetbrains.com/help/pycharm/run-debug-configuration.html
 - install the **EnvFile** plug-in so that the environment file can be read by your run configuration (see https://stackoverflow.com/a/42708476/992999)
 - set `OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES` as an environment variable in your run configuration to avoid [errors](https://stackoverflow.com/a/52230415/992999) on recent _macos_ installs
+- consider also specifying a 'pytest' configuration where you can store the arguments to prevent pytest running those tests that should only run in the live environment (assuming that you are developing locally)
+
+e.g. where you have decorated your test function
+
+```python
+@pytest.mark.live
+def test_get_demo():
+    response = client.get("/demo/", params={"days_ahead": 3})
+    assert response.status_code == 200
+```
+
+```shell
+pytest -v -m 'not live'
+```
 
 Example configurations here
 - [FastAPI](../snippets/HyUI-API%20FastAPI.run.xml)

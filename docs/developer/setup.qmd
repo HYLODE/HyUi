@@ -104,14 +104,23 @@ Ensure you replace `.env` with the correct path to your development `.env` file.
 Sometimes it can be difficult to debug your staging services from within the NHS's firewall on live data. You can log into the `hyui-web` or `hyui-api` services from a terminal within the `HyUi` directory using the following:
 
 ```sh
-docker compose --project-name [project name] exec hyui-web bash
+docker compose --project-name [project name] exec web bash
 ```
 
 ```sh
-docker compose --project-name [project name] exec hyui-api bash
+docker compose --project-name [project name] exec api bash
 ```
 
 You can then change the code using vim or open a python console and debug from there. It may be useful to edit the `docker/api/Dockerfile` or `docker/web/Dockerfile` and add a `--reload` flag to the `ENTRYPOINT` so that code changes from within the container are reloaded automatically. `ENTRYPOINT ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--reload"]` instead of `ENTRYPOINT ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--reload"]`.
+You can also run `pytest` from within the docker container (if the `pip install` step enables the additonal options in the `pyproject.toml` file)
+
+e.g.
+```Dockerfile
+# without testing: standard set-up
+#RUN pip install --no-cache-dir /app/api
+# installs testing: useful for debugging
+RUN pip install --no-cache-dir /app/api[test]
+```
 
 If you prefer not to use vim then Visual Studio can SSH into the running containers somehow.
 

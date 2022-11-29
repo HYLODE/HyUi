@@ -33,3 +33,11 @@ docker compose --project-name [project name] up
 ```sh
 docker compose --project-name [project name] down
 ```
+
+### An one-liner
+
+Replace _myname_ with anything that won't clash with other users (e.g. _your_ name!)
+
+```shell
+docker compose --project-name hyui-dev-myname up --build -d && docker compose -p hyui-dev-myname logs -f
+```
