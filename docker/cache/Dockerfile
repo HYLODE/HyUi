@@ -27,9 +27,7 @@ COPY --chown=hyui:root ./docker/cache/docker-entrypoint.sh /app
 ENV VARNISH_CONFIG /etc/varnish/default.vcl
 ENV VARNISH_STORAGE malloc,2048m
 ENV VARNISH_LISTEN :6081
-ENV VARNISH_MANAGEMENT_LISTEN :6082
 EXPOSE 6081
-EXPOSE 6082
 
 WORKDIR /app
 USER hyui
