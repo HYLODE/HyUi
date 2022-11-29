@@ -30,3 +30,7 @@ minversion = "7.1.3"
 testpaths = [
     "src/api/tests"
 ]
+markers = [
+    "smoke: subset of tests",
+    "live: tests that should only run in the live environment"
+]
