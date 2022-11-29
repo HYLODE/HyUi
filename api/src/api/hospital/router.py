@@ -2,7 +2,7 @@ from fastapi import APIRouter
 
 from api import wards
 
-from models.hosptial import BuildingDepartments
+from models.hospital import BuildingDepartments
 
 router = APIRouter(
     prefix="/hospital",
