@@ -14,8 +14,12 @@ class Settings(BaseSettings):
 
     hycastle_url: AnyHttpUrl
     hymind_url: AnyHttpUrl
+    towermail_url: AnyHttpUrl
+
+    echo_sql: bool = False
 
     class Config:
+        # The prefix below scopes the .env variables.
         env_prefix = "api_"
         frozen = True  # So Settings can be hashable and cachable
 

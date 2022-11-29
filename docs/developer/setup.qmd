@@ -1,8 +1,5 @@
 # Developing For HyUi
 
-## Overview
-This is an experimental workflow designed to ultimately align the way packages are installed on development machines and in production. It is ultimately intended to replace Conda.
-
 ## Architecture
 
 The root directory contains all the libraries that are used to power the HyUi dashboards.
@@ -19,10 +16,16 @@ The root directory contains all the libraries that are used to power the HyUi da
 
 ## Development
 
+Clone the HyUi repository to your local machine.
+
+```sh
+git clone https://github.com/HYLODE/HyUi.git
+```
+
 ### Install Requirements
 
-- Install (https://github.com/pyenv/pyenv)[pyenv]
-- Install (https://github.com/pyenv/pyenv-virtualenv)[pyenv-virtualenv]
+- Install [https://github.com/pyenv/pyenv](pyenv)
+- Install [https://github.com/pyenv/pyenv-virtualenv](pyenv-virtualenv)
 
 ### Create Required Virtual Environments
 
@@ -46,28 +49,26 @@ pyenv activate hyui-api
 
 These will be the Python virtual environments that contains all the dependencies for the Dash web app and the API backend.
 
-### Install The Website App Requirements
+### Install the Website app requirements
 
 In the `hyui-web` terminal in the root directory:
 
 ```sh
-pip install -e "utils[test]"
 pip install -e "models[test]"
 pip install -e "web[test]"
 ```
 
-### Install The API Requirements
+### Install the API requirements
 In the `hyui-api` terminal in the root directory:
 
 ```sh
-pip install -e "utils[test]"
 pip install -e "models[test]"
 pip install -e "api[test]"
 ```
 
 ### Install The pre-commit Hooks
 
-In your shell (`hyui-api` or `hyui-web`) runn the following command:
+In your shell (`hyui-api` or `hyui-web`) run the following command:
 
 ```sh
 pre-commit install
@@ -77,42 +78,44 @@ pre-commit install
 
 An example environment variable file can be found at `.env.example`. The environment variables for each app are documented in the Pydantic Settings classes in `web/src/web/config.py` and `api/src/api/config.py`. An important one for development and production is the `WEB_API_URL` variable. This should be set to the host and port of your `api` server so most likely something like `http://api:8000` for running in Docker or `http://localhost:[port]/mock` for development. Note that in development a `/mock` path has been added. This allows the Dash web app to use all the mock endpoints instead of the live endpoints.
 
+The environment variables are _required_, and the application will fail if any of these are missing when it attempts to run.
+
 ### Running The Servers Manually When Developing
 
 The web server when in the `hyui-web` shell:
 
 ```sh
-> env $(grep -v '^#' .env | xargs) python -m web.main
+env $(grep -v '^#' .env | xargs) python -m web.main
 ```
 
 The API server when in the `hyui-api` shell:
 
 ```sh
-> env $(grep -v '^#' .env | xargs) uvicorn api.main:app --reload --port 8092
+env $(grep -v '^#' .env | xargs) uvicorn api.main:app --reload --port 8092
 ```
 
 Ensure you replace `.env` with the correct path to your development `.env` file. The command `env $(grep -v '^#' .env | xargs)` loads the contents of the `.env` into the environment just for the current execution. The `grep -v '^#'` part excludes lines beginning with a `#` in the env file.
 
-### Running in PyCharm
 
-On MacOS you will likely need to add the environment variable `OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES` to the `web` debugging process to stop a crash. This is due to a bug in the way the Dash background callback system works.
+### Tips And Tricks
 
-## Deployment
+#### Debugging From Within The NHS Network
 
-First create a `.env` file and ensure it is correct.
-
-### Build the Docker Compose services.
-
-In the `code` directory:
+Sometimes it can be difficult to debug your staging services from within the NHS's firewall on live data. You can log into the `hyui-web` or `hyui-api` services from a terminal within the `HyUi` directory using the following:
 
 ```sh
-> docker compose build
+docker compose --project-name [project name] exec hyui-web bash
 ```
-
-### Run the Docker Compose services
-
-In the `code` directory:
 
 ```sh
-> docker compose up
+docker compose --project-name [project name] exec hyui-api bash
 ```
+
+You can then change the code using vim or open a python console and debug from there. It may be useful to edit the `docker/api/Dockerfile` or `docker/web/Dockerfile` and add a `--reload` flag to the `ENTRYPOINT` so that code changes from within the container are reloaded automatically. `ENTRYPOINT ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--reload"]` instead of `ENTRYPOINT ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--reload"]`.
+
+If you prefer not to use vim then Visual Studio can SSH into the running containers somehow.
+
+
+#### Debugging On Your Local Machine
+
+If you are using PyCharm or another IDE then ensure that the environment variables in `.env` are loaded. PyCharm has a plugin that can load these when unit testing with `pytest` or running the main application.

@@ -6,9 +6,13 @@ router = APIRouter(
     prefix="/bedbones",
 )
 
+mock_router = APIRouter(
+    prefix="/bedbones",
+)
 
-@router.get("/beds")
-def read_beds() -> dict[str, Any]:
+
+@mock_router.get("/beds/")
+def get_beds() -> dict[str, Any]:
     return {
         "count": 1,
         "next": None,

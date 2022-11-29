@@ -11,8 +11,16 @@ from web.config import get_settings
 from web.convert import to_data_frame
 from web.pages.sitrep import (
     BPID,
-    DEPT2WARD_MAPPING,
 )
+
+DEPARTMENT_WARD_MAPPINGS = {
+    "UCH T03 INTENSIVE CARE": "T03",
+    "UCH T06 SOUTH PACU": "T06",
+    "GWB L01 CRITICAL CARE": "GWB",
+    "WMS W01 CRITICAL CARE": "WMS",
+    "NHNN C0 NCCU": "NCCU0",
+    "NHNN C1 NCCU": "NCCU1",
+}
 
 
 def _get_beds(department: str) -> list[BedRow]:
@@ -30,13 +38,13 @@ def _get_census(department: str) -> list[CensusRow]:
 
 
 def _get_sitrep(department: str) -> list[SitrepRow]:
-    ward = DEPT2WARD_MAPPING[department]
+    ward = DEPARTMENT_WARD_MAPPINGS[department]
     response = requests.get(f"{get_settings().api_url}/sitrep/live/{ward}/ui/")
     return [SitrepRow.parse_obj(row) for row in response.json()]
 
 
 def _get_discharge_predictions(department: str) -> list[IndividualDischargePrediction]:
-    ward = DEPT2WARD_MAPPING[department]
+    ward = DEPARTMENT_WARD_MAPPINGS[department]
     response = requests.get(
         f"{get_settings().api_url}/sitrep/predictions/discharge/individual/{ward}/"
     )

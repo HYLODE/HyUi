@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     api_url: AnyHttpUrl
 
     class Config:
+        # The prefix below scopes the .env variables.
         env_prefix = "web_"
         frozen = True  # So Settings can be hashable and cachable
 

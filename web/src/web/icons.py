@@ -32,17 +32,13 @@ def closed(value: bool) -> str:
 
 def aki(level: str) -> str:
     icon = "fa fa-flask"
-    try:
-        level = level.lower()
-    except AttributeError:
-        level = "unknown"
 
-    if level == "false":
+    if level is False:
         colour = COLOUR_GREY
-    elif level == "true":
+    elif level is True:
         colour = COLOUR_RED
     else:
-        colour = COLOUR_GREY
+        colour = COLOUR_AMBER
     icon_string = f'<i class="{icon}" style="color: {colour};"></i>'
     return icon_string
 

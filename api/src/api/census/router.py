@@ -47,7 +47,7 @@ def get_closed_beds(settings=Depends(get_settings)):
 def get_mock_closed_beds():
     data = [
         {
-            "department": "UCH T01 ACUTE MEDICAL",
+            "department": "UCH T03 INTENSIVE CARE",
             "closed": False,
         },
         {
@@ -205,7 +205,7 @@ def get_departments(
 
 @mock_router.get("/", response_model=list[CensusRow])
 def get_mock_census(
-    departments: list[str] = Query(default=wards.ALL[:3]),
+    departments: list[str] = Query(default=[]),
     locations: list[str] = Query(default=[]),
 ) -> list[CensusRow]:
     return fetch_mock_census(departments, locations)
@@ -214,7 +214,7 @@ def get_mock_census(
 @router.get("/", response_model=list[CensusRow])
 def get_census(
     session: Session = Depends(get_star_session),
-    departments: list[str] = Query(default=wards.ALL[:3]),
+    departments: list[str] = Query(default=[]),
     locations: list[str] = Query(default=[]),
 ) -> list[CensusRow]:
     query = text((Path(__file__).parent / "live.sql").read_text())

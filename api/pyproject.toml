@@ -7,7 +7,6 @@ name = "hyui-api"
 version = "0.0.1"
 dependencies = [
     "hyui-models",
-    "hyui-utils",
     "arrow == 1.2.3",
     "fastapi[all] == 0.85.0",
     "pandas == 1.5.1",
