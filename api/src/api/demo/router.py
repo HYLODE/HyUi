@@ -19,13 +19,13 @@ def get_mock_demo_rows():
     """
     Return mock data from adjacent mock.json file
     """
-    with open("api/src/api/demo/mock.json", "r") as f:
+    with open(Path(__file__).parent / "mock.json", "r") as f:
         mock_json = json.load(f)
         mock_table = mock_json["rows"]
     return [ClarityOrCase.parse_obj(row) for row in mock_table]
 
 
-@mock_router.get("/", response_model=list[ClarityOrCase])
+@router.get("/", response_model=list[ClarityOrCase])
 def get_demo_rows(session: Session = Depends(get_clarity_session), days_ahead: int = 1):
     """
     Return mock data by running query in anger
@@ -33,5 +33,5 @@ def get_demo_rows(session: Session = Depends(get_clarity_session), days_ahead: i
     """
     query = text((Path(__file__).parent / "live.sql").read_text())
     params = {"days_ahead": days_ahead}
-    df = pd.read_sql(query, get_clarity_session, params=params)
+    df = pd.read_sql(query, session, params=params)
     return [ClarityOrCase.parse_obj(row) for row in df.to_dict(orient="records")]

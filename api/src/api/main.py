@@ -1,3 +1,7 @@
+"""
+Entry point and main file for the FastAPI backend
+"""
+
 from fastapi import FastAPI, APIRouter
 from fastapi.responses import ORJSONResponse
 

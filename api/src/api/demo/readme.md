@@ -1,7 +1,1 @@
-- Example of how to create a new endpoint.
-- Create a new 'python package' (directory containing an `__init__.py`) file under `api/src/api/`.
-- Create a `router.py` file within this package
-- Generate some fake/mock data ideally by hand. You might want to run the SQL script you're planning to use, then copy the column headings into an excel file, and then create a couple of rows of fake data that you could/should save as a Python List of dictionaries or similar. You need to make this data available to your 'mock' endpoint.
-- create a mock and a non-mock endpoint in `router.py`
-- register these endpoints in `api/src/api/main.py`
-- test!
+See [docs/developer/demo_vignette.md]() (path starting from the project root)

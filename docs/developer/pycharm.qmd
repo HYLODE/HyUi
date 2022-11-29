@@ -1,0 +1,13 @@
+Notes on setting up PyCharm for development with specific reference to working on a Mac
+
+## Tips
+
+Set up run configurations
+
+- https://www.jetbrains.com/help/pycharm/run-debug-configuration.html
+- install the **EnvFile** plug-in so that the environment file can be read by your run configuration (see https://stackoverflow.com/a/42708476/992999)
+- set `OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES` as an environment variable in your run configuration to avoid [errors](https://stackoverflow.com/a/52230415/992999) on recent _macos_ installs
+
+Example configurations here
+- [FastAPI](../snippets/HyUI-API%20FastAPI.run.xml)
+- [Plotly Dash](../snippets/HyUI-Web%20Plotly%20Dash.run.xml)

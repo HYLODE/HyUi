@@ -1,0 +1,56 @@
+## Example of how to create a new endpoint
+
+1. Create a 'back end' endpoint using FastAPI
+2. Write a simple test that checks that route exists
+3. Create a 'front end' endpoint using Plotly Dash
+4. Write a simple integration test that checks that the page displays
+
+### 1. Back end FastAPI endpoint
+
+- Create a new 'python package' (directory containing an `__init__.py`) file under `api/src/api/`.
+- Create a `router.py` file within this package
+- Generate some fake/mock data ideally by hand. You might want to run the SQL script you're planning to use, then copy the column headings into an Excel file, and then create a couple of rows of fake data that you could/should save as a Python List of dictionaries or similar. You need to make this data available to your 'mock' endpoint.
+- create a mock and a non-mock endpoint in `router.py`
+- register these endpoints in `api/src/api/main.py`
+
+```python
+# At the top of the file
+from api.demo.router import (
+    router as demo_router,
+    mock_router as mock_demo_router,
+)
+
+# further imports etc. ...
+
+# declare the app
+app = FastAPI(default_response_class=ORJSONResponse)
+mock_router = APIRouter(
+    prefix="/mock",
+)
+
+# ...
+app.include_router(demo_router)
+mock_router.include_router(mock_demo_router)
+
+```
+### Test!
+
+
+### Plotly Dash Frontend
+
+- Create a new 'python package' (directory containing an `__init__.py`) file under `web/src/web/pages` (in this example named 'demo')
+- Create single page Plotly Dash application here
+- This will be automatically registered by the `web/src/web/main.py` module because of the `use_pages=True` argument passed to the Dash app
+- The page has 3 main components:
+  - A layout
+  - A data store
+  - A series of callbacks that fire as the user interacts with the data
+
+
+- Inspect at [http://localhost:8201/demo/demo]()
+
+
+## Ways of working
+
+- Pycharm
+  - setup the FastAPI and Plotly Dash configurations so that you can see the changes as you work
