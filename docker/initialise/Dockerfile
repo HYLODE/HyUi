@@ -34,10 +34,10 @@ RUN pip install --no-cache-dir -U pip
 COPY --chown=hyui:root ./models/pyproject.toml /app/models/
 RUN pip install --no-cache-dir /app/models
 
-COPY --chown=hyui:root ./api/pyproject.toml /app/api/
-RUN pip install --no-cache-dir /app/api
+COPY --chown=hyui:root ./initialise/pyproject.toml /app/initialise/
+RUN pip install --no-cache-dir /app/initialise
 
 COPY --chown=hyui:root ./models/src/models /app/models
-COPY --chown=hyui:root ./api/src/api /app/api
+COPY --chown=hyui:root ./initialise/src/initialise /app/initialise
 
-ENTRYPOINT ["uvicorn", "api.main:app", "--host", "0.0.0.0"]
+ENTRYPOINT ["python", "-m", "initialise.main"]

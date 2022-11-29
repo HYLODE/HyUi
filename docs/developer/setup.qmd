@@ -119,3 +119,17 @@ If you prefer not to use vim then Visual Studio can SSH into the running contain
 #### Debugging On Your Local Machine
 
 If you are using PyCharm or another IDE then ensure that the environment variables in `.env` are loaded. PyCharm has a plugin that can load these when unit testing with `pytest` or running the main application.
+
+
+## Initialisation
+
+Currently only Baserow needs to be initialised by creating an admin user and setting up the tables required for the rest of the app to function correct. The `initialise` python package contains the code that does all this.
+
+```sh
+pyenv virtualenv 3.11.0 hyui-initialise
+pyenv activate hyui-initialise
+
+pip install -e "initialise"
+
+python -m initialise.main
+```
