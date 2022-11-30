@@ -3,20 +3,20 @@ from functools import lru_cache
 from pydantic import BaseSettings, EmailStr, SecretStr, AnyHttpUrl
 
 
-class Settings(BaseSettings):
+class BaserowSettings(BaseSettings):
 
-    baserow_email: EmailStr
-    baserow_username: str
-    baserow_password: SecretStr
+    email: EmailStr
+    username: str
+    password: SecretStr
 
-    baserow_base_url: AnyHttpUrl = "http://baserow:80"
+    public_url: AnyHttpUrl
 
     class Config:
         # The prefix below scopes the .env variables.
-        env_prefix = "INIT_"
+        env_prefix = "baserow_"
         frozen = True
 
 
 @lru_cache()
-def get_settings() -> Settings:
-    return Settings()
+def get_baserow_settings() -> BaserowSettings:
+    return BaserowSettings()

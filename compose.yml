@@ -27,8 +27,6 @@ services:
       - ${API_PORT}:8000
     networks:
       - hyui
-    profiles:
-      - run
 
   web:
     build:
@@ -44,37 +42,17 @@ services:
       - api
     networks:
       - hyui
-    profiles:
-      - run
 
   baserow:
     image: baserow/baserow:1.13.1
     environment:
       <<: *proxy-common
       DISABLE_VOLUME_CHECK: yes
-      BASEROW_PUBLIC_URL: "http://baserow:80"
     env_file: .env
     ports:
       - ${BASEROW_PORT}:80
     networks:
       - hyui
-    profiles:
-      - run
-
-  initialise:
-    build:
-      dockerfile: docker/initialise/Dockerfile
-      args:
-        <<: *build-args-common
-    environment:
-      <<: *proxy-common
-    env_file: .env
-    depends_on:
-      - baserow
-    networks:
-      - hyui
-    profiles:
-      - initialise
 
 networks:
   hyui:
