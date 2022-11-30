@@ -25,7 +25,7 @@ class PerrtRaw(BaseModel):
     dept_name: str
     room_name: str
     bed_hl7: str
-    perrt_consult_datetime: Optional[datetime]
+    perrt_consult_datetime: object
     # observation level fields
     visit_observation_id: int
     hospital_visit_id: str
@@ -105,7 +105,7 @@ class PerrtBase(BaseModel):
     dept_name: str
     room_name: str
     bed_hl7: str
-    perrt_consult_datetime: Optional[datetime]
+    perrt_consult_datetime: object
     # observation level fields collapsed to per patient
     air_or_o2_max: Optional[float]
     air_or_o2_min: Optional[float]
