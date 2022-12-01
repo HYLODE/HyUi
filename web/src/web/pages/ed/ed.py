@@ -1,5 +1,6 @@
-from typing import Any
+from typing import Any, List, Dict
 
+from datetime import datetime
 import requests
 from dash import register_page, html, dcc, callback, Output, Input
 from dash.dash_table import DataTable, FormatTemplate
@@ -22,9 +23,14 @@ def _get_individual_patients() -> list[EmergencyDepartmentPatient]:
     Input("title", "children"),
     background=True,
 )
-def individual_predictions_table(title: Any) -> Any:
+def individual_predictions_table(title: Any) -> List[Dict]:
     patients = _get_individual_patients()
-    return [patient.dict() for patient in patients]
+    ps = [patient.dict() for patient in patients]
+    ps = sorted(ps, key=lambda i: i["arrival_datetime"], reverse=True)
+    for i, p in enumerate(ps):
+        p["arrival_datetime_pretty"] = _prettify_datetime(p["arrival_datetime"])
+        p["arrival_order"] = i + 1  # most recent patient = 1
+    return ps
 
 
 def _get_aggregations() -> list[AggregateAdmissionRow]:
@@ -40,6 +46,11 @@ def _get_aggregations() -> list[AggregateAdmissionRow]:
 def beds_required(title: Any) -> Any:
     aggregations = _get_aggregations()
     return [aggregation.dict() for aggregation in aggregations]
+
+
+def _prettify_datetime(s: datetime) -> str:
+    """Private method to format string"""
+    return s.strftime("%H:%M %a %d %b")
 
 
 def layout():
@@ -91,7 +102,8 @@ def layout():
                         id="individual-predictions-table",
                         data=[],
                         columns=[
-                            {"name": "Arrival Date", "id": "arrival_datetime"},
+                            {"name": "Reverse Order", "id": "arrival_order"},
+                            {"name": "Arrival Date", "id": "arrival_datetime_pretty"},
                             {"name": "Bed", "id": "bed"},
                             {"name": "MRN", "id": "mrn"},
                             {"name": "Name", "id": "name"},
