@@ -28,7 +28,7 @@ class NavbarDropdown(NamedTuple):
 
 
 BPID = "app_"
-CORE_PAGES = ["Sitrep", "Electives", "PERRT"]
+CORE_PAGES = ["Sitrep", "Electives", "PERRT", "ED"]
 ADMIN_PAGES = ["Home", "Login", "Logout"]
 HIDDEN_PAGES: list[str] = []
 

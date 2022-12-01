@@ -9,7 +9,7 @@ import dash_bootstrap_components as dbc
 from models.ed import EmergencyDepartmentPatient, AggregateAdmissionRow
 from web.config import get_settings
 
-register_page(__name__, name="ED Admissions")
+register_page(__name__, name="Ed")
 
 
 def _get_individual_patients() -> list[EmergencyDepartmentPatient]:
