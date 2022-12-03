@@ -1,3 +1,5 @@
+-- noinspection SqlNoDataSourceInspectionForFile
+
 -- 2022-08-02
 -- Query by J Hunter
 -- see https://github.com/HYLODE/HyUi/issues/47#issuecomment-1160706270

@@ -1,0 +1,22 @@
+{
+	"table": "ClinicalNoteFact",
+	"rows":
+	[
+		{
+			"PatientDurableKey": 6999991,
+			"CreationInstant": "2022-11-28 12:33:40.000",
+			"StringValue": "ITU/PACU Bed",
+			"NumericValue": null,
+			"Name": "POST-OP DESTINATION",
+			"DataType": "Category"
+		},
+		{
+			"PatientDurableKey": 199995,
+			"CreationInstant": "2022-10-12 08:56:02.000",
+			"StringValue": "Inpatient Ward",
+			"NumericValue": null,
+			"Name": "POST-OP DESTINATION",
+			"DataType": "Category"
+		}
+	]
+}

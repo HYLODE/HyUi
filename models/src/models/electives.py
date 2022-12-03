@@ -17,6 +17,10 @@ def _to_camel(member: str) -> str:
 
 
 class ElectiveRow(BaseModel):
+    """
+    results of the live_case.sql query against caboodle
+    """
+
     patient_durable_key: str
     primary_mrn: str
     surgical_case_epic_id: int
