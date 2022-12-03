@@ -6,7 +6,7 @@ from dash import dash_table as dt
 from dash import dcc, html, register_page
 from flask_login import current_user
 
-from models.electives import GetElectiveRow
+from models.electives import ElectiveSurgCase
 from web.config import get_settings
 from web.convert import parse_to_data_frame
 from web.pages.electives import (
@@ -110,7 +110,7 @@ def store_data(days_ahead: int):
     response = requests.get(
         f"{get_settings().api_url}/electives/", params={"days_ahead": days_ahead}
     )
-    return [GetElectiveRow.parse_obj(row).dict() for row in response.json()]
+    return [ElectiveSurgCase.parse_obj(row).dict() for row in response.json()]
 
 
 @callback(
@@ -143,7 +143,7 @@ def gen_surgeries_over_time(data: list[dict]):
     if not data:
         return html.H2("No data to plot")
 
-    df = parse_to_data_frame(data, GetElectiveRow)
+    df = parse_to_data_frame(data, ElectiveSurgCase)
     df = (
         df.groupby("surgical_service")
         .resample("24H", on="planned_operation_start_instant")
@@ -168,7 +168,7 @@ def gen_table_consults(data: list[dict]):
     if not data:
         return html.H2("No data to tabulate")
 
-    dfo = parse_to_data_frame(data, GetElectiveRow)
+    dfo = parse_to_data_frame(data, ElectiveSurgCase)
 
     dfo["pacu"] = dfo["pacu"].apply(lambda x: "PACU" if x else "")
     dfo["age_sex"] = dfo.apply(
@@ -251,5 +251,5 @@ def gen_table_consults(data: list[dict]):
 )
 def update_service_dropdown(data: list[dict]):
 
-    df = parse_to_data_frame(data, GetElectiveRow)
+    df = parse_to_data_frame(data, ElectiveSurgCase)
     return df["surgical_service"].sort_values().unique()
