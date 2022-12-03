@@ -1,24 +1,20 @@
 import json
 from pathlib import Path
-from typing import List, Dict
 
-from pydantic import BaseModel
-import pandas as pd
 import numpy as np
+import pandas as pd
 from fastapi import APIRouter, Depends
-from sqlmodel import Session
 from sqlalchemy import text
+from sqlmodel import Session
 
-from api.db import get_clarity_session, get_caboodle_session
-
+from api.db import get_caboodle_session, get_clarity_session
+from api.electives.wrangle import prepare_electives
 from models.electives import (
     CaboodleCaseBooking,
-    ClarityPostopDestination,
     CaboodlePreassessment,
+    ClarityPostopDestination,
     ElectiveSurgCase,
 )
-
-from api.electives.wrangle import prepare_electives
 
 router = APIRouter(
     prefix="/electives",
@@ -77,8 +73,21 @@ def _get_json_rows(filename: str):
 #     return []
 
 
+@router.get("/case_booking", response_model=list[CaboodleCaseBooking])
+def get_caboodle_cases(
+    session: Session = Depends(get_caboodle_session), days_ahead: int = 1
+):
+    """
+    Return caboodle case booking data
+    """
+    query = text((Path(__file__).parent / "live_case.sql").read_text())
+    params = {"days_ahead": days_ahead}
+    df = pd.read_sql(query, session.connection(), params=params)
+    return [CaboodleCaseBooking.parse_obj(row) for row in df.to_dict(orient="records")]
+
+
 @mock_router.get("/case_booking", response_model=list[CaboodleCaseBooking])
-def get_mock_cases():
+def get_mock_caboodle_cases():
     """
     returns mock of caboodle query for elective cases
     :return:
@@ -87,18 +96,47 @@ def get_mock_cases():
     return rows
 
 
+@router.get("/postop_destination", response_model=list[ClarityPostopDestination])
+def get_clarity_pod(
+    session: Session = Depends(get_clarity_session), days_ahead: int = 1
+):
+    """
+    Return clarity post op destination
+    """
+    query = text((Path(__file__).parent / "live_pod.sql").read_text())
+    params = {"days_ahead": days_ahead}
+    df = pd.read_sql(query, session.connection(), params=params)
+    return [
+        ClarityPostopDestination.parse_obj(row) for row in df.to_dict(orient="records")
+    ]
+
+
 @mock_router.get("/postop_destination", response_model=list[ClarityPostopDestination])
-def get_mock_pod():
+def get_mock_clarity_pod():
     """
     returns mock of caboodle query for preassessment
-    :return:
     """
     rows = _get_json_rows("mock_pod.json")
     return rows
 
 
+@router.get("/preassessment", response_model=list[CaboodlePreassessment])
+def get_caboodle_preassess(
+    session: Session = Depends(get_caboodle_session), days_ahead: int = 1
+):
+    """
+    Return caboodle preassessment data
+    """
+    query = text((Path(__file__).parent / "live_preassess.sql").read_text())
+    params = {"days_ahead": days_ahead}
+    df = pd.read_sql(query, session.connection(), params=params)
+    return [
+        CaboodlePreassessment.parse_obj(row) for row in df.to_dict(orient="records")
+    ]
+
+
 @mock_router.get("/preassessment", response_model=list[CaboodlePreassessment])
-def get_mock_preassess():
+def get_mock_caboodle_preassess():
     """
     returns mock of caboodle query for preassessment
     :return:
