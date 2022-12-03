@@ -16,7 +16,7 @@ def _to_camel(member: str) -> str:
     return "".join(word.capitalize() for word in member.split("_"))
 
 
-class ElectiveRow(BaseModel):
+class CaboodleCaseBooking(BaseModel):
     """
     results of the live_case.sql query against caboodle
     """
@@ -39,12 +39,12 @@ class ElectiveRow(BaseModel):
         alias_generator = _to_camel
 
 
-class ElectivePostOpDestinationRow(BaseModel):
+class ClarityPostopDestination(BaseModel):
     pod_orc: str
     or_case_id: int
 
 
-class ElectivePreassessRow(BaseModel):
+class CaboodlePreassessment(BaseModel):
     patient_durable_key: int
     name: str
     creation_instant: datetime
@@ -54,7 +54,7 @@ class ElectivePreassessRow(BaseModel):
         alias_generator = _to_camel
 
 
-class GetElectiveRow(BaseModel):
+class ElectiveSurgCase(BaseModel):
     patient_durable_key: int
     primary_mrn: str
     surgical_case_epic_id: int

@@ -5,9 +5,9 @@ import pandas as pd
 from api.convert import parse_to_data_frame
 
 from models.electives import (
-    ElectiveRow,
-    ElectivePostOpDestinationRow,
-    ElectivePreassessRow,
+    CaboodleCaseBooking,
+    ClarityPostopDestination,
+    CaboodlePreassessment,
 )
 
 
@@ -103,9 +103,9 @@ def prepare_electives(
 
     :returns:   merged dataframe
     """
-    electives_df = parse_to_data_frame(electives, ElectiveRow)
-    preassess_df = parse_to_data_frame(preassess, ElectivePreassessRow)
-    pod_df = parse_to_data_frame(pod, ElectivePostOpDestinationRow)
+    electives_df = parse_to_data_frame(electives, CaboodleCaseBooking)
+    preassess_df = parse_to_data_frame(preassess, CaboodlePreassessment)
+    pod_df = parse_to_data_frame(pod, ClarityPostopDestination)
 
     # join caboodle case booking to preassess case
     dfca = process_join_preassess_data(electives_df, preassess_df)

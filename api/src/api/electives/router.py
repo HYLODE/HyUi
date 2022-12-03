@@ -12,10 +12,10 @@ from sqlalchemy import text
 from api.db import get_clarity_session, get_caboodle_session
 
 from models.electives import (
-    ElectiveRow,
-    ElectivePostOpDestinationRow,
-    ElectivePreassessRow,
-    GetElectiveRow,
+    CaboodleCaseBooking,
+    ClarityPostopDestination,
+    CaboodlePreassessment,
+    ElectiveSurgCase,
 )
 
 from api.electives.wrangle import prepare_electives
@@ -27,7 +27,7 @@ router = APIRouter(
 mock_router = APIRouter(prefix="/electives")
 
 
-def _get_json_rows(filename: str) -> List[Dict]:
+def _get_json_rows(filename: str):
     """
     Return mock data from adjacent mock.json file
     Assumes that data in nested object 'rows'
@@ -77,7 +77,7 @@ def _get_json_rows(filename: str) -> List[Dict]:
 #     return []
 
 
-@mock_router.get("/cases", response_model=list[ElectiveRow])
+@mock_router.get("/case_booking", response_model=list[CaboodleCaseBooking])
 def get_mock_cases():
     """
     returns mock of caboodle query for elective cases
@@ -87,7 +87,7 @@ def get_mock_cases():
     return rows
 
 
-@mock_router.get("/pod", response_model=list[ElectivePostOpDestinationRow])
+@mock_router.get("/postop_destination", response_model=list[ClarityPostopDestination])
 def get_mock_pod():
     """
     returns mock of caboodle query for preassessment
@@ -97,7 +97,7 @@ def get_mock_pod():
     return rows
 
 
-@mock_router.get("/preassess", response_model=list[ElectivePreassessRow])
+@mock_router.get("/preassessment", response_model=list[CaboodlePreassessment])
 def get_mock_preassess():
     """
     returns mock of caboodle query for preassessment
@@ -107,7 +107,7 @@ def get_mock_preassess():
     return rows
 
 
-@mock_router.get("/", response_model=list[GetElectiveRow])
+@mock_router.get("/", response_model=list[ElectiveSurgCase])
 def get_mock_electives(
     days_ahead: int = 3,
 ):
@@ -123,7 +123,7 @@ def get_mock_electives(
 
     df = prepare_electives(_case, _pod, _preassess)
     df = df.replace({np.nan: None})
-    return [GetElectiveRow.parse_obj(row) for row in df.to_dict(orient="records")]
+    return [ElectiveSurgCase.parse_obj(row) for row in df.to_dict(orient="records")]
 
 
 # @router.get("/cases/", response_model=list[ElectiveRow])
