@@ -21,7 +21,7 @@ class ElectiveRow(BaseModel):
     results of the live_case.sql query against caboodle
     """
 
-    patient_durable_key: str
+    patient_durable_key: int
     primary_mrn: str
     surgical_case_epic_id: int
     canceled: bool
@@ -45,7 +45,7 @@ class ElectivePostOpDestinationRow(BaseModel):
 
 
 class ElectivePreassessRow(BaseModel):
-    patient_durable_key: str
+    patient_durable_key: int
     name: str
     creation_instant: datetime
     string_value: str
@@ -55,7 +55,7 @@ class ElectivePreassessRow(BaseModel):
 
 
 class GetElectiveRow(BaseModel):
-    patient_durable_key: str
+    patient_durable_key: int
     primary_mrn: str
     surgical_case_epic_id: int
     canceled: bool
