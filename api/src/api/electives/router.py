@@ -37,7 +37,7 @@ def _get_json_rows(filename: str):
 
 
 def _parse_query(
-    query_file: str, session: Session, model: BaseModel, params: Dict = {}
+        query_file: str, session: Session, model: BaseModel, params: Dict = {}
 ) -> List[BaseModel]:
     """
     generic function that reads a text query from a file, handles parameters
@@ -55,7 +55,7 @@ def _parse_query(
 
 @router.get("/case_booking", response_model=list[CaboodleCaseBooking])
 def get_caboodle_cases(
-    session: Session = Depends(get_caboodle_session), days_ahead: int = 1
+        session: Session = Depends(get_caboodle_session), days_ahead: int = 1
 ):
     """
     Return caboodle case booking data
@@ -77,7 +77,7 @@ def get_mock_caboodle_cases():
 
 @router.get("/postop_destination", response_model=list[ClarityPostopDestination])
 def get_clarity_pod(
-    session: Session = Depends(get_clarity_session), days_ahead: int = 1
+        session: Session = Depends(get_clarity_session), days_ahead: int = 1
 ):
     """
     Return clarity post op destination
@@ -98,13 +98,13 @@ def get_mock_clarity_pod():
 
 @router.get("/preassessment", response_model=list[CaboodlePreassessment])
 def get_caboodle_preassess(
-    session: Session = Depends(get_caboodle_session), days_ahead: int = 1
+        session: Session = Depends(get_caboodle_session), days_ahead: int = 1
 ):
     """
     Return caboodle preassessment data
     """
     params = {"days_ahead": days_ahead}
-    res = _parse_query("live_preassess.sql", session, CaboodleCaseBooking, params)
+    res = _parse_query("live_preassess.sql", session, CaboodlePreassessment, params)
     return res
 
 
@@ -120,7 +120,7 @@ def get_mock_caboodle_preassess():
 
 @mock_router.get("/", response_model=list[ElectiveSurgCase])
 def get_mock_electives(
-    days_ahead: int = 3,
+        days_ahead: int = 3,
 ):
     """
     Returns Electives data class populated by query-live/mock
@@ -139,22 +139,17 @@ def get_mock_electives(
 
 @router.get("/", response_model=list[ElectiveSurgCase])
 def get_electives(
-    days_ahead: int = 3,
-    #     settings: Settings = Depends(get_settings),
-    session_caboodle: Session = Depends(get_caboodle_session),
-    session_clarity: Session = Depends(get_clarity_session),
+        s_caboodle: Session = Depends(get_caboodle_session),
+        s_clarity: Session = Depends(get_clarity_session),
+        days_ahead: int = 3,
 ):
     """
     Returns elective surgical cases by wrangling together the three components
     """
     params = {"days_ahead": days_ahead}
-    _case = _parse_query("live_case.sql", session_caboodle, CaboodleCaseBooking, params)
-    _preassess = _parse_query(
-        "live_preassess.sql", session_caboodle, CaboodlePreassessment, params
-    )
-    _pod = _parse_query(
-        "live_pod.sql", session_clarity, ClarityPostopDestination, params
-    )
+    _case = _parse_query("live_case.sql", s_caboodle, CaboodleCaseBooking, params)
+    _preassess = _parse_query("live_preassess.sql", s_caboodle, CaboodlePreassessment, params)
+    _pod = _parse_query("live_pod.sql", s_clarity, ClarityPostopDestination, params)
 
     df = prepare_electives(_case, _pod, _preassess)
     df = df.replace({np.nan: None})
