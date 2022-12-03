@@ -27,6 +27,17 @@ router = APIRouter(
 mock_router = APIRouter(prefix="/electives")
 
 
+def _get_json_rows(filename: str) -> List[Dict]:
+    """
+    Return mock data from adjacent mock.json file
+    Assumes that data in nested object 'rows'
+    """
+    with open(Path(__file__).parent / filename, "r") as f:
+        mock_json = json.load(f)
+    mock_table = mock_json["rows"]
+    return mock_table
+
+
 # @router.get("/", response_model=List[GetElectiveRow])
 # def get_electives(
 #     days_ahead: int = 3,
@@ -66,23 +77,13 @@ mock_router = APIRouter(prefix="/electives")
 #     return []
 
 
-def _parse_json(filename: str, model: BaseModel) -> List[Dict]:
-    """
-    Return mock data from adjacent mock.json file
-    """
-    with open(Path(__file__).parent / filename, "r") as f:
-        mock_json = json.load(f)
-    mock_table = mock_json["rows"]
-    return [model.parse_obj(row).dict() for row in mock_table]
-
-
 @mock_router.get("/cases", response_model=list[ElectiveRow])
 def get_mock_cases():
     """
     returns mock of caboodle query for elective cases
     :return:
     """
-    rows = _parse_json("mock_case.json", ElectiveRow)
+    rows = _get_json_rows("mock_case.json")
     return rows
 
 
@@ -92,7 +93,7 @@ def get_mock_pod():
     returns mock of caboodle query for preassessment
     :return:
     """
-    rows = _parse_json("mock_pod.json", ElectivePostOpDestinationRow)
+    rows = _get_json_rows("mock_pod.json")
     return rows
 
 
@@ -102,7 +103,7 @@ def get_mock_preassess():
     returns mock of caboodle query for preassessment
     :return:
     """
-    rows = _parse_json("mock_preassess.json", ElectivePreassessRow)
+    rows = _get_json_rows("mock_preassess.json")
     return rows
 
 
@@ -116,15 +117,11 @@ def get_mock_electives(
     - post op destination info
     """
 
-    df_case = pd.DataFrame.from_records(_parse_json("mock_case.json", ElectiveRow))
-    df_pod = pd.DataFrame.from_records(
-        _parse_json("mock_pod.json", ElectivePostOpDestinationRow)
-    )
-    df_preassess = pd.DataFrame.from_records(
-        _parse_json("mock_preassess.json", ElectivePreassessRow)
-    )
+    _case = _get_json_rows("mock_case.json")
+    _pod = _get_json_rows("mock_pod.json")
+    _preassess = _get_json_rows("mock_preassess.json")
 
-    df = prepare_electives(df_case, df_pod, df_preassess)
+    df = prepare_electives(_case, _pod, _preassess)
     df = df.replace({np.nan: None})
     return [GetElectiveRow.parse_obj(row) for row in df.to_dict(orient="records")]
 
