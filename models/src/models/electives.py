@@ -37,11 +37,18 @@ class CaboodleCaseBooking(BaseModel):
 
     class Config:
         alias_generator = _to_camel
+        # https://stackoverflow.com/a/69434012/992999
+        allow_population_by_field_name = True
 
 
 class ClarityPostopDestination(BaseModel):
     pod_orc: str
     or_case_id: int
+    surgery_date_clarity: datetime
+
+    class Config:
+        alias_generator = _to_camel
+        allow_population_by_field_name = True
 
 
 class CaboodlePreassessment(BaseModel):
@@ -52,6 +59,7 @@ class CaboodlePreassessment(BaseModel):
 
     class Config:
         alias_generator = _to_camel
+        allow_population_by_field_name = True
 
 
 class ElectiveSurgCase(BaseModel):
