@@ -54,6 +54,9 @@ mock_router.include_router(mock_sitrep_router)
 app.include_router(electives_router)
 mock_router.include_router(mock_electives_router)
 
+app.include_router(perrt_router)
+mock_router.include_router(mock_perrt_router)
+
 app.include_router(ed_router)
 mock_router.include_router(mock_ed_router)
 
@@ -62,7 +65,6 @@ mock_router.include_router(mock_beds_router)
 
 app.include_router(consults_router)
 
-app.include_router(perrt_router)
 app.include_router(ros_router)
 app.include_router(hymind_router)
 

@@ -1,6 +1,11 @@
+-- noinspection SqlNoDataSourceInspectionForFile
+
 -- 2022-06-24
 -- return recent vitals and current location and most recent PERRT visit
 WITH
+-- start from the visit observation table since this is where all the vital signs live
+-- roughly 1000 rows/hour for UCH only
+-- 20k rows for 8 hours for the whole trust
 obs AS
     (SELECT
         ob.visit_observation_id
@@ -13,7 +18,7 @@ obs AS
     FROM star.visit_observation ob
     LEFT JOIN star.visit_observation_type ot ON ob.visit_observation_type_id = ot.visit_observation_type_id
     WHERE
-    ob.observation_datetime > NOW() - '12 HOURS'::INTERVAL
+    ob.observation_datetime > NOW() - '8 HOURS'::INTERVAL
     AND
     ot.id_in_application in
       (
@@ -69,19 +74,21 @@ loc AS
         cd.date_of_death IS NULL
         AND
         vo.patient_class = ANY('{INPATIENT,DAY_CASE,EMERGENCY}')
-        AND
-        dept.name LIKE 'UCH%'
-        AND
-        dept.name NOT  IN (
-             'UCH EMERGENCY DEPT'
-            ,'UCH P02 ENDOSCOPY'
-            ,'UCH P03 THEATRE SUITE'
-            ,'UCH T02 DAY SURG THR'
-            ,'UCH T02 VASCULAR ANGIO'
-            ,'UCH T03 INTENSIVE CARE'
-            ,'UCH T06 SOUTH PACU'
-        )
+
+        --         AND
+        --         dept.name LIKE 'UCH%'
+        --         AND
+        -- dept.name NOT  IN (
+            -- 'UCH EMERGENCY DEPT'
+            -- ,'UCH P02 ENDOSCOPY'
+            -- ,'UCH P03 THEATRE SUITE'
+            -- ,'UCH T02 DAY SURG THR'
+            -- ,'UCH T02 VASCULAR ANGIO'
+            -- ,'UCH T03 INTENSIVE CARE'
+            -- ,'UCH T06 SOUTH PACU'
+        --)
 ) bed_tail WHERE bed_tail_i = 1),
+-- PERRT consults
 consults AS (
     SELECT
 
