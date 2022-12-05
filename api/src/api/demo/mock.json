@@ -3,23 +3,23 @@
 	"rows":
 	[
 		{
-			"pod_orc": "Day Surgery Ward",
-			"or_case_id": "473112",
+			"PodOrc": "Day Surgery Ward",
+			"OrCaseId": "473112",
 			"SurgeryDateClarity": "2022-11-25 00:00:00.000"
 		},
 		{
-			"pod_orc": "Day Surgery Ward",
-			"or_case_id": "597244",
+			"PodOrc": "Day Surgery Ward",
+			"OrCaseId": "597244",
 			"SurgeryDateClarity": "2022-11-25 00:00:00.000"
 		},
 		{
-			"pod_orc": "ITU/PACU Bed",
-			"or_case_id": "617016",
+			"PodOrc": "ITU/PACU Bed",
+			"OrCaseId": "617016",
 			"SurgeryDateClarity": "2022-11-25 00:00:00.000"
 		},
 		{
-			"pod_orc": "Inpatient Ward",
-			"or_case_id": "719054",
+			"PodOrc": "Inpatient Ward",
+			"OrCaseId": "719054",
 			"SurgeryDateClarity": "2022-11-25 00:00:00.000"
 		}
 	]
