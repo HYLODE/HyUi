@@ -176,6 +176,7 @@ def _create_beds_table(settings: BaserowSettings, auth_token: str, application_i
 
 
 def initialise_baserow(settings: BaserowSettings):
+    logging.info("Starting Baserow initialisation.")
     _create_admin_user(settings)
     auth_token = _get_admin_user_auth_token(settings)
     group_id = _get_group_id(settings, auth_token)
@@ -184,4 +185,5 @@ def initialise_baserow(settings: BaserowSettings):
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
     initialise_baserow(get_baserow_settings())
