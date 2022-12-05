@@ -1,6 +1,6 @@
 import requests
 
-from models.hosptial import BuildingDepartments
+from models.hospital import BuildingDepartments
 from web.config import get_settings
 
 
