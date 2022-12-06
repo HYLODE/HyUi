@@ -36,4 +36,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     _set_log_level(args.log_level)
-    _start_operation(args.system)
+    _start_operation(args.operation)
