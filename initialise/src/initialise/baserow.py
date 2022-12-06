@@ -236,7 +236,7 @@ def _merge_star_and_caboodle_beds(
         on="merge_key",
         indicator=True,
         validate="one_to_one",
-    ).drop("merge_key", axis="columns")
+    ).drop(["merge_key", "_LastUpdatedInstant", "_CreationInstant"], axis="columns")
 
 
 def _fetch_beds() -> list[list[str]]:
