@@ -232,10 +232,8 @@ def _merge_star_and_caboodle_beds(
 
     return star_locations_df.merge(
         caboodle_departments_df,
-        how="left",
+        how="inner",
         on="merge_key",
-        indicator=True,
-        validate="one_to_one",
     ).drop(["merge_key", "_LastUpdatedInstant", "_CreationInstant"], axis="columns")
 
 
