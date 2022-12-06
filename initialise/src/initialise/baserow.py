@@ -147,26 +147,25 @@ def _star_locations() -> pd.DataFrame:
 
 def _caboodle_departments() -> pd.DataFrame:
     return pd.read_sql(
-        """SELECT DepartmentKey,
-            BedEpicId,
-            Name,
-            DepartmentName,
-            RoomName,
-            BedName,
-            IsBed,
-            BedInCensus,
-            IsDepartment,
-            IsRoom,
-            IsCareArea,
-            DepartmentExternalName,
-            DepartmentSpecialty,
-            DepartmentType,
-            DepartmentServiceGrouper,
-            DepartmentLevelOfCareGrouper,
-            LocationName,
-            ParentLocationName,
-            _CreationInstant,
-            _LastUpdatedInstant
+        """SELECT
+            --DepartmentKey AS department_key,
+            --BedEpicId AS bed_epic_id,
+            Name AS name,
+            DepartmentName AS department_name,
+            RoomName AS room_name,
+            BedName AS bed_name,
+            --BedInCensus AS bed_in_census,
+            IsRoom AS is_room,
+            IsCareArea AS is_care_area,
+            DepartmentExternalName AS department_external_name,
+            DepartmentSpecialty AS department_speciality,
+            DepartmentType AS department_type,
+            DepartmentServiceGrouper AS department_service_grouper,
+            DepartmentLevelOfCareGrouper AS department_level_of_care_grouper,
+            LocationName AS location_name,
+            ParentLocationName AS parent_location_name,
+            _CreationInstant AS creation_instant,
+            _LastUpdatedInstant AS last_updated_instant
         FROM dbo.DepartmentDim
         WHERE IsBed = 1
         AND Name <> 'Wait'
@@ -189,7 +188,7 @@ def _merge_star_and_caboodle_beds(
         star_locations_df["department"].isin(DEPARTMENTS), :
     ]
     caboodle_departments_df = caboodle_departments_df.loc[
-        caboodle_departments_df["DepartmentName"].isin(DEPARTMENTS), :
+        caboodle_departments_df["department_name"].isin(DEPARTMENTS), :
     ]
 
     # Remove virtual rooms and beds.
@@ -213,19 +212,20 @@ def _merge_star_and_caboodle_beds(
 
     # Still left with dups so now choose the most recent
     caboodle_departments_df.sort_values(
-        by=["DepartmentName", "RoomName", "BedName", "_CreationInstant"], inplace=True
+        by=["department_name", "room_name", "bed_name", "creation_instant"],
+        inplace=True,
     )
     caboodle_departments_df.drop_duplicates(
-        subset=["DepartmentName", "RoomName", "BedName"], keep="last", inplace=True
+        subset=["department_name", "room_name", "bed_name"], keep="last", inplace=True
     )
 
     # Make key to merge and force to lower etc
     caboodle_departments_df["merge_key"] = caboodle_departments_df.agg(
         lambda x: (
-            x["DepartmentSpecialty"],
-            x["DepartmentName"],
-            x["RoomName"],
-            x["Name"].lower(),
+            x["department_speciality"],
+            x["department_name"],
+            x["room_name"],
+            x["name"].lower(),
         ),
         axis=1,
     )
@@ -234,7 +234,17 @@ def _merge_star_and_caboodle_beds(
         caboodle_departments_df,
         how="inner",
         on="merge_key",
-    ).drop(["merge_key", "_LastUpdatedInstant", "_CreationInstant"], axis="columns")
+    ).drop(
+        [
+            "merge_key",
+            "last_updated_instant",
+            "creation_instant",
+            "name",
+            "room_name",
+            "bed_name",
+        ],
+        axis="columns",
+    )
 
 
 def _fetch_beds() -> list[list[str]]:
