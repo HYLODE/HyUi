@@ -8,6 +8,7 @@ from models.electives import (
     CaboodleCaseBooking,
     ClarityPostopDestination,
     CaboodlePreassessment,
+    SurgData,
 )
 
 
@@ -104,6 +105,7 @@ def prepare_electives(
     :returns:   merged dataframe
     """
     electives_df = parse_to_data_frame(electives, CaboodleCaseBooking)
+    # electives_df = parse_to_data_frame(electives, SurgData)
     preassess_df = parse_to_data_frame(preassess, CaboodlePreassessment)
     pod_df = parse_to_data_frame(pod, ClarityPostopDestination)
 
@@ -129,5 +131,46 @@ def prepare_electives(
 
     # drop cancellations
     df = df[~(df["canceled"] == 1)]
+
+    return df
+
+
+def prepare_draft(
+    electives: List[Dict],
+) -> pd.DataFrame:
+    """
+    Prepare elective case list
+
+    :param      electives:  list of dicts with surgical cases
+    :param      pod:    list of dicts with postop destination
+    :param      preassess:    list of dicts with preassessment info
+
+    :returns:   merged dataframe
+    """
+    # electives_df = parse_to_data_frame(electives, CaboodleCaseBooking)
+    electives_df = parse_to_data_frame(electives, SurgData)
+    # preassess_df = parse_to_data_frame(preassess, CaboodlePreassessment)
+    # pod_df = parse_to_data_frame(pod, ClarityPostopDestination)
+
+    # join caboodle case booking to preassess case
+    # dfca = process_join_preassess_data(electives_df, preassess_df)
+
+    # join on post op destinations from clarity
+    # df = dfca.merge(
+    #     pod_df,
+    #     left_on="surgical_case_epic_id",
+    #     right_on="or_case_id",
+    #     how="left",
+    # )
+
+    df = electives_df
+    # create pacu label
+    df["pacu"] = False
+    df["pacu"] = np.where(
+        df["booked_destination"].astype(str).str.contains("PACU"), True, df["pacu"]
+    )
+
+    # drop cancellations
+    df = df[~(df["Canceled"] == 1)]
 
     return df

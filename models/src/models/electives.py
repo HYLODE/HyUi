@@ -7,7 +7,7 @@ and follow the **same** naming convention such that
 the module.classname can be reliably used for access
 """
 
-from datetime import datetime, date
+from datetime import datetime, date, time
 
 from pydantic import BaseModel
 
@@ -83,3 +83,54 @@ class ElectiveSurgCase(BaseModel):
     surgery_date: date
     patient_friendly_name: str
     planned_operation_start_instant: datetime
+
+
+class SurgData(BaseModel):
+    PrimaryMrn: int
+    PatientKey: int
+    PatientDurableKey: int
+    SurgicalCaseKey: int
+    SurgicalCaseUclhKey: int
+    FirstName: str
+    LastName: str
+    BirthDate: datetime
+    AgeInYears: int
+    Sex: str
+    PlacedOnWaitingListDate: datetime | None
+    DecidedToAdmitDate: datetime | None
+    SurgeryDate: datetime
+    CaseRequestDate: datetime
+    CaseRequestTimeOfDay: time
+    CancelDate: datetime | None
+    PrimaryService: str
+    ProcedureLevel: str
+    Classification: str | None
+    SurgeryPatientClass: str
+    AdmissionPatientClass: str
+    PrimaryAnesthesiaType: str | None
+    ReasonNotPerformed: str | None
+    Canceled: bool | None
+    PlannedOperationStartInstant: datetime | None
+    PlannedOperationEndInstant: datetime | None
+    TouchTimeStartInstant: datetime | None
+    TouchTimeEndInstant: datetime | None
+    TouchTimeMinutes: float | None
+    PostOperativeDestination: str
+    AdmissionService: str | None
+    ElectiveAdmissionType: str
+    IntendedManagement: str
+    Priority: str | None
+    RemovalReason: str | None
+    Status: str | None
+    SurgicalService: str | None
+    Type: str | None
+    Count: str | None
+    CaseScheduleStatus: str | None
+    CaseCancelReason: str | None
+    CaseCancelReasonCode: str | None
+    AsaRatingCode: str | None
+    Name: str | None
+    PatientFriendlyName: str | None
+    RoomName: str | None
+    DepartmentName: str | None
+    booked_destination: str | None
