@@ -3,7 +3,7 @@
 -- see https://github.com/HYLODE/HyUi/issues/47#issuecomment-1160706270
 
 SELECT
-     pod.NAME AS pod_orc
+     pod.NAME AS PodOrc
     ,c.OR_CASE_ID AS or_case_id
     ,c.SURGERY_DATE AS SurgeryDateClarity
 FROM OR_CASE c
