@@ -4,38 +4,39 @@ Serve the PERRT endpoints
 - wrangled data at the route
 """
 
-from datetime import datetime
+import datetime as dt
 from pathlib import Path
-from typing import List
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlmodel import Session
 
+from api.convert import parse_to_data_frame
 from api.db import get_star_session
 from api.mock import _get_json_rows, _parse_query
-from models.perrt import EmapVitals
+from api.perrt.wrangle import wrangle
+from models.perrt import EmapVitalsLong, EmapVitalsWide
 
 router = APIRouter(prefix="/perrt")
 mock_router = APIRouter(prefix="/perrt")
 _this_file = Path(__file__)
 
 
-@router.get("/vitals", response_model=list[EmapVitals])
+@router.get("/vitals/long", response_model=list[EmapVitalsLong])
 def get_emap_vitals(
-    encounter_ids: List[int],
-    horizon_dt: datetime,
     session: Session = Depends(get_star_session),
+    encounter_ids: list[str] = Query(default=[]),
+    horizon_dt: dt.datetime = dt.datetime.now() - dt.timedelta(hours=6),
 ):
     """
     Return vital signs
     :type horizon_dt: datetime remember to diff this from 'now'
     """
     params = {"encounter_ids": encounter_ids, "horizon_dt": horizon_dt}
-    res = _parse_query("live_vitals.sql", session, EmapVitals, params)
+    res = _parse_query(_this_file, "live_vitals.sql", session, EmapVitalsLong, params)
     return res
 
 
-@mock_router.get("/vitals", response_model=list[EmapVitals])
+@mock_router.get("/vitals/long", response_model=list[EmapVitalsLong])
 def get_mock_emap_vitals():
     """
     returns mock of emap query for vital signs
@@ -45,27 +46,24 @@ def get_mock_emap_vitals():
     return rows
 
 
-# TODO: 2022-12-05 resume here; check on live; write a test
-# TODO: 2022-12-05 then call census and merge
+# TODO: 2022-12-06 rather than prepare the vitals and the patients together;
+#  leave that to the front end which can use census itself and instead you
+#  will need a query for perrt consults and a wrangle to return one row per
+#  encounter for the vitals
 
-# @router.get("/raw", response_model=list[PerrtRaw])
-# def read_perrt_table(
-#         session: Session = Depends(get_star_session),
-#         offset: int = 0,
-#         limit: int = Query(default=100, lte=100),
-# ):
-#     """
-#     Returns PerrtTable data class populated by query-live/mock
-#
-#     Query preparation depends on the environment via arg get_emap_session so
-#     will return mock data in dev and live (from the API itself)
-#     """
-#     q = prepare_query("perrt", "FIXME")
-#     results = session.exec(q)  # type: ignore
-#     Record = namedtuple("Record", results.keys())  # type: ignore
-#     records = [Record(*r) for r in results.fetchall()]
-#     records = records[offset:limit]
-#     return records
+
+@mock_router.get("/vitals/wide")
+def get_mock_emap_vitals_wide():
+    """
+    returns mock of emap query after wrangling
+    :return:
+    """
+    rows = _get_json_rows(_this_file, "mock_vitals.json")
+    df = parse_to_data_frame(rows, EmapVitalsLong)
+    df_wide = wrangle(df)
+
+    return [EmapVitalsWide.parse_obj(row) for row in df_wide.to_dict(orient="records")]
+
 
 # @router.get("/", response_model=list[PerrtRead])
 # def read_perrt(session: Session = Depends(get_star_session)):
@@ -93,7 +91,8 @@ def get_mock_emap_vitals():
 #     return recw
 #
 #
-# @router.post("/admission_predictions", response_model=list[AdmissionPrediction])
+# @router.post("/admission_predictions", response_model=list[
+# AdmissionPrediction])
 # def get_predictions(
 #         hospital_visit_ids: list[str] = Body(),
 # ):

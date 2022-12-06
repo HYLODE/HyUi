@@ -9,7 +9,7 @@ from dash import dcc, html
 from flask_caching import Cache
 from flask_login import current_user
 
-from models.perrt import PerrtRead
+from models.perrt import PerrtWide
 from web.config import get_settings
 from web.convert import parse_to_data_frame
 
@@ -126,7 +126,7 @@ def store_data(n_intervals: int):
     Read data from API then store as JSON
     """
     response = requests.get(f"{get_settings().api_url}/perrt/")
-    data = [PerrtRead.parse_obj(row) for row in response.json()]
+    data = [PerrtWide.parse_obj(row) for row in response.json()]
 
     hospital_visit_ids = [perrt_entry["hospital_visit_id"] for perrt_entry in data]
 
@@ -155,7 +155,7 @@ def store_data(n_intervals: int):
 def gen_simple_fig(data: list[dict]):
     # TODO: move data validation to store
 
-    df = parse_to_data_frame(data, PerrtRead)
+    df = parse_to_data_frame(data, PerrtWide)
     df = df[["dept_name", "news_scale_1_max", "mrn"]]
     df = df.groupby(["dept_name", "news_scale_1_max"], as_index=False).count()
     df["news_scale_1_max"] = df["news_scale_1_max"].astype(int).astype(str)

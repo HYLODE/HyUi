@@ -5,15 +5,16 @@ Entry point and main file for the FastAPI backend
 from fastapi import FastAPI, APIRouter
 from fastapi.responses import ORJSONResponse
 
-from api.census.router import router as census_router, mock_router as mock_census_router
-from api.sitrep.router import router as sitrep_router, mock_router as mock_sitrep_router
-from api.electives.router import (
-    router as electives_router,
-    mock_router as mock_electives_router,
+from api.bedbones.router import (
+    mock_router as mock_bedbones_router,
+    router as bedbones_router,
 )
-from api.ed.router import (
-    router as ed_router,
-    mock_router as mock_ed_router,
+from api.census.router import mock_router as mock_census_router, router as census_router
+from api.consults.router import router as consults_router
+from api.ed.router import mock_router as mock_ed_router, router as ed_router
+from api.electives.router import (
+    mock_router as mock_electives_router,
+    router as electives_router,
 )
 
 from api.beds.router import (
@@ -33,6 +34,14 @@ from api.demo.router import (
     mock_router as mock_demo_router,
 )
 
+from api.hospital.router import (
+    mock_router as mock_hospital_router,
+    router as hospital_router,
+)
+from api.hymind.router import router as hymind_router
+from api.perrt.router import mock_router as mock_perrt_router, router as perrt_router
+from api.ros.router import router as ros_router
+from api.sitrep.router import mock_router as mock_sitrep_router, router as sitrep_router
 
 app = FastAPI(default_response_class=ORJSONResponse)
 mock_router = APIRouter(
