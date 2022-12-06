@@ -123,57 +123,59 @@ VIRTUAL_BEDS = (
 
 
 def _star_locations() -> pd.DataFrame:
-    return pd.read_sql_query(
-        """
-    SELECT
-        lo.location_id,
-        lo.location_string,
-        SPLIT_PART(lo.location_string, '^', 1) AS hl7_department,
-        SPLIT_PART(lo.location_string, '^', 2) AS hl7_room,
-        SPLIT_PART(lo.location_string, '^', 3) AS hl7_bed,
-        lo.department_id,
-        lo.room_id,
-        lo.bed_id,
-        dept.name AS department,
-        dept.speciality,
-        room.name room
-    FROM star.location lo
-    INNER JOIN star.department dept ON lo.department_id = dept.department_id
-    INNER JOIN star.room ON lo.room_id = room.room_id
-    """,
-        star_engine(),
-    )
+    with star_engine().connect() as conn:
+        return pd.read_sql_query(
+            """
+        SELECT
+            lo.location_id,
+            lo.location_string,
+            SPLIT_PART(lo.location_string, '^', 1) AS hl7_department,
+            SPLIT_PART(lo.location_string, '^', 2) AS hl7_room,
+            SPLIT_PART(lo.location_string, '^', 3) AS hl7_bed,
+            lo.department_id,
+            lo.room_id,
+            lo.bed_id,
+            dept.name AS department,
+            dept.speciality,
+            room.name room
+        FROM star.location lo
+        INNER JOIN star.department dept ON lo.department_id = dept.department_id
+        INNER JOIN star.room ON lo.room_id = room.room_id
+        """,
+            conn,
+        )
 
 
 def _caboodle_departments() -> pd.DataFrame:
-    return pd.read_sql_query(
-        """SELECT DepartmentKey,
-            BedEpicId,
-            Name,
-            DepartmentName,
-            RoomName,
-            BedName,
-            IsBed,
-            BedInCensus,
-            IsDepartment,
-            IsRoom,
-            IsCareArea,
-            DepartmentExternalName,
-            DepartmentSpecialty,
-            DepartmentType,
-            DepartmentServiceGrouper,
-            DepartmentLevelOfCareGrouper,
-            LocationName,
-            ParentLocationName,
-            _CreationInstant,
-            _LastUpdatedInstant
-        FROM dbo.DepartmentDim
-        WHERE IsBed = 1
-        AND Name <> 'Wait'
-        AND DepartmentType <> 'OR'
-        ORDER BY DepartmentName, RoomName, BedName, _CreationInstant""",
-        caboodle_engine(),
-    )
+    with caboodle_engine().connect() as conn:
+        return pd.read_sql_query(
+            """SELECT DepartmentKey,
+                BedEpicId,
+                Name,
+                DepartmentName,
+                RoomName,
+                BedName,
+                IsBed,
+                BedInCensus,
+                IsDepartment,
+                IsRoom,
+                IsCareArea,
+                DepartmentExternalName,
+                DepartmentSpecialty,
+                DepartmentType,
+                DepartmentServiceGrouper,
+                DepartmentLevelOfCareGrouper,
+                LocationName,
+                ParentLocationName,
+                _CreationInstant,
+                _LastUpdatedInstant
+            FROM dbo.DepartmentDim
+            WHERE IsBed = 1
+            AND Name <> 'Wait'
+            AND DepartmentType <> 'OR'
+            ORDER BY DepartmentName, RoomName, BedName, _CreationInstant""",
+            conn,
+        )
 
 
 def _merge_star_and_caboodle_beds(
