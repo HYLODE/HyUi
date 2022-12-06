@@ -1,12 +1,38 @@
 import numpy as np
 import pandas as pd
-from api.convert import parse_to_data_frame
 from pydantic import BaseModel
+
+# import pickle
+# from pathlib import Path
+
+# from imblearn.pipeline import Pipeline
+# from sklearn.model_selection import RandomizedSearchCV, StratifiedKFold
+# from sklearn.linear_model import BayesianRidge
+# from sklearn.ensemble import RandomForestClassifier
+# from category_encoders import TargetEncoder
+from api.convert import to_data_frame
 
 from models.electives import (
     CaboodleCaseBooking,
     ClarityPostopDestination,
     CaboodlePreassessment,
+    SurgData,
+    PreassessData,
+    LabData,
+    # EchoData,
+    EchoWithAbnormalData,
+    ObsData,
+    AxaCodes,
+)
+from api.electives.hypo_help import (
+    merge_surg_preassess,
+    wrangle_labs,
+    # simple_sum,
+    #  j_wrangle_echo,
+    j_wrangle_obs,
+    wrangle_echo,
+    fill_na,
+    # camel_to_snake,
 )
 
 
@@ -53,7 +79,7 @@ def process_join_preassess_data(
     postop destination plan is included, as this may be relevant
     operationally, whereas the date of the creation of the note with the most
     recent ASA and METs value is less important. This merge is based on
-    PatientDurableKey(unique patient identifier), rather than a surgical case
+    patient_durable_key(unique patient identifier), rather than a surgical case
     identifier, which is not available for preassessment note data.
 
     preassess_data - derived from preassment query against caboodle
@@ -89,9 +115,9 @@ def process_join_preassess_data(
 
 
 def prepare_electives(
-    electives: list[BaseModel],
-    pod: list[BaseModel],
-    preassess: list[BaseModel],
+    electives: list[type[BaseModel]],
+    pod: list[type[BaseModel]],
+    preassess: list[type[BaseModel]],
 ) -> pd.DataFrame:
     """
     Prepare elective case list
@@ -102,9 +128,10 @@ def prepare_electives(
 
     :returns:   merged dataframe
     """
-    electives_df = parse_to_data_frame(electives, CaboodleCaseBooking)
-    preassess_df = parse_to_data_frame(preassess, CaboodlePreassessment)
-    pod_df = parse_to_data_frame(pod, ClarityPostopDestination)
+    electives_df = to_data_frame(electives, CaboodleCaseBooking)
+    # electives_df = parse_to_data_frame(electives, SurgData)
+    preassess_df = to_data_frame(preassess, CaboodlePreassessment)
+    pod_df = to_data_frame(pod, ClarityPostopDestination)
 
     # join caboodle case booking to preassess case
     dfca = process_join_preassess_data(electives_df, preassess_df)
@@ -128,5 +155,74 @@ def prepare_electives(
 
     # drop cancellations
     df = df[~(df["canceled"] == 1)]
+
+    return df
+
+
+def prepare_draft(
+    electives: list[type[BaseModel]],
+    preassess: list[type[BaseModel]],
+    labs: list[type[BaseModel]],
+    echo: list[type[BaseModel]],
+    obs: list[type[BaseModel]],
+    axa: list[type[BaseModel]],
+    pod: list[type[BaseModel]],
+) -> pd.DataFrame:
+
+    electives_df = to_data_frame(electives, SurgData)
+    preassess_df = to_data_frame(preassess, PreassessData)
+    labs_df = to_data_frame(labs, LabData)
+    echo_df = to_data_frame(echo, EchoWithAbnormalData)
+    obs_df = to_data_frame(obs, ObsData)
+    axa_codes = to_data_frame(axa, AxaCodes)
+    pod_df = to_data_frame(pod, ClarityPostopDestination)
+    # axa_codes = camel_to_snake(
+    #    pd.read_csv(
+    #        "axa_codes.csv",
+    #        encoding="cp1252",
+    #        usecols=["SurgicalService", "Name", "axa_severity", "protocolised_adm"],
+    #    )
+    # )
+
+    # print(axa_codes.columns)
+
+    df = (
+        merge_surg_preassess(surg_data=electives_df, preassess_data=preassess_df)
+        .merge(pod_df, left_on="surgical_case_epic_id", right_on="or_case_id")
+        .merge(wrangle_labs(labs_df), how="left", on="patient_durable_key")
+        .merge(wrangle_echo(echo_df), how="left", on="patient_durable_key")
+        .merge(
+            j_wrangle_obs(obs_df),
+            how="left",
+            on=["surgical_case_key", "planned_operation_start_instant"],
+        )
+        .sort_values("surgery_date", ascending=True)
+        .drop_duplicates(subset="patient_durable_key", keep="first")
+        .sort_index()
+        .pipe(fill_na)
+        .merge(
+            axa_codes[["surgical_service", "name", "axa_severity", "protocolised_adm"]],
+            on=["surgical_service", "name"],
+            how="left",
+        )
+    )
+    # print(df.columns)
+    # create pacu label
+    df["pacu"] = np.where(
+        df["booked_destination"].astype(str).str.contains("PACU")
+        | df["pacdest"].astype(str).str.contains("PACU")
+        | df["pod_orc"].astype(str).str.contains("PACU"),
+        True,
+        False,
+    )
+
+    # deployed = pickle.load(
+    #     open((Path(__file__).parent / "deploy/RFR_jan1601.sav"), "rb")
+    # )
+    # model = deployed.best_estimator_
+    # cols = model[1].feature_names_in_
+    # preds = model.predict_proba(df[cols])[:, 1]
+    # df["icu_prob"] = preds
+    df["icu_prob"] = 0
 
     return df

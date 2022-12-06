@@ -1,0 +1,33 @@
+[
+  {
+    "if": {"column_id": "surgery_date"},
+    "textAlign": "left",
+    "fontWeight": "bold"
+  },
+  {
+    "if": {"column_id": "pacu"},
+    "fontWeight": "bold",
+    "textAlign": "left",
+    "width": "5vw",
+    "minWidth": "5vw",
+    "maxWidth": "5vw",
+    "whitespace": "normal"
+  },
+  {"if": {"column_id": "primary_service"}, "textAlign": "left", "width": "20vw"},
+  {
+    "if": {"column_id": "patient_friendly_name"},
+    "textAlign": "left"
+  },
+  {
+    "if": {"column_id": "primary_mrn"},
+    "textAlign": "left",
+    "font-family": "monospace"
+  },
+  {
+    "if": {"column_id": "name"},
+    "textAlign": "left",
+    "font-family": "sans-serif",
+    "fontWeight": "bold",
+    "width": "20vw"
+  }
+]
