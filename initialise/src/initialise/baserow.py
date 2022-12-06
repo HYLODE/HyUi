@@ -124,7 +124,7 @@ VIRTUAL_BEDS = (
 
 def _star_locations() -> pd.DataFrame:
     with star_engine().connect() as conn:
-        return pd.read_sql_query(
+        return pd.read_sql(
             """
         SELECT
             lo.location_id,
@@ -148,7 +148,7 @@ def _star_locations() -> pd.DataFrame:
 
 def _caboodle_departments() -> pd.DataFrame:
     with caboodle_engine().connect() as conn:
-        return pd.read_sql_query(
+        return pd.read_sql(
             """SELECT DepartmentKey,
                 BedEpicId,
                 Name,
