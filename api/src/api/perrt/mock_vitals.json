@@ -161,6 +161,16 @@
 			"value_as_text": "Room air",
 			"unit": null,
 			"encounter": 1039738111
+		},
+		{
+			"visit_observation_id": 679779241,
+			"hospital_visit_id": 674628501,
+			"observation_datetime": "2022-12-05 10:54:00+00",
+			"id_in_application": "28316",
+			"value_as_real": null,
+			"value_as_text": "4",
+			"unit": null,
+			"encounter": 1039738111
 		}
 	]
 }
