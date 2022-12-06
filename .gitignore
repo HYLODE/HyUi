@@ -924,5 +924,9 @@ docs/_linkcheck/
 # ignore generated data
 src/api/perrt/admission_probability/generated_data
 
-# local jupyter lab for exploratory work
-jupyter/
+
+# pete odor's PACU dashboard
+web/src/web/assets/pacu_dashboard.html
+
+# temporary Model storage
+api/src/api/electives/deploy/*

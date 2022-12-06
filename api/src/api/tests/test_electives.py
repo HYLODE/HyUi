@@ -1,47 +1,61 @@
-from datetime import date, datetime
-
-from api.convert import to_data_frame
-from api.electives.wrangle import prepare_electives
 from api.main import app
 from fastapi.testclient import TestClient
 
 from models.electives import (
-    CaboodleCaseBooking,
-    ClarityPostopDestination,
-    CaboodlePreassessment,
-    ElectiveSurgCase,
+    SurgData,
+    PreassessData,
+    MergedData,
+    LabData,
+    EchoWithAbnormalData,
+    ObsData,
 )
 
 client = TestClient(app)
 
 
-def test_get_mock_preassess():
-    response = client.get("/mock/electives/preassessment")
+def test_get_mock_preassess() -> None:
+    response = client.get("/mock/electives/preassessment/")
     assert response.status_code == 200
 
-    rows = [CaboodlePreassessment.parse_obj(row) for row in response.json()]
+    rows = [PreassessData.parse_obj(row) for row in response.json()]
     assert len(rows) > 0
 
 
-def test_get_mock_pod():
-    response = client.get("/mock/electives/postop_destination")
+def test_get_mock_cases() -> None:
+    response = client.get("/mock/electives/case_booking/")
     assert response.status_code == 200
 
-    rows = [ClarityPostopDestination.parse_obj(row) for row in response.json()]
+    rows = [SurgData.parse_obj(row) for row in response.json()]
     assert len(rows) > 0
 
 
-def test_get_mock_cases():
-    response = client.get("/mock/electives/case_booking")
+def test_get_mock_labs() -> None:
+    response = client.get("/mock/electives/labs/")
     assert response.status_code == 200
 
-    rows = [CaboodleCaseBooking.parse_obj(row) for row in response.json()]
-    assert len(rows) > 0
-
-
-def test_get_mock_electives():
-    response = client.get("/mock/electives")
-    assert response.status_code == 200
-
-    elective_rows = [ElectiveSurgCase.parse_obj(row) for row in response.json()]
+    elective_rows = [LabData.parse_obj(row) for row in response.json()]
     assert len(elective_rows) > 0
+
+
+def test_get_mock_electives() -> None:
+    response = client.get("/mock/electives/")
+    assert response.status_code == 200
+
+    elective_rows = [MergedData.parse_obj(row) for row in response.json()]
+    assert len(elective_rows) > 0
+
+
+def test_mock_echo() -> None:
+    response = client.get("/mock/electives/echo/")
+    assert response.status_code == 200
+
+    rows = [EchoWithAbnormalData.parse_obj(row) for row in response.json()]
+    assert len(rows) > 0
+
+
+def test_mock_obs() -> None:
+    response = client.get("/mock/electives/obs/")
+    assert response.status_code == 200
+
+    rows = [ObsData.parse_obj(row) for row in response.json()]
+    assert len(rows) > 0

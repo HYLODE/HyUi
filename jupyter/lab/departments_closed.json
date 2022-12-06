@@ -1,0 +1,682 @@
+[
+  {
+    "department": "GWB L01 CRITICAL CARE",
+    "beds": 10,
+    "patients": 8,
+    "empties": 2,
+    "days_since_last_dc": 3,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "GWB L01 ELECTIVE SURG",
+    "beds": 35,
+    "patients": 10,
+    "empties": 25,
+    "days_since_last_dc": 3,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "GWB L02 EAST (L02E)",
+    "beds": 17,
+    "patients": 17,
+    "empties": 0,
+    "days_since_last_dc": 3,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "GWB L02 NORTH (L02N)",
+    "beds": 17,
+    "patients": 17,
+    "empties": 0,
+    "days_since_last_dc": 3,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "GWB L03 EAST (L03E)",
+    "beds": 17,
+    "patients": 17,
+    "empties": 0,
+    "days_since_last_dc": 4,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "GWB L03 NORTH (L03N)",
+    "beds": 17,
+    "patients": 16,
+    "empties": 1,
+    "days_since_last_dc": 3,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "GWB L04 EAST (L04E)",
+    "beds": 14,
+    "patients": 14,
+    "empties": 0,
+    "days_since_last_dc": 3,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "GWB L04 NORTH (L04N)",
+    "beds": 18,
+    "patients": 9,
+    "empties": 9,
+    "days_since_last_dc": 4,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "NHNN C0 NCCU",
+    "beds": 11,
+    "patients": 4,
+    "empties": 7,
+    "days_since_last_dc": 3,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "NHNN C1 NCCU",
+    "beds": 20,
+    "patients": 11,
+    "empties": 9,
+    "days_since_last_dc": 3,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "NHNN C1 SURGICAL ITU",
+    "beds": 19,
+    "patients": 0,
+    "empties": 19,
+    "days_since_last_dc": 180,
+    "closed_temp": false,
+    "closed_perm": true,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "NHNN C2 VICTOR HORSLEY",
+    "beds": 29,
+    "patients": 22,
+    "empties": 7,
+    "days_since_last_dc": 3,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "NHNN C3 BERNARD SUNLEY",
+    "beds": 28,
+    "patients": 26,
+    "empties": 2,
+    "days_since_last_dc": 3,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "NHNN C3 DAVID FERRIER",
+    "beds": 26,
+    "patients": 24,
+    "empties": 2,
+    "days_since_last_dc": 3,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "NHNN C4 BLOOMSBURY WRD",
+    "beds": 19,
+    "patients": 8,
+    "empties": 11,
+    "days_since_last_dc": 3,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "NHNN C4 MOLLY LANE FOX",
+    "beds": 27,
+    "patients": 22,
+    "empties": 5,
+    "days_since_last_dc": 3,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "NHNN Q1 LADY ANNE",
+    "beds": 27,
+    "patients": 7,
+    "empties": 20,
+    "days_since_last_dc": 3,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "NHNN Q3 REHABILITATION",
+    "beds": 18,
+    "patients": 11,
+    "empties": 7,
+    "days_since_last_dc": 4,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "NHNN Q4 JOHN YOUNG WRD",
+    "beds": 14,
+    "patients": 11,
+    "empties": 3,
+    "days_since_last_dc": 4,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "NHNN Q5 H JACKSON WARD",
+    "beds": 12,
+    "patients": 6,
+    "empties": 6,
+    "days_since_last_dc": 6,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "NHNN Q6 MAIDA VALE WRD",
+    "beds": 14,
+    "patients": 12,
+    "empties": 2,
+    "days_since_last_dc": 3,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "NHNN Q7 TELEMETRY UNIT",
+    "beds": 7,
+    "patients": 4,
+    "empties": 3,
+    "days_since_last_dc": 15,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "UCH SDEC",
+    "beds": 36,
+    "patients": 20,
+    "empties": 16,
+    "days_since_last_dc": 3,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "UCH T01 ACUTE MEDICAL",
+    "beds": 84,
+    "patients": 38,
+    "empties": 46,
+    "days_since_last_dc": 3,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "UCH T01 ENHANCED CARE",
+    "beds": 18,
+    "patients": 16,
+    "empties": 2,
+    "days_since_last_dc": 3,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "UCH T03 INTENSIVE CARE",
+    "beds": 35,
+    "patients": 25,
+    "empties": 10,
+    "days_since_last_dc": 3,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "UCH T06 CENTRAL (T06C)",
+    "beds": 24,
+    "patients": 0,
+    "empties": 24,
+    "days_since_last_dc": 15,
+    "closed_temp": true,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "UCH T06 GYNAE (T06G)",
+    "beds": 16,
+    "patients": 0,
+    "empties": 16,
+    "days_since_last_dc": 954,
+    "closed_temp": false,
+    "closed_perm": true,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "UCH T06 HEAD (T06H)",
+    "beds": 25,
+    "patients": 8,
+    "empties": 17,
+    "days_since_last_dc": 3,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "UCH T06 SOUTH PACU",
+    "beds": 21,
+    "patients": 1,
+    "empties": 20,
+    "days_since_last_dc": 13,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "UCH T07 CV SURGE",
+    "beds": 35,
+    "patients": 0,
+    "empties": 35,
+    "days_since_last_dc": 589,
+    "closed_temp": false,
+    "closed_perm": true,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "UCH T07 HDRU",
+    "beds": 18,
+    "patients": 0,
+    "empties": 18,
+    "days_since_last_dc": 845,
+    "closed_temp": false,
+    "closed_perm": true,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "UCH T07 NORTH (T07N)",
+    "beds": 43,
+    "patients": 13,
+    "empties": 30,
+    "days_since_last_dc": 3,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "UCH T07 SOUTH",
+    "beds": 31,
+    "patients": 5,
+    "empties": 26,
+    "days_since_last_dc": 3,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "UCH T07 SOUTH (T07S)",
+    "beds": 21,
+    "patients": 0,
+    "empties": 21,
+    "days_since_last_dc": 847,
+    "closed_temp": false,
+    "closed_perm": true,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "UCH T08 NORTH (T08N)",
+    "beds": 26,
+    "patients": 17,
+    "empties": 9,
+    "days_since_last_dc": 3,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "UCH T08 SOUTH (T08S)",
+    "beds": 23,
+    "patients": 22,
+    "empties": 1,
+    "days_since_last_dc": 3,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "UCH T08S ARCU",
+    "beds": 5,
+    "patients": 0,
+    "empties": 5,
+    "days_since_last_dc": 281,
+    "closed_temp": false,
+    "closed_perm": true,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "UCH T09 CENTRAL (T09C)",
+    "beds": 23,
+    "patients": 0,
+    "empties": 23,
+    "days_since_last_dc": 52,
+    "closed_temp": false,
+    "closed_perm": true,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "UCH T09 NORTH (T09N)",
+    "beds": 30,
+    "patients": 20,
+    "empties": 10,
+    "days_since_last_dc": 3,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "UCH T09 SOUTH (T09S)",
+    "beds": 32,
+    "patients": 21,
+    "empties": 11,
+    "days_since_last_dc": 3,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "UCH T10 MED (T10M)",
+    "beds": 14,
+    "patients": 0,
+    "empties": 14,
+    "days_since_last_dc": 1006,
+    "closed_temp": false,
+    "closed_perm": true,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "UCH T10 NORTH (T10N)",
+    "beds": 30,
+    "patients": 29,
+    "empties": 1,
+    "days_since_last_dc": 3,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "UCH T10 SOUTH (T10S)",
+    "beds": 32,
+    "patients": 32,
+    "empties": 0,
+    "days_since_last_dc": 3,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "UCH T11 EAST (T11E)",
+    "beds": 19,
+    "patients": 5,
+    "empties": 14,
+    "days_since_last_dc": 3,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "UCH T11 NORTH (T11N)",
+    "beds": 23,
+    "patients": 5,
+    "empties": 18,
+    "days_since_last_dc": 3,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "UCH T11 NORTH (T11NO)",
+    "beds": 6,
+    "patients": 0,
+    "empties": 6,
+    "days_since_last_dc": 1041,
+    "closed_temp": false,
+    "closed_perm": true,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "UCH T11 SOUTH (T11S)",
+    "beds": 25,
+    "patients": 12,
+    "empties": 13,
+    "days_since_last_dc": 3,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "UCH T12 NORTH (T12N)",
+    "beds": 21,
+    "patients": 12,
+    "empties": 9,
+    "days_since_last_dc": 3,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "UCH T12 SOUTH (T12S)",
+    "beds": 30,
+    "patients": 5,
+    "empties": 25,
+    "days_since_last_dc": 3,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "UCH T13 NORTH (T13N)",
+    "beds": 24,
+    "patients": 0,
+    "empties": 24,
+    "days_since_last_dc": 348,
+    "closed_temp": false,
+    "closed_perm": true,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "UCH T13 NORTH ONCOLOGY",
+    "beds": 24,
+    "patients": 8,
+    "empties": 16,
+    "days_since_last_dc": 3,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "UCH T13 SOUTH (T13S)",
+    "beds": 29,
+    "patients": 9,
+    "empties": 20,
+    "days_since_last_dc": 3,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "UCH T14 NORTH (T14N)",
+    "beds": 26,
+    "patients": 0,
+    "empties": 26,
+    "days_since_last_dc": 224,
+    "closed_temp": false,
+    "closed_perm": true,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "UCH T14 NORTH TRAUMA",
+    "beds": 26,
+    "patients": 16,
+    "empties": 10,
+    "days_since_last_dc": 3,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "UCH T14 SOUTH (T14S)",
+    "beds": 15,
+    "patients": 0,
+    "empties": 15,
+    "days_since_last_dc": 349,
+    "closed_temp": false,
+    "closed_perm": true,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "UCH T14 SOUTH ASU",
+    "beds": 20,
+    "patients": 18,
+    "empties": 2,
+    "days_since_last_dc": 3,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "UCH T15 NORTH (T15N)",
+    "beds": 14,
+    "patients": 0,
+    "empties": 14,
+    "days_since_last_dc": 336,
+    "closed_temp": false,
+    "closed_perm": true,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "UCH T15 NORTH DECANT",
+    "beds": 13,
+    "patients": 0,
+    "empties": 13,
+    "days_since_last_dc": 142,
+    "closed_temp": false,
+    "closed_perm": true,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "UCH T15 SOUTH (T15S)",
+    "beds": 19,
+    "patients": 0,
+    "empties": 19,
+    "days_since_last_dc": 336,
+    "closed_temp": false,
+    "closed_perm": true,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "UCH T15 SOUTH DECANT",
+    "beds": 19,
+    "patients": 18,
+    "empties": 1,
+    "days_since_last_dc": 4,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "UCH T16 NORTH (T16N)",
+    "beds": 17,
+    "patients": 16,
+    "empties": 1,
+    "days_since_last_dc": 3,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "UCH T16 SOUTH (T16S)",
+    "beds": 17,
+    "patients": 0,
+    "empties": 17,
+    "days_since_last_dc": 89,
+    "closed_temp": false,
+    "closed_perm": true,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "UCH T16 SOUTH WINTER",
+    "beds": 15,
+    "patients": 0,
+    "empties": 15,
+    "days_since_last_dc": 89,
+    "closed_temp": false,
+    "closed_perm": true,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "WMS W01 CRITICAL CARE",
+    "beds": 9,
+    "patients": 2,
+    "empties": 7,
+    "days_since_last_dc": 3,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "WMS W02 SHORT STAY",
+    "beds": 18,
+    "patients": 7,
+    "empties": 11,
+    "days_since_last_dc": 3,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "WMS W03 WARD",
+    "beds": 25,
+    "patients": 13,
+    "empties": 12,
+    "days_since_last_dc": 3,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  },
+  {
+    "department": "WMS W04 WARD",
+    "beds": 26,
+    "patients": 8,
+    "empties": 18,
+    "days_since_last_dc": 3,
+    "closed_temp": false,
+    "closed_perm": false,
+    "modified_at": "2023-01-07T18:08:04.697771+00:00"
+  }
+]

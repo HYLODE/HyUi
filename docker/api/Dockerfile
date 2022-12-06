@@ -40,4 +40,4 @@ RUN pip install --no-cache-dir /app/api
 COPY --chown=hyui:root ./models/src/models /app/models
 COPY --chown=hyui:root ./api/src/api /app/api
 
-ENTRYPOINT ["uvicorn", "api.main:app", "--host", "0.0.0.0"]
+ENTRYPOINT ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--reload"]
