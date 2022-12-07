@@ -434,7 +434,7 @@ def _add_beds_column(
         f"{base_url}/api/database/fields/table/{table_id}/",
         headers=_auth_headers(auth_token),
         data=json.dumps(
-            {"name": column_name, "type": column_type, "select_potions": select_options}
+            {"name": column_name, "type": column_type, "select_options": select_options}
         ),
     )
     if response.status_code != 200:
