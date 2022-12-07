@@ -10,6 +10,7 @@ from models.electives import (
     CaboodlePreassessment,
     SurgData,
     PreassessData,
+    LabData,
 )
 
 
@@ -328,7 +329,7 @@ def wrangle_preassess(df):
 
     note_nums = (
         df.groupby(["PatientDurableKey", "CreationInstant", "AuthorType"])
-        .agg("sum")
+        .agg("sum", numeric_only=True)
         .reset_index()
     )
 
@@ -399,44 +400,52 @@ def wrangle_labs(df):
         "count": "_measured_count",
     }
 
-    df.loc[:, "Value"] = pd.to_numeric(
-        df.Value.str.replace("<|(result checked)", "", regex=True),
-        errors="coerce",
-    ).dropna()
+    # df.loc[:, "Value"] = pd.to_numeric(
+    #     df["Value"].str.replace("<|(result checked)", "", regex=True),
+    #     errors="coerce",
+    # .dropna() ## TOFIX why doesn't this work?
     df["Name"] = df["Name"].replace({v: k for k, v in lab_names.items()})
     df = df.join(df.pivot(columns="Name", values="Value"))
 
     for key in lab_names:
-        df[key + "_abnormal_count"] = df[key].groupby(df["SurgicalCaseKey"]).transform(
-            lambda x: x > labs_limits[key][1]
-        ) | df[key].groupby(df["SurgicalCaseKey"]).transform(
+        df[key + "_abnormal_count"] = df[key].groupby(
+            df["PatientDurableKey"]
+        ).transform(lambda x: x > labs_limits[key][1]) | df[key].groupby(
+            df["PatientDurableKey"]
+        ).transform(
             lambda x: x < labs_limits[key][0]
         )
 
         for op in op_dict:
-            df[key + op_dict[op]] = df[key].groupby(df["SurgicalCaseKey"]).transform(op)
-    gdf = df.groupby("SurgicalCaseKey").sum()
+            df[key + op_dict[op]] = (
+                df[key].groupby(df["PatientDurableKey"]).transform(op)
+            )
+    gdf = df.groupby("PatientDurableKey").sum()
     gdf = gdf.loc[:, gdf.columns.str.contains("_abnormal")]
 
-    hdf = df.groupby("SurgicalCaseKey").mean()
+    hdf = df.groupby("PatientDurableKey").mean()
     hdf = hdf.loc[:, hdf.columns.str.contains("_m")]
 
-    idf = df.sort_values("ResultInstant").groupby("SurgicalCaseKey").last()
+    idf = df.sort_values("ResultInstant").groupby("PatientDurableKey").last()
     idf = idf.loc[:, list(lab_names.keys())]
 
     final_df = gdf.join(hdf).join(idf.add_suffix("_last_value")).reset_index()
+
     return final_df
 
 
 def prepare_draft(
     electives: List[Dict],
     preassess: List[Dict],
+    labs: List[Dict],
 ) -> pd.DataFrame:
     electives_df = parse_to_data_frame(electives, SurgData)
     preassess_df = parse_to_data_frame(preassess, PreassessData)
+    labs_df = parse_to_data_frame(labs, LabData)
 
-    df = merge_surg_preassess(surg_data=electives_df, preassess_data=preassess_df)
-
+    df = merge_surg_preassess(
+        surg_data=electives_df, preassess_data=preassess_df
+    ).merge(wrangle_labs(labs_df), how="left", on="PatientDurableKey")
     # df = electives_df
     # create pacu label
     df["pacu"] = False

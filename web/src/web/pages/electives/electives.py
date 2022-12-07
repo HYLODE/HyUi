@@ -6,7 +6,7 @@ from dash import dash_table as dt
 from dash import dcc, html, register_page
 from flask_login import current_user
 
-from models.electives import Merged_Preassess, SurgData  # ElectiveSurgCase,
+from models.electives import MergedData, SurgData  # ElectiveSurgCase,
 from web.config import get_settings
 from web.convert import parse_to_data_frame
 from web.pages.electives import (
@@ -110,7 +110,7 @@ def store_data(days_ahead: int):
     response = requests.get(
         f"{get_settings().api_url}/electives/", params={"days_ahead": days_ahead}
     )
-    return [Merged_Preassess.parse_obj(row).dict() for row in response.json()]
+    return [MergedData.parse_obj(row).dict() for row in response.json()]
 
 
 @callback(
@@ -168,7 +168,7 @@ def gen_table_consults(data: list[dict]):
     if not data:
         return html.H2("No data to tabulate")
 
-    dfo = parse_to_data_frame(data, Merged_Preassess)
+    dfo = parse_to_data_frame(data, MergedData)
 
     # dfo["pacu"] = dfo["pacu"].apply(lambda x: "PACU" if x else "")
     dfo["age_sex"] = dfo.apply(
@@ -202,18 +202,22 @@ def gen_table_consults(data: list[dict]):
         dt.DataTable(
             id=f"{BPID}_data_table",
             columns=[
-                {"id": "SurgeryDate", "name": "Date"},
+                # {"id": "SurgeryDate", "name": "Date"},
                 {"id": "pacu", "name": "pacu"},
-                {"id": "PrimaryService", "name": "Specialty"},
-                {"id": "RoomName", "name": "Theatre"},
+                # {"id": "PrimaryService", "name": "Specialty"},
+                # {"id": "RoomName", "name": "Theatre"},
                 {"id": "age_sex", "name": ""},
                 {"id": "name", "name": "Full Name"},
                 {"id": "PrimaryMrn", "name": "MRN"},
-                {"id": "PatientFriendlyName", "name": "Procedure"},
+                #   {"id": "PatientFriendlyName", "name": "Procedure"},
                 {"id": "CreationInstant", "name": "Pre-assess Date"},
                 {"id": "asa", "name": "asa"},
-                {"id": "c_line", "name": "Central line"},
-                {"id": "resp", "name": "resp"},
+                {"id": "c_line", "name": "Central line consent"},
+                {"id": "resp", "name": "resp condition count"},
+                {"id": "CRP_abnormal_count", "name": "CRP_abnormal_count"},
+                {"id": "INR_last_value", "name": "INR_last_value"},
+                {"id": "NA_max_value", "name": "NA_max_value"},
+                {"id": "PatientDurableKey", "name": "key"},
             ],
             data=dfo.to_dict("records"),
             style_table={"width": "100%", "minWidth": "100%", "maxWidth": "100%"},
@@ -253,5 +257,5 @@ def gen_table_consults(data: list[dict]):
 )
 def update_service_dropdown(data: list[dict]):
 
-    df = parse_to_data_frame(data, Merged_Preassess)
+    df = parse_to_data_frame(data, MergedData)
     return df["PrimaryService"].sort_values().unique()

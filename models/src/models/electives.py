@@ -123,13 +123,13 @@ class SurgData(BaseModel):
     RemovalReason: str | None
     Status: str | None
     SurgicalService: str | None
-    Type: str | None  # RISK - DUPLICATED NAME
+    Type: str | None  # TOFIX RISK - DUPLICATED NAME
     Count: str | None
     CaseScheduleStatus: str | None
     CaseCancelReason: str | None
     CaseCancelReasonCode: str | None
     AsaRatingCode: str | None
-    Name: str | None  # RISK - DUPLICATED NAME
+    Name: str | None  # TOFIX RISK - DUPLICATED NAME
     PatientFriendlyName: str | None
     RoomName: str | None
     DepartmentName: str | None
@@ -139,20 +139,29 @@ class SurgData(BaseModel):
 class PreassessData(BaseModel):
     PatientDurableKey: int
     CreationInstant: datetime
-    Type: str | None  # RISK - DUPLICATED NAME
+    Type: str | None  # TOFIX RISK - DUPLICATED NAME
     AuthorType: str | None
     StringValue: str | None
     NumericValue: float | None
     DateValue: datetime | None
     SmartDataElementEpicId: str | None
-    Name: str | None  # RISK - DUPLICATED NAME
+    Name: str | None  # TOFIX RISK - DUPLICATED NAME
     Abbreviation: str | None
     DataType: str | None
     ConceptType: str | None
-    ConceptValue: str | None  # float ideally - need to deal with "unspecified"
+    ConceptValue: str | None  # TOFIX float ideally - need to deal with "unspecified"
 
 
-class Merged_Preassess(SurgData, PreassessData):
+class LabData(BaseModel):
+    Name: str
+    PatientDurableKey: int
+    SurgicalCaseKey: int
+    PlannedOperationStartInstant: datetime
+    Value: float
+    ResultInstant: datetime
+
+
+class MergedData(SurgData, PreassessData):
     AuthorType: str | None
     NumericValue: float | None
     cardio: int | None
@@ -174,4 +183,8 @@ class Merged_Preassess(SurgData, PreassessData):
     urgency: str | None
     pacdest: str | None
     prioritisation: str | None
-    # preassess_date: datetime | None
+    # preassess_date: datetime | None # TOFIX for some reason this causes bugs. to fix.
+    NA_abnormal_count: float | None
+    CRP_abnormal_count: float | None
+    INR_last_value: float | None
+    NA_max_value: float | None

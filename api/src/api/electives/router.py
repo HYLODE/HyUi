@@ -18,7 +18,8 @@ from models.electives import (
     # ElectiveSurgCase,
     SurgData,
     PreassessData,
-    Merged_Preassess,
+    MergedData,
+    LabData,
 )
 
 router = APIRouter(
@@ -144,7 +145,17 @@ def get_mock_caboodle_preassess():
     return rows
 
 
-@mock_router.get("/", response_model=list[Merged_Preassess])
+@mock_router.get(
+    "/labs", response_model=list[LabData]
+)  # response_model=list[CaboodlePreassessment])
+def get_mock_labs():
+    # rows = _get_json_rows("mock_preassess.json")
+    rows = _get_sql_rows("labs", LabData)
+
+    return rows
+
+
+@mock_router.get("/", response_model=list[MergedData])
 def get_mock_electives(
     #   days_ahead: int = 100,
 ):
@@ -155,10 +166,11 @@ def get_mock_electives(
     """
     _case = _get_sql_rows("surg", SurgData)
     _preassess = _get_sql_rows("preassess", PreassessData)
+    _labs = _get_sql_rows("labs", LabData)
 
-    df = prepare_draft(_case, _preassess)
+    df = prepare_draft(_case, _preassess, _labs)
     df = df.replace({np.nan: None})
-    return [Merged_Preassess.parse_obj(row) for row in df.to_dict(orient="records")]
+    return [MergedData.parse_obj(row) for row in df.to_dict(orient="records")]
 
 
 # @router.get("/", response_model=list[ElectiveSurgCase])
