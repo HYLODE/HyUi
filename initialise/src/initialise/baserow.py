@@ -252,6 +252,11 @@ def _fetch_beds() -> list[list[str]]:
     caboodle_departments_df = _caboodle_departments()
     beds_df = _merge_star_and_caboodle_beds(star_locations_df, caboodle_departments_df)
 
+    # Add extra columns needed for application to function.
+    beds_df["closed"] = False
+    beds_df["bed_physical"] = None
+    beds_df["bed_functional"] = None
+
     rows = [beds_df.columns.tolist()]
     rows.extend(beds_df.values.tolist())
     return rows
@@ -315,14 +320,18 @@ def _get_admin_user_auth_token(settings: BaserowSettings) -> str:
     return cast(str, response.json()["token"])
 
 
+def _auth_headers(auth_token: str) -> dict[str, str]:
+    return {
+        "Content-Type": "application/json",
+        "Authorization": f"JWT {auth_token}",
+    }
+
+
 def _get_group_id(settings: BaserowSettings, auth_token: str) -> int:
     logging.info("Getting default group_id.")
     response = requests.get(
         f"{settings.public_url}/api/groups/",
-        headers={
-            "Content-Type": "application/json",
-            "Authorization": f"JWT {auth_token}",
-        },
+        headers=_auth_headers(auth_token),
     )
     if response.status_code != 200:
         raise BaserowException(
@@ -344,10 +353,7 @@ def _create_application(
     logging.info("Checking to see if application hyui is already created.")
     response = requests.get(
         f"{settings.public_url}/api/applications/group/{group_id}/",
-        headers={
-            "Content-Type": "application/json",
-            "Authorization": f"JWT {auth_token}",
-        },
+        headers=_auth_headers(auth_token),
     )
     if response.status_code != 200:
         raise BaserowException(
@@ -364,10 +370,7 @@ def _create_application(
     logging.info("Creating application hyui.")
     response = requests.post(
         f"{settings.public_url}/api/applications/group/{group_id}/",
-        headers={
-            "Content-Type": "application/json",
-            "Authorization": f"JWT {auth_token}",
-        },
+        headers=_auth_headers(auth_token),
         data=json.dumps({"name": "hyui", "type": "database"}),
     )
     if response.status_code != 200:
@@ -387,10 +390,7 @@ def _create_beds_table(
     logging.info("Checking to see if beds table already exists.")
     response = requests.get(
         f"{settings.public_url}/api/database/tables/database/{application_id}/",
-        headers={
-            "Content-Type": "application/json",
-            "Authorization": f"JWT {auth_token}",
-        },
+        headers=_auth_headers(auth_token),
     )
     if response.status_code != 200:
         raise BaserowException(
@@ -406,10 +406,7 @@ def _create_beds_table(
 
     response = requests.post(
         f"{settings.public_url}/api/database/tables/database/{application_id}/",
-        headers={
-            "Content-Type": "application/json",
-            "Authorization": f"JWT {auth_token}",
-        },
+        headers=_auth_headers(auth_token),
         data=json.dumps(
             {
                 "name": "beds",
@@ -429,7 +426,9 @@ def _create_beds_table(
 
 def initialise_baserow():
     settings = get_baserow_settings()
+
     logging.info("Starting Baserow initialisation.")
+
     _create_admin_user(settings)
     auth_token = _get_admin_user_auth_token(settings)
     group_id = _get_group_id(settings, auth_token)
