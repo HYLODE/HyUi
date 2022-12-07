@@ -47,12 +47,16 @@ services:
     image: baserow/baserow:1.13.1
     environment:
       <<: *proxy-common
-      DISABLE_VOLUME_CHECK: yes
     env_file: .env
     ports:
       - ${BASEROW_PORT}:80
     networks:
       - hyui
+    volumes:
+      - baserow-data:/baserow/data
 
 networks:
   hyui:
+
+volumes:
+  baserow-data:
