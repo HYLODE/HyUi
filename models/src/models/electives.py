@@ -101,7 +101,7 @@ class SurgData(BaseModel):
     SurgeryDate: datetime
     CaseRequestDate: datetime
     CaseRequestTimeOfDay: time
-    CancelDate: datetime | None
+    CancelDate: date | None
     PrimaryService: str
     ProcedureLevel: str
     Classification: str | None

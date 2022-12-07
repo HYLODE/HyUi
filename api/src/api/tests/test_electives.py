@@ -44,17 +44,17 @@ def test_get_mock_cases():
     assert len(rows) > 0
 
 
+def test_get_mock_labs():
+    response = client.get("/mock/electives/labs")
+    assert response.status_code == 200
+
+    elective_rows = [LabData.parse_obj(row) for row in response.json()]
+    assert len(elective_rows) > 0
+
+
 def test_get_mock_electives():
     response = client.get("/mock/electives")
     assert response.status_code == 200
 
     elective_rows = [MergedData.parse_obj(row) for row in response.json()]
-    assert len(elective_rows) > 0
-
-
-def test_get_mock_labs():
-    response = client.get("/mock/labs")
-    assert response.status_code == 200
-
-    elective_rows = [LabData.parse_obj(row) for row in response.json()]
     assert len(elective_rows) > 0
