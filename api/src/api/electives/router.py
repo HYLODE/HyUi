@@ -17,6 +17,8 @@ from models.electives import (
     ClarityPostopDestination,
     # ElectiveSurgCase,
     SurgData,
+    PreassessData,
+    Merged_Preassess,
 )
 
 router = APIRouter(
@@ -37,7 +39,7 @@ def _get_json_rows(filename: str):
     return mock_table
 
 
-def _get_sql_rows(table: str):
+def _get_sql_rows(table: str, model):
 
     engine = create_engine(f"sqlite:///{Path(__file__).parent}/mock.db", future=True)
     query = text(f"""SELECT * FROM {table}""")
@@ -49,8 +51,6 @@ def _get_sql_rows(table: str):
         for col in df_result.columns:
             if "Date" in col:
                 df_result[col] = pd.to_datetime(df_result[col])
-
-    model = SurgData
 
     json_result = [model.parse_obj(row) for row in df_result.to_dict(orient="records")]
     return json_result
@@ -94,7 +94,7 @@ def get_mock_caboodle_cases():
     :return:
     """
     # rows = _get_json_rows("mock_case.json")
-    rows = _get_sql_rows("surg")
+    rows = _get_sql_rows("surg", SurgData)
     return rows
 
 
@@ -131,17 +131,17 @@ def get_caboodle_preassess(
     return res
 
 
-@mock_router.get("/preassessment", response_model=list[CaboodlePreassessment])
+@mock_router.get(
+    "/preassessment", response_model=list[PreassessData]
+)  # response_model=list[CaboodlePreassessment])
 def get_mock_caboodle_preassess():
-    """
-    returns mock of caboodle query for preassessment
-    :return:
-    """
-    rows = _get_json_rows("mock_preassess.json")
+    # rows = _get_json_rows("mock_preassess.json")
+    rows = _get_sql_rows("preassess", PreassessData)
+
     return rows
 
 
-@mock_router.get("/", response_model=list[SurgData])
+@mock_router.get("/", response_model=list[Merged_Preassess])
 def get_mock_electives(
     #   days_ahead: int = 100,
 ):
@@ -150,15 +150,12 @@ def get_mock_electives(
     Includes
     - post op destination info
     """
+    _case = _get_sql_rows("surg", SurgData)
+    _preassess = _get_sql_rows("preassess", PreassessData)
 
-    # _case = _get_json_rows("mock_case.json")
-    _case = _get_sql_rows("surg")
-    #   _pod = _get_json_rows("mock_pod.json")
-    # _preassess = _get_json_rows("mock_preassess.json")
-
-    df = prepare_draft(_case)  # , _pod, _preassess)
+    df = prepare_draft(_case, _preassess)
     df = df.replace({np.nan: None})
-    return [SurgData.parse_obj(row) for row in df.to_dict(orient="records")]
+    return [Merged_Preassess.parse_obj(row) for row in df.to_dict(orient="records")]
 
 
 # @router.get("/", response_model=list[ElectiveSurgCase])

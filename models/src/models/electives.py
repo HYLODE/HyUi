@@ -123,14 +123,55 @@ class SurgData(BaseModel):
     RemovalReason: str | None
     Status: str | None
     SurgicalService: str | None
-    Type: str | None
+    Type: str | None  # RISK - DUPLICATED NAME
     Count: str | None
     CaseScheduleStatus: str | None
     CaseCancelReason: str | None
     CaseCancelReasonCode: str | None
     AsaRatingCode: str | None
-    Name: str | None
+    Name: str | None  # RISK - DUPLICATED NAME
     PatientFriendlyName: str | None
     RoomName: str | None
     DepartmentName: str | None
     booked_destination: str | None
+
+
+class PreassessData(BaseModel):
+    PatientDurableKey: int
+    CreationInstant: datetime
+    Type: str | None  # RISK - DUPLICATED NAME
+    AuthorType: str | None
+    StringValue: str | None
+    NumericValue: float | None
+    DateValue: datetime | None
+    SmartDataElementEpicId: str | None
+    Name: str | None  # RISK - DUPLICATED NAME
+    Abbreviation: str | None
+    DataType: str | None
+    ConceptType: str | None
+    ConceptValue: str | None  # float ideally - need to deal with "unspecified"
+
+
+class Merged_Preassess(SurgData, PreassessData):
+    AuthorType: str | None
+    NumericValue: float | None
+    cardio: int | None
+    resp: int | None
+    airway: int | None
+    infectious: int | None
+    endo: int | None
+    neuro: int | None
+    haem: int | None
+    renal: int | None
+    gastro: int | None
+    CPET: int | None
+    mets: int | None
+    anaesthetic_alert: int | None
+    asa: int | None
+    c_line: int | None
+    a_line: int | None
+    expected_stay: str | None
+    urgency: str | None
+    pacdest: str | None
+    prioritisation: str | None
+    # preassess_date: datetime | None
