@@ -420,10 +420,10 @@ def wrangle_labs(df):
             df[key + op_dict[op]] = (
                 df[key].groupby(df["PatientDurableKey"]).transform(op)
             )
-    gdf = df.groupby("PatientDurableKey").sum()
+    gdf = df.groupby("PatientDurableKey").sum(numeric_only=True)
     gdf = gdf.loc[:, gdf.columns.str.contains("_abnormal")]
 
-    hdf = df.groupby("PatientDurableKey").mean()
+    hdf = df.groupby("PatientDurableKey").mean(numeric_only=True)
     hdf = hdf.loc[:, hdf.columns.str.contains("_m")]
 
     idf = df.sort_values("ResultInstant").groupby("PatientDurableKey").last()
