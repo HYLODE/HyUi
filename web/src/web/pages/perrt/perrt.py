@@ -9,7 +9,7 @@ from dash import dcc, html
 from flask_caching import Cache
 from flask_login import current_user
 
-from models.perrt import PerrtWide
+from models.perrt import EmapVitalsLong, EmapVitalsWide
 from web.config import get_settings
 from web.convert import parse_to_data_frame
 
