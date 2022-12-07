@@ -1,3 +1,7 @@
+"""
+Entry point and main file for the FastAPI backend
+"""
+
 from fastapi import FastAPI, APIRouter
 from fastapi.responses import ORJSONResponse
 
@@ -24,12 +28,19 @@ from api.hospital.router import (
     router as hospital_router,
     mock_router as mock_hospital_router,
 )
+from api.demo.router import (
+    router as demo_router,
+    mock_router as mock_demo_router,
+)
 
 
 app = FastAPI(default_response_class=ORJSONResponse)
 mock_router = APIRouter(
     prefix="/mock",
 )
+
+app.include_router(demo_router)
+mock_router.include_router(mock_demo_router)
 
 app.include_router(hospital_router)
 mock_router.include_router(mock_hospital_router)
