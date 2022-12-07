@@ -430,11 +430,20 @@ def _add_beds_column(
 ):
     logging.info(f"Adding column {column_name} to beds table.")
 
+    select_options_dicts = [
+        {"id": option[0], "value": option[1], "color": option[2]}
+        for option in select_options
+    ]
+
     response = requests.post(
         f"{base_url}/api/database/fields/table/{table_id}/",
         headers=_auth_headers(auth_token),
         data=json.dumps(
-            {"name": column_name, "type": column_type, "select_options": select_options}
+            {
+                "name": column_name,
+                "type": column_type,
+                "select_options": select_options_dicts,
+            }
         ),
     )
     if response.status_code != 200:
