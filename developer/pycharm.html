@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>HYLODE documentation - Vignettes</title>
+<title>HYLODE documentation – pycharm</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -30,8 +30,6 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<script src="../site_libs/quarto-listing/list.min.js"></script>
-<script src="../site_libs/quarto-listing/quarto-listing.js"></script>
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -60,37 +58,7 @@ ul.task-list li input[type="checkbox"] {
     "search-submit-button-title": "Submit"
   }
 }</script>
-<script>
 
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-listing .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
-
-    const options = {
-      valueNames: ['listing-title','listing-author',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-title-sort'] }],
-      
-      searchColumns: ["listing-title","listing-author"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  </script>
-
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <link rel="stylesheet" href="../styles.css">
 </head>
@@ -116,7 +84,7 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="../vignettes/vignettes.html" aria-current="page">
+    <a class="nav-link" href="../vignettes/vignettes.html">
  <span class="menu-text">Vignettes</span></a>
   </li>  
   <li class="nav-item">
@@ -137,7 +105,7 @@ ul.task-list li input[type="checkbox"] {
     </nav>
   <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
     <div class="container-fluid d-flex justify-content-between">
-      <h1 class="quarto-secondary-nav-title">Vignettes</h1>
+      <h1 class="quarto-secondary-nav-title"></h1>
       <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
         <i class="bi bi-chevron-right"></i>
       </button>
@@ -215,114 +183,34 @@ ul.task-list li input[type="checkbox"] {
 </nav>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#tips" id="toc-tips" class="nav-link active" data-scroll-target="#tips">Tips</a></li>
+  </ul>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hylode/hyui/edit/main/hyui/developer/pycharm.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/hylode/hyui/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title d-none d-lg-block">Vignettes</h1>
-</div>
 
 
-
-<div class="quarto-title-meta">
-
-    
-  
-    
-  </div>
-  
-
-</header>
-
-
+<p>Notes on setting up PyCharm for development with specific reference to working on a Mac</p>
+<section id="tips" class="level2">
+<h2 class="anchored" data-anchor-id="tips">Tips</h2>
+<p>Set up run configurations</p>
+<ul>
+<li>https://www.jetbrains.com/help/pycharm/run-debug-configuration.html</li>
+<li>install the <strong>EnvFile</strong> plug-in so that the environment file can be read by your run configuration (see https://stackoverflow.com/a/42708476/992999)</li>
+<li>set <code>OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES</code> as an environment variable in your run configuration to avoid <a href="https://stackoverflow.com/a/52230415/992999">errors</a> on recent <em>macos</em> installs</li>
+</ul>
+<p>Example configurations here - <a href="../snippets/HyUI-API FastAPI.run.xml">FastAPI</a> - <a href="../snippets/HyUI-Web Plotly Dash.run.xml">Plotly Dash</a></p>
 
 
+</section>
 
-<div class="quarto-listing quarto-listing-container-table" id="listing-listing">
-<div class="listing-actions-group">
-   <div class="input-group input-group-sm quarto-listing-sort">
-     <span class="input-group-text"><i class="bi bi-sort-down"></i></span>
-     <select id="listing-listing-sort" class="form-select" aria-label="Order By" onchange="window['quarto-listings']['listing-listing'].sort(this.options[this.selectedIndex].value, { order: this.options[this.selectedIndex].getAttribute('data-direction')})">
-       <option value="" disabled="" selected="" hidden="">Order By</option>
-       <option value="index" data-direction="asc">Default</option>
-         <option value="listing-title-sort" data-direction="asc">
-          Title
-        </option>
-         <option value="listing-author" data-direction="asc">
-          Author
-        </option>
-     </select>
-  </div>
-    <div class="input-group input-group-sm quarto-listing-filter">
-      <span class="input-group-text"><i class="bi bi-search"></i></span>
-      <input type="text" class="search form-control" placeholder="Filter">
-    </div>
-</div>
-
-<table class="quarto-listing-table table">
-<thead>
-<tr>
-<th>
-<a class="sort" data-sort="listing-title-sort" onclick="if (this.classList.contains('sort-asc')) { this.classList.add('sort-desc'); this.classList.remove('sort-asc') } else { this.classList.add('sort-asc'); this.classList.remove('sort-desc')} return false;">Title</a>
-</th>
-<th>
-<a class="sort" data-sort="listing-author" onclick="if (this.classList.contains('sort-asc')) { this.classList.add('sort-desc'); this.classList.remove('sort-asc') } else { this.classList.add('sort-asc'); this.classList.remove('sort-desc')} return false;">Author</a>
-</th>
-</tr>
-</thead>
-<tbody class="list">
-<tr data-index="0" data-listing-file-modified-sort="1670416839874" data-listing-reading-time-sort="1.015" data-listing-title-sort="Working notes on merging Caboodle and EMAP (NHNN)" data-listing-filename-sort="beds_v3NHNN.ipynb">
-<td class="listing-title">
-<a href="../vignettes/beds_v3NHNN.html" class="title">Working notes on merging Caboodle and EMAP (NHNN)</a>
-</td>
-<td class="listing-author">
-</td>
-</tr>
-<tr data-index="1" data-listing-file-modified-sort="1670416839874" data-listing-reading-time-sort="0.99" data-listing-title-sort="Working notes on merging caboodle info on beds with EMAP (UCLH)" data-listing-filename-sort="beds_v3UCLH.ipynb">
-<td class="listing-title">
-<a href="../vignettes/beds_v3UCLH.html" class="title">Working notes on merging caboodle info on beds with EMAP (UCLH)</a>
-</td>
-<td class="listing-author">
-</td>
-</tr>
-<tr data-index="2" data-listing-file-modified-sort="1670416839874" data-listing-reading-time-sort="0.005" data-listing-title-sort="ICU aggregate probabilities" data-listing-filename-sort="icu-tap-aggregate-probs.ipynb">
-<td class="listing-title">
-<a href="../vignettes/icu-tap-aggregate-probs.html" class="title">ICU aggregate probabilities</a>
-</td>
-<td class="listing-author">
-</td>
-</tr>
-<tr data-index="3" data-listing-file-modified-sort="1670416839874" data-listing-reading-time-sort="1.875" data-listing-title-sort="Make predictions using a saved binomial model for ICU elective admission" data-listing-filename-sort="icu-tap-elective-predictions.ipynb">
-<td class="listing-title">
-<a href="../vignettes/icu-tap-elective-predictions.html" class="title">Make predictions using a saved binomial model for ICU elective admission</a>
-</td>
-<td class="listing-author">
-</td>
-</tr>
-<tr data-index="4" data-listing-file-modified-sort="1670416839874" data-listing-reading-time-sort="1.81" data-listing-title-sort="Make predictions using a saved poisson model for ICU non-elective admission" data-listing-filename-sort="icu-tap-emergency-predictions.ipynb">
-<td class="listing-title">
-<a href="../vignettes/icu-tap-emergency-predictions.html" class="title">Make predictions using a saved poisson model for ICU non-elective admission</a>
-</td>
-<td class="listing-author">
-</td>
-</tr>
-<tr data-index="5" data-listing-file-modified-sort="1670416839874" data-listing-reading-time-sort="0.445" data-listing-title-sort="Wrangle live beds into a simple census" data-listing-filename-sort="wrangle_beds.ipynb">
-<td class="listing-title">
-<a href="../vignettes/wrangle_beds.html" class="title">Wrangle live beds into a simple census</a>
-</td>
-<td class="listing-author">
-</td>
-</tr>
-</tbody>
-
-</table>
-<div class="listing-no-matching d-none">
-No matching items
-</div>
-</div></main> <!-- /main -->
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {

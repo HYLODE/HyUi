@@ -91,6 +91,20 @@
     "text": "Acknowledgements\nThis project structure is based on the govcookiecutter template project."
   },
   {
+    "objectID": "developer/pycharm.html",
+    "href": "developer/pycharm.html",
+    "title": "HYLODE documentation",
+    "section": "",
+    "text": "Notes on setting up PyCharm for development with specific reference to working on a Mac"
+  },
+  {
+    "objectID": "developer/pycharm.html#tips",
+    "href": "developer/pycharm.html#tips",
+    "title": "HYLODE documentation",
+    "section": "Tips",
+    "text": "Tips\nSet up run configurations\n\nhttps://www.jetbrains.com/help/pycharm/run-debug-configuration.html\ninstall the EnvFile plug-in so that the environment file can be read by your run configuration (see https://stackoverflow.com/a/42708476/992999)\nset OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES as an environment variable in your run configuration to avoid errors on recent macos installs\n\nExample configurations here - FastAPI - Plotly Dash"
+  },
+  {
     "objectID": "developer/deployment.html",
     "href": "developer/deployment.html",
     "title": "HYLODE documentation",
@@ -187,6 +201,20 @@
     "title": "HYLODE documentation",
     "section": "",
     "text": "Writing documentation\nSet up for editing and building documentation All based around Quarto Documentation in ./docs\n\ninstalled basic python and jupyter extensions necessary including those for jupyter\ninstalled quarto\ninstalled the VSCode extension\n\nWorkflow\ncd docs\nquarto preview\nDon’t forget that changes to config (e.g. _quarto.yml may need you to rerun quarto render to ensure the whole site is correctly rebuilt)\nWhen you push to either dev or main branches, then a GitHub Action (see .github/workflows/publish.yml) will be triggered that should publish the current documentation to https://hylode.github.io/HyUi/."
+  },
+  {
+    "objectID": "developer/demo_vignette.html",
+    "href": "developer/demo_vignette.html",
+    "title": "HYLODE documentation",
+    "section": "",
+    "text": "Create a ‘back end’ endpoint using FastAPI\nWrite a simple test that checks that route exists\nCreate a ‘front end’ endpoint using Plotly Dash\nWrite a simple integration test that checks that the page displays\n\n\n\n\nCreate a new ‘python package’ (directory containing an __init__.py) file under api/src/api/.\nCreate a router.py file within this package\nGenerate some fake/mock data ideally by hand. You might want to run the SQL script you’re planning to use, then copy the column headings into an Excel file, and then create a couple of rows of fake data that you could/should save as a Python List of dictionaries or similar. You need to make this data available to your ‘mock’ endpoint.\ncreate a mock and a non-mock endpoint in router.py\nregister these endpoints in api/src/api/main.py\n\n# At the top of the file\nfrom api.demo.router import (\n    router as demo_router,\n    mock_router as mock_demo_router,\n)\n\n# further imports etc. ...\n\n# declare the app\napp = FastAPI(default_response_class=ORJSONResponse)\nmock_router = APIRouter(\n    prefix=\"/mock\",\n)\n\n# ...\napp.include_router(demo_router)\nmock_router.include_router(mock_demo_router)\n\n\n\n\n\n\n\nCreate a new ‘python package’ (directory containing an __init__.py) file under web/src/web/pages (in this example named ‘demo’)\nCreate single page Plotly Dash application here\nThis will be automatically registered by the web/src/web/main.py module because of the use_pages=True argument passed to the Dash app\nThe page has 3 main components:\n\nA layout\nA data store\nA series of callbacks that fire as the user interacts with the data\n\nInspect at http://localhost:8201/demo/demo"
+  },
+  {
+    "objectID": "developer/demo_vignette.html#ways-of-working",
+    "href": "developer/demo_vignette.html#ways-of-working",
+    "title": "HYLODE documentation",
+    "section": "Ways of working",
+    "text": "Ways of working\n\nPycharm\n\nsetup the FastAPI and Plotly Dash configurations so that you can see the changes as you work"
   },
   {
     "objectID": "developer/setup.html",
