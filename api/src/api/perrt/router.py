@@ -10,7 +10,7 @@ from pathlib import Path
 from fastapi import APIRouter, Depends, Query
 from sqlmodel import Session
 
-from api.convert import parse_to_data_frame
+from api.convert import parse_to_data_frame, to_data_frame
 from api.db import get_star_session
 from api.mock import _get_json_rows, _parse_query
 from api.perrt.wrangle import wrangle
@@ -22,13 +22,14 @@ _this_file = Path(__file__)
 
 
 @router.get("/vitals/long", response_model=list[EmapVitalsLong])
-def get_emap_vitals(
+def get_emap_vitals_long(
     session: Session = Depends(get_star_session),
     encounter_ids: list[str] = Query(default=[]),
     horizon_dt: dt.datetime = dt.datetime.now() - dt.timedelta(hours=6),
 ):
     """
     Return vital signs
+    :type session: Session object from sqlmodel
     :type horizon_dt: datetime remember to diff this from 'now'
     """
     params = {"encounter_ids": encounter_ids, "horizon_dt": horizon_dt}
@@ -37,7 +38,7 @@ def get_emap_vitals(
 
 
 @mock_router.get("/vitals/long", response_model=list[EmapVitalsLong])
-def get_mock_emap_vitals():
+def get_mock_emap_vitals_long():
     """
     returns mock of emap query for vital signs
     :return:
@@ -50,6 +51,22 @@ def get_mock_emap_vitals():
 #  leave that to the front end which can use census itself and instead you
 #  will need a query for perrt consults and a wrangle to return one row per
 #  encounter for the vitals
+@router.get("/vitals/wide", response_model=list[EmapVitalsWide])
+def get_emap_vitals_wide(
+    session: Session = Depends(get_star_session),
+    encounter_ids: list[str] = Query(default=[]),
+    horizon_dt: dt.datetime = dt.datetime.now() - dt.timedelta(hours=6),
+):
+    """
+    Return vital signs as a wide table after wrangling
+    :type horizon_dt: datetime remember to diff this from 'now'
+    """
+    params = {"encounter_ids": encounter_ids, "horizon_dt": horizon_dt}
+    rows = _parse_query(_this_file, "live_vitals.sql", session, EmapVitalsLong, params)
+    df = to_data_frame(rows, EmapVitalsLong)
+    df_wide = wrangle(df)
+
+    return [EmapVitalsWide.parse_obj(row) for row in df_wide.to_dict(orient="records")]
 
 
 @mock_router.get("/vitals/wide")
