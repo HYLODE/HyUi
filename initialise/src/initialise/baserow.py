@@ -428,7 +428,7 @@ def _add_beds_column(
     column_type: str,
     select_options: list[tuple[int, str, str]],
 ):
-    logging.info("Adding extra columns to beds table.")
+    logging.info(f"Adding column {column_name} to beds table.")
 
     response = requests.post(
         f"{base_url}/api/database/fields/table/{table_id}/",
@@ -481,7 +481,7 @@ def initialise_baserow():
         settings.public_url,
         auth_token,
         beds_table_id,
-        "bed_physical",
+        "bed_functional",
         "multiple_select",
         [
             (1, "periop", "red"),
@@ -493,7 +493,7 @@ def initialise_baserow():
             (7, "south", "red"),
             (8, "plex", "red"),
             (9, "nhnn", "red"),
-            (9, "hdu", "red"),
-            (9, "icu", "red"),
+            (10, "hdu", "red"),
+            (11, "icu", "red"),
         ],
     )
