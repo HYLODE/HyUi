@@ -374,13 +374,14 @@ def _create_application(base_url: str, auth_token: str, group_id: int) -> int:
     return cast(int, response.json()["id"])
 
 
-def _create_beds_table(
+def _create_table(
     base_url: str,
     auth_token: str,
     application_id: int,
-    beds: list[list[str]],
+    table_name: str,
+    data: list[list[str]],
 ) -> int:
-    logging.info("Checking to see if beds table already exists.")
+    logging.info(f"Checking to see if {table_name} table already exists.")
     response = requests.get(
         f"{base_url}/api/database/tables/database/{application_id}/",
         headers=_auth_headers(auth_token),
@@ -390,20 +391,22 @@ def _create_beds_table(
             f"unexpected response {response.status_code}: {str(response.content)}"
         )
 
-    beds_table_id = next(
-        (row["id"] for row in response.json() if row["name"] == "beds"), None
+    table_id = next(
+        (row["id"] for row in response.json() if row["name"] == table_name), None
     )
-    if beds_table_id:
-        logging.warning(f"A table called beds already exists with id {beds_table_id}")
-        return cast(int, beds_table_id)
+    if table_id:
+        logging.warning(
+            f"A table called {table_name} already exists with id {table_id}"
+        )
+        return cast(int, table_id)
 
     response = requests.post(
         f"{base_url}/api/database/tables/database/{application_id}/",
         headers=_auth_headers(auth_token),
         data=json.dumps(
             {
-                "name": "beds",
-                "data": beds,
+                "name": table_name,
+                "data": data,
                 "first_row_header": True,
             }
         ),
@@ -414,21 +417,21 @@ def _create_beds_table(
             f"unexpected response {response.status_code}: {str(response.content)}"
         )
 
-    beds_table_id = response.json()["id"]
+    table_id = response.json()["id"]
 
-    logging.info(f"Table called beds created with ID {beds_table_id}.")
-    return cast(int, beds_table_id)
+    logging.info(f"Table called beds created with ID {table_id}.")
+    return cast(int, table_id)
 
 
-def _add_beds_column(
+def _add_table_field(
     base_url: str,
     auth_token: str,
-    table_id: str,
+    table_id: int,
     column_name: str,
     column_type: str,
     select_options: list[tuple[int, str, str]],
 ):
-    logging.info(f"Adding column {column_name} to beds table.")
+    logging.info(f"Adding column {column_name} to table {table_id}.")
 
     select_options_dicts = [
         {"id": option[0], "value": option[1], "color": option[2]}
@@ -452,28 +455,11 @@ def _add_beds_column(
         )
 
 
-def initialise_baserow():
-    settings = get_baserow_settings()
-
-    logging.info("Starting Baserow initialisation.")
-
-    _create_admin_user(settings)
-    auth_token = _get_admin_user_auth_token(settings)
-    group_id = _get_group_id(settings.public_url, auth_token)
-    application_id = _create_application(settings.public_url, auth_token, group_id)
-
-    beds = _fetch_beds()
-    beds_table_id = _create_beds_table(
-        settings.public_url, auth_token, application_id, beds
-    )
-    _add_beds_column(
-        settings.public_url, auth_token, beds_table_id, "closed", "boolean", []
-    )
-    _add_beds_column(
-        settings.public_url, auth_token, beds_table_id, "covid", "boolean", []
-    )
-    _add_beds_column(
-        settings.public_url,
+def _add_beds_fields(base_url: str, auth_token: str, beds_table_id: int):
+    _add_table_field(base_url, auth_token, beds_table_id, "closed", "boolean", [])
+    _add_table_field(base_url, auth_token, beds_table_id, "covid", "boolean", [])
+    _add_table_field(
+        base_url,
         auth_token,
         beds_table_id,
         "bed_physical",
@@ -486,8 +472,8 @@ def initialise_baserow():
             (5, "virtual", "red"),
         ],
     )
-    _add_beds_column(
-        settings.public_url,
+    _add_table_field(
+        base_url,
         auth_token,
         beds_table_id,
         "bed_functional",
@@ -505,4 +491,35 @@ def initialise_baserow():
             (10, "hdu", "red"),
             (11, "icu", "red"),
         ],
+    )
+
+
+def initialise_baserow():
+    settings = get_baserow_settings()
+
+    logging.info("Starting Baserow initialisation.")
+
+    _create_admin_user(settings)
+    auth_token = _get_admin_user_auth_token(settings)
+    group_id = _get_group_id(settings.public_url, auth_token)
+    application_id = _create_application(settings.public_url, auth_token, group_id)
+
+    # Create the beds table.
+    beds_rows = _fetch_beds()
+    beds_table_id = _create_table(
+        settings.public_url, auth_token, application_id, "bed_bones", beds_rows
+    )
+    _add_beds_fields(settings.public_url, auth_token, beds_table_id)
+
+    # Create the discharge_statuses table.
+    discharge_statuses_table_id = _create_table(
+        settings.public_url, auth_token, application_id, "discharge_statuses"[["csn"]]
+    )
+    _add_table_field(
+        settings.public_url,
+        auth_token,
+        discharge_statuses_table_id,
+        column_name="status",
+        column_type="text",
+        select_options=[],
     )
