@@ -252,11 +252,6 @@ def _fetch_beds() -> list[list[str]]:
     caboodle_departments_df = _caboodle_departments()
     beds_df = _merge_star_and_caboodle_beds(star_locations_df, caboodle_departments_df)
 
-    # Add extra columns needed for application to function.
-    beds_df["closed"] = False
-    beds_df["bed_physical"] = None
-    beds_df["bed_functional"] = None
-
     rows = [beds_df.columns.tolist()]
     rows.extend(beds_df.values.tolist())
     return rows
@@ -327,10 +322,10 @@ def _auth_headers(auth_token: str) -> dict[str, str]:
     }
 
 
-def _get_group_id(settings: BaserowSettings, auth_token: str) -> int:
+def _get_group_id(base_url: str, auth_token: str) -> int:
     logging.info("Getting default group_id.")
     response = requests.get(
-        f"{settings.public_url}/api/groups/",
+        f"{base_url}/api/groups/",
         headers=_auth_headers(auth_token),
     )
     if response.status_code != 200:
@@ -346,13 +341,11 @@ def _get_group_id(settings: BaserowSettings, auth_token: str) -> int:
     return cast(int, group_id)
 
 
-def _create_application(
-    settings: BaserowSettings, auth_token: str, group_id: int
-) -> int:
+def _create_application(base_url: str, auth_token: str, group_id: int) -> int:
 
     logging.info("Checking to see if application hyui is already created.")
     response = requests.get(
-        f"{settings.public_url}/api/applications/group/{group_id}/",
+        f"{base_url}/api/applications/group/{group_id}/",
         headers=_auth_headers(auth_token),
     )
     if response.status_code != 200:
@@ -369,7 +362,7 @@ def _create_application(
 
     logging.info("Creating application hyui.")
     response = requests.post(
-        f"{settings.public_url}/api/applications/group/{group_id}/",
+        f"{base_url}/api/applications/group/{group_id}/",
         headers=_auth_headers(auth_token),
         data=json.dumps({"name": "hyui", "type": "database"}),
     )
@@ -382,14 +375,14 @@ def _create_application(
 
 
 def _create_beds_table(
-    settings: BaserowSettings,
+    base_url: str,
     auth_token: str,
     application_id: int,
     beds: list[list[str]],
-):
+) -> int:
     logging.info("Checking to see if beds table already exists.")
     response = requests.get(
-        f"{settings.public_url}/api/database/tables/database/{application_id}/",
+        f"{base_url}/api/database/tables/database/{application_id}/",
         headers=_auth_headers(auth_token),
     )
     if response.status_code != 200:
@@ -402,10 +395,10 @@ def _create_beds_table(
     )
     if beds_table_id:
         logging.warning(f"A table called beds already exists with id {beds_table_id}")
-        return
+        return cast(int, beds_table_id)
 
     response = requests.post(
-        f"{settings.public_url}/api/database/tables/database/{application_id}/",
+        f"{base_url}/api/database/tables/database/{application_id}/",
         headers=_auth_headers(auth_token),
         data=json.dumps(
             {
@@ -421,7 +414,33 @@ def _create_beds_table(
             f"unexpected response {response.status_code}: {str(response.content)}"
         )
 
-    logging.info("Table called beds created.")
+    beds_table_id = response.json()["id"]
+
+    logging.info(f"Table called beds created with ID {beds_table_id}.")
+    return cast(int, beds_table_id)
+
+
+def _add_beds_column(
+    base_url: str,
+    auth_token: str,
+    table_id: str,
+    column_name: str,
+    column_type: str,
+    select_options: list[tuple[int, str, str]],
+):
+    logging.info("Adding extra columns to beds table.")
+
+    response = requests.post(
+        f"{base_url}/api/database/fields/table/{table_id}/",
+        headers=_auth_headers(auth_token),
+        data=json.dumps(
+            {"name": column_name, "type": column_type, "select_potions": select_options}
+        ),
+    )
+    if response.status_code != 200:
+        raise BaserowException(
+            f"unexpected response {response.status_code}: {str(response.content)}"
+        )
 
 
 def initialise_baserow():
@@ -431,8 +450,50 @@ def initialise_baserow():
 
     _create_admin_user(settings)
     auth_token = _get_admin_user_auth_token(settings)
-    group_id = _get_group_id(settings, auth_token)
-    application_id = _create_application(settings, auth_token, group_id)
+    group_id = _get_group_id(settings.public_url, auth_token)
+    application_id = _create_application(settings.public_url, auth_token, group_id)
 
     beds = _fetch_beds()
-    _create_beds_table(settings, auth_token, application_id, beds)
+    beds_table_id = _create_beds_table(
+        settings.public_url, auth_token, application_id, beds
+    )
+    _add_beds_column(
+        settings.public_url, auth_token, beds_table_id, "closed", "boolean", []
+    )
+    _add_beds_column(
+        settings.public_url, auth_token, beds_table_id, "covid", "boolean", []
+    )
+    _add_beds_column(
+        settings.public_url,
+        auth_token,
+        beds_table_id,
+        "bed_physical",
+        "multiple_select",
+        [
+            (1, "sideroom", "red"),
+            (2, "ventilator", "red"),
+            (3, "monitored", "red"),
+            (4, "ensuite", "red"),
+            (5, "virtual", "red"),
+        ],
+    )
+    _add_beds_column(
+        settings.public_url,
+        auth_token,
+        beds_table_id,
+        "bed_physical",
+        "multiple_select",
+        [
+            (1, "periop", "red"),
+            (2, "ficm", "red"),
+            (3, "gwb", "red"),
+            (4, "wms", "red"),
+            (5, "t06", "red"),
+            (6, "north", "red"),
+            (7, "south", "red"),
+            (8, "plex", "red"),
+            (9, "nhnn", "red"),
+            (9, "hdu", "red"),
+            (9, "icu", "red"),
+        ],
+    )
