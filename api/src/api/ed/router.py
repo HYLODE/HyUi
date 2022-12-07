@@ -26,13 +26,31 @@ def get_mock_individual_admission_rows():
     return [
         EmergencyDepartmentPatient(
             arrival_datetime=datetime(2022, 10, 12, 13, 14),
-            bed="BED1",
-            mrn="MRNABC",
-            name="Name A",
+            bed="BED2",
+            mrn="MRNABC1",
+            name="Donald Trump",
             sex="F",
             date_of_birth=date(1990, 10, 6),
-            admission_probability=0.56,
-        )
+            admission_probability=0.06,
+        ),
+        EmergencyDepartmentPatient(
+            arrival_datetime=datetime(2022, 10, 13, 13, 14),
+            bed="BED1",
+            mrn="MRNABC2",
+            name="Boris Johnson",
+            sex="F",
+            date_of_birth=date(1990, 10, 6),
+            admission_probability=0.26,
+        ),
+        EmergencyDepartmentPatient(
+            arrival_datetime=datetime(2022, 10, 12, 9, 14),
+            bed="BED3",
+            mrn="MRN12345",
+            name="Vladimir Putin",
+            sex="F",
+            date_of_birth=date(1990, 10, 6),
+            admission_probability=0.16,
+        ),
     ]
 
 
