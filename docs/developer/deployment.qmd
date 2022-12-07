@@ -23,7 +23,7 @@ Ensure that you use a unique name for your `[project name]`. The production serv
 This should be done the first time you stand up the services. It populates the Baserow database with the tables and static data required to run the rest of the HyUi services.
 
 ```sh
-./initialise/bin/run.sh --operation baserow
+./bin/initialise.sh --operation baserow
 ```
 
 ### Stop And Remove Docker Containers
