@@ -126,11 +126,16 @@ def _long_to_wide(df, cols_per_csn: tuple = _cols_per_csn) -> pd.DataFrame:
     # rename the cols (b/c multi-index)
     dft.columns = [f"{col[1]}_{col[0]}".lower() for col in dft.columns.tolist()]
     dft.reset_index(inplace=True)
-    dft.sort_values(
-        ["news_scale_1_max", "news_scale_2_max"],
-        ascending=False,
-        inplace=True,
-    )
+
+    # sort by news score if poss
+    try:
+        dft.sort_values(
+            ["news_scale_1_max", "news_scale_2_max"],
+            ascending=False,
+            inplace=True,
+        )
+    except:
+        pass
     # IMPORTANT data model has now changed
     return dft
 
