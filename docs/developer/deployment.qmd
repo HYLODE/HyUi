@@ -1,31 +1,29 @@
 # Deployment
 
--
-- Configure your `.env` variables using `.env.example` as a template.
-- Stand up with Docker Compose. `docker compose --project-name [project name] up --build`. Ensure that you use a project name that does not conflict with others. Our production project name is `hyui-prod`.
-
-
-
 ## Deployment
 
 ### Setup environment
 
-Clone the repository on an NHS server `git clone https://github.com/HYLODE/HyUi.git` and configure your `.env` variables using `.env.example` as a template.
-
-### Build the Docker Compose services.
-
-In the `code` directory:
-
-```sh
-docker compose --project-name [project name] build
-```
+- Clone the repository on an NHS server `git clone https://github.com/HYLODE/HyUi.git`.
+- Configure your `.env` variables using `.env.example` as a template.
+- Configure `docker/initialise/.env` variables using `docker/initialise/.env.example.`
 
 ### Run the Docker Compose services
 
 In the `code` directory:
 
 ```sh
-docker compose --project-name [project name] up
+docker compose --project-name [project name] up --build
+```
+
+Ensure that you use a unique name for your `[project name]`. The production service should be named `hyui-prod`.
+
+### Initialise services
+
+This should be done the first time you stand up the services. It populates the Baserow database with the tables and static data required to run the rest of the HyUi services.
+
+```sh
+./initialise/bin/run.sh --operation baserow
 ```
 
 ### Stop And Remove Docker Containers

@@ -395,10 +395,9 @@ def _create_table(
         (row["id"] for row in response.json() if row["name"] == table_name), None
     )
     if table_id:
-        logging.warning(
-            f"A table called {table_name} already exists with id {table_id}"
+        raise BaserowException(
+            f"table called {table_name} already exists with id {table_id}"
         )
-        return cast(int, table_id)
 
     response = requests.post(
         f"{base_url}/api/database/tables/database/{application_id}/",
