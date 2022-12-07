@@ -2,7 +2,6 @@
 utils for working with the mock json data
 """
 import json
-from pathlib import Path
 from typing import Dict, List
 
 import pandas as pd
@@ -23,7 +22,11 @@ def _get_json_rows(this_file, filename: str):
 
 
 def _parse_query(
-    this_file, query_file: str, session: Session, model: BaseModel, params: Dict = {}
+    this_file,
+    query_file: str,
+    session: Session,
+    model: type[BaseModel],
+    params: Dict = {},
 ) -> List[BaseModel]:
     """
     generic function that reads a text query from a file, handles parameters
