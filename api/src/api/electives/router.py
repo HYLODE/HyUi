@@ -48,9 +48,12 @@ def _get_sql_rows(table: str, model):
         # result = conn.execute(query)
         #   result_as_json = json.dumps([dict(r) for r in result])
         df_result = pd.read_sql(query, conn)
-        for col in df_result.columns:
-            if "Date" in col:
-                df_result[col] = pd.to_datetime(df_result[col])
+
+        columns_with_datetimes = df_result.filter(
+            regex="Date|date|Instant", axis=1
+        ).columns
+        for col in columns_with_datetimes:
+            df_result[col] = pd.to_datetime(df_result[col])
 
     json_result = [model.parse_obj(row) for row in df_result.to_dict(orient="records")]
     return json_result

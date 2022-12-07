@@ -180,12 +180,13 @@ def wrangle_surgical(df):
         | (~df["TouchTimeStartInstant"].isna() & ~df["TouchTimeEndInstant"].isna())
     ]
 
-    df["PlannedOperationEndInstant"] = pd.to_datetime(df["PlannedOperationEndInstant"])
-    df["PlannedOperationStartInstant"] = pd.to_datetime(
-        df["PlannedOperationStartInstant"]
-    )
+    # df["PlannedOperationEndInstant"]
+    # = pd.to_datetime(df["PlannedOperationEndInstant"])
+    # df["PlannedOperationStartInstant"] = pd.to_datetime(
+    #     df["PlannedOperationStartInstant"]
+    # )
 
-    df["SurgeryDate"] = pd.to_datetime(df["SurgeryDate"])
+    # df["SurgeryDate"] = pd.to_datetime(df["SurgeryDate"])
 
     df.loc[:, "op_duration_minutes"] = (
         df.loc[:, "PlannedOperationEndInstant"]
@@ -323,7 +324,7 @@ def wrangle_preassess(df):
         ["a_line", "c_line", "expected_stay", "asa"]
     ].astype("float", errors="ignore")
 
-    df["CreationInstant"] = pd.to_datetime(df["CreationInstant"])
+    # df["CreationInstant"] = pd.to_datetime(df["CreationInstant"])
 
     note_nums = (
         df.groupby(["PatientDurableKey", "CreationInstant", "AuthorType"])
