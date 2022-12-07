@@ -504,16 +504,9 @@ def initialise_baserow():
     group_id = _get_group_id(settings.public_url, auth_token)
     application_id = _create_application(settings.public_url, auth_token, group_id)
 
-    # Create the beds table.
-    beds_rows = _fetch_beds()
-    beds_table_id = _create_table(
-        settings.public_url, auth_token, application_id, "bed_bones", beds_rows
-    )
-    _add_beds_fields(settings.public_url, auth_token, beds_table_id)
-
     # Create the discharge_statuses table.
     discharge_statuses_table_id = _create_table(
-        settings.public_url, auth_token, application_id, "discharge_statuses"[["csn"]]
+        settings.public_url, auth_token, application_id, "discharge_statuses", [["csn"]]
     )
     _add_table_field(
         settings.public_url,
@@ -523,3 +516,10 @@ def initialise_baserow():
         column_type="text",
         select_options=[],
     )
+
+    # Create the beds table.
+    beds_rows = _fetch_beds()
+    beds_table_id = _create_table(
+        settings.public_url, auth_token, application_id, "bed_bones", beds_rows
+    )
+    _add_beds_fields(settings.public_url, auth_token, beds_table_id)
