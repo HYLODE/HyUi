@@ -5,19 +5,19 @@ backend default {
     .port = "8000";
 }
 
-acl purge {
-    "localhost";
-}
-
 sub vcl_recv {
     /* other config here */
 
-    if (req.http.X-Varnish-Nuke == "1" && client.ip ~ purge) {
+    if (req.http.X-Varnish-Nuke == "1") {
         set req.hash_always_miss = true;
     }
 
-    if (! req.url ~ "^(.+)\/(predictions)\/(discharge)\/(individual)(.+)$") {
-        return(pass);
+    // to cache a url
+    /*
+    if (req.url ~ "^(.+)\/(census)\/(beds)(.+)$") {
+        return(hash);
     }
-    return(hash);
+    */
+
+    return(pass);
 }
