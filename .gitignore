@@ -291,6 +291,7 @@ Temporary Items
 .idea/**/usage.statistics.xml
 .idea/**/dictionaries
 .idea/**/shelf
+.run/
 
 # Generated files
 .idea/**/contentModel.xml
@@ -907,7 +908,6 @@ docs/_linkcheck/
 # Ignore sublime artifacts
 *.sublime-project
 *.sublime-workspace
-*.code-workspace
 ./sftp-config.json
 
 # Temp and scratch

@@ -1,18 +1,26 @@
-import pandas as pd
+from typing import Dict, List
+
 import numpy as np
+import pandas as pd
+from api.convert import parse_to_data_frame
+
+from models.electives import (
+    CaboodleCaseBooking,
+    ClarityPostopDestination,
+    CaboodlePreassessment,
+)
 
 
-def _get_most_recent_value(name: str, preassess_data: pd.DataFrame) -> pd.DataFrame:
+def _get_most_recent_value(label: str, preassess_data: pd.DataFrame) -> pd.DataFrame:
     """
-    Gets the most recent value.
+    Gets the most recent value from pre-assessment data since this is a long EAV table
 
-    :param      name:            The name
-    :type       name:            { type_description }
+    :param      label:            The label of the attribute
     :param      preassess_data:  The preassess data
-    :type       preassess_data:  { type_description }
     """
 
-    pod_data = preassess_data[preassess_data["name"] == name]
+    # filter name column of pre-assessment data to most recent attribute
+    pod_data = preassess_data[preassess_data["name"] == label]
 
     idx = (
         pod_data.groupby("patient_durable_key")["creation_instant"].transform(max)
@@ -82,77 +90,35 @@ def process_join_preassess_data(
 
 
 def prepare_electives(
-    electives_df: pd.DataFrame,
-    post_op_destinations_df: pd.DataFrame,
-    preassess_df: pd.DataFrame,
+    electives: List[Dict],
+    pod: List[Dict],
+    preassess: List[Dict],
 ) -> pd.DataFrame:
     """
     Prepare elective case list
 
-    :param      electives_df:  dataframe with surgical cases
-    :param      post_op_destinations_df:    dataframe with postop destination
-    :param      preassess_df:    dataframe with preassessment info
+    :param      electives:  list of dicts with surgical cases
+    :param      pod:    list of dicts with postop destination
+    :param      preassess:    list of dicts with preassessment info
 
     :returns:   merged dataframe
     """
+    electives_df = parse_to_data_frame(electives, CaboodleCaseBooking)
+    preassess_df = parse_to_data_frame(preassess, CaboodlePreassessment)
+    pod_df = parse_to_data_frame(pod, ClarityPostopDestination)
 
-    # Prepare copies of each data frame
-    # --------------------------
-    # dfc = electives_df.copy()
-    # dfp = post_op_destinations_df.copy()
-    # # dfp.drop(['id'], axis=1, inplace=True)
-    # dfa = preassess_df.copy()
-    # dfa.drop(['id'], axis=1, inplace=True)
-
-    # PREASSESSMENT JOIN TO CASES
-    # ---------------------------
-    # import ipdb; ipdb.set_trace()
-    # drop duplicate columns to avoid suffix after merge
-    # dfc.drop(
-    #     [
-    #         "most_recent_pod_dt",
-    #         "pod_preassessment",
-    #         "most_recent_METs",
-    #         "most_recent_ASA",
-    #     ],
-    #     axis=1,
-    #     inplace=True,
-    # )
+    # join caboodle case booking to preassess case
     dfca = process_join_preassess_data(electives_df, preassess_df)
 
-    # Post-op destination from case booking (clarity) join
-    # ----------------------------------------------------
-    # drop duplicate columns to avoid suffix after merge
-    # dfca.drop(["pod_orc", "SurgeryDateClarity"], axis=1, inplace=True)
-    # dfp.drop(['id'], axis=1, inplace=True)
+    # join on post op destinations from clarity
     df = dfca.merge(
-        post_op_destinations_df,
+        pod_df,
         left_on="surgical_case_epic_id",
         right_on="or_case_id",
         how="left",
     )
 
-    # Can't drop b/c it breaks the pydantic model
-    # df.drop(columns=[
-    #     "PatientKey",
-    #     "SurgicalCaseEpicId",
-    #     "PatientDurableKey",
-    #     "PlacedOnWaitingListDate",
-    #     "PatientDurableKey",
-    #     "LastUpdatedInstant",
-    #     "SurgicalCaseUclhKey",
-    #     "SurgicalCaseKey",
-    #     "CaseCancelReasonCode",
-    #     "CaseCancelReason",
-    #     "Name",
-    #     "id",
-    #     "ElectiveAdmissionType",
-    #     "IntendedManagement",
-    #     "RemovalReason",
-    #     "Subgroup",
-    #     "PlannedOperationEndInstant",
-    # ], inplace=True)
-
+    # create pacu label
     df["pacu"] = False
     df["pacu"] = np.where(
         df["pod_orc"].astype(str).str.contains("PACU"), True, df["pacu"]

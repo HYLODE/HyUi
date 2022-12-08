@@ -16,8 +16,12 @@ def _to_camel(member: str) -> str:
     return "".join(word.capitalize() for word in member.split("_"))
 
 
-class ElectiveRow(BaseModel):
-    patient_durable_key: str
+class CaboodleCaseBooking(BaseModel):
+    """
+    results of the live_case.sql query against caboodle
+    """
+
+    patient_durable_key: int
     primary_mrn: str
     surgical_case_epic_id: int
     canceled: bool
@@ -33,25 +37,33 @@ class ElectiveRow(BaseModel):
 
     class Config:
         alias_generator = _to_camel
+        # https://stackoverflow.com/a/69434012/992999
+        allow_population_by_field_name = True
 
 
-class ElectivePostOpDestinationRow(BaseModel):
+class ClarityPostopDestination(BaseModel):
     pod_orc: str
     or_case_id: int
+    surgery_date_clarity: datetime
+
+    class Config:
+        alias_generator = _to_camel
+        allow_population_by_field_name = True
 
 
-class ElectivePreassessRow(BaseModel):
-    patient_durable_key: str
+class CaboodlePreassessment(BaseModel):
+    patient_durable_key: int
     name: str
     creation_instant: datetime
     string_value: str
 
     class Config:
         alias_generator = _to_camel
+        allow_population_by_field_name = True
 
 
-class GetElectiveRow(BaseModel):
-    patient_durable_key: str
+class ElectiveSurgCase(BaseModel):
+    patient_durable_key: int
     primary_mrn: str
     surgical_case_epic_id: int
     canceled: bool

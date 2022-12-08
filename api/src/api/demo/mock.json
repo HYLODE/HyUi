@@ -1,0 +1,26 @@
+{
+	"table": "OR_CASE",
+	"rows":
+	[
+		{
+			"PodOrc": "Day Surgery Ward",
+			"OrCaseId": "473112",
+			"SurgeryDateClarity": "2022-11-25 00:00:00.000"
+		},
+		{
+			"PodOrc": "Day Surgery Ward",
+			"OrCaseId": "597244",
+			"SurgeryDateClarity": "2022-11-25 00:00:00.000"
+		},
+		{
+			"PodOrc": "ITU/PACU Bed",
+			"OrCaseId": "617016",
+			"SurgeryDateClarity": "2022-11-25 00:00:00.000"
+		},
+		{
+			"PodOrc": "Inpatient Ward",
+			"OrCaseId": "719054",
+			"SurgeryDateClarity": "2022-11-25 00:00:00.000"
+		}
+	]
+}
