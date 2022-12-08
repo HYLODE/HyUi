@@ -1,30 +1,28 @@
-import json
-
+import datetime
 import dash_bootstrap_components as dbc
 import plotly.express as px
 import requests
-from dash import Input, Output, callback, register_page, get_app
-from dash import dash_table as dt
-from dash import dcc, html
-from flask_caching import Cache
+from dash import (
+    Input,
+    Output,
+    callback,
+    dash_table as dt,
+    dcc,
+    get_app,
+    html,
+    register_page,
+)
 from flask_login import current_user
 
-from models.perrt import EmapVitalsLong, EmapVitalsWide
 from web.config import get_settings
-from web.convert import parse_to_data_frame
+from web.convert import parse_to_data_frame, to_data_frame
+from models.census import CensusRow
+from models.perrt import EmapVitalsWide
 
-CACHE_TIMEOUT = 5 * 60 * 1000
 BPID = "PERRT_"
 
 register_page(__name__)
 app = get_app()
-cache = Cache(
-    app.server,
-    config={
-        "CACHE_TYPE": "filesystem",
-        "CACHE_DIR": "cache-directory",
-    },
-)
 
 REFRESH_INTERVAL = 10 * 60 * 1000  # milliseconds
 
@@ -68,17 +66,9 @@ card_fig = dbc.Card(
 
 card_table = dbc.Card(
     [
-        # dbc.CardHeader(html.H6("Ward patients")),
         dbc.CardBody(
             [
-                html.Div(
-                    [
-                        html.P(
-                            "Inpatients sorted by highest NEWS "
-                            + "score in the last 12 hours"
-                        )
-                    ]
-                ),
+                html.Div([html.P("Some patients ")]),
                 table_perrt := html.Div(),
             ]
         ),
@@ -91,7 +81,6 @@ main = html.Div(
         card_table,
     ]
 )
-
 
 dash_only = html.Div(
     [
@@ -116,58 +105,86 @@ def layout():
     )
 
 
+def _get_census(department: str) -> list[CensusRow]:
+    response = requests.get(
+        f"{get_settings().api_url}/census/", params={"departments": [department]}
+    )
+    return [CensusRow.parse_obj(row) for row in response.json()]
+
+
+def _get_vitals_wide(
+    encounter_ids: list[str], horizon_dt: datetime.datetime
+) -> list[EmapVitalsWide]:
+    response = requests.get(
+        f"{get_settings().api_url}/perrt/vitals/wide",
+        params={"encounter_ids": encounter_ids, "horizon_dt": horizon_dt},
+    )
+    return [EmapVitalsWide.parse_obj(row) for row in response.json()]
+
+
 @callback(
     Output(request_data, "data"),
     Input(query_interval, "n_intervals"),
 )
-@cache.memoize(timeout=CACHE_TIMEOUT)
-def store_data(n_intervals: int):
+def store_census(n_intervals: int):
     """
     Read data from API then store as JSON
     """
-    response = requests.get(f"{get_settings().api_url}/perrt/")
-    data = [PerrtWide.parse_obj(row) for row in response.json()]
+    census = _get_census("GWB L01 CRITICAL CARE")
+    census_df = to_data_frame(census, CensusRow)
+    census_df = census_df[census_df["occupied"]]
 
-    hospital_visit_ids = [perrt_entry["hospital_visit_id"] for perrt_entry in data]
+    horizon_dt = datetime.datetime.now() - datetime.timedelta(hours=24)
+    vitals = _get_vitals_wide(encounter_ids=["1040463999"], horizon_dt=horizon_dt)
+    vitals_df = to_data_frame(vitals, EmapVitalsWide)
 
-    predictions_list = requests.post(
-        f"{get_settings().api_url}/perrt/admission_predictions/",
-        data=json.dumps(hospital_visit_ids),
-    ).json()
+    df_res = census_df.merge(vitals_df, how="left", on="encounter")
 
-    predictions_map = {
-        p["hospital_visit_id"]: p["admission_probability"] for p in predictions_list
-    }
+    # response = requests.get(f"{get_settings().api_url}/perrt/vitals/wide")
+    # data = [EmapVitalsWide.parse_obj(row).dict() for row in response.json()]
+    #
+    # hospital_visit_ids = [perrt_entry["hospital_visit_id"] for perrt_entry
+    # in data]
+    #
+    # predictions_list = requests.post(
+    #     f"{get_settings().api_url}/perrt/admission_predictions/",
+    #     data=json.dumps(hospital_visit_ids),
+    # ).json()
+    #
+    # predictions_map = {
+    #     p["hospital_visit_id"]: p["admission_probability"] for p in
+    #     predictions_list
+    # }
+    #
+    # for entry in data:
+    #     entry["admission_probability"] = predictions_map.get(
+    #         str(entry["hospital_visit_id"]), 0.0
+    #     )
 
-    for entry in data:
-        entry["admission_probability"] = predictions_map.get(
-            str(entry["hospital_visit_id"]), 0.0
-        )
-
-    return data
+    return df_res.to_dict(orient="records")
 
 
-@callback(
-    Output(fig_perrt, "children"),
-    Input(request_data, "data"),
-    prevent_initial_call=True,
-)
-def gen_simple_fig(data: list[dict]):
-    # TODO: move data validation to store
-
-    df = parse_to_data_frame(data, PerrtWide)
-    df = df[["dept_name", "news_scale_1_max", "mrn"]]
-    df = df.groupby(["dept_name", "news_scale_1_max"], as_index=False).count()
-    df["news_scale_1_max"] = df["news_scale_1_max"].astype(int).astype(str)
-    fig = px.bar(
-        df,
-        x="dept_name",
-        y="mrn",
-        color="news_scale_1_max",
-        color_discrete_map=NEWS_SCORE_COLORS,
-        category_orders={"news_scale_1_max": [str(x) for x in range(1, 24)]},
-    )
-    return dcc.Graph(id="perrt_fig", figure=fig)
+# @callback(
+#     Output(fig_perrt, "children"),
+#     Input(request_data, "data"),
+#     prevent_initial_call=True,
+# )
+# def gen_simple_fig(data: list[dict]):
+#     # TODO: move data validation to store
+#
+#     df = parse_to_data_frame(data, PerrtWide)
+#     df = df[["dept_name", "news_scale_1_max", "mrn"]]
+#     df = df.groupby(["dept_name", "news_scale_1_max"], as_index=False).count()
+#     df["news_scale_1_max"] = df["news_scale_1_max"].astype(int).astype(str)
+#     fig = px.bar(
+#         df,
+#         x="dept_name",
+#         y="mrn",
+#         color="news_scale_1_max",
+#         color_discrete_map=NEWS_SCORE_COLORS,
+#         category_orders={"news_scale_1_max": [str(x) for x in range(1, 24)]},
+#     )
+#     return dcc.Graph(id="perrt_fig", figure=fig)
 
 
 @callback(
@@ -184,12 +201,14 @@ def gen_simple_table(data: dict):
         lastname="Last name",
         firstname="First name",
         date_of_birth="DoB",
-        dept_name="Ward/Department",
-        bed_hl7="Bed",
-        perrt_consult_datetime="PERRT consult",
+        deptartment="Ward/Department",
+        location_string="Bed",
+        # perrt_consult_datetime="PERRT consult",
         news_scale_1_max="NEWS (max)",
         news_scale_1_min="NEWS (min)",
-        admission_probability="Admission probability",
+        temp_min="Temp (min)",
+        temp_max="Temp (max)",
+        # admission_probability="Admission probability",
     )
     return [
         dt.DataTable(
