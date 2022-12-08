@@ -106,7 +106,7 @@ class SurgData(CabData):
     CaseRequestTimeOfDay: time
     CancelDate: date | None
     PrimaryService: str
-    ProcedureLevel: str
+    ProcedureLevel: str | None
     Classification: str | None
     SurgeryPatientClass: str
     AdmissionPatientClass: str
@@ -182,7 +182,7 @@ class MergedData(SurgData):
     urgency: str | None
     pacdest: str | None
     prioritisation: str | None
-    # preassess_date: datetime | None # TOFIX for some reason this causes bugs. to fix.
+    preassess_date: date | None  # TOFIX for some reason this causes bugs. to fix.
     NA_abnormal_count: float | None
     CRP_abnormal_count: float | None
     INR_last_value: float | None

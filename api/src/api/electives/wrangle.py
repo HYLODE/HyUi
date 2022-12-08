@@ -1224,7 +1224,7 @@ def prepare_draft(
     )
 
     # drop cancellations
-    df = df[~(df["Canceled"] == 1)]
+    # df = df[~(df["Canceled"] == 1)]
 
     df = simple_sum(df)
 

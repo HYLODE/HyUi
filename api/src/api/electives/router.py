@@ -208,5 +208,4 @@ def get_mock_electives(
 
     df = prepare_draft(_case, _preassess, _labs, _echo, _obs)
     df = df.replace({np.nan: None})
-    # print(list(df.columns))
     return [MergedData.parse_obj(row) for row in df.to_dict(orient="records")]
