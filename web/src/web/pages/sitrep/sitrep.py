@@ -99,7 +99,6 @@ def gen_fancy_table(data: dict):
         lambda row: f"{row['age']:.0f}{row['sex']} " if row["mrn"] else "",
         axis=1,
     )
-
     df["organ_icons"] = ""
     llist = []
     for t in df.itertuples(index=False):
