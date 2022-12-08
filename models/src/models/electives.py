@@ -16,6 +16,11 @@ def _to_camel(member: str) -> str:
     return "".join(word.capitalize() for word in member.split("_"))
 
 
+class CabData(BaseModel):
+    PatientDurableKey: int
+    SurgicalCaseKey: int | None
+
+
 class CaboodleCaseBooking(BaseModel):
     """
     results of the live_case.sql query against caboodle
@@ -85,11 +90,9 @@ class ElectiveSurgCase(BaseModel):
     planned_operation_start_instant: datetime
 
 
-class SurgData(BaseModel):
+class SurgData(CabData):
     PrimaryMrn: int
     PatientKey: int
-    PatientDurableKey: int
-    SurgicalCaseKey: int
     SurgicalCaseUclhKey: int
     FirstName: str
     LastName: str
@@ -134,10 +137,10 @@ class SurgData(BaseModel):
     RoomName: str | None
     DepartmentName: str | None
     booked_destination: str | None
+    pacu: int | None
 
 
-class PreassessData(BaseModel):
-    PatientDurableKey: int
+class PreassessData(CabData):
     CreationInstant: datetime
     Type: str | None  # TOFIX RISK - DUPLICATED NAME
     AuthorType: str | None
@@ -152,19 +155,15 @@ class PreassessData(BaseModel):
     ConceptValue: str | None  # TOFIX float ideally - need to deal with "unspecified"
 
 
-class LabData(BaseModel):
+class LabData(CabData):
     Name: str
-    PatientDurableKey: int
-    SurgicalCaseKey: int
     PlannedOperationStartInstant: datetime
     Value: float
     ResultInstant: datetime
 
 
-class MergedData(SurgData, PreassessData):
-    AuthorType: str | None
-    NumericValue: float | None
-    cardio: int | None
+class MergedData(SurgData):
+    #  cardio: int | None ## TOFIX cardio does not appear. wrangle. preassess error.
     resp: int | None
     airway: int | None
     infectious: int | None
@@ -189,3 +188,26 @@ class MergedData(SurgData, PreassessData):
     INR_last_value: float | None
     NA_max_value: float | None
     simple_score: float | None
+    EchoPerformed: bool | None
+    EchoAbnormal: bool | None
+
+
+class EchoData(CabData):
+    ImagingKey: int
+    FindingType: str | None
+    FindingName: str | None
+    StringValue: str | None
+    NumericValue: float | None
+    Unit: str | None
+    EchoStartDate: datetime
+    EchoFinalisedDate: datetime
+    PlannedOperationStartInstant: datetime
+
+
+class ObsData(CabData):
+    PlannedOperationStartInstant: datetime
+    Value: str
+    NumericValue: float
+    FirstDocumentedInstant: datetime
+    TakenInstant: datetime
+    DisplayName: str
