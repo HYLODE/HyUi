@@ -487,3 +487,15 @@ def prepare_draft(
     df = simple_sum(df)
 
     return df
+
+
+def j_wrangle_obs(df):
+    pass
+
+
+def j_wrangle_echo(df):
+    pass
+
+
+def j_wrangle_hx(df):
+    pass
