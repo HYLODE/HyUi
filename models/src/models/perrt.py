@@ -11,6 +11,36 @@ def _to_camel(member: str) -> str:
     return "".join(word.capitalize() for word in member.split("_"))
 
 
+class EmapCpr(BaseModel):
+    """
+    Advance Decisions and CPR
+    """
+
+    advance_decision_id: int
+    requested_datetime: datetime
+    status_change_datetime: datetime
+    care_code: str
+    name: str
+    cancelled: bool
+    closed_due_to_discharge: bool
+    hospital_visit_id: int
+    encounter: str
+
+
+class EmapConsults(BaseModel):
+    """
+    Consults and Consult type
+    """
+
+    consultation_request_id: int
+    scheduled_datetime: datetime
+    status_change_datetime: datetime
+    hospital_visit_id: int
+    encounter: str
+    code: str
+    name: Optional[str]
+
+
 class EmapVitalsLong(BaseModel):
     """
     vital signs extracted from the visit observation table
