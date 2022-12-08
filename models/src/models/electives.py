@@ -188,3 +188,4 @@ class MergedData(SurgData, PreassessData):
     CRP_abnormal_count: float | None
     INR_last_value: float | None
     NA_max_value: float | None
+    simple_score: float | None

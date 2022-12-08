@@ -218,6 +218,7 @@ def gen_table_consults(data: list[dict]):
                 {"id": "INR_last_value", "name": "INR_last_value"},
                 {"id": "NA_max_value", "name": "NA_max_value"},
                 {"id": "PatientDurableKey", "name": "key"},
+                {"id": "simple_score", "name": "simple_score"},
             ],
             data=dfo.to_dict("records"),
             style_table={"width": "100%", "minWidth": "100%", "maxWidth": "100%"},

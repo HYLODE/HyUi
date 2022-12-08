@@ -434,6 +434,34 @@ def wrangle_labs(df):
     return final_df
 
 
+def simple_sum(df):
+    surg_columns = []
+    preassess_columns = [
+        # "cardio",
+        "resp",
+        "airway",
+        "infectious",
+        "endo",
+        "neuro",
+        "haem",
+        "renal",
+        "gastro",
+        "CPET",
+        # "mets",
+        "anaesthetic_alert",
+        "asa",
+        "c_line",
+        "a_line",
+    ]
+    lab_names = ["NA", "CREA", "WCC", "HB", "PLT", "ALB", "BILI", "INR", "CRP"]
+    lab_columns = [ln + "_abnormal_count" for ln in lab_names]
+    columns_to_sum = surg_columns + preassess_columns + lab_columns
+    df["simple_score"] = (
+        df[columns_to_sum].replace(np.nan, 0).astype("bool").sum(axis=1)
+    )
+    return df
+
+
 def prepare_draft(
     electives: List[Dict],
     preassess: List[Dict],
@@ -455,5 +483,7 @@ def prepare_draft(
 
     # drop cancellations
     df = df[~(df["Canceled"] == 1)]
+
+    df = simple_sum(df)
 
     return df
