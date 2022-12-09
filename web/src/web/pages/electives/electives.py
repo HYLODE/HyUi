@@ -145,7 +145,7 @@ def gen_surgeries_over_time(data: list[dict]):
 
     df = parse_to_data_frame(data, SurgData)
     df = (
-        df.groupby("PrimaryService")
+        df.groupby("pacu")
         .resample("24H", on="PlannedOperationStartInstant")
         .agg({"PatientDurableKey": "size"})
     )
@@ -221,7 +221,10 @@ def gen_table_consults(data: list[dict]):
                 {"id": "NA_max_value", "name": "NA_max_value"},
                 {"id": "PatientDurableKey", "name": "key"},
                 {"id": "EchoPerformed", "name": "EchoPerformed"},
-                {"id": "EchoAbnormal", "name": "EchoAbnormal"},
+                {
+                    "id": "EchoAbnormal",
+                    "name": "EchoAbnormal",
+                },  # TOFIX this is false when it should not be
                 {"id": "SYS_BP_abnormal_count", "name": "SYS_BP_abnormal_count"},
                 {"id": "DIAS_BP_abnormal_count", "name": "DIAS_BP_abnormal_count"},
                 {"id": "PULSE_measured_count", "name": "PULSE_measured_count"},
