@@ -12,7 +12,7 @@ from models.electives import (
     PreassessData,
     LabData,
     EchoData,
-    # ObsData,
+    ObsData,
 )
 import re
 
@@ -1192,10 +1192,6 @@ def j_wrangle_obs(caboodle_obs):
     return obs
 
 
-def j_wrangle_hx(df):
-    pass
-
-
 def prepare_draft(
     electives: List[Dict],
     preassess: List[Dict],
@@ -1208,15 +1204,15 @@ def prepare_draft(
     preassess_df = parse_to_data_frame(preassess, PreassessData)
     labs_df = parse_to_data_frame(labs, LabData)
     echo_df = parse_to_data_frame(echo, EchoData)
-    # obs_df = parse_to_data_frame(obs, ObsData)
+    obs_df = parse_to_data_frame(obs, ObsData)
 
     df = (
         merge_surg_preassess(surg_data=electives_df, preassess_data=preassess_df)
         .merge(wrangle_labs(labs_df), how="left", on="PatientDurableKey")
         .merge(j_wrangle_echo(echo_df), how="left", on="SurgicalCaseKey")
-        # .merge(j_wrangle_obs(obs_df), how="left", on="SurgicalCaseKey")
+        .merge(j_wrangle_obs(obs_df), how="inner", on="SurgicalCaseKey")
+        .drop_duplicates(subset="PatientDurableKey")
     )
-    # df = electives_df
     # create pacu label
     df["pacu"] = False
     df["pacu"] = np.where(
@@ -1227,5 +1223,5 @@ def prepare_draft(
     # df = df[~(df["Canceled"] == 1)]
 
     df = simple_sum(df)
-
+    print(list(df.columns))
     return df

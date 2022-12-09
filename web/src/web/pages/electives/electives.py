@@ -150,12 +150,11 @@ def gen_surgeries_over_time(data: list[dict]):
         .agg({"PatientDurableKey": "size"})
     )
     df.reset_index(inplace=True)
-    # print(df)
     fig = px.bar(
         df,
         x="PlannedOperationStartInstant",
         y="PatientDurableKey",
-        color="PrimaryService",
+        color="pacu",
     )
     return dcc.Graph(id=f"{BPID}fig", figure=fig)
 
@@ -223,6 +222,10 @@ def gen_table_consults(data: list[dict]):
                 {"id": "PatientDurableKey", "name": "key"},
                 {"id": "EchoPerformed", "name": "EchoPerformed"},
                 {"id": "EchoAbnormal", "name": "EchoAbnormal"},
+                {"id": "SYS_BP_abnormal_count", "name": "SYS_BP_abnormal_count"},
+                {"id": "DIAS_BP_abnormal_count", "name": "DIAS_BP_abnormal_count"},
+                {"id": "PULSE_measured_count", "name": "PULSE_measured_count"},
+                {"id": "BMI_max_value", "name": "BMI"},
                 {"id": "simple_score", "name": "simple_score"},
             ],
             data=dfo.to_dict("records"),

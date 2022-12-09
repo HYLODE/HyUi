@@ -190,6 +190,10 @@ class MergedData(SurgData):
     simple_score: float | None
     EchoPerformed: bool | None
     EchoAbnormal: bool | None
+    SYS_BP_abnormal_count: int | None
+    DIAS_BP_abnormal_count: int | None
+    PULSE_measured_count: int | None
+    BMI_max_value: float | None
 
 
 class EchoData(CabData):
@@ -207,7 +211,7 @@ class EchoData(CabData):
 class ObsData(CabData):
     PlannedOperationStartInstant: datetime
     Value: str
-    NumericValue: float
+    NumericValue: float | None
     FirstDocumentedInstant: datetime
     TakenInstant: datetime
     DisplayName: str
