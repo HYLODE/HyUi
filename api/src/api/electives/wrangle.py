@@ -406,7 +406,7 @@ def wrangle_labs(df):
     # df.loc[:, "Value"] = pd.to_numeric(
     #     df["Value"].str.replace("<|(result checked)", "", regex=True),
     #     errors="coerce",
-    # .dropna() ## TOFIX why doesn't this work?
+    # .dropna() ## TODO: FIX why doesn't this work?
     df["Name"] = df["Name"].replace({v: k for k, v in lab_names.items()})
     df = df.join(df.pivot(columns="Name", values="Value"))
 
@@ -458,7 +458,16 @@ def simple_sum(df):
     ]
     lab_names = ["NA", "CREA", "WCC", "HB", "PLT", "ALB", "BILI", "INR", "CRP"]
     lab_columns = [ln + "_abnormal_count" for ln in lab_names]
-    columns_to_sum = surg_columns + preassess_columns + lab_columns
+    echo_columns = ["EchoAbnormal"]
+    obs_columns = [
+        "SYS_BP_abnormal_count",
+        "DIAS_BP_abnormal_count",
+        "PULSE_measured_count",
+    ]  # TODO actually write this
+
+    columns_to_sum = (
+        surg_columns + preassess_columns + lab_columns + echo_columns + obs_columns
+    )
     df["simple_score"] = (
         df[columns_to_sum].replace(np.nan, 0).astype("bool").sum(axis=1)
     )
@@ -1223,5 +1232,5 @@ def prepare_draft(
     # df = df[~(df["Canceled"] == 1)]
 
     df = simple_sum(df)
-    print(list(df.columns))
+    # print(list(df.columns))
     return df

@@ -213,7 +213,10 @@ def gen_table_consults(data: list[dict]):
                 {"id": "asa", "name": "asa"},
                 {"id": "c_line", "name": "Central line consent"},
                 {"id": "resp", "name": "resp condition count"},
-                {"id": "cardio", "name": "cardio"},
+                {
+                    "id": "cardio",
+                    "name": "cardio",
+                },  # TODO: FIX this does not pull in cardio properly
                 {"id": "haem", "name": "haem"},
                 {"id": "anaesthetic_alert", "name": "anaesthetic_alert"},
                 {"id": "CRP_abnormal_count", "name": "CRP_abnormal_count"},
@@ -224,7 +227,7 @@ def gen_table_consults(data: list[dict]):
                 {
                     "id": "EchoAbnormal",
                     "name": "EchoAbnormal",
-                },  # TOFIX this is false when it should not be
+                },  # TODO: FIX this is false when it should not be
                 {"id": "SYS_BP_abnormal_count", "name": "SYS_BP_abnormal_count"},
                 {"id": "DIAS_BP_abnormal_count", "name": "DIAS_BP_abnormal_count"},
                 {"id": "PULSE_measured_count", "name": "PULSE_measured_count"},
