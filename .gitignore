@@ -923,3 +923,7 @@ docs/_linkcheck/
 
 # ignore generated data
 src/api/perrt/admission_probability/generated_data
+
+
+# odor dashboard
+web/src/web/assets/odor_dashboard.html
