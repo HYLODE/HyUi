@@ -1,0 +1,602 @@
+[
+  {
+    "id": 365,
+    "order": "365.00000000000000000000",
+    "location_string": "1021800003^GWB L01W SR04^SR04-04",
+    "location_id": "182077063",
+    "department_id": "332104960",
+    "room_id": "332104963",
+    "bed_id": "332104965",
+    "department": "GWB L01 CRITICAL CARE",
+    "speciality": "Critical Care - GWB L01 ICU",
+    "room": "SR04",
+    "dept": "1021800003",
+    "room_hl7": "GWB L01W SR04",
+    "bed": "SR04-04",
+    "loc2merge": "critical care - gwb l01 icu __ gwb l01 critical care __ sr04 __ sr04-04",
+    "DepartmentKey": "31808",
+    "BedEpicId": "1.0218E+14",
+    "Name": "SR04-04",
+    "DepartmentName": "GWB L01 CRITICAL CARE",
+    "RoomName": "SR04",
+    "BedName": "SR04-04",
+    "IsBed": "1",
+    "BedInCensus": "1",
+    "IsDepartment": "0",
+    "IsRoom": "0",
+    "IsCareArea": "0",
+    "DepartmentExternalName": "GWB 1st Floor Critical Care Unit",
+    "DepartmentSpecialty": "Critical Care - GWB L01 ICU",
+    "DepartmentType": "ICU",
+    "DepartmentServiceGrouper": "Adult Critical Care",
+    "DepartmentLevelOfCareGrouper": "*Unspecified",
+    "LocationName": "GRAFTON WAY BUILDING",
+    "ParentLocationName": "UCLH PARENT HOSPITAL",
+    "_CreationInstant": "49:59.9",
+    "_LastUpdatedInstant": "06:27.0",
+    "_merge": "both",
+    "bed_physical": [
+      {
+        "id": 981,
+        "value": "sideroom",
+        "color": "dark-red"
+      }
+    ],
+    "bed_functional": [
+      {
+        "id": 986,
+        "value": "ficm",
+        "color": "dark-green"
+      },
+      {
+        "id": 987,
+        "value": "gwb",
+        "color": "light-orange"
+      }
+    ],
+    "unit_order": "4",
+    "closed": false,
+    "covid": false,
+    "DischargeReady": "ready"
+  },
+  {
+    "id": 366,
+    "order": "366.00000000000000000000",
+    "location_string": "1021800003^GWB L01W SR02^SR02-02",
+    "location_id": "183827636",
+    "department_id": "332104960",
+    "room_id": "332104977",
+    "bed_id": "332104979",
+    "department": "GWB L01 CRITICAL CARE",
+    "speciality": "Critical Care - GWB L01 ICU",
+    "room": "SR02",
+    "dept": "1021800003",
+    "room_hl7": "GWB L01W SR02",
+    "bed": "SR02-02",
+    "loc2merge": "critical care - gwb l01 icu __ gwb l01 critical care __ sr02 __ sr02-02",
+    "DepartmentKey": "31806",
+    "BedEpicId": "1.0218E+14",
+    "Name": "SR02-02",
+    "DepartmentName": "GWB L01 CRITICAL CARE",
+    "RoomName": "SR02",
+    "BedName": "SR02-02",
+    "IsBed": "1",
+    "BedInCensus": "1",
+    "IsDepartment": "0",
+    "IsRoom": "0",
+    "IsCareArea": "0",
+    "DepartmentExternalName": "GWB 1st Floor Critical Care Unit",
+    "DepartmentSpecialty": "Critical Care - GWB L01 ICU",
+    "DepartmentType": "ICU",
+    "DepartmentServiceGrouper": "Adult Critical Care",
+    "DepartmentLevelOfCareGrouper": "*Unspecified",
+    "LocationName": "GRAFTON WAY BUILDING",
+    "ParentLocationName": "UCLH PARENT HOSPITAL",
+    "_CreationInstant": "49:59.9",
+    "_LastUpdatedInstant": "06:27.0",
+    "_merge": "both",
+    "bed_physical": [
+      {
+        "id": 981,
+        "value": "sideroom",
+        "color": "dark-red"
+      }
+    ],
+    "bed_functional": [
+      {
+        "id": 986,
+        "value": "ficm",
+        "color": "dark-green"
+      },
+      {
+        "id": 987,
+        "value": "gwb",
+        "color": "light-orange"
+      }
+    ],
+    "unit_order": "2",
+    "closed": false,
+    "covid": false,
+    "DischargeReady": "No"
+  },
+  {
+    "id": 367,
+    "order": "367.00000000000000000000",
+    "location_string": "1021800003^GWB L01W SR05^SR05-05",
+    "location_id": "187151939",
+    "department_id": "332104960",
+    "room_id": "332104999",
+    "bed_id": "332105001",
+    "department": "GWB L01 CRITICAL CARE",
+    "speciality": "Critical Care - GWB L01 ICU",
+    "room": "SR05",
+    "dept": "1021800003",
+    "room_hl7": "GWB L01W SR05",
+    "bed": "SR05-05",
+    "loc2merge": "critical care - gwb l01 icu __ gwb l01 critical care __ sr05 __ sr05-05",
+    "DepartmentKey": "31809",
+    "BedEpicId": "1.0218E+14",
+    "Name": "SR05-05",
+    "DepartmentName": "GWB L01 CRITICAL CARE",
+    "RoomName": "SR05",
+    "BedName": "SR05-05",
+    "IsBed": "1",
+    "BedInCensus": "1",
+    "IsDepartment": "0",
+    "IsRoom": "0",
+    "IsCareArea": "0",
+    "DepartmentExternalName": "GWB 1st Floor Critical Care Unit",
+    "DepartmentSpecialty": "Critical Care - GWB L01 ICU",
+    "DepartmentType": "ICU",
+    "DepartmentServiceGrouper": "Adult Critical Care",
+    "DepartmentLevelOfCareGrouper": "*Unspecified",
+    "LocationName": "GRAFTON WAY BUILDING",
+    "ParentLocationName": "UCLH PARENT HOSPITAL",
+    "_CreationInstant": "49:59.9",
+    "_LastUpdatedInstant": "06:27.0",
+    "_merge": "both",
+    "bed_physical": [
+      {
+        "id": 981,
+        "value": "sideroom",
+        "color": "dark-red"
+      }
+    ],
+    "bed_functional": [
+      {
+        "id": 986,
+        "value": "ficm",
+        "color": "dark-green"
+      },
+      {
+        "id": 987,
+        "value": "gwb",
+        "color": "light-orange"
+      }
+    ],
+    "unit_order": "5",
+    "closed": false,
+    "covid": false,
+    "DischargeReady": "No"
+  },
+  {
+    "id": 368,
+    "order": "368.00000000000000000000",
+    "location_string": "1021800003^GWB L01W SR03^SR03-03",
+    "location_id": "182415664",
+    "department_id": "332104960",
+    "room_id": "332105017",
+    "bed_id": "332105019",
+    "department": "GWB L01 CRITICAL CARE",
+    "speciality": "Critical Care - GWB L01 ICU",
+    "room": "SR03",
+    "dept": "1021800003",
+    "room_hl7": "GWB L01W SR03",
+    "bed": "SR03-03",
+    "loc2merge": "critical care - gwb l01 icu __ gwb l01 critical care __ sr03 __ sr03-03",
+    "DepartmentKey": "31807",
+    "BedEpicId": "1.0218E+14",
+    "Name": "SR03-03",
+    "DepartmentName": "GWB L01 CRITICAL CARE",
+    "RoomName": "SR03",
+    "BedName": "SR03-03",
+    "IsBed": "1",
+    "BedInCensus": "1",
+    "IsDepartment": "0",
+    "IsRoom": "0",
+    "IsCareArea": "0",
+    "DepartmentExternalName": "GWB 1st Floor Critical Care Unit",
+    "DepartmentSpecialty": "Critical Care - GWB L01 ICU",
+    "DepartmentType": "ICU",
+    "DepartmentServiceGrouper": "Adult Critical Care",
+    "DepartmentLevelOfCareGrouper": "*Unspecified",
+    "LocationName": "GRAFTON WAY BUILDING",
+    "ParentLocationName": "UCLH PARENT HOSPITAL",
+    "_CreationInstant": "49:59.9",
+    "_LastUpdatedInstant": "06:27.0",
+    "_merge": "both",
+    "bed_physical": [
+      {
+        "id": 981,
+        "value": "sideroom",
+        "color": "dark-red"
+      }
+    ],
+    "bed_functional": [
+      {
+        "id": 986,
+        "value": "ficm",
+        "color": "dark-green"
+      },
+      {
+        "id": 987,
+        "value": "gwb",
+        "color": "light-orange"
+      }
+    ],
+    "unit_order": "3",
+    "closed": false,
+    "covid": false,
+    "DischargeReady": "No"
+  },
+  {
+    "id": 369,
+    "order": "369.00000000000000000000",
+    "location_string": "1021800003^GWB L01W SR06^SR06-06",
+    "location_id": "185482486",
+    "department_id": "332104960",
+    "room_id": "332105399",
+    "bed_id": "332105401",
+    "department": "GWB L01 CRITICAL CARE",
+    "speciality": "Critical Care - GWB L01 ICU",
+    "room": "SR06",
+    "dept": "1021800003",
+    "room_hl7": "GWB L01W SR06",
+    "bed": "SR06-06",
+    "loc2merge": "critical care - gwb l01 icu __ gwb l01 critical care __ sr06 __ sr06-06",
+    "DepartmentKey": "31810",
+    "BedEpicId": "1.0218E+14",
+    "Name": "SR06-06",
+    "DepartmentName": "GWB L01 CRITICAL CARE",
+    "RoomName": "SR06",
+    "BedName": "SR06-06",
+    "IsBed": "1",
+    "BedInCensus": "1",
+    "IsDepartment": "0",
+    "IsRoom": "0",
+    "IsCareArea": "0",
+    "DepartmentExternalName": "GWB 1st Floor Critical Care Unit",
+    "DepartmentSpecialty": "Critical Care - GWB L01 ICU",
+    "DepartmentType": "ICU",
+    "DepartmentServiceGrouper": "Adult Critical Care",
+    "DepartmentLevelOfCareGrouper": "*Unspecified",
+    "LocationName": "GRAFTON WAY BUILDING",
+    "ParentLocationName": "UCLH PARENT HOSPITAL",
+    "_CreationInstant": "49:59.9",
+    "_LastUpdatedInstant": "06:27.0",
+    "_merge": "both",
+    "bed_physical": [
+      {
+        "id": 981,
+        "value": "sideroom",
+        "color": "dark-red"
+      }
+    ],
+    "bed_functional": [
+      {
+        "id": 986,
+        "value": "ficm",
+        "color": "dark-green"
+      },
+      {
+        "id": 987,
+        "value": "gwb",
+        "color": "light-orange"
+      }
+    ],
+    "unit_order": "6",
+    "closed": false,
+    "covid": false,
+    "DischargeReady": "No"
+  },
+  {
+    "id": 370,
+    "order": "370.00000000000000000000",
+    "location_string": "1021800003^GWB L01W SR09^SR09-09",
+    "location_id": "186862692",
+    "department_id": "332104960",
+    "room_id": "332105405",
+    "bed_id": "332105407",
+    "department": "GWB L01 CRITICAL CARE",
+    "speciality": "Critical Care - GWB L01 ICU",
+    "room": "SR09",
+    "dept": "1021800003",
+    "room_hl7": "GWB L01W SR09",
+    "bed": "SR09-09",
+    "loc2merge": "critical care - gwb l01 icu __ gwb l01 critical care __ sr09 __ sr09-09",
+    "DepartmentKey": "31813",
+    "BedEpicId": "1.0218E+14",
+    "Name": "SR09-09",
+    "DepartmentName": "GWB L01 CRITICAL CARE",
+    "RoomName": "SR09",
+    "BedName": "SR09-09",
+    "IsBed": "1",
+    "BedInCensus": "1",
+    "IsDepartment": "0",
+    "IsRoom": "0",
+    "IsCareArea": "0",
+    "DepartmentExternalName": "GWB 1st Floor Critical Care Unit",
+    "DepartmentSpecialty": "Critical Care - GWB L01 ICU",
+    "DepartmentType": "ICU",
+    "DepartmentServiceGrouper": "Adult Critical Care",
+    "DepartmentLevelOfCareGrouper": "*Unspecified",
+    "LocationName": "GRAFTON WAY BUILDING",
+    "ParentLocationName": "UCLH PARENT HOSPITAL",
+    "_CreationInstant": "49:59.9",
+    "_LastUpdatedInstant": "06:27.0",
+    "_merge": "both",
+    "bed_physical": [
+      {
+        "id": 981,
+        "value": "sideroom",
+        "color": "dark-red"
+      }
+    ],
+    "bed_functional": [
+      {
+        "id": 986,
+        "value": "ficm",
+        "color": "dark-green"
+      },
+      {
+        "id": 987,
+        "value": "gwb",
+        "color": "light-orange"
+      }
+    ],
+    "unit_order": "9",
+    "closed": false,
+    "covid": false,
+    "DischargeReady": "No"
+  },
+  {
+    "id": 372,
+    "order": "372.00000000000000000000",
+    "location_string": "1021800003^GWB L01W SR01^SR01-01",
+    "location_id": "184431051",
+    "department_id": "332104960",
+    "room_id": "332105421",
+    "bed_id": "332105423",
+    "department": "GWB L01 CRITICAL CARE",
+    "speciality": "Critical Care - GWB L01 ICU",
+    "room": "SR01",
+    "dept": "1021800003",
+    "room_hl7": "GWB L01W SR01",
+    "bed": "SR01-01",
+    "loc2merge": "critical care - gwb l01 icu __ gwb l01 critical care __ sr01 __ sr01-01",
+    "DepartmentKey": "31805",
+    "BedEpicId": "1.0218E+14",
+    "Name": "SR01-01",
+    "DepartmentName": "GWB L01 CRITICAL CARE",
+    "RoomName": "SR01",
+    "BedName": "SR01-01",
+    "IsBed": "1",
+    "BedInCensus": "1",
+    "IsDepartment": "0",
+    "IsRoom": "0",
+    "IsCareArea": "0",
+    "DepartmentExternalName": "GWB 1st Floor Critical Care Unit",
+    "DepartmentSpecialty": "Critical Care - GWB L01 ICU",
+    "DepartmentType": "ICU",
+    "DepartmentServiceGrouper": "Adult Critical Care",
+    "DepartmentLevelOfCareGrouper": "*Unspecified",
+    "LocationName": "GRAFTON WAY BUILDING",
+    "ParentLocationName": "UCLH PARENT HOSPITAL",
+    "_CreationInstant": "49:59.9",
+    "_LastUpdatedInstant": "06:27.0",
+    "_merge": "both",
+    "bed_physical": [
+      {
+        "id": 981,
+        "value": "sideroom",
+        "color": "dark-red"
+      }
+    ],
+    "bed_functional": [
+      {
+        "id": 986,
+        "value": "ficm",
+        "color": "dark-green"
+      },
+      {
+        "id": 987,
+        "value": "gwb",
+        "color": "light-orange"
+      }
+    ],
+    "unit_order": "1",
+    "closed": false,
+    "covid": false,
+    "DischargeReady": "No"
+  },
+  {
+    "id": 378,
+    "order": "378.00000000000000000000",
+    "location_string": "1021800003^GWB L01W SR10^SR10-10",
+    "location_id": "190347917",
+    "department_id": "332104960",
+    "room_id": "332104989",
+    "bed_id": "332104991",
+    "department": "GWB L01 CRITICAL CARE",
+    "speciality": "Critical Care - GWB L01 ICU",
+    "room": "SR10",
+    "dept": "1021800003",
+    "room_hl7": "GWB L01W SR10",
+    "bed": "SR10-10",
+    "loc2merge": "critical care - gwb l01 icu __ gwb l01 critical care __ sr10 __ sr10-10",
+    "DepartmentKey": "31814",
+    "BedEpicId": "1.0218E+14",
+    "Name": "SR10-10",
+    "DepartmentName": "GWB L01 CRITICAL CARE",
+    "RoomName": "SR10",
+    "BedName": "SR10-10",
+    "IsBed": "1",
+    "BedInCensus": "1",
+    "IsDepartment": "0",
+    "IsRoom": "0",
+    "IsCareArea": "0",
+    "DepartmentExternalName": "GWB 1st Floor Critical Care Unit",
+    "DepartmentSpecialty": "Critical Care - GWB L01 ICU",
+    "DepartmentType": "ICU",
+    "DepartmentServiceGrouper": "Adult Critical Care",
+    "DepartmentLevelOfCareGrouper": "*Unspecified",
+    "LocationName": "GRAFTON WAY BUILDING",
+    "ParentLocationName": "UCLH PARENT HOSPITAL",
+    "_CreationInstant": "49:59.9",
+    "_LastUpdatedInstant": "06:27.0",
+    "_merge": "both",
+    "bed_physical": [
+      {
+        "id": 981,
+        "value": "sideroom",
+        "color": "dark-red"
+      }
+    ],
+    "bed_functional": [
+      {
+        "id": 986,
+        "value": "ficm",
+        "color": "dark-green"
+      },
+      {
+        "id": 987,
+        "value": "gwb",
+        "color": "light-orange"
+      }
+    ],
+    "unit_order": "10",
+    "closed": false,
+    "covid": false,
+    "DischargeReady": "No"
+  },
+  {
+    "id": 421,
+    "order": "421.00000000000000000000",
+    "location_string": "1021800003^GWB L01W SR07^SR07-07",
+    "location_id": "327696204",
+    "department_id": "332104960",
+    "room_id": "332105445",
+    "bed_id": "332105447",
+    "department": "GWB L01 CRITICAL CARE",
+    "speciality": "Critical Care - GWB L01 ICU",
+    "room": "SR07",
+    "dept": "1021800003",
+    "room_hl7": "GWB L01W SR07",
+    "bed": "SR07-07",
+    "loc2merge": "critical care - gwb l01 icu __ gwb l01 critical care __ sr07 __ sr07-07",
+    "DepartmentKey": "31811",
+    "BedEpicId": "1.0218E+14",
+    "Name": "SR07-07",
+    "DepartmentName": "GWB L01 CRITICAL CARE",
+    "RoomName": "SR07",
+    "BedName": "SR07-07",
+    "IsBed": "1",
+    "BedInCensus": "1",
+    "IsDepartment": "0",
+    "IsRoom": "0",
+    "IsCareArea": "0",
+    "DepartmentExternalName": "GWB 1st Floor Critical Care Unit",
+    "DepartmentSpecialty": "Critical Care - GWB L01 ICU",
+    "DepartmentType": "ICU",
+    "DepartmentServiceGrouper": "Adult Critical Care",
+    "DepartmentLevelOfCareGrouper": "*Unspecified",
+    "LocationName": "GRAFTON WAY BUILDING",
+    "ParentLocationName": "UCLH PARENT HOSPITAL",
+    "_CreationInstant": "49:59.9",
+    "_LastUpdatedInstant": "06:27.0",
+    "_merge": "both",
+    "bed_physical": [
+      {
+        "id": 981,
+        "value": "sideroom",
+        "color": "dark-red"
+      }
+    ],
+    "bed_functional": [
+      {
+        "id": 986,
+        "value": "ficm",
+        "color": "dark-green"
+      },
+      {
+        "id": 987,
+        "value": "gwb",
+        "color": "light-orange"
+      }
+    ],
+    "unit_order": "7",
+    "closed": false,
+    "covid": false,
+    "DischargeReady": "No"
+  },
+  {
+    "id": 433,
+    "order": "433.00000000000000000000",
+    "location_string": "1021800003^GWB L01W SR08^SR08-08",
+    "location_id": "187840613",
+    "department_id": "332104960",
+    "room_id": "332105490",
+    "bed_id": "332105492",
+    "department": "GWB L01 CRITICAL CARE",
+    "speciality": "Critical Care - GWB L01 ICU",
+    "room": "SR08",
+    "dept": "1021800003",
+    "room_hl7": "GWB L01W SR08",
+    "bed": "SR08-08",
+    "loc2merge": "critical care - gwb l01 icu __ gwb l01 critical care __ sr08 __ sr08-08",
+    "DepartmentKey": "31812",
+    "BedEpicId": "1.0218E+14",
+    "Name": "SR08-08",
+    "DepartmentName": "GWB L01 CRITICAL CARE",
+    "RoomName": "SR08",
+    "BedName": "SR08-08",
+    "IsBed": "1",
+    "BedInCensus": "1",
+    "IsDepartment": "0",
+    "IsRoom": "0",
+    "IsCareArea": "0",
+    "DepartmentExternalName": "GWB 1st Floor Critical Care Unit",
+    "DepartmentSpecialty": "Critical Care - GWB L01 ICU",
+    "DepartmentType": "ICU",
+    "DepartmentServiceGrouper": "Adult Critical Care",
+    "DepartmentLevelOfCareGrouper": "*Unspecified",
+    "LocationName": "GRAFTON WAY BUILDING",
+    "ParentLocationName": "UCLH PARENT HOSPITAL",
+    "_CreationInstant": "49:59.9",
+    "_LastUpdatedInstant": "06:27.0",
+    "_merge": "both",
+    "bed_physical": [
+      {
+        "id": 981,
+        "value": "sideroom",
+        "color": "dark-red"
+      }
+    ],
+    "bed_functional": [
+      {
+        "id": 986,
+        "value": "ficm",
+        "color": "dark-green"
+      },
+      {
+        "id": 987,
+        "value": "gwb",
+        "color": "light-orange"
+      }
+    ],
+    "unit_order": "8",
+    "closed": false,
+    "covid": false,
+    "DischargeReady": "No"
+  }
+]

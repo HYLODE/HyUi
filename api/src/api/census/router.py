@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 from typing import Any
 
@@ -79,54 +80,9 @@ def get_beds_list(department: str, settings=Depends(get_settings)):
 
 @mock_router.get("/beds/", response_model=list[dict])
 def get_mock_beds_list(department: str):
-    return [
-        {
-            "BedEpicId": "6959",
-            "BedInCensus": "0",
-            "BedName": "Lounge",
-            "DepartmentExternalName": "UCH Tower 6th Floor Gynaecology (T06G)",
-            "DepartmentKey": "31146",
-            "DepartmentLevelOfCareGrouper": "Surgical",
-            "DepartmentName": "UCH T06 GYNAE (T06G)",
-            "DepartmentServiceGrouper": "Gynaecology",
-            "DepartmentSpecialty": "Gynaecology - General",
-            "DepartmentType": "HOD",
-            "DischargeReady": "No",
-            "IsBed": "1",
-            "IsCareArea": "0",
-            "IsDepartment": "0",
-            "IsRoom": "0",
-            "LocationName": "UNIVERSITY COLLEGE HOSPITAL CAMPUS",
-            "Name": "Lounge",
-            "ParentLocationName": "UCLH PARENT HOSPITAL",
-            "RoomName": "Patient Lounge",
-            "_CreationInstant": "47:26.0",
-            "_LastUpdatedInstant": "06:27.0",
-            "_merge": "both",
-            "bed": "Lounge",
-            "bed_functional": [],
-            "bed_id": "332107431",
-            "bed_physical": [],
-            "closed": False,
-            "covid": False,
-            "department": "UCH T06 GYNAE (T06G)",
-            "department_id": "331969463",
-            "dept": "T06G",
-            "id": 1,
-            "loc2merge": (
-                "gynaecology - general __ uch t06 "
-                "gynae (t06g) __ patient lounge __ lounge"
-            ),
-            "location_id": "332107428",
-            "location_string": "T06G^PATIENT LOUNGE^Lounge",
-            "order": "1.00000000000000000000",
-            "room": "Patient Lounge",
-            "room_hl7": "PATIENT LOUNGE",
-            "room_id": "332107429",
-            "speciality": "Gynaecology - General",
-            "unit_order": None,
-        },
-    ]
+    with open(Path(__file__).parent / "beds.json", "r") as f:
+        mock_json = json.load(f)
+    return mock_json
 
 
 def _fetch_census(
