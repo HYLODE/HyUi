@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 from api.baserow import get_fields, get_rows
 from api.config import get_settings
 from api.wards import MISSING_LOCATION_DEPARTMENTS, MISSING_DEPARTMENT_LOCATIONS
-from models.census import CensusDepartment, CensusRow, ClosedBed
+from models.census import CensusDepartment, CensusRow, ClosedBed, CensusBed
 from api.db import get_star_session
 
 from api.census.wrangle import aggregate_by_department
@@ -59,7 +59,7 @@ def get_mock_closed_beds():
     return [ClosedBed.parse_obj(row) for row in data]
 
 
-@router.get("/beds/", response_model=list[dict])
+@router.get("/beds/", response_model=list[CensusBed])
 def get_beds_list(department: str, settings=Depends(get_settings)):
     baserow_url = settings.baserow_url
     token = settings.baserow_read_write_token
@@ -78,7 +78,7 @@ def get_beds_list(department: str, settings=Depends(get_settings)):
     return get_rows(baserow_url, token, beds_table_id, params)
 
 
-@mock_router.get("/beds/", response_model=list[dict])
+@mock_router.get("/beds/", response_model=list[CensusBed])
 def get_mock_beds_list(department: str):
     with open(Path(__file__).parent / "beds.json", "r") as f:
         mock_json = json.load(f)
