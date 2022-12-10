@@ -1,95 +1,197 @@
-import datetime
+"""
+sub-application for PERRT
+"""
+
 import dash_bootstrap_components as dbc
-import plotly.express as px
-import requests
-from dash import (
-    Input,
-    Output,
-    callback,
-    dash_table as dt,
-    dcc,
-    get_app,
-    html,
-    register_page,
-)
+from datetime import datetime
+import numpy as np
+import pandas as pd
+import warnings
+from dash import Input, Output, callback
+from dash import dash_table as dt
+from dash import html, dcc, register_page
 from flask_login import current_user
 
+# make all functions in callbacks.py available to the app
+import web.pages.perrt.callbacks  # noqa: F401
+
+from web.pages.perrt import (
+    BPID,
+    DEPT_COLS,
+    REFRESH_INTERVAL,
+    widgets,
+)
+
+register_page(__name__)
+
+from web import icons
 from web.config import get_settings
 from web.convert import parse_to_data_frame, to_data_frame
 from models.census import CensusRow
 from models.perrt import EmapVitalsWide
 
-BPID = "PERRT_"
 
 register_page(__name__)
-app = get_app()
 
-REFRESH_INTERVAL = 10 * 60 * 1000  # milliseconds
 
-NEWS_SCORE_COLORS = {
-    "1": "rgb(189, 230, 175)",
-    "2": "rgb(189, 230, 175)",
-    "3": "rgb(189, 230, 175)",
-    "4": "rgb(189, 230, 175)",
-    "5": "rgb(247, 215, 172)",
-    "6": "rgb(247, 215, 172)",
-    "7": "rgb(240, 158, 158)",
-    "8": "rgb(240, 158, 158)",
-    "9": "rgb(240, 158, 158)",
-    "10": "rgb(240, 158, 158)",
-    "11": "rgb(240, 158, 158)",
-    "12": "rgb(240, 158, 158)",
-    "13": "rgb(240, 158, 158)",
-    "14": "rgb(240, 158, 158)",
-    "15": "rgb(240, 158, 158)",
-    "16": "rgb(240, 158, 158)",
-    "17": "rgb(240, 158, 158)",
-    "18": "rgb(240, 158, 158)",
-    "19": "rgb(240, 158, 158)",
-    "20": "rgb(240, 158, 158)",
-    "21": "rgb(240, 158, 158)",
-    "22": "rgb(240, 158, 158)",
-    "23": "rgb(240, 158, 158)",
-}
+@callback(
+    Output(f"{BPID}census_table", "children"),
+    Input(f"{BPID}ward_data", "data"),
+    prevent_initial_call=True,
+)
+def gen_census_table(data: dict):
+    # import ipdb; ipdb.set_trace()
+    dfo = pd.DataFrame.from_records(data)
+    if len(dfo) == 0:
+        warnings.warn("[WARN] No data provided for table")
+        return html.H2("No data found for table")
 
-card_fig = dbc.Card(
-    [
-        # dbc.CardHeader(html.H6("Ward patients")),
-        dbc.CardBody(
-            [
-                html.Div([html.P("UCLH inpatients and vital signs (Tower)")]),
-                fig_perrt := html.Div(),
-            ]
+    # TODO: Fix this.
+    # dfo["bed_label"] = dfo["bed"].str.split(pat="-", expand=True).iloc[:, 1]
+    # dfo["bed_label"] = dfo["bed_label"].apply(
+    #   lambda x: "".join(filter(str.isdigit, x)))
+    # TODO: abstract this out into a function
+    dfo["room_label"] = dfo["room"]
+    dfo["room_label"] = np.where(
+        dfo["room"].astype(str).str.contains("SR"), "SR", dfo["room_label"]
+    )
+
+    try:
+
+        # https://stackoverflow.com/a/4289557/992999
+        # int(''.join(filter(str.isdigit, your_string)))
+        dfo["room_i"] = dfo.apply(
+            lambda row: int("".join(filter(str.isdigit, row["room"]))), axis=1
+        )
+        dfo["room_i"] = dfo.apply(lambda row: f"Bay {row['room_i']}", axis=1)
+    except ValueError:
+        dfo["room_i"] = ""
+
+    dfo["room_label"] = np.where(
+        dfo["room"].astype(str).str.contains("BY"), dfo["room_i"], dfo["room_label"]
+    )
+    dfo["room_label"] = np.where(
+        dfo["room"].astype(str).str.contains("CB"), "", dfo["room_label"]
+    )
+
+    # bed status icons
+    dfo["bed_icons"] = ""
+    llist = []
+    for t in dfo.itertuples(index=False):
+        closed = icons.closed(t.closed)
+        covid = icons.covid(t.covid)
+
+        icon_string = f"{closed}{covid}"
+        ti = t._replace(bed_icons=icon_string)
+        llist.append(ti)
+    dfo = pd.DataFrame(llist, columns=dfo.columns)
+
+    # END: Prepare icons
+    # --------------------
+
+    # Sort into unit order / displayed tables will NOT be sortable
+    # ------------------------------------------------------------
+    dfo.sort_values(by=["department", "room", "bed"], inplace=True)
+
+    dto = (
+        dt.DataTable(
+            id=f"{BPID}tbl-census",
+            columns=[
+                {"id": "bed_icons", "name": "", "presentation": "markdown"},
+                {"id": "bed_label", "name": "Bed", "type": "text"},
+                {"id": "room_label", "name": ""},
+                {"id": "age_sex", "name": ""},
+                {"id": "name", "name": "Full Name"},
+                {"id": "mrn", "name": "MRN", "type": "text"},
+            ],
+            data=dfo.to_dict("records"),
+            editable=True,
+            # fixed_columns={},
+            style_table={"width": "100%", "minWidth": "100%", "maxWidth": "100%"},
+            style_as_list_view=True,  # remove col lines
+            style_cell={
+                "fontSize": 13,
+                "font-family": "monospace",
+                "padding": "1px",
+            },
+            # style_cell_conditional=CENSUS_STYLE_CELL_CONDITIONAL,
+            style_data={"color": "black", "backgroundColor": "white"},
+            # striped rows
+            style_data_conditional=[
+                {
+                    "if": {"row_index": "odd"},
+                    "backgroundColor": "rgb(220, 220, 220)",
+                },
+                {
+                    "if": {
+                        "filter_query": "{closed} contains true",
+                        # "column_id": "closed"
+                    },
+                    "color": "maroon",
+                },
+            ],
+            # sort_action="native",
+            markdown_options={"html": True},
+            persistence=True,
+            persisted_props=["data"],
         ),
+    )
+
+    # wrap in container
+    return (
+        dbc.Container(
+            dto,
+            className="dbc",
+        ),
+    )
+
+
+dept_selector = dbc.Card(
+    [
+        dbc.CardHeader(html.H6("Select a ward")),
+        dbc.CardBody(html.Div(id=f"{BPID}dept_dropdown_div")),
     ]
 )
 
-card_table = dbc.Card(
+dept_table = dbc.Card(
     [
-        dbc.CardBody(
-            [
-                html.Div([html.P("Some patients ")]),
-                table_perrt := html.Div(),
-            ]
-        ),
+        dbc.CardHeader(html.H6("Ward details")),
+        dbc.CardBody(id=f"{BPID}dept_table"),
     ]
 )
 
-main = html.Div(
+census_table = dbc.Card(
     [
-        card_fig,
-        card_table,
+        dbc.CardHeader(html.H6("census details")),
+        dbc.CardBody(id=f"{BPID}census_table"),
+    ]
+)
+
+config_footer = dbc.Card(
+    [
+        dbc.CardHeader(html.H6("Settings")),
+        dbc.CardBody(id=f"{BPID}settings", children=[widgets.closed_beds_switch]),
     ]
 )
 
 dash_only = html.Div(
     [
-        query_interval := dcc.Interval(interval=REFRESH_INTERVAL, n_intervals=0),
+        dcc.Interval(
+            id=f"{BPID}query-interval", interval=REFRESH_INTERVAL, n_intervals=0
+        ),
         dcc.Loading(
-            request_data := dcc.Store(id=f"{BPID}request_data"),
+            [
+                dcc.Store(id=f"{BPID}dept_data"),
+                dcc.Store(id=f"{BPID}beds_data"),
+                dcc.Store(id=f"{BPID}census_data"),
+            ],
             fullscreen=True,
             type="default",
         ),
+        dcc.Store(id=f"{BPID}patients_data"),
+        dcc.Store(id=f"{BPID}ward_data"),
+        # Need a hidden div for the callback with no output
+        html.Div(id="hidden-div-diff-table", style={"display": "none"}),
     ]
 )
 
@@ -97,129 +199,27 @@ dash_only = html.Div(
 def layout():
     if not current_user.is_authenticated:
         return html.Div(["Please ", dcc.Link("login", href="/login"), " to continue"])
+
     return html.Div(
         [
-            main,
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [widgets.building_radio_button],
+                        width={"size": 6, "order": "last", "offset": 6},
+                    ),
+                ]
+            ),
+            # dbc.Row(dbc.Col([dept_table])),
+            dbc.Row(dbc.Col([dept_selector])),
+            dbc.Row(dbc.Col([census_table])),
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [config_footer],
+                    ),
+                ]
+            ),
             dash_only,
-        ],
+        ]
     )
-
-
-def _get_census(department: str) -> list[CensusRow]:
-    response = requests.get(
-        f"{get_settings().api_url}/census/", params={"departments": [department]}
-    )
-    return [CensusRow.parse_obj(row) for row in response.json()]
-
-
-def _get_vitals_wide(
-    encounter_ids: list[str], horizon_dt: datetime.datetime
-) -> list[EmapVitalsWide]:
-    response = requests.get(
-        f"{get_settings().api_url}/perrt/vitals/wide",
-        params={"encounter_ids": encounter_ids, "horizon_dt": horizon_dt},
-    )
-    return [EmapVitalsWide.parse_obj(row) for row in response.json()]
-
-
-@callback(
-    Output(request_data, "data"),
-    Input(query_interval, "n_intervals"),
-)
-def store_census(n_intervals: int):
-    """
-    Read data from API then store as JSON
-    """
-    census = _get_census("GWB L01 CRITICAL CARE")
-    census_df = to_data_frame(census, CensusRow)
-    census_df = census_df[census_df["occupied"]]
-
-    horizon_dt = datetime.datetime.now() - datetime.timedelta(hours=24)
-    vitals = _get_vitals_wide(encounter_ids=["1040463999"], horizon_dt=horizon_dt)
-    vitals_df = to_data_frame(vitals, EmapVitalsWide)
-
-    df_res = census_df.merge(vitals_df, how="left", on="encounter")
-
-    # response = requests.get(f"{get_settings().api_url}/perrt/vitals/wide")
-    # data = [EmapVitalsWide.parse_obj(row).dict() for row in response.json()]
-    #
-    # hospital_visit_ids = [perrt_entry["hospital_visit_id"] for perrt_entry
-    # in data]
-    #
-    # predictions_list = requests.post(
-    #     f"{get_settings().api_url}/perrt/admission_predictions/",
-    #     data=json.dumps(hospital_visit_ids),
-    # ).json()
-    #
-    # predictions_map = {
-    #     p["hospital_visit_id"]: p["admission_probability"] for p in
-    #     predictions_list
-    # }
-    #
-    # for entry in data:
-    #     entry["admission_probability"] = predictions_map.get(
-    #         str(entry["hospital_visit_id"]), 0.0
-    #     )
-
-    return df_res.to_dict(orient="records")
-
-
-# @callback(
-#     Output(fig_perrt, "children"),
-#     Input(request_data, "data"),
-#     prevent_initial_call=True,
-# )
-# def gen_simple_fig(data: list[dict]):
-#     # TODO: move data validation to store
-#
-#     df = parse_to_data_frame(data, PerrtWide)
-#     df = df[["dept_name", "news_scale_1_max", "mrn"]]
-#     df = df.groupby(["dept_name", "news_scale_1_max"], as_index=False).count()
-#     df["news_scale_1_max"] = df["news_scale_1_max"].astype(int).astype(str)
-#     fig = px.bar(
-#         df,
-#         x="dept_name",
-#         y="mrn",
-#         color="news_scale_1_max",
-#         color_discrete_map=NEWS_SCORE_COLORS,
-#         category_orders={"news_scale_1_max": [str(x) for x in range(1, 24)]},
-#     )
-#     return dcc.Graph(id="perrt_fig", figure=fig)
-
-
-@callback(
-    Output(table_perrt, "children"),
-    Input(request_data, "data"),
-    prevent_initial_call=True,
-)
-def gen_simple_table(data: dict):
-    # TODO: reintroduce data validation
-    # ideally this should happen when storing
-
-    cols = dict(
-        mrn="MRN",
-        lastname="Last name",
-        firstname="First name",
-        date_of_birth="DoB",
-        deptartment="Ward/Department",
-        location_string="Bed",
-        # perrt_consult_datetime="PERRT consult",
-        news_scale_1_max="NEWS (max)",
-        news_scale_1_min="NEWS (min)",
-        temp_min="Temp (min)",
-        temp_max="Temp (max)",
-        # admission_probability="Admission probability",
-    )
-    return [
-        dt.DataTable(
-            id="results_table",
-            columns=[{"name": v, "id": k} for k, v in cols.items()],
-            data=data,
-            filter_action="native",
-            sort_action="native",
-            page_current=0,
-            page_size=10,
-            # export_format="xlsx",
-            # export_headers="display",
-        )
-    ]
