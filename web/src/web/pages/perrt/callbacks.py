@@ -6,7 +6,7 @@ import requests
 from dash import Input, Output, callback, dcc, get_app
 from flask_caching import Cache
 
-from models.census import CensusRow
+from models.census import CensusRow, CensusBed
 from web.config import get_settings
 from web.census import fetch_department_census
 from web.convert import to_data_frame
@@ -94,15 +94,18 @@ def gen_dept_dropdown(building: str):
         value=default_value,
         options=[{"label": v, "value": v} for v in departments],
         placeholder="Pick a department",
-        multi=True,
+        # NOTE: converting this to multi would require changing all the
+        #  endpoints to handle a list of strings (i.e. list of depts)
+        multi=False,
     )
 
 
-def _get_bed_list(department: str):
+def _get_bed_list(department: str) -> list[CensusBed]:
     """Returns bed not patient level data from BaseRow for that department"""
-    return requests.get(
+    response = requests.get(
         f"{get_settings().api_url}/census/beds/", params={"department": department}
-    ).json()
+    )
+    return [CensusBed.parse_obj(row) for row in response.json()]
 
 
 @callback(
@@ -124,7 +127,7 @@ def store_beds(n_intervals: int, dept: str):
     """
     Stores data from census api (i.e. skeleton)
     """
-    beds = _get_bed_list(dept)
+    beds = [i.dict() for i in _get_bed_list(dept)]
     beds = _unpack_nested_dict(beds, f2unpack="bed_functional", subkey="value")
     beds = _unpack_nested_dict(beds, f2unpack="bed_physical", subkey="value")
 
