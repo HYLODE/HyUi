@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from typing import Any
 
 from pydantic import BaseModel
 
@@ -57,7 +58,7 @@ class CensusBed(BaseModel):
     """Bed model as defined in baserow"""
 
     id: int
-    order: int
+    order: Any
     location_string: str
     location_id: int
     department_id: int
@@ -66,12 +67,12 @@ class CensusBed(BaseModel):
     department: str
     speciality: str
     room: str
-    dept: int
+    dept: Any
     room_hl7: str
     bed: str
     # loc2merge: "critical care - gwb l01 icu __ gwb l01 critical care __ sr04 __ sr04-04",
-    DepartmentKey: int
-    BedEpicId: int
+    DepartmentKey: Any
+    BedEpicId: Any
     Name: str
     DepartmentName: str
     RoomName: str
@@ -91,7 +92,7 @@ class CensusBed(BaseModel):
     _CreationInstant: datetime
     _LastUpdatedInstant: datetime
     # _merge: "both",
-    unit_order: int
+    unit_order: Any
     closed: bool
     covid: bool
     # DischargeReady: str
