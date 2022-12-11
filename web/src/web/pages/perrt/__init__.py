@@ -91,6 +91,6 @@ BEDS_KEEP_COLS = [
     "covid",
     "bed_functional",
     "bed_physical",
-    "DischargeReady",
+    # "DischargeReady",
     "closed",  # only exists after merging with bed_bones
 ]

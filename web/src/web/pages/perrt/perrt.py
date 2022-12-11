@@ -9,6 +9,7 @@ import pandas as pd
 import warnings
 from dash import Input, Output, callback
 from dash import dash_table as dt
+from dash.dash_table.Format import Format, Scheme
 from dash import html, dcc, register_page
 from flask_login import current_user
 
@@ -47,9 +48,8 @@ def gen_census_table(data: dict):
         return html.H2("No data found for table")
 
     # TODO: Fix this.
-    # dfo["bed_label"] = dfo["bed"].str.split(pat="-", expand=True).iloc[:, 1]
-    # dfo["bed_label"] = dfo["bed_label"].apply(
-    #   lambda x: "".join(filter(str.isdigit, x)))
+    dfo["bed_label"] = dfo["bed"].str.split(pat="-", expand=True).iloc[:, 1]
+    dfo["bed_label"] = dfo["bed_label"].apply(lambda x: "".join(filter(str.isdigit, x)))
     # TODO: abstract this out into a function
     dfo["room_label"] = dfo["room"]
     dfo["room_label"] = np.where(
@@ -100,7 +100,14 @@ def gen_census_table(data: dict):
                 {"id": "bed_icons", "name": "", "presentation": "markdown"},
                 {"id": "bed_label", "name": "Bed", "type": "text"},
                 {"id": "room_label", "name": ""},
-                {"id": "age_sex", "name": ""},
+                # {"id": "age_sex", "name": ""},
+                {
+                    "id": "age",
+                    "name": "age",
+                    "type": "numeric",
+                    "format": Format(precision=0, scheme=Scheme.fixed),
+                },
+                {"id": "sex", "name": "sex"},
                 {"id": "name", "name": "Full Name"},
                 {"id": "mrn", "name": "MRN", "type": "text"},
             ],
