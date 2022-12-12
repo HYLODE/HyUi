@@ -1,5 +1,3 @@
-from typing import Dict, List
-
 import numpy as np
 import pandas as pd
 from api.convert import parse_to_data_frame
@@ -15,6 +13,10 @@ from models.electives import (
     ObsData,
 )
 import re
+
+
+def to_camel(string: str) -> str:
+    return "".join(word.capitalize() for word in string.split("_"))
 
 
 def _get_most_recent_value(label: str, preassess_data: pd.DataFrame) -> pd.DataFrame:
@@ -60,7 +62,7 @@ def process_join_preassess_data(
     postop destination plan is included, as this may be relevant
     operationally, whereas the date of the creation of the note with the most
     recent ASA and METs value is less important. This merge is based on
-    PatientDurableKey(unique patient identifier), rather than a surgical case
+    patient_durable_key(unique patient identifier), rather than a surgical case
     identifier, which is not available for preassessment note data.
 
     preassess_data - derived from preassment query against caboodle
@@ -96,9 +98,9 @@ def process_join_preassess_data(
 
 
 def prepare_electives(
-    electives: List[Dict],
-    pod: List[Dict],
-    preassess: List[Dict],
+    electives: list[dict],
+    pod: list[dict],
+    preassess: list[dict],
 ) -> pd.DataFrame:
     """
     Prepare elective case list
@@ -140,26 +142,26 @@ def prepare_electives(
     return df
 
 
-def make_UTC(df):
-    for i in df.loc[:, df.columns.str.endswith("Instant")]:
-        df.loc[:, i + "UTC"] = pd.to_datetime(df[i], utc=True)
+def make_utc(df):
+    for i in df.loc[:, df.columns.str.endswith("instant")]:
+        df.loc[:, i + "_utc"] = pd.to_datetime(df[i], utc=True)
     return df
 
 
 def wrangle_surgical(df):
     terms_dict = {
-        "Priority": {
+        "priority": {
             "Two Week Wait": "Cancer Pathway",
             "*Unspecified": "Unknown",
         },
-        "PrimaryAnesthesiaType": {
+        "primary_anaesthesia_type": {
             "Sedation by Anaesthetist": "Sedation",
             "Sedation by Physician Assistant (Anaesthesia)": "Sedation",
             "Sedation by Physician Assistant (Anaesthesia) ": "Sedation",
             "Sedation by Endoscopist": "Sedation",
             "*Unspecified": "Unknown",
         },
-        "PrimaryService": {
+        "primary_service": {
             "Special Needs Dental": "Other",
             "Paediatric Surgery": "Other",
             "Thoracic Medicine": "Other",
@@ -167,7 +169,7 @@ def wrangle_surgical(df):
             "Interventional Radiology": "Other",
             "Emergency Surgery": "Other",
         },
-        "PostOperativeDestination": {
+        "post_operative_destination": {
             "Paediatric Ward": "Other",
             "Overnight Recovery": "Other",
             "*Unspecified": "Other",
@@ -177,27 +179,30 @@ def wrangle_surgical(df):
         },
     }
 
-    df.pipe(make_UTC).replace(terms_dict)
+    df.pipe(make_utc).replace(terms_dict)
 
     df = df[
-        (df["TouchTimeStartInstant"].isna() & df["TouchTimeEndInstant"].isna())
-        | (~df["TouchTimeStartInstant"].isna() & ~df["TouchTimeEndInstant"].isna())
+        (df["touch_time_start_instant"].isna() & df["touch_time_end_instant"].isna())
+        | (
+            ~df["touch_time_start_instant"].isna()
+            & ~df["touch_time_end_instant"].isna()
+        )
     ]
 
     # df["PlannedOperationEndInstant"]
     # = pd.to_datetime(df["PlannedOperationEndInstant"])
-    # df["PlannedOperationStartInstant"] = pd.to_datetime(
-    #     df["PlannedOperationStartInstant"]
+    # df["planned_operation_start_instant"] = pd.to_datetime(
+    #     df["planned_operation_start_instant"]
     # )
 
     # df["SurgeryDate"] = pd.to_datetime(df["SurgeryDate"])
 
     df.loc[:, "op_duration_minutes"] = (
-        df.loc[:, "PlannedOperationEndInstant"]
-        - df.loc[:, "PlannedOperationStartInstant"]
+        df.loc[:, "planned_operation_end_instant"]
+        - df.loc[:, "planned_operation_start_instant"]
     ).astype("timedelta64[m]")
 
-    # df.drop(["FirstName", "LastName", "BirthDate"], axis=1, inplace=True)
+    # df.drop(["Firstname", "Lastname", "BirthDate"], axis=1, inplace=True)
 
     return df
 
@@ -315,7 +320,7 @@ def wrangle_preassess(df):
         },
     }
     for c in categories:
-        df[c] = df[df["Name"].str.contains(categories[c])]["StringValue"]
+        df[c] = df[df["name"].str.contains(categories[c])]["string_value"]
 
     df.replace(categories_dicts, inplace=True)
 
@@ -328,10 +333,10 @@ def wrangle_preassess(df):
         ["a_line", "c_line", "expected_stay", "asa"]
     ].astype("float", errors="ignore")
 
-    # df["CreationInstant"] = pd.to_datetime(df["CreationInstant"])
+    # df["creation_instant"] = pd.to_datetime(df["creation_instant"])
 
     note_nums = (
-        df.groupby(["PatientDurableKey", "CreationInstant", "AuthorType"])
+        df.groupby(["patient_durable_key", "creation_instant", "author_type"])
         .agg("sum", numeric_only=True)
         .reset_index()
     )
@@ -340,14 +345,14 @@ def wrangle_preassess(df):
     note_nums["c_line"] = note_nums["a_line"].astype(bool).astype(int)
 
     note_strings = (
-        df.groupby(["PatientDurableKey", "CreationInstant", "AuthorType"])
+        df.groupby(["patient_durable_key", "creation_instant", "author_type"])
         .first()[["urgency", "pacdest", "prioritisation"]]
         .reset_index()
     )
     all_notes = note_nums.merge(
-        note_strings, on=["PatientDurableKey", "CreationInstant"]
+        note_strings, on=["patient_durable_key", "creation_instant"]
     )
-    all_notes["preassess_date"] = all_notes["CreationInstant"].dt.date
+    all_notes["preassess_date"] = all_notes["creation_instant"].dt.date
 
     return all_notes
 
@@ -358,13 +363,13 @@ def merge_surg_preassess(surg_data, preassess_data):
     data_preassess = wrangle_preassess(preassess_data)
 
     linked_notes = data_surg.merge(
-        data_preassess, on="PatientDurableKey", how="inner"
-    ).query("SurgeryDate >= preassess_date")
+        data_preassess, on="patient_durable_key", how="inner"
+    ).query("surgery_date >= preassess_date")
 
     merged_df = linked_notes[
-        linked_notes["CreationInstant"]
-        == linked_notes.groupby(["PatientDurableKey", "SurgeryDate"])[
-            "CreationInstant"
+        linked_notes["creation_instant"]
+        == linked_notes.groupby(["patient_durable_key", "surgery_date"])[
+            "creation_instant"
         ].transform(max)
     ]
     return merged_df
@@ -374,26 +379,26 @@ def wrangle_labs(df):
     # this takes some particular lab results from 4 months prior to the operation.
 
     labs_limits = {
-        "CREA": (49, 112),
-        "HB": (115, 170),
-        "WCC": (3, 10),
-        "PLT": (150, 400),
-        "NA": (135, 145),
-        "ALB": (34, 50),
-        "CRP": (0, 5),
-        "BILI": (0, 20),
-        "INR": (0.8, 1.3),
+        "crea": (49, 112),
+        "hb": (115, 170),
+        "wcc": (3, 10),
+        "plt": (150, 400),
+        "na": (135, 145),
+        "alb": (34, 50),
+        "crp": (0, 5),
+        "bili": (0, 20),
+        "inr": (0.8, 1.3),
     }
     lab_names = {
-        "NA": "Sodium",
-        "CREA": "Creatinine",
-        "WCC": "White cell count",
-        "HB": "Haemoglobin (g/L)",
-        "PLT": "Platelet count",
-        "ALB": "Albumin",
-        "BILI": "Bilirubin (total)",
-        "INR": "INR",
-        "CRP": "C-reactive protein",
+        "na": "Sodium",
+        "crea": "Creatinine",
+        "wcc": "White cell count",
+        "hb": "Haemoglobin (g/L)",
+        "plt": "Platelet count",
+        "alb": "Albumin",
+        "bili": "Bilirubin (total)",
+        "inr": "INR",
+        "crp": "C-reactive protein",
     }
 
     op_dict = {
@@ -403,33 +408,33 @@ def wrangle_labs(df):
         "count": "_measured_count",
     }
 
-    # df.loc[:, "Value"] = pd.to_numeric(
-    #     df["Value"].str.replace("<|(result checked)", "", regex=True),
+    # df.loc[:, "value"] = pd.to_numeric(
+    #     df["value"].str.replace("<|(result checked)", "", regex=True),
     #     errors="coerce",
     # .dropna() ## TODO: FIX why doesn't this work?
-    df["Name"] = df["Name"].replace({v: k for k, v in lab_names.items()})
-    df = df.join(df.pivot(columns="Name", values="Value"))
+    df["name"] = df["name"].replace({v: k for k, v in lab_names.items()})
+    df = df.join(df.pivot(columns="name", values="value"))
 
     for key in lab_names:
         df[key + "_abnormal_count"] = df[key].groupby(
-            df["PatientDurableKey"]
+            df["patient_durable_key"]
         ).transform(lambda x: x > labs_limits[key][1]) | df[key].groupby(
-            df["PatientDurableKey"]
+            df["patient_durable_key"]
         ).transform(
             lambda x: x < labs_limits[key][0]
         )
 
         for op in op_dict:
             df[key + op_dict[op]] = (
-                df[key].groupby(df["PatientDurableKey"]).transform(op)
+                df[key].groupby(df["patient_durable_key"]).transform(op)
             )
-    gdf = df.groupby("PatientDurableKey").sum(numeric_only=True)
+    gdf = df.groupby("patient_durable_key").sum(numeric_only=True)
     gdf = gdf.loc[:, gdf.columns.str.contains("_abnormal")]
 
-    hdf = df.groupby("PatientDurableKey").mean(numeric_only=True)
+    hdf = df.groupby("patient_durable_key").mean(numeric_only=True)
     hdf = hdf.loc[:, hdf.columns.str.contains("_m")]
 
-    idf = df.sort_values("ResultInstant").groupby("PatientDurableKey").last()
+    idf = df.sort_values("result_instant").groupby("patient_durable_key").last()
     idf = idf.loc[:, list(lab_names.keys())]
 
     final_df = gdf.join(hdf).join(idf.add_suffix("_last_value")).reset_index()
@@ -456,13 +461,11 @@ def simple_sum(df):
         "c_line",
         "a_line",
     ]
-    lab_names = ["NA", "CREA", "WCC", "HB", "PLT", "ALB", "BILI", "INR", "CRP"]
+    lab_names = ["na", "crea", "wcc", "hb", "plt", "alb", "bili", "inr", "crp"]
     lab_columns = [ln + "_abnormal_count" for ln in lab_names]
-    echo_columns = ["EchoAbnormal"]
+    echo_columns = ["echo_abnormal"]
     obs_columns = [
-        "SYS_BP_abnormal_count",
-        "DIAS_BP_abnormal_count",
-        "PULSE_measured_count",
+        "bmi_max_value",
     ]  # TODO actually write this
 
     columns_to_sum = (
@@ -475,7 +478,7 @@ def simple_sum(df):
 
 
 def j_wrangle_echo(df):
-    df["Finding"] = df["FindingType"] + " " + df["FindingName"]
+    df["finding"] = df["finding_type"] + " " + df["finding_name"]
 
     findings_categorical = [
         "Aortic Valve regurgitation severity",
@@ -512,78 +515,78 @@ def j_wrangle_echo(df):
     ]
 
     # split findings into those of interest by data type
-    df_numeric = df[df["Finding"].isin(findings_numerical)]
-    df_string = df[df["Finding"].isin(findings_string)]
-    df_cat = df[df["Finding"].isin(findings_categorical)]
+    df_numeric = df[df["finding"].isin(findings_numerical)]
+    df_string = df[df["finding"].isin(findings_string)]
+    df_cat = df[df["finding"].isin(findings_categorical)]
 
     # extract EF values from LV comments strings
-    df_string.loc[:, "LV_string_value"] = df_string.loc[
-        df_string["Finding"] == "Left Ventricle Comment", "StringValue"
+    df_string.loc[:, "lv_string_value"] = df_string.loc[
+        df_string["finding"] == "Left Ventricle Comment", "string_value"
     ].apply(lambda x: re.findall(r"\d*[%]", x))
-    df_string.loc[:, "LV_string_value"] = df_string.loc[:, "LV_string_value"].apply(
+    df_string.loc[:, "lv_string_value"] = df_string.loc[:, "lv_string_value"].apply(
         lambda d: d if isinstance(d, list) else []
     )
-    df_string.loc[:, "LV_string_value"] = df_string.loc[:, "LV_string_value"].str[0]
+    df_string.loc[:, "lv_string_value"] = df_string.loc[:, "lv_string_value"].str[0]
     df_string.loc[
-        ~df_string["LV_string_value"].isna(), "LV_string_value"
-    ] = df_string.loc[~df_string["LV_string_value"].isna(), "LV_string_value"].apply(
+        ~df_string["lv_string_value"].isna(), "lv_string_value"
+    ] = df_string.loc[~df_string["lv_string_value"].isna(), "lv_string_value"].apply(
         lambda x: x.replace("%", "")
     )
-    df_string.loc[:, "LV_string_value"] = (
-        df_string.loc[:, "LV_string_value"]
+    df_string.loc[:, "lv_string_value"] = (
+        df_string.loc[:, "lv_string_value"]
         .replace(r"^\s*$", np.nan, regex=True)
         .apply(float)
     )
     df_string.loc[
-        ~df_string["LV_string_value"].isna(), "LV_string_value"
-    ] = df_string.loc[~df_string["LV_string_value"].isna(), "LV_string_value"].apply(
+        ~df_string["lv_string_value"].isna(), "lv_string_value"
+    ] = df_string.loc[~df_string["lv_string_value"].isna(), "lv_string_value"].apply(
         lambda x: float(x)
     )
 
     # extract EF values from LVEF comments strings
-    df_string.loc[:, "LV_string_value_2"] = df_string.loc[
-        df_string["Finding"] == "Left Ventricle ejection fraction comments",
-        "StringValue",
+    df_string.loc[:, "lv_string_value_2"] = df_string.loc[
+        df_string["finding"] == "Left Ventricle ejection fraction comments",
+        "string_value",
     ].apply(lambda x: re.findall(r"\d*[%]", x))
-    df_string.loc[:, "LV_string_value_2"] = df_string.loc[:, "LV_string_value_2"].apply(
+    df_string.loc[:, "lv_string_value_2"] = df_string.loc[:, "lv_string_value_2"].apply(
         lambda d: d if isinstance(d, list) else []
     )
-    df_string.loc[:, "LV_string_value_2"] = df_string.loc[:, "LV_string_value_2"].str[0]
+    df_string.loc[:, "lv_string_value_2"] = df_string.loc[:, "lv_string_value_2"].str[0]
     df_string.loc[
-        ~df_string["LV_string_value_2"].isna(), "LV_string_value_2"
+        ~df_string["lv_string_value_2"].isna(), "lv_string_value_2"
     ] = df_string.loc[
-        ~df_string["LV_string_value_2"].isna(), "LV_string_value_2"
+        ~df_string["lv_string_value_2"].isna(), "lv_string_value_2"
     ].apply(
         lambda x: x.replace("%", "")
     )
-    df_string.loc[:, "LV_string_value_2"] = (
-        df_string.loc[:, "LV_string_value_2"]
+    df_string.loc[:, "lv_string_value_2"] = (
+        df_string.loc[:, "lv_string_value_2"]
         .replace(r"^\s*$", np.nan, regex=True)
         .apply(float)
     )
     df_string.loc[
-        ~df_string["LV_string_value_2"].isna(), "LV_string_value_2"
+        ~df_string["lv_string_value_2"].isna(), "lv_string_value_2"
     ] = df_string.loc[
-        ~df_string["LV_string_value_2"].isna(), "LV_string_value_2"
+        ~df_string["lv_string_value_2"].isna(), "lv_string_value_2"
     ].apply(
         lambda x: float(x)
     )
 
     # Extract PASP strings from PH comments
     df_string.loc[:, "contains PASP value"] = df_string.loc[
-        df_string["Finding"] == "Pulmonary Hypertension pulmonary hypertension",
-        "StringValue",
+        df_string["finding"] == "Pulmonary Hypertension pulmonary hypertension",
+        "string_value",
     ].apply(lambda x: np.where(("PASP" in x) | ("systolic pressure" in x), 1, 0))
     df_string.loc[:, "PH_string_value"] = df_string.loc[
         (
-            (df_string["Finding"] == "Pulmonary Hypertension pulmonary hypertension")
+            (df_string["finding"] == "Pulmonary Hypertension pulmonary hypertension")
             & (df_string["contains PASP value"] == 1)
         ),
-        "StringValue",
+        "string_value",
     ].apply(lambda x: re.findall(r"\d*\.?\d+", x))
     df_string.loc[:, "PH_string_value"] = df_string.loc[
         (
-            (df_string["Finding"] == "Pulmonary Hypertension pulmonary hypertension")
+            (df_string["finding"] == "Pulmonary Hypertension pulmonary hypertension")
             & (df_string["contains PASP value"] == 1)
         ),
         "PH_string_value",
@@ -595,7 +598,7 @@ def j_wrangle_echo(df):
 
     df_string.loc[:, "PH_string_value"] = df_string.loc[
         (
-            (df_string["Finding"] == "Pulmonary Hypertension pulmonary hypertension")
+            (df_string["finding"] == "Pulmonary Hypertension pulmonary hypertension")
             & (df_string["contains PASP value"] == 1)
         ),
         "PH_string_value",
@@ -605,24 +608,24 @@ def j_wrangle_echo(df):
     # convert selected PH comment strings to binary vars
     df_string["pulm_HTN_string_bin"] = np.where(
         (
-            (df_string["Finding"] == "Pulmonary Hypertension pulmonary hypertension")
-            & (df_string["StringValue"] == "1")
+            (df_string["finding"] == "Pulmonary Hypertension pulmonary hypertension")
+            & (df_string["string_value"] == "1")
         ),
         1,
         np.nan,
     )
     df_string["pulm_HTN_string_moderate"] = np.where(
         (
-            (df_string["Finding"] == "Pulmonary Hypertension pulmonary hypertension")
-            & (df_string["StringValue"] == "moderate")
+            (df_string["finding"] == "Pulmonary Hypertension pulmonary hypertension")
+            & (df_string["string_value"] == "moderate")
         ),
         1,
         np.nan,
     )
     df_string["pulm_HTN_string_severe"] = np.where(
         (
-            (df_string["Finding"] == "Pulmonary Hypertension pulmonary hypertension")
-            & (df_string["StringValue"] == "severe")
+            (df_string["finding"] == "Pulmonary Hypertension pulmonary hypertension")
+            & (df_string["string_value"] == "severe")
         ),
         1,
         np.nan,
@@ -631,19 +634,19 @@ def j_wrangle_echo(df):
     # keep only features generated from string columns
     df_string = df_string.drop(
         columns=[
-            "FindingType",
-            "FindingName",
-            "StringValue",
-            "NumericValue",
-            "Unit",
-            "Finding",
+            "finding_type",
+            "finding_name",
+            "string_value",
+            "numeric_value",
+            "unit",
+            "finding",
         ]
     )
 
     # rename numeric values and pivot table
     df_numeric = df_numeric.replace(
         {
-            "Finding": {
+            "finding": {
                 "*Not Applicable RV TAPSE (TV annulus)": "TAPSE_num",
                 "*Not Applicable Echo EF Estimated": "EF_est_num",
                 "*Not Applicable EF (Mod BP)": "EF_mbp_num",
@@ -654,20 +657,20 @@ def j_wrangle_echo(df):
     )
 
     df_numeric = df_numeric.drop(
-        columns=["FindingType", "FindingName", "StringValue", "Unit"]
+        columns=["finding_type", "finding_name", "string_value", "unit"]
     )
 
     df_numeric_pivot = df_numeric.pivot_table(
         index=[
-            "PatientDurableKey",
-            "SurgicalCaseKey",
-            "ImagingKey",
-            "EchoStartDate",
-            "EchoFinalisedDate",
-            "PlannedOperationStartInstant",
+            "patient_durable_key",
+            "surgical_case_key",
+            "imaging_key",
+            "echo_start_date",
+            "echo_finalised_date",
+            "planned_operation_start_instant",
         ],
-        values="NumericValue",
-        columns="Finding",
+        values="numeric_value",
+        columns="finding",
     )
 
     df_numeric_pivot.reset_index(inplace=True)
@@ -688,7 +691,7 @@ def j_wrangle_echo(df):
     # rename categorical values and pivot table
     df_cat = df_cat.replace(
         {
-            "Finding": {
+            "finding": {
                 "Aortic Valve regurgitation severity": "AVR",
                 "Aortic Valve stenosis": "AVS",
                 "Left Ventricle left ventricular cavity size": "LV_size_cat",
@@ -711,19 +714,21 @@ def j_wrangle_echo(df):
         }
     )
 
-    df_cat = df_cat.drop(columns=["FindingType", "FindingName", "NumericValue", "Unit"])
+    df_cat = df_cat.drop(
+        columns=["finding_type", "finding_name", "numeric_value", "unit"]
+    )
 
     df_cat_pivot = df_cat.pivot_table(
         index=[
-            "PatientDurableKey",
-            "SurgicalCaseKey",
-            "ImagingKey",
-            "EchoStartDate",
-            "EchoFinalisedDate",
-            "PlannedOperationStartInstant",
+            "patient_durable_key",
+            "surgical_case_key",
+            "imaging_key",
+            "echo_start_date",
+            "echo_finalised_date",
+            "planned_operation_start_instant",
         ],
-        values="StringValue",
-        columns="Finding",
+        values="string_value",
+        columns="finding",
         aggfunc=lambda x: " ".join(x),
     )
 
@@ -758,24 +763,24 @@ def j_wrangle_echo(df):
 
     df_cases = df[
         [
-            "PatientDurableKey",
-            "SurgicalCaseKey",
-            "ImagingKey",
-            "EchoStartDate",
-            "EchoFinalisedDate",
-            "PlannedOperationStartInstant",
+            "patient_durable_key",
+            "surgical_case_key",
+            "imaging_key",
+            "echo_start_date",
+            "echo_finalised_date",
+            "planned_operation_start_instant",
         ]
     ].drop_duplicates()
 
     df_results = df_cases.merge(
         df_cat_pivot,
         on=[
-            "PatientDurableKey",
-            "SurgicalCaseKey",
-            "ImagingKey",
-            "EchoStartDate",
-            "EchoFinalisedDate",
-            "PlannedOperationStartInstant",
+            "patient_durable_key",
+            "surgical_case_key",
+            "imaging_key",
+            "echo_start_date",
+            "echo_finalised_date",
+            "planned_operation_start_instant",
         ],
         how="left",
     )
@@ -783,19 +788,19 @@ def j_wrangle_echo(df):
     df_results = df_results.merge(
         df_numeric_pivot,
         on=[
-            "PatientDurableKey",
-            "SurgicalCaseKey",
-            "ImagingKey",
-            "EchoStartDate",
-            "EchoFinalisedDate",
-            "PlannedOperationStartInstant",
+            "patient_durable_key",
+            "surgical_case_key",
+            "imaging_key",
+            "echo_start_date",
+            "echo_finalised_date",
+            "planned_operation_start_instant",
         ],
         how="left",
     )
 
     string_cols_to_join = [
-        "LV_string_value",
-        "LV_string_value_2",
+        "lv_string_value",
+        "lv_string_value_2",
         "PH_string_value",
         "pulm_HTN_string_bin",
         "pulm_HTN_string_moderate",
@@ -804,12 +809,12 @@ def j_wrangle_echo(df):
 
     for col in string_cols_to_join:
         cols = [
-            "PatientDurableKey",
-            "SurgicalCaseKey",
-            "ImagingKey",
-            "EchoStartDate",
-            "EchoFinalisedDate",
-            "PlannedOperationStartInstant",
+            "patient_durable_key",
+            "surgical_case_key",
+            "imaging_key",
+            "echo_start_date",
+            "echo_finalised_date",
+            "planned_operation_start_instant",
         ] + [col]
 
         to_join = df_string[cols]
@@ -820,12 +825,12 @@ def j_wrangle_echo(df):
         df_results = df_results.merge(
             to_join,
             on=[
-                "PatientDurableKey",
-                "SurgicalCaseKey",
-                "ImagingKey",
-                "EchoStartDate",
-                "EchoFinalisedDate",
-                "PlannedOperationStartInstant",
+                "patient_durable_key",
+                "surgical_case_key",
+                "imaging_key",
+                "echo_start_date",
+                "echo_finalised_date",
+                "planned_operation_start_instant",
             ],
             how="left",
         )
@@ -862,11 +867,11 @@ def j_wrangle_echo(df):
         1,
         0,
     )
-    df_results["LV_function_abnormal"] = np.where(
+    df_results["lv_function_abnormal"] = np.where(
         (df_results["EF_est_num"] <= 30)
         | (df_results["EF_mbp_num"] <= 30)
-        | (df_results["LV_string_value"] <= 30)
-        | (df_results["LV_string_value_2"] <= 30)
+        | (df_results["lv_string_value"] <= 30)
+        | (df_results["lv_string_value_2"] <= 30)
         | (df_results["LVEF_cat"] == "decreased")
         | (df_results["LV_diast_fill_cat"] == "abnormal")
         | (df_results["LV_imp_cat"] == "1")
@@ -875,7 +880,7 @@ def j_wrangle_echo(df):
         0,
     )
 
-    df_results["RV_function_abnormal"] = np.where(
+    df_results["rv_function_abnormal"] = np.where(
         (df_results["RV_func_cat"] == "severely reduced")
         | (df_results["RV_size_cat"] == "severely enlarged")
         | (df_results["TAPSE_num"] <= 1.7),
@@ -896,11 +901,11 @@ def j_wrangle_echo(df):
     )
 
     # create variables for echo performed and echo abnormal
-    df_results["EchoPerformed"] = 1
-    df_results["EchoAbnormal"] = np.where(
+    df_results["echo_performed"] = 1
+    df_results["echo_abnormal"] = np.where(
         (df_results["valve_abnormal"] == 1)
-        | (df_results["LV_function_abnormal"] == 1)
-        | (df_results["RV_function_abnormal"] == 1)
+        | (df_results["lv_function_abnormal"] == 1)
+        | (df_results["rv_function_abnormal"] == 1)
         | (df_results["pulm_htn"] == 1),
         1,
         0,
@@ -909,30 +914,30 @@ def j_wrangle_echo(df):
     # select only engineered features
     df_results = df_results[
         [
-            "PatientDurableKey",
-            "SurgicalCaseKey",
-            "ImagingKey",
-            "EchoStartDate",
-            "EchoFinalisedDate",
-            "PlannedOperationStartInstant",
+            "patient_durable_key",
+            "surgical_case_key",
+            "imaging_key",
+            "echo_start_date",
+            "echo_finalised_date",
+            "planned_operation_start_instant",
             "valve_abnormal",
-            "LV_function_abnormal",
-            "RV_function_abnormal",
+            "lv_function_abnormal",
+            "rv_function_abnormal",
             "pulm_htn",
-            "EchoPerformed",
-            "EchoAbnormal",
+            "echo_performed",
+            "echo_abnormal",
         ]
     ]
 
     # select only most recent echo per surgical case and return this
 
     df_last_echo = (
-        df_results.sort_values("EchoFinalisedDate")
+        df_results.sort_values("echo_finalised_date")
         .groupby(
             [
-                "PatientDurableKey",
-                "SurgicalCaseKey",
-                "PlannedOperationStartInstant",
+                "patient_durable_key",
+                "surgical_case_key",
+                "planned_operation_start_instant",
             ]
         )
         .tail(1)
@@ -940,14 +945,14 @@ def j_wrangle_echo(df):
 
     df_last_echo = df_last_echo[
         [
-            "SurgicalCaseKey",
-            "PlannedOperationStartInstant",
+            "surgical_case_key",
+            "planned_operation_start_instant",
             "valve_abnormal",
-            "LV_function_abnormal",
-            "RV_function_abnormal",
+            "lv_function_abnormal",
+            "rv_function_abnormal",
             "pulm_htn",
-            "EchoPerformed",
-            "EchoAbnormal",
+            "echo_performed",
+            "echo_abnormal",
         ]
     ]
 
@@ -957,24 +962,24 @@ def j_wrangle_echo(df):
 def j_wrangle_obs(caboodle_obs):
 
     caboodle_obs.loc[:, "month_pre_theatre"] = caboodle_obs.loc[
-        :, "PlannedOperationStartInstant"
+        :, "planned_operation_start_instant"
     ] - pd.to_timedelta(16, unit="W")
 
     caboodle_obs = caboodle_obs[
         (
-            caboodle_obs.loc[:, "TakenInstant"]
-            < caboodle_obs.loc[:, "PlannedOperationStartInstant"]
+            caboodle_obs.loc[:, "taken_instant"]
+            < caboodle_obs.loc[:, "planned_operation_start_instant"]
         )
         & (
-            caboodle_obs.loc[:, "FirstDocumentedInstant"]
-            < caboodle_obs.loc[:, "PlannedOperationStartInstant"]
+            caboodle_obs.loc[:, "first_documented_instant"]
+            < caboodle_obs.loc[:, "planned_operation_start_instant"]
         )
         & (
-            caboodle_obs.loc[:, "TakenInstant"]
+            caboodle_obs.loc[:, "taken_instant"]
             > caboodle_obs.loc[:, "month_pre_theatre"]
         )
         & (
-            caboodle_obs.loc[:, "FirstDocumentedInstant"]
+            caboodle_obs.loc[:, "first_documented_instant"]
             > caboodle_obs.loc[:, "month_pre_theatre"]
         )
     ]
@@ -985,16 +990,16 @@ def j_wrangle_obs(caboodle_obs):
 
     # Split to numerical and text obs for processing
     numerical_obs = caboodle_obs[
-        caboodle_obs.loc[:, "DisplayName"].isin(numerical_obs_list)
+        caboodle_obs.loc[:, "display_name"].isin(numerical_obs_list)
     ]
-    numerical_obs = numerical_obs[~numerical_obs["NumericValue"].isna()]
+    numerical_obs = numerical_obs[~numerical_obs["numeric_value"].isna()]
 
-    text_obs = caboodle_obs[caboodle_obs.loc[:, "DisplayName"].isin(text_obs_list)]
-    text_obs = text_obs[text_obs["Value"] != ""]
+    text_obs = caboodle_obs[caboodle_obs.loc[:, "display_name"].isin(text_obs_list)]
+    text_obs = text_obs[text_obs["value"] != ""]
 
     # Process text obs
-    text_obs[["SYS_BP", "DIAS_BP"]] = text_obs[text_obs.loc[:, "DisplayName"] == "BP"][
-        "Value"
+    text_obs[["SYS_BP", "DIAS_BP"]] = text_obs[text_obs.loc[:, "display_name"] == "BP"][
+        "value"
     ].str.split("/", 1, expand=True)
 
     text_obs.loc[:, "SYS_BP"].fillna(value=np.nan, inplace=True)
@@ -1004,11 +1009,11 @@ def j_wrangle_obs(caboodle_obs):
     text_obs.loc[:, "DIAS_BP"] = text_obs.loc[:, "DIAS_BP"].apply(lambda x: float(x))
 
     oxygen_conditions = [
-        (text_obs.loc[:, "DisplayName"] == "Room Air or Oxygen")
-        & (text_obs.loc[:, "Value"] == "Supplemental Oxygen"),
-        (text_obs.loc[:, "DisplayName"] == "Room Air or Oxygen")
-        & (text_obs.loc[:, "Value"] == "Room air"),
-        (text_obs.loc[:, "DisplayName"] != "Room Air or Oxygen"),
+        (text_obs.loc[:, "display_name"] == "Room Air or Oxygen")
+        & (text_obs.loc[:, "value"] == "Supplemental Oxygen"),
+        (text_obs.loc[:, "display_name"] == "Room Air or Oxygen")
+        & (text_obs.loc[:, "value"] == "Room air"),
+        (text_obs.loc[:, "display_name"] != "Room Air or Oxygen"),
     ]
 
     oxygen_codes = (1, 0, np.nan)
@@ -1016,15 +1021,15 @@ def j_wrangle_obs(caboodle_obs):
     text_obs.loc[:, "ON_OXYGEN_BIN"] = np.select(oxygen_conditions, oxygen_codes)
 
     text_obs = text_obs.drop(
-        columns=["Value", "NumericValue", "DisplayName", "month_pre_theatre"]
+        columns=["value", "numeric_value", "display_name", "month_pre_theatre"]
     )
 
     bp_obs = text_obs[
         [
-            "SurgicalCaseKey",
-            "FirstDocumentedInstant",
-            "TakenInstant",
-            "PlannedOperationStartInstant",
+            "surgical_case_key",
+            "first_documented_instant",
+            "taken_instant",
+            "planned_operation_start_instant",
             "SYS_BP",
             "DIAS_BP",
         ]
@@ -1035,10 +1040,10 @@ def j_wrangle_obs(caboodle_obs):
 
     o2_obs = text_obs[
         [
-            "SurgicalCaseKey",
-            "FirstDocumentedInstant",
-            "TakenInstant",
-            "PlannedOperationStartInstant",
+            "surgical_case_key",
+            "first_documented_instant",
+            "taken_instant",
+            "planned_operation_start_instant",
             "ON_OXYGEN_BIN",
         ]
     ]
@@ -1049,10 +1054,10 @@ def j_wrangle_obs(caboodle_obs):
     text_obs = bp_obs.merge(
         o2_obs,
         on=[
-            "SurgicalCaseKey",
-            "FirstDocumentedInstant",
-            "TakenInstant",
-            "PlannedOperationStartInstant",
+            "surgical_case_key",
+            "first_documented_instant",
+            "taken_instant",
+            "planned_operation_start_instant",
         ],
         how="outer",
     )
@@ -1067,11 +1072,11 @@ def j_wrangle_obs(caboodle_obs):
     # Process numerical obs
 
     obs_long_names_conditions = [
-        (numerical_obs["DisplayName"] == "SpO2"),
-        (numerical_obs["DisplayName"] == "Pulse"),
-        (numerical_obs["DisplayName"] == "Resp"),
-        (numerical_obs["DisplayName"] == "Temp"),
-        (numerical_obs["DisplayName"] == "BMI (Calculated)"),
+        (numerical_obs["display_name"] == "SpO2"),
+        (numerical_obs["display_name"] == "Pulse"),
+        (numerical_obs["display_name"] == "Resp"),
+        (numerical_obs["display_name"] == "Temp"),
+        (numerical_obs["display_name"] == "BMI (Calculated)"),
     ]
 
     values_obs_codes = ("SPO2", "PULSE", "RR", "TEMP", "BMI")
@@ -1081,17 +1086,17 @@ def j_wrangle_obs(caboodle_obs):
     )
 
     numerical_obs = numerical_obs.drop(
-        columns=["Value", "DisplayName", "month_pre_theatre"]
+        columns=["value", "display_name", "month_pre_theatre"]
     )
 
     numerical_obs = numerical_obs.pivot_table(
         index=[
-            "SurgicalCaseKey",
-            "PlannedOperationStartInstant",
-            "FirstDocumentedInstant",
-            "TakenInstant",
+            "surgical_case_key",
+            "planned_operation_start_instant",
+            "first_documented_instant",
+            "taken_instant",
         ],
-        values="NumericValue",
+        values="numeric_value",
         columns="obs_code",
     )
 
@@ -1122,10 +1127,10 @@ def j_wrangle_obs(caboodle_obs):
     all_obs = text_obs.merge(
         numerical_obs,
         on=[
-            "SurgicalCaseKey",
-            "FirstDocumentedInstant",
-            "TakenInstant",
-            "PlannedOperationStartInstant",
+            "surgical_case_key",
+            "first_documented_instant",
+            "taken_instant",
+            "planned_operation_start_instant",
         ],
         how="outer",
     )
@@ -1154,38 +1159,38 @@ def j_wrangle_obs(caboodle_obs):
     # process aggregate stats
 
     for ob in preadm_obs_list:
-        all_obs[ob + "_abnormal_count"] = all_obs.groupby(["SurgicalCaseKey"])[
+        all_obs[ob + "_abnormal_count"] = all_obs.groupby(["surgical_case_key"])[
             ob + "_abnormal_flag"
         ].transform(sum)
 
     for ob in preadm_obs_list:
-        all_obs[ob + "_measured_count"] = all_obs.groupby(["SurgicalCaseKey"])[
+        all_obs[ob + "_measured_count"] = all_obs.groupby(["surgical_case_key"])[
             ob
         ].transform("count")
 
     for ob in preadm_obs_list:
         all_obs[ob + "_last_value"] = (
-            all_obs.sort_values("TakenInstant")
-            .groupby(["SurgicalCaseKey"])[ob]
+            all_obs.sort_values("taken_instant")
+            .groupby(["surgical_case_key"])[ob]
             .transform("last")
         )
 
     for ob in preadm_obs_list:
-        all_obs[ob + "_mean_value"] = all_obs.groupby(["SurgicalCaseKey"])[
+        all_obs[ob + "_mean_value"] = all_obs.groupby(["surgical_case_key"])[
             ob
         ].transform("mean")
 
     for ob in preadm_obs_list:
-        all_obs[ob + "_min_value"] = all_obs.groupby(["SurgicalCaseKey"])[ob].transform(
-            min
-        )
+        all_obs[ob + "_min_value"] = all_obs.groupby(["surgical_case_key"])[
+            ob
+        ].transform(min)
 
     for ob in preadm_obs_list:
-        all_obs[ob + "_max_value"] = all_obs.groupby(["SurgicalCaseKey"])[ob].transform(
-            max
-        )
+        all_obs[ob + "_max_value"] = all_obs.groupby(["surgical_case_key"])[
+            ob
+        ].transform(max)
 
-    all_obs["BMI_max_value"] = all_obs.groupby(["SurgicalCaseKey"])["BMI"].transform(
+    all_obs["bmi_max_value"] = all_obs.groupby(["surgical_case_key"])["BMI"].transform(
         max
     )
 
@@ -1193,7 +1198,7 @@ def j_wrangle_obs(caboodle_obs):
     cols_to_drop_obs = (
         preadm_obs_list
         + [ob + "_abnormal_flag" for ob in preadm_obs_list]
-        + ["FirstDocumentedInstant", "TakenInstant", "BMI"]
+        + ["first_documented_instant", "taken_instant", "BMI"]
     )
 
     obs = all_obs.drop(columns=cols_to_drop_obs).drop_duplicates()
@@ -1202,11 +1207,11 @@ def j_wrangle_obs(caboodle_obs):
 
 
 def prepare_draft(
-    electives: List[Dict],
-    preassess: List[Dict],
-    labs: List[Dict],
-    echo: List[Dict],
-    obs: List[Dict],
+    electives: list[dict],
+    preassess: list[dict],
+    labs: list[dict],
+    echo: list[dict],
+    obs: list[dict],
 ) -> pd.DataFrame:
 
     electives_df = parse_to_data_frame(electives, SurgData)
@@ -1217,10 +1222,10 @@ def prepare_draft(
 
     df = (
         merge_surg_preassess(surg_data=electives_df, preassess_data=preassess_df)
-        .merge(wrangle_labs(labs_df), how="left", on="PatientDurableKey")
-        .merge(j_wrangle_echo(echo_df), how="left", on="SurgicalCaseKey")
-        .merge(j_wrangle_obs(obs_df), how="inner", on="SurgicalCaseKey")
-        .drop_duplicates(subset="PatientDurableKey")
+        .merge(wrangle_labs(labs_df), how="left", on="patient_durable_key")
+        .merge(j_wrangle_echo(echo_df), how="left", on="surgical_case_key")
+        .merge(j_wrangle_obs(obs_df), how="inner", on="surgical_case_key")
+        .drop_duplicates(subset="patient_durable_key")
     )
     # create pacu label
     df["pacu"] = False

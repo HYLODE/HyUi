@@ -17,8 +17,8 @@ def _to_camel(member: str) -> str:
 
 
 class CabData(BaseModel):
-    PatientDurableKey: int  # TODO: FIX camelcase -> snakecase for consistency (?)
-    SurgicalCaseKey: int | None
+    patient_durable_key: int
+    surgical_case_key: int | None
 
     class Config:
         alias_generator = _to_camel
@@ -94,75 +94,75 @@ class ElectiveSurgCase(BaseModel):
 
 
 class SurgData(CabData):
-    PrimaryMrn: int
-    PatientKey: int
-    SurgicalCaseUclhKey: int
-    FirstName: str
-    LastName: str
-    BirthDate: date
-    AgeInYears: int
-    Sex: str
-    PlacedOnWaitingListDate: date | None
-    DecidedToAdmitDate: date | None
-    SurgeryDate: date
-    CaseRequestDate: date
-    CaseRequestTimeOfDay: time
-    CancelDate: date | None
-    PrimaryService: str
-    ProcedureLevel: str | None
-    Classification: str | None
-    SurgeryPatientClass: str
-    AdmissionPatientClass: str
-    PrimaryAnesthesiaType: str | None
-    ReasonNotPerformed: str | None
-    Canceled: bool | None
-    PlannedOperationStartInstant: datetime | None
-    PlannedOperationEndInstant: datetime | None
-    TouchTimeStartInstant: datetime | None
-    TouchTimeEndInstant: datetime | None
-    TouchTimeMinutes: float | None
-    PostOperativeDestination: str
-    AdmissionService: str | None
-    ElectiveAdmissionType: str
-    IntendedManagement: str
-    Priority: str | None
-    RemovalReason: str | None
-    Status: str | None
-    SurgicalService: str | None
-    Type: str | None  # TODO: FIX RISK - DUPLICATED NAME
-    Count: str | None
-    CaseScheduleStatus: str | None
-    CaseCancelReason: str | None
-    CaseCancelReasonCode: str | None
-    AsaRatingCode: str | None
-    Name: str | None  # TODO: FIX RISK - DUPLICATED NAME
-    PatientFriendlyName: str | None
-    RoomName: str | None
-    DepartmentName: str | None
+    primary_mrn: int
+    patient_key: int
+    surgical_case_uclh_key: int
+    first_name: str
+    last_name: str
+    birth_date: date
+    age_in_years: int
+    sex: str
+    placed_on_waiting_list_date: date | None
+    decided_to_admit_date: date | None
+    surgery_date: date
+    case_request_date: date
+    case_request_time_of_day: time
+    cancel_date: date | None
+    primary_service: str
+    procedure_level: str | None
+    classification: str | None
+    surgery_patient_class: str
+    admission_patient_class: str
+    primary_anaesthesia_type: str | None
+    reason_not_performed: str | None
+    canceled: bool | None
+    planned_operation_start_instant: datetime | None
+    planned_operation_end_instant: datetime | None
+    touch_time_start_instant: datetime | None
+    touch_time_end_instant: datetime | None
+    touch_time_minutes: float | None
+    post_operative_destination: str
+    admission_service: str | None
+    elective_admission_type: str
+    intended_management: str
+    priority: str | None
+    removal_reason: str | None
+    status: str | None
+    surgical_service: str | None
+    type: str | None  # TODO: FIX RISK - DUPLICATED NAME
+    count: str | None
+    case_schedule_status: str | None
+    case_cancel_reason: str | None
+    case_cancel_reason_code: str | None
+    asa_rating_code: str | None
+    name: str | None  # TODO: FIX RISK - DUPLICATED NAME
+    patient_friendly_name: str | None
+    room_name: str | None
+    department_name: str | None
     booked_destination: str | None
     pacu: int | None
 
 
 class PreassessData(CabData):
-    CreationInstant: datetime
-    Type: str | None  # TODO: FIX RISK - DUPLICATED NAME
-    AuthorType: str | None
-    StringValue: str | None
-    NumericValue: float | None
-    DateValue: datetime | None
-    SmartDataElementEpicId: str | None
-    Name: str | None  # TODO: FIX RISK - DUPLICATED NAME
-    Abbreviation: str | None
-    DataType: str | None
-    ConceptType: str | None
-    ConceptValue: str | None  # TODO: FIX float ideally
+    creation_instant: datetime
+    type: str | None  # TODO: FIX RISK - DUPLICATED NAME
+    author_type: str | None
+    string_value: str | None
+    numeric_value: float | None
+    date_value: datetime | None
+    smart_data_element_epic_id: str | None
+    name: str | None  # TODO: FIX RISK - DUPLICATED NAME
+    abbreviation: str | None
+    data_type: str | None
+    concept_type: str | None
+    concept_value: str | None  # TODO: FIX float ideally
 
 
 class LabData(CabData):
-    Name: str
-    PlannedOperationStartInstant: datetime
-    Value: float
-    ResultInstant: datetime
+    name: str
+    planned_operation_start_instant: datetime
+    value: float
+    result_instant: datetime
 
 
 class MergedData(SurgData):
@@ -175,7 +175,7 @@ class MergedData(SurgData):
     haem: int | None
     renal: int | None
     gastro: int | None
-    CPET: int | None
+    cpet: int | None
     mets: int | None
     anaesthetic_alert: int | None
     asa: int | None
@@ -186,35 +186,35 @@ class MergedData(SurgData):
     pacdest: str | None
     prioritisation: str | None
     preassess_date: date | None
-    NA_abnormal_count: float | None
-    CRP_abnormal_count: float | None
-    INR_last_value: float | None
-    NA_max_value: float | None
+    na_abnormal_count: float | None
+    crp_abnormal_count: float | None
+    inr_last_value: float | None
+    na_max_value: float | None
     simple_score: float | None
-    EchoPerformed: bool | None
-    EchoAbnormal: bool | None
-    SYS_BP_abnormal_count: int | None
-    DIAS_BP_abnormal_count: int | None
-    PULSE_measured_count: int | None
-    BMI_max_value: float | None
+    echo_performed: bool | None
+    echo_abnormal: bool | None
+    sys_bp_abnormal_count: int | None
+    dias_bp_abnormal_count: int | None
+    pulse_measured_count: int | None
+    bmi_max_value: float | None
 
 
 class EchoData(CabData):
-    ImagingKey: int
-    FindingType: str | None
-    FindingName: str | None
-    StringValue: str | None
-    NumericValue: float | None
-    Unit: str | None
-    EchoStartDate: date
-    EchoFinalisedDate: date
-    PlannedOperationStartInstant: datetime
+    imaging_key: int
+    finding_type: str | None
+    finding_name: str | None
+    string_value: str | None
+    numeric_value: float | None
+    unit: str | None
+    echo_start_date: date
+    echo_finalised_date: date
+    planned_operation_start_instant: datetime
 
 
 class ObsData(CabData):
-    PlannedOperationStartInstant: datetime
-    Value: str
-    NumericValue: float | None
-    FirstDocumentedInstant: datetime
-    TakenInstant: datetime
-    DisplayName: str
+    planned_operation_start_instant: datetime
+    value: str
+    numeric_value: float | None
+    first_documented_instant: datetime
+    taken_instant: datetime
+    display_name: str

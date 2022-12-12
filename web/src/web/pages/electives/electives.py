@@ -127,7 +127,7 @@ def filter_data(service: list[str], pacu: list[bool], data: list[dict]):
     # TODO: Fix this.
     # data = [row for row in data if row["pacu"] in pacu]
     if service:
-        return [row for row in data if row["PrimaryService"] in service]
+        return [row for row in data if row["primary_service"] in service]
     return data
 
 
@@ -146,14 +146,14 @@ def gen_surgeries_over_time(data: list[dict]):
     df = parse_to_data_frame(data, SurgData)
     df = (
         df.groupby("pacu")
-        .resample("24H", on="PlannedOperationStartInstant")
-        .agg({"PatientDurableKey": "size"})
+        .resample("24H", on="planned_operation_start_instant")
+        .agg({"patient_durable_key": "size"})
     )
     df.reset_index(inplace=True)
     fig = px.bar(
         df,
-        x="PlannedOperationStartInstant",
-        y="PatientDurableKey",
+        x="planned_operation_start_instant",
+        y="patient_durable_key",
         color="pacu",
     )
     return dcc.Graph(id=f"{BPID}fig", figure=fig)
@@ -171,67 +171,47 @@ def gen_table_consults(data: list[dict]):
 
     # dfo["pacu"] = dfo["pacu"].apply(lambda x: "PACU" if x else "")
     dfo["age_sex"] = dfo.apply(
-        lambda row: f"{row['AgeInYears']:.0f}{row['Sex'][:1]} ",
+        lambda row: f"{row['age_in_years']:.0f}{row['sex'][:1]} ",
         axis=1,
     )
 
     def _display_name(row):
-        FirstName = row["FirstName"].title()
-        LastName = row["LastName"].upper()
+        FirstName = row["first_name"].title()
+        LastName = row["last_name"].upper()
         return f"{FirstName} {LastName}"
 
     dfo["name"] = dfo.apply(_display_name, axis="columns")
 
-    dfo["RoomName"] = dfo["RoomName"].fillna("")
-    dfo["RoomName"] = dfo["RoomName"].apply(
+    dfo["room_name"] = dfo["room_name"].fillna("")
+    dfo["room_name"] = dfo["room_name"].apply(
         lambda x: "" if "Not Applicable" in x else x
     )
-    dfo["PrimaryService"] = dfo["PrimaryService"].fillna("")
-    dfo["PrimaryService"] = dfo["PrimaryService"].apply(
+    dfo["primary_service"] = dfo["primary_service"].fillna("")
+    dfo["primary_service"] = dfo["primary_service"].apply(
         lambda x: x.replace("Surgery", "" if x else "")
     )
-    dfo["PrimaryService"] = dfo["PrimaryService"].apply(
+    dfo["primary_service"] = dfo["primary_service"].apply(
         lambda x: SPECIALTY_SHORTNAMES.get(x, x)
     )
     # Sort into unit order / displayed tables will NOT be sortable
     # ------------------------------------------------------------
-    dfo.sort_values(by="SurgeryDate", ascending=True, inplace=True)
+    dfo.sort_values(by="surgery_date", ascending=True, inplace=True)
 
     return [
         dt.DataTable(
             id=f"{BPID}_data_table",
             columns=[
-                # {"id": "SurgeryDate", "name": "Date"},
+                {"id": "surgery_date", "name": "Date"},
                 {"id": "pacu", "name": "pacu"},
-                # {"id": "PrimaryService", "name": "Specialty"},
-                # {"id": "RoomName", "name": "Theatre"},
+                {"id": "primary_service", "name": "Specialty"},
+                {"id": "RoomName", "name": "Theatre"},
                 {"id": "age_sex", "name": ""},
                 {"id": "name", "name": "Full Name"},
-                {"id": "PrimaryMrn", "name": "MRN"},
-                #   {"id": "PatientFriendlyName", "name": "Procedure"},
+                {"id": "primary_mrn", "name": "MRN"},
                 {"id": "preassess_date", "name": "Pre-assess Date"},
                 {"id": "asa", "name": "asa"},
                 {"id": "c_line", "name": "Central line consent"},
                 {"id": "resp", "name": "resp condition count"},
-                {
-                    "id": "cardio",
-                    "name": "cardio",
-                },  # TODO: FIX this does not pull in cardio properly
-                {"id": "haem", "name": "haem"},
-                {"id": "anaesthetic_alert", "name": "anaesthetic_alert"},
-                {"id": "CRP_abnormal_count", "name": "CRP_abnormal_count"},
-                {"id": "INR_last_value", "name": "INR_last_value"},
-                {"id": "NA_max_value", "name": "NA_max_value"},
-                {"id": "PatientDurableKey", "name": "key"},
-                {"id": "EchoPerformed", "name": "EchoPerformed"},
-                {
-                    "id": "EchoAbnormal",
-                    "name": "EchoAbnormal",
-                },  # TODO: FIX this is false when it should not be
-                {"id": "SYS_BP_abnormal_count", "name": "SYS_BP_abnormal_count"},
-                {"id": "DIAS_BP_abnormal_count", "name": "DIAS_BP_abnormal_count"},
-                {"id": "PULSE_measured_count", "name": "PULSE_measured_count"},
-                {"id": "BMI_max_value", "name": "BMI"},
                 {"id": "simple_score", "name": "simple_score"},
             ],
             data=dfo.to_dict("records"),
@@ -273,4 +253,4 @@ def gen_table_consults(data: list[dict]):
 def update_service_dropdown(data: list[dict]):
 
     df = parse_to_data_frame(data, MergedData)
-    return df["PrimaryService"].sort_values().unique()
+    return df["primary_service"].sort_values().unique()

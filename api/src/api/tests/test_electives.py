@@ -24,7 +24,7 @@ client = TestClient(app)
 
 
 def test_get_mock_preassess():
-    response = client.get("/mock/electives/preassessment")
+    response = client.get("/mock/electives/preassessment/")
     assert response.status_code == 200
 
     rows = [PreassessData.parse_obj(row) for row in response.json()]
@@ -32,7 +32,7 @@ def test_get_mock_preassess():
 
 
 def test_get_mock_cases():
-    response = client.get("/mock/electives/case_booking")
+    response = client.get("/mock/electives/case_booking/")
     assert response.status_code == 200
 
     rows = [SurgData.parse_obj(row) for row in response.json()]
@@ -40,7 +40,7 @@ def test_get_mock_cases():
 
 
 def test_get_mock_labs():
-    response = client.get("/mock/electives/labs")
+    response = client.get("/mock/electives/labs/")
     assert response.status_code == 200
 
     elective_rows = [LabData.parse_obj(row) for row in response.json()]
@@ -48,7 +48,7 @@ def test_get_mock_labs():
 
 
 def test_get_mock_electives():
-    response = client.get("/mock/electives")
+    response = client.get("/mock/electives/")
     assert response.status_code == 200
 
     elective_rows = [MergedData.parse_obj(row) for row in response.json()]
@@ -56,7 +56,7 @@ def test_get_mock_electives():
 
 
 def test_mock_echo():
-    response = client.get("/mock/electives/echo")
+    response = client.get("/mock/electives/echo/")
     assert response.status_code == 200
 
     rows = [EchoData.parse_obj(row) for row in response.json()]
@@ -64,7 +64,7 @@ def test_mock_echo():
 
 
 def test_mock_obs():
-    response = client.get("/mock/electives/obs")
+    response = client.get("/mock/electives/obs/")
     assert response.status_code == 200
 
     rows = [ObsData.parse_obj(row) for row in response.json()]
