@@ -43,6 +43,23 @@ services:
     networks:
       - hyui
 
+  varnish:
+    build:
+      dockerfile: docker/cache/Dockerfile
+      args:
+        <<: *build-args-common
+    environment:
+      <<: *proxy-common
+    env_file: .env
+    ports:
+      - "${CACHE_PORT}:6081"
+    command: "-p default_keep=300"
+    depends_on:
+      - api
+      - web
+    networks:
+      - hyui
+
   baserow:
     image: baserow/baserow:1.13.1
     environment:
