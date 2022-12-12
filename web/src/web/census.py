@@ -1,8 +1,16 @@
 import requests
 
-from models.census import CensusDepartment, ClosedBed
+from models.census import CensusDepartment, ClosedBed, CensusRow
 from web.config import get_settings
 from web.convert import to_data_frame
+
+
+def get_census(departments: list[str]) -> list[CensusRow]:
+    """returns census for list of departments"""
+    response = requests.get(
+        f"{get_settings().api_url}/census/", params={"departments": departments}
+    )
+    return [CensusRow.parse_obj(row) for row in response.json()]
 
 
 def _get_closed_beds() -> list[ClosedBed]:

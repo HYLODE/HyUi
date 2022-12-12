@@ -94,3 +94,37 @@ BEDS_KEEP_COLS = [
     # "DischargeReady",
     "closed",  # only exists after merging with bed_bones
 ]
+
+CENSUS_KEEP_COLS = [
+    "location_string",
+    "location_id",
+    "ovl_admission",
+    "ovl_hv_id",
+    "cvl_discharge",
+    "occupied",
+    "ovl_ghost",
+    "mrn",
+    "encounter",
+    "date_of_birth",
+    "lastname",
+    "firstname",
+    "sex",
+    "planned_move",
+    "pm_datetime",
+    "pm_type",
+    "pm_dept",
+    "pm_location_string",
+]
+
+CPR_COLS = {
+    "status_change_datetime": "CPR status timestamp",
+    "name": "CPR status",
+    "encounter": "CSN",
+}
+
+PERRT_CONSULTS_COLS = {
+    # 'consultation_request_id',
+    "status_change_datetime": "Consult status timestamp",
+    "name": "Consult",
+    "encounter": "CSN",
+}

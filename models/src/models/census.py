@@ -1,4 +1,6 @@
 from datetime import date, datetime
+
+# FIXME: using Any to force poor data through pydantic
 from typing import Any
 
 from pydantic import BaseModel
