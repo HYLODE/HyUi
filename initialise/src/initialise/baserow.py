@@ -341,6 +341,34 @@ def _get_group_id(base_url: str, auth_token: str) -> int:
     return cast(int, group_id)
 
 
+def _delete_default_application(base_url: str, auth_token: str, group_id: int):
+    response = requests.get(
+        f"{base_url}/api/applications/group/{group_id}/",
+        headers=_auth_headers(auth_token),
+    )
+    if response.status_code != 200:
+        raise BaserowException(
+            f"unexpected response {response.status_code}: {str(response.content)}"
+        )
+
+    application_id = next(
+        (row["id"] for row in response.json() if row["name"] == "hyui's company"), None
+    )
+
+    if not application_id:
+        return
+
+    logging.info('Deleting the default application "hyui\'s company"')
+    response = requests.delete(
+        f"{base_url}/api/applications/{application_id}/",
+        headers=_auth_headers(auth_token),
+    )
+    if response.status_code != 204:
+        raise BaserowException(
+            f"unexpected response {response.status_code}: {str(response.content)}"
+        )
+
+
 def _create_application(base_url: str, auth_token: str, group_id: int) -> int:
 
     logging.info("Checking to see if application hyui is already created.")
@@ -500,7 +528,11 @@ def initialise_baserow():
 
     _create_admin_user(settings)
     auth_token = _get_admin_user_auth_token(settings)
+
     group_id = _get_group_id(settings.public_url, auth_token)
+
+    _delete_default_application(settings.public_url, auth_token, group_id)
+
     application_id = _create_application(settings.public_url, auth_token, group_id)
 
     # Create the discharge_statuses table.
