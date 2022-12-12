@@ -17,8 +17,12 @@ def _to_camel(member: str) -> str:
 
 
 class CabData(BaseModel):
-    PatientDurableKey: int
+    PatientDurableKey: int  # TODO: FIX camelcase -> snakecase for consistency (?)
     SurgicalCaseKey: int | None
+
+    class Config:
+        alias_generator = _to_camel
+        allow_population_by_field_name = True
 
 
 class CaboodleCaseBooking(BaseModel):
@@ -42,7 +46,6 @@ class CaboodleCaseBooking(BaseModel):
 
     class Config:
         alias_generator = _to_camel
-        # https://stackoverflow.com/a/69434012/992999
         allow_population_by_field_name = True
 
 
@@ -96,13 +99,13 @@ class SurgData(CabData):
     SurgicalCaseUclhKey: int
     FirstName: str
     LastName: str
-    BirthDate: datetime
+    BirthDate: date
     AgeInYears: int
     Sex: str
-    PlacedOnWaitingListDate: datetime | None
-    DecidedToAdmitDate: datetime | None
-    SurgeryDate: datetime
-    CaseRequestDate: datetime
+    PlacedOnWaitingListDate: date | None
+    DecidedToAdmitDate: date | None
+    SurgeryDate: date
+    CaseRequestDate: date
     CaseRequestTimeOfDay: time
     CancelDate: date | None
     PrimaryService: str
@@ -203,8 +206,8 @@ class EchoData(CabData):
     StringValue: str | None
     NumericValue: float | None
     Unit: str | None
-    EchoStartDate: datetime
-    EchoFinalisedDate: datetime
+    EchoStartDate: date
+    EchoFinalisedDate: date
     PlannedOperationStartInstant: datetime
 
 

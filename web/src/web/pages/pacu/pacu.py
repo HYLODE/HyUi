@@ -16,6 +16,6 @@ def layout():
 
 
 main = html.Iframe(
-    src="/assets/odor_dashboard.html",
+    src="/assets/pacu_dashboard.html",
     style={"height": "1000px", "width": "100%"},
 )

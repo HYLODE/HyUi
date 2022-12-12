@@ -1,12 +1,11 @@
 import json
 from pathlib import Path
-from typing import Dict, List
 
 import numpy as np
 import pandas as pd
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
-from sqlalchemy import text, create_engine  # , bindparam
+from sqlalchemy import text, create_engine
 from sqlmodel import Session
 
 from api.db import get_caboodle_session, get_clarity_session
@@ -42,30 +41,21 @@ def _get_json_rows(filename: str):
     return mock_table
 
 
-def _get_sql_rows(table: str, model):
+def _get_mock_sql_rows(table: str, model):
 
     engine = create_engine(f"sqlite:///{Path(__file__).parent}/mock.db", future=True)
-    query = text(f"""SELECT * FROM {table}""")
+    query = text(f"SELECT * FROM {table}")
 
     with engine.connect() as conn:
-        # result = conn.execute(query)
-        #   result_as_json = json.dumps([dict(r) for r in result])
         df_result = pd.read_sql(query, conn)
 
-        columns_with_datetimes = df_result.filter(
-            regex="Date|date|Instant", axis=1
-        ).columns
-        for col in columns_with_datetimes:
-            df_result[col] = pd.to_datetime(df_result[col]).replace({np.nan: None})
-
-    # print(df_result.columns)
     json_result = [model.parse_obj(row) for row in df_result.to_dict(orient="records")]
     return json_result
 
 
 def _parse_query(
-    query_file: str, session: Session, model: BaseModel, params: Dict = {}
-) -> List[BaseModel]:
+    query_file: str, session: Session, model: BaseModel, params: dict
+) -> list[BaseModel]:
     """
     generic function that reads a text query from a file, handles parameters
     within the query and then returns after parsing through a pydantic model
@@ -80,7 +70,7 @@ def _parse_query(
     return [model.parse_obj(row) for row in df.to_dict(orient="records")]
 
 
-@router.get("/case_booking", response_model=list[CaboodleCaseBooking])
+@router.get("/case_booking/", response_model=list[CaboodleCaseBooking])
 def get_caboodle_cases(
     session: Session = Depends(get_caboodle_session), days_ahead: int = 1
 ):
@@ -93,7 +83,7 @@ def get_caboodle_cases(
 
 
 @mock_router.get(
-    "/case_booking", response_model=list[SurgData]
+    "/case_booking/", response_model=list[SurgData]
 )  # response_model=list[CaboodleCaseBooking])
 def get_mock_caboodle_cases():
     """
@@ -101,11 +91,11 @@ def get_mock_caboodle_cases():
     :return:
     """
     # rows = _get_json_rows("mock_case.json")
-    rows = _get_sql_rows("surg", SurgData)
+    rows = _get_mock_sql_rows("surg", SurgData)
     return rows
 
 
-@router.get("/postop_destination", response_model=list[ClarityPostopDestination])
+@router.get("/postop_destination/", response_model=list[ClarityPostopDestination])
 def get_clarity_pod(
     session: Session = Depends(get_clarity_session), days_ahead: int = 1
 ):
@@ -117,7 +107,7 @@ def get_clarity_pod(
     return res
 
 
-@mock_router.get("/postop_destination", response_model=list[ClarityPostopDestination])
+@mock_router.get("/postop_destination/", response_model=list[ClarityPostopDestination])
 def get_mock_clarity_pod():
     """
     returns mock of caboodle query for preassessment
@@ -126,7 +116,7 @@ def get_mock_clarity_pod():
     return rows
 
 
-@router.get("/preassessment", response_model=list[CaboodlePreassessment])
+@router.get("/preassessment/", response_model=list[CaboodlePreassessment])
 def get_caboodle_preassess(
     session: Session = Depends(get_caboodle_session), days_ahead: int = 1
 ):
@@ -139,21 +129,21 @@ def get_caboodle_preassess(
 
 
 @mock_router.get(
-    "/preassessment", response_model=list[PreassessData]
+    "/preassessment/", response_model=list[PreassessData]
 )  # response_model=list[CaboodlePreassessment])
 def get_mock_caboodle_preassess():
     # rows = _get_json_rows("mock_preassess.json")
-    rows = _get_sql_rows("preassess", PreassessData)
+    rows = _get_mock_sql_rows("preassess", PreassessData)
 
     return rows
 
 
 @mock_router.get(
-    "/labs", response_model=list[LabData]
+    "/labs/", response_model=list[LabData]
 )  # response_model=list[CaboodlePreassessment])
 def get_mock_labs():
     # rows = _get_json_rows("mock_preassess.json")
-    rows = _get_sql_rows("labs", LabData)
+    rows = _get_mock_sql_rows("labs", LabData)
 
     return rows
 
@@ -179,15 +169,15 @@ def get_electives(
     return [ElectiveSurgCase.parse_obj(row) for row in df.to_dict(orient="records")]
 
 
-@mock_router.get("/echo", response_model=list[EchoData])
+@mock_router.get("/echo/", response_model=list[EchoData])
 def get_mock_echo():
-    rows = _get_sql_rows("echo", EchoData)
+    rows = _get_mock_sql_rows("echo", EchoData)
     return rows
 
 
-@mock_router.get("/obs", response_model=list[ObsData])
+@mock_router.get("/obs/", response_model=list[ObsData])
 def get_mock_obs():
-    rows = _get_sql_rows("obs", ObsData)
+    rows = _get_mock_sql_rows("obs", ObsData)
     return rows
 
 
@@ -195,17 +185,13 @@ def get_mock_obs():
 def get_mock_electives(
     #   days_ahead: int = 100,
 ):
-    """
-    Returns Electives data class populated by query-live/mock
-    Includes
-    - post op destination info
-    """
-    _case = _get_sql_rows("surg", SurgData)
-    _preassess = _get_sql_rows("preassess", PreassessData)
-    _labs = _get_sql_rows("labs", LabData)
-    _echo = _get_sql_rows("echo", EchoData)
-    _obs = _get_sql_rows("obs", ObsData)
 
-    df = prepare_draft(_case, _preassess, _labs, _echo, _obs)
+    case = _get_mock_sql_rows("surg", SurgData)
+    preassess = _get_mock_sql_rows("preassess", PreassessData)
+    labs = _get_mock_sql_rows("labs", LabData)
+    echo = _get_mock_sql_rows("echo", EchoData)
+    obs = _get_mock_sql_rows("obs", ObsData)
+
+    df = prepare_draft(case, preassess, labs, echo, obs)
     df = df.replace({np.nan: None})
     return [MergedData.parse_obj(row) for row in df.to_dict(orient="records")]

@@ -35,7 +35,7 @@ HIDDEN_PAGES: list[str] = []
 dropdown_more = [
     NavbarDropdown("Additional reports", "", header=True),
     NavbarDropdown("COVID SitRep", "http://uclvlddpragae08:5701/sitrep/T03", False),
-    NavbarDropdown("Pete Odor's PACU dashboard", "/odor/odor", False),
+    NavbarDropdown("PACU dashboard", "/pacu/pacu", False),
 ]
 dropdown_dev = [
     NavbarDropdown("Developer Tools", "", True),

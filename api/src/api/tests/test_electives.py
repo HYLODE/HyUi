@@ -11,10 +11,13 @@ from models.electives import (
     # ClarityPostopDestination,
     # CaboodlePreassessment,
     # ElectiveSurgCase,
-    PreassessData,
+    # ElectiveSurgCase,
     SurgData,
+    PreassessData,
     MergedData,
     LabData,
+    EchoData,
+    ObsData,
 )
 
 client = TestClient(app)
@@ -26,14 +29,6 @@ def test_get_mock_preassess():
 
     rows = [PreassessData.parse_obj(row) for row in response.json()]
     assert len(rows) > 0
-
-
-# def test_get_mock_pod():
-#     response = client.get("/mock/electives/postop_destination")
-#     assert response.status_code == 200
-
-#     rows = [ClarityPostopDestination.parse_obj(row) for row in response.json()]
-#     assert len(rows) > 0
 
 
 def test_get_mock_cases():
@@ -58,3 +53,19 @@ def test_get_mock_electives():
 
     elective_rows = [MergedData.parse_obj(row) for row in response.json()]
     assert len(elective_rows) > 0
+
+
+def test_mock_echo():
+    response = client.get("/mock/electives/echo")
+    assert response.status_code == 200
+
+    rows = [EchoData.parse_obj(row) for row in response.json()]
+    assert len(rows) > 0
+
+
+def test_mock_obs():
+    response = client.get("/mock/electives/obs")
+    assert response.status_code == 200
+
+    rows = [ObsData.parse_obj(row) for row in response.json()]
+    assert len(rows) > 0
