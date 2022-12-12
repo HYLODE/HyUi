@@ -1,6 +1,6 @@
 import requests
 
-from models.census import CensusDepartment, ClosedBed
+from models.census import CensusDepartment, ClosedBed, CensusRow
 from web.config import get_settings
 from web.convert import to_data_frame
 
