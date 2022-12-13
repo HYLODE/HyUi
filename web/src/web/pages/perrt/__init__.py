@@ -129,3 +129,9 @@ PERRT_CONSULTS_COLS = {
     "name": "Consult",
     "encounter": "CSN",
 }
+
+PERRT_VITALS_WIDE = {
+    "encounter": "CSN",
+    "news_scale_1_max": "NEWS1MAX",
+    "news_scale_2_max": "NEWS2MAX",
+}

@@ -2,7 +2,7 @@ from datetime import datetime
 
 import requests
 
-from models.perrt import EmapConsults, EmapCpr
+from models.perrt import EmapConsults, EmapCpr, EmapVitalsWide
 from web.config import get_settings
 
 
@@ -32,3 +32,19 @@ def get_perrt_consults(
         params={"encounter_ids": encounter_ids, "horizon_dt": horizon_dt},
     )
     return [EmapConsults.parse_obj(row) for row in response.json()]
+
+
+def get_perrt_wide(
+    encounter_ids: list[str], horizon_dt: datetime
+) -> list[EmapVitalsWide]:
+    """
+    get news scores
+    :param horizon_dt:
+    :param encounter_ids:
+    :return:
+    """
+    response = requests.get(
+        f"{get_settings().api_url}/perrt/vitals/wide",
+        params={"encounter_ids": encounter_ids, "horizon_dt": horizon_dt},
+    )
+    return [EmapVitalsWide.parse_obj(row) for row in response.json()]

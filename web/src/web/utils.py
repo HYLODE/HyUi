@@ -1,6 +1,27 @@
 """
 Utility functions for web pages
 """
+import numpy as np
+import pandas as pd
+
+
+def time_since(when: pd.Series, units: str = "D") -> pd.Series:
+    """
+    Time since 'when' in units as per np.timedelta64
+    e.g.  (D)ay, (M)onth, (Y)ear, (h)ours, (m)inutes,
+    or (s)econds
+
+    Accepts a pandas series
+    Returns a float in the appropriate units
+    defaults to days
+    """
+    try:
+        res = (pd.Timestamp.now() - when.apply(pd.to_datetime)) / np.timedelta64(
+            1, units
+        )
+    except TypeError:
+        res = np.NaN
+    return res
 
 
 def unpack_nested_baserow_dict(
