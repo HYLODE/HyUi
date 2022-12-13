@@ -104,6 +104,7 @@ CENSUS_KEEP_COLS = [
     "occupied",
     "ovl_ghost",
     "mrn",
+    "hv_admission_dt",
     "encounter",
     "date_of_birth",
     "lastname",

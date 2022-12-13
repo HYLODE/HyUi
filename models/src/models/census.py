@@ -25,6 +25,7 @@ class CensusRow(BaseModel):
     occupied: bool | None
 
     patient_class: str | None
+    hv_admission_dt: datetime | None
 
     mrn: str | None
     encounter: str | None
