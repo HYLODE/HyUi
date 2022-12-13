@@ -19,7 +19,8 @@ def time_since(when: pd.Series, units: str = "D") -> pd.Series:
         res = (pd.Timestamp.now() - when.apply(pd.to_datetime)) / np.timedelta64(
             1, units
         )
-    except TypeError:
+    except TypeError as e:
+        print(e)
         res = np.NaN
     return res
 

@@ -94,6 +94,7 @@ def store_census(n_intervals: int, departments: list[str]):
     df = df.merge(df_vw, how="left", on="encounter", suffixes=(None, "_news"))
 
     df["bed_label"] = df["location_string"].str.split("^", expand=True)[2]
+    # FIXME: 2022-12-13 LoS not displaying live
     df["los"] = time_since(df["hv_admission_dt"], units="D")
     df["age"] = time_since(df["date_of_birth"], units="Y")
     df["name"] = df.apply(

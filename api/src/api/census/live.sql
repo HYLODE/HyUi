@@ -130,7 +130,7 @@ SELECT
 
 	,hv.patient_class
 	,hv.encounter
-    ,hv.hv_admission_dt
+    ,hv.admission_datetime hv_admission_dt
 	,live_mrn.mrn
 	,cd.lastname
 	,cd.firstname
