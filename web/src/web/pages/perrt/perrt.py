@@ -42,8 +42,8 @@ def gen_census_table(data: dict):
             id=f"{BPID}tbl-census",
             columns=[
                 # {"id": "bed_icons", "name": "", "presentation": "markdown"},
-                # {"id": "bed_label", "name": "Bed", "type": "text"},
                 # {"id": "room_label", "name": ""},
+                {"id": "bed_label", "name": "Bed", "type": "text"},
                 # {"id": "age_sex", "name": ""},
                 {
                     "id": "age",
@@ -55,17 +55,29 @@ def gen_census_table(data: dict):
                 {"id": "name", "name": "Full Name"},
                 {"id": "mrn", "name": "MRN", "type": "text"},
                 {"id": "encounter", "name": "CSN", "type": "text"},
-                {"id": "name_cpr", "name": "CPR", "type": "text"},
                 {
-                    "id": "status_change_datetime",
-                    "name": "CPR timestamp",
-                    "type": "datetime",
+                    "id": "los",
+                    "name": "LoS",
+                    "type": "numeric",
+                    "format": Format(precision=0, scheme=Scheme.fixed),
                 },
-                {"id": "name_consults", "name": "Consult", "type": "text"},
+                {"id": "name_cpr", "name": "CPR", "type": "text"},
+                # {
+                #     "id": "status_change_datetime",
+                #     "name": "CPR timestamp",
+                #     "type": "datetime",
+                # },
+                # {"id": "name_consults", "name": "Consult", "type": "text"},
                 {
                     "id": "status_change_datetime_consults",
-                    "name": "Consult " "timestamp",
+                    "name": "Last PERRT",
                     "type": "datetime",
+                },
+                {
+                    "id": "news_max",
+                    "name": "NEWS",
+                    "type": "numeric",
+                    "format": Format(precision=0, scheme=Scheme.fixed),
                 },
             ],
             data=dfo.to_dict("records"),
@@ -87,10 +99,11 @@ def gen_census_table(data: dict):
                     "backgroundColor": "rgb(220, 220, 220)",
                 },
             ],
-            # sort_action="native",
             markdown_options={"html": True},
             persistence=True,
             persisted_props=["data"],
+            filter_action="native",
+            sort_action="native",
         ),
     )
 

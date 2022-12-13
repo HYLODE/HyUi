@@ -1,11 +1,9 @@
-import numpy as np
-import pandas as pd
+import datetime
+
 from dash import Input, Output, callback, dcc
 
-import datetime
-from web.perrt import get_cpr_status, get_perrt_consults
-from models.perrt import EmapCpr, EmapConsults
 from models.census import CensusRow
+from models.perrt import EmapConsults, EmapCpr, EmapVitalsWide
 from web.census import get_census
 from web.convert import to_data_frame
 from web.hospital import departments_by_building
@@ -14,7 +12,10 @@ from web.pages.perrt import (
     CENSUS_KEEP_COLS,
     CPR_COLS,
     PERRT_CONSULTS_COLS,
+    PERRT_VITALS_WIDE,
 )
+from web.perrt import get_cpr_status, get_perrt_consults, get_perrt_wide
+from web.utils import time_since
 
 
 @callback(
@@ -33,8 +34,9 @@ def gen_dept_dropdown(building: str):
     """
 
     departments = departments_by_building(building)
-    # TODO: should remove closed departments from the list defer until cache works since the query is slow
-    default_value = departments
+    # TODO: should remove closed departments from the list defer until cache
+    #  works since the query is slow
+    default_value = [departments[0]]
 
     return dcc.Dropdown(
         id=f"{BPID}dept_dropdown",
@@ -82,15 +84,18 @@ def store_census(n_intervals: int, departments: list[str]):
     df = df.merge(df_pc, how="left", on="encounter", suffixes=(None, "_consults"))
     df.rename(columns={"name": "name_consults"}, inplace=True)
 
-    # TODO: @next 2022-12-12t18:31:37 merge on NEWS
+    # merge on NEWS
+    horizon_dt = datetime.datetime.now() - datetime.timedelta(hours=6)
+    perrt_vitals_wide = get_perrt_wide(encounter_ids, horizon_dt)
+    df_vw = to_data_frame(perrt_vitals_wide, EmapVitalsWide)
+    df_vw = df_vw[PERRT_VITALS_WIDE.keys()]
+    df_vw["news_max"] = df_vw[["news_scale_1_max", "news_scale_2_max"]].max(axis=1)
+    df_vw = df_vw[["encounter", "news_max"]]
+    df = df.merge(df_vw, how="left", on="encounter", suffixes=(None, "_news"))
 
-    # TODO: @next add hospital admission datetime into census model so can
-    #  calc LoS
-
-    # TODO: @resume 2022-12-12t18:30:27 factor out these functions
-    df["age"] = (
-        pd.Timestamp.now() - df["date_of_birth"].apply(pd.to_datetime)
-    ) / np.timedelta64(1, "Y")
+    df["bed_label"] = df["location_string"].str.split("^", expand=True)[2]
+    df["los"] = time_since(df["hv_admission_dt"], units="D")
+    df["age"] = time_since(df["date_of_birth"], units="Y")
     df["name"] = df.apply(
         lambda row: f"{row.lastname.upper()}, {row.firstname.title()}", axis=1
     )
