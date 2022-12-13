@@ -13,12 +13,12 @@ def get_census(departments: list[str]) -> list[CensusRow]:
     return [CensusRow.parse_obj(row) for row in response.json()]
 
 
-def _get_closed_beds() -> list[ClosedBed]:
+def get_closed_beds() -> list[ClosedBed]:
     response = requests.get(f"{get_settings().api_url}/census/beds/closed/")
     return [ClosedBed.parse_obj(row) for row in response.json()]
 
 
-def _get_department_census() -> list[CensusDepartment]:
+def get_department_status() -> list[CensusDepartment]:
     response = requests.get(f"{get_settings().api_url}/census/departments/")
     return [CensusDepartment.parse_obj(row) for row in response.json()]
 
@@ -28,11 +28,11 @@ def fetch_department_census():
     Stores data from census api (i.e. skeleton)
     Also reaches out to bed_bones and pulls in additional closed beds
     """
-    departments = _get_department_census()
+    departments = get_department_status()
     departments_df = to_data_frame(departments, CensusDepartment)
 
     # Now update with closed beds from bed_bones
-    closed_beds = _get_closed_beds()
+    closed_beds = get_closed_beds()
     closed_beds_df = to_data_frame(closed_beds, ClosedBed)
 
     closed = closed_beds_df.groupby("department")["closed"].sum()

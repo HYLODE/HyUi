@@ -1,8 +1,9 @@
+from datetime import datetime
+
 import requests
 
-from models.perrt import EmapCpr, EmapConsults
+from models.perrt import EmapConsults, EmapCpr
 from web.config import get_settings
-from datetime import datetime
 
 
 def get_cpr_status(encounter_ids: list[str]) -> list[EmapCpr]:
@@ -28,6 +29,6 @@ def get_perrt_consults(
     """
     response = requests.get(
         f"{get_settings().api_url}/perrt/consults",
-        params={"encounter_ids": encounter_ids, horizon_dt: horizon_dt},
+        params={"encounter_ids": encounter_ids, "horizon_dt": horizon_dt},
     )
     return [EmapConsults.parse_obj(row) for row in response.json()]

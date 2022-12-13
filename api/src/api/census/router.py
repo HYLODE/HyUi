@@ -44,6 +44,7 @@ def get_closed_beds(settings=Depends(get_settings)):
     return get_rows(baserow_url, token, beds_table_id, params)
 
 
+# FIXME: mock data should reflect bed level nature of response
 @mock_router.get("/beds/closed/", response_model=list[ClosedBed])
 def get_mock_closed_beds():
     data = [
