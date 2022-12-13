@@ -21,7 +21,7 @@ from web.pages.perrt import (
     Output(f"{BPID}dept_dropdown_div", "children"),
     Input(f"{BPID}building_radio", "value"),
 )
-def gen_dept_dropdown(building: str) -> list[str]:
+def gen_dept_dropdown(building: str):
     """
     Dynamically build department picker list
 
@@ -33,7 +33,8 @@ def gen_dept_dropdown(building: str) -> list[str]:
     """
 
     departments = departments_by_building(building)
-    default_value = [departments[0]]
+    # TODO: should remove closed departments from the list defer until cache works since the query is slow
+    default_value = departments
 
     return dcc.Dropdown(
         id=f"{BPID}dept_dropdown",
@@ -70,7 +71,7 @@ def store_census(n_intervals: int, departments: list[str]):
     df.rename(columns={"name": "name_cpr"}, inplace=True)
 
     # perrt consults in the last 7 days
-    horizon_dt = (datetime.datetime.now() - datetime.timedelta(days=7),)
+    horizon_dt = datetime.datetime.now() - datetime.timedelta(days=7)
     perrt_consults = get_perrt_consults(encounter_ids, horizon_dt)
     df_pc = to_data_frame(perrt_consults, EmapConsults)
     df_pc = df_pc[PERRT_CONSULTS_COLS.keys()]

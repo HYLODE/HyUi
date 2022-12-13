@@ -10,7 +10,7 @@ from web.convert import to_data_frame
 #     return [Bed.parse_obj(row) for row in response.json()]
 
 
-def _get_department_census() -> list[CensusDepartment]:
+def get_department_status() -> list[CensusDepartment]:
     response = requests.get(f"{get_settings().api_url}/census/departments/")
     return [CensusDepartment.parse_obj(row) for row in response.json()]
 
@@ -20,7 +20,7 @@ def fetch_department_census():
     Stores data from census api (i.e. skeleton)
     Also reaches out to beds and pulls in additional closed beds
     """
-    departments = _get_department_census()
+    departments = get_department_status()
     departments_df = to_data_frame(departments, CensusDepartment)
 
     # TODO: rebuild to capture the beds reported to be closed in baserow
