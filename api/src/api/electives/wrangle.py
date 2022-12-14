@@ -596,7 +596,7 @@ def j_wrangle_echo(df: pd.DataFrame) -> pd.DataFrame:
         "PH_string_value",
     ].apply(lambda x: [float(i) for i in x])
 
-    def get_first_above_8(list_of_nos: list[float]) -> float | np.nan:
+    def get_first_above_8(list_of_nos: list[float]) -> float:
         item = next((x for x in list_of_nos if ((x > 8) & (x < 80))), np.nan)
         return item
 
