@@ -7,35 +7,35 @@ from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
-from api.config import get_settings
+from api.config import get_settings, Settings
 
 
 @lru_cache()
-def _caboodle_engine(settings=Depends(get_settings)) -> Engine:
+def _caboodle_engine(settings: Settings = Depends(get_settings)) -> Engine:
     return create_engine(settings.caboodle_dsn, echo=settings.echo_sql, future=True)
 
 
-def get_caboodle_session(engine=Depends(_caboodle_engine)) -> Session:
+def get_caboodle_session(engine: Engine = Depends(_caboodle_engine)) -> Session:
     with Session(engine) as session:
         yield session
 
 
 @lru_cache()
-def _star_engine(settings=Depends(get_settings)) -> Engine:
+def _star_engine(settings: Settings = Depends(get_settings)) -> Engine:
     return create_engine(settings.star_dsn, echo=settings.echo_sql, future=True)
 
 
-def get_star_session(engine=Depends(_star_engine)) -> Session:
+def get_star_session(engine: Engine = Depends(_star_engine)) -> Session:
     with Session(engine) as session:
         yield session
 
 
 @lru_cache()
-def _clarity_engine(settings=Depends(get_settings)) -> Engine:
+def _clarity_engine(settings: Settings = Depends(get_settings)) -> Engine:
     return create_engine(settings.clarity_dsn, echo=settings.echo_sql, future=True)
 
 
-def get_clarity_session(engine=Depends(_clarity_engine)) -> Session:
+def get_clarity_session(engine: Engine = Depends(_clarity_engine)) -> Session:
     with Session(engine) as session:
         yield session
 
