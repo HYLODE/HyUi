@@ -12,7 +12,7 @@ mock_router = APIRouter(
 
 
 @mock_router.get("/beds/")
-def get_beds() -> dict[str, Any]:
+def get_mock_beds() -> dict[str, Any]:
     return {
         "count": 1,
         "next": None,
