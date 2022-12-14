@@ -252,13 +252,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <ul>
   <li><a href="#deployment" id="toc-deployment" class="nav-link active" data-scroll-target="#deployment">Deployment</a>
   <ul class="collapse">
-  <li><a href="#deployment-1" id="toc-deployment-1" class="nav-link" data-scroll-target="#deployment-1">Deployment</a>
-  <ul class="collapse">
   <li><a href="#setup-environment" id="toc-setup-environment" class="nav-link" data-scroll-target="#setup-environment">Setup environment</a></li>
-  <li><a href="#build-the-docker-compose-services." id="toc-build-the-docker-compose-services." class="nav-link" data-scroll-target="#build-the-docker-compose-services.">Build the Docker Compose services.</a></li>
   <li><a href="#run-the-docker-compose-services" id="toc-run-the-docker-compose-services" class="nav-link" data-scroll-target="#run-the-docker-compose-services">Run the Docker Compose services</a></li>
+  <li><a href="#initialise-services" id="toc-initialise-services" class="nav-link" data-scroll-target="#initialise-services">Initialise services</a></li>
   <li><a href="#stop-and-remove-docker-containers" id="toc-stop-and-remove-docker-containers" class="nav-link" data-scroll-target="#stop-and-remove-docker-containers">Stop And Remove Docker Containers</a></li>
-  </ul></li>
   </ul></li>
   </ul>
 <div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hylode/hyui/edit/main/hyui/developer/deployment.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/hylode/hyui/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
@@ -270,33 +267,30 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <section id="deployment" class="level1">
 <h1>Deployment</h1>
-<ul>
-<li></li>
-<li>Configure your <code>.env</code> variables using <code>.env.example</code> as a template.</li>
-<li>Stand up with Docker Compose. <code>docker compose --project-name [project name] up --build</code>. Ensure that you use a project name that does not conflict with others. Our production project name is <code>hyui-prod</code>.</li>
-</ul>
-<section id="deployment-1" class="level2">
-<h2 class="anchored" data-anchor-id="deployment-1">Deployment</h2>
 <section id="setup-environment" class="level3">
 <h3 class="anchored" data-anchor-id="setup-environment">Setup environment</h3>
-<p>Clone the repository on an NHS server <code>git clone https://github.com/HYLODE/HyUi.git</code> and configure your <code>.env</code> variables using <code>.env.example</code> as a template.</p>
-</section>
-<section id="build-the-docker-compose-services." class="level3">
-<h3 class="anchored" data-anchor-id="build-the-docker-compose-services.">Build the Docker Compose services.</h3>
-<p>In the <code>code</code> directory:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> compose <span class="at">--project-name</span> [project name] build</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>Clone the repository on an NHS server <code>git clone https://github.com/HYLODE/HyUi.git</code>.</li>
+<li>Configure your <code>.env</code> variables using <code>.env.example</code> as a template.</li>
+<li>Configure <code>docker/initialise/.env</code> variables using <code>docker/initialise/.env.example.</code></li>
+</ul>
 </section>
 <section id="run-the-docker-compose-services" class="level3">
 <h3 class="anchored" data-anchor-id="run-the-docker-compose-services">Run the Docker Compose services</h3>
 <p>In the <code>code</code> directory:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> compose <span class="at">--project-name</span> [project name] up</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> compose <span class="at">--project-name</span> [project name] up <span class="at">--build</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Ensure that you use a unique name for your <code>[project name]</code>. The production service should be named <code>hyui-prod</code>.</p>
+</section>
+<section id="initialise-services" class="level3">
+<h3 class="anchored" data-anchor-id="initialise-services">Initialise services</h3>
+<p>This should be done the first time you stand up the services. It populates the Baserow database with the tables and static data required to run the rest of the HyUi services.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./bin/initialise.sh</span> <span class="at">--operation</span> baserow</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="stop-and-remove-docker-containers" class="level3">
 <h3 class="anchored" data-anchor-id="stop-and-remove-docker-containers">Stop And Remove Docker Containers</h3>
 <div class="sourceCode" id="cb3"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> compose <span class="at">--project-name</span> [project name] down</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 
-</section>
 </section>
 </section>
 

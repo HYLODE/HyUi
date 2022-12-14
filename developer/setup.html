@@ -269,6 +269,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <li><a href="#running-the-servers-manually-when-developing" id="toc-running-the-servers-manually-when-developing" class="nav-link" data-scroll-target="#running-the-servers-manually-when-developing">Running The Servers Manually When Developing</a></li>
   <li><a href="#tips-and-tricks" id="toc-tips-and-tricks" class="nav-link" data-scroll-target="#tips-and-tricks">Tips And Tricks</a></li>
   </ul></li>
+  <li><a href="#initialisation" id="toc-initialisation" class="nav-link" data-scroll-target="#initialisation">Initialisation</a></li>
   </ul></li>
   </ul>
 <div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hylode/hyui/edit/main/hyui/developer/setup.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/hylode/hyui/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
@@ -364,10 +365,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <section id="debugging-on-your-local-machine" class="level4">
 <h4 class="anchored" data-anchor-id="debugging-on-your-local-machine">Debugging On Your Local Machine</h4>
 <p>If you are using PyCharm or another IDE then ensure that the environment variables in <code>.env</code> are loaded. PyCharm has a plugin that can load these when unit testing with <code>pytest</code> or running the main application.</p>
-
-
 </section>
 </section>
+</section>
+<section id="initialisation" class="level2">
+<h2 class="anchored" data-anchor-id="initialisation">Initialisation</h2>
+<p>Currently only Baserow needs to be initialised by creating an admin user and setting up the tables required for the rest of the app to function correct. The <code>initialise</code> python package contains the code that does all this.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pyenv</span> virtualenv 3.11.0 hyui-initialise</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pyenv</span> activate hyui-initialise</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="at">-e</span> <span class="st">"initialise"</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> initialise.main</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+
 </section>
 </section>
 
