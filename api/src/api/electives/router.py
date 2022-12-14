@@ -41,16 +41,14 @@ def _get_json_rows(filename: str):
     return mock_table
 
 
-def _get_mock_sql_rows(table: str, model):
+def _get_mock_sql_rows(table: str, model: type[BaseModel]) -> list[type[BaseModel]]:
 
     engine = create_engine(f"sqlite:///{Path(__file__).parent}/mock.db", future=True)
-    query = text(f"SELECT * FROM {table}")
 
-    with engine.connect() as conn:
-        df_result = pd.read_sql(query, conn)
-
-    json_result = [model.parse_obj(row) for row in df_result.to_dict(orient="records")]
-    return json_result
+    with Session(engine) as session:
+        query = text(f"SELECT * FROM {table}")
+        result = session.execute(query)
+        return [model.parse_obj(row) for row in result]
 
 
 def _parse_query(

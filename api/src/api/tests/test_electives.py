@@ -1,17 +1,7 @@
-# from datetime import date, datetime
-
-# from api.convert import to_data_frame
-
-# from api.electives.wrangle import prepare_draft  # prepare_electives
 from api.main import app
 from fastapi.testclient import TestClient
 
 from models.electives import (
-    # CaboodleCaseBooking,
-    # ClarityPostopDestination,
-    # CaboodlePreassessment,
-    # ElectiveSurgCase,
-    # ElectiveSurgCase,
     SurgData,
     PreassessData,
     MergedData,
