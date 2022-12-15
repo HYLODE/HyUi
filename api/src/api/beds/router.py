@@ -1,5 +1,7 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
+from api.baserow import get_fields, get_rows
+from api.config import get_settings
 from models.beds import Bed
 
 router = APIRouter(
@@ -12,7 +14,7 @@ mock_router = APIRouter(
 
 
 @mock_router.get("/", response_model=list[Bed])
-def get_mock_beds(ward: str) -> list[Bed]:
+def get_mock_beds(department: str) -> list[Bed]:
     return [
         Bed(location_string="LOC1", room="ROOM1", bed="BED1", closed=False, covid=True),
         Bed(location_string="LOC1", room="ROOM1", bed="BED2", closed=True, covid=False),
@@ -20,31 +22,20 @@ def get_mock_beds(ward: str) -> list[Bed]:
 
 
 @router.get("/", response_model=list[Bed])
-def get_beds(ward: str) -> list[Bed]:
-    pass
+def get_beds(department: str, settings=Depends(get_settings)) -> list[Bed]:
 
-    # API_URL = f"{BASEROW_API_URL}/database/rows/table/261/"
-    #
-    # try:
-    #     response = requests.get(
-    #         url=API_URL,
-    #         params={
-    #             "user_field_names": "true",
-    #             "filter__field_2051__equal": ward_radio_value,
-    #             "include": (
-    #                 "location_id,location_string,closed,unit_order,"
-    #                 "DepartmentName,room,bed,bed_physical,"
-    #                 "bed_functional,covid,LocationName"
-    #             ),
-    #             "include": (
-    #                 "location_id,location_string,closed,unit_order,"
-    #                 "DepartmentName,room,bed,bed_physical,"
-    #                 "bed_functional,covid,LocationName"
-    #             ),
-    #         },
-    #         headers={
-    #             "Authorization": f"Token {settings.BASEROW_READWRITE_TOKEN}",
-    #         },
-    #     )
-    # except requests.exceptions.RequestException:
-    #     warnings.warn("HTTP Request failed")
+    baserow_url = settings.baserow_url
+    token = settings.baserow_read_write_token
+
+    field_ids = get_fields(baserow_url, token, "hyui", "beds")
+
+    department_field_id = field_ids["department"]
+
+    params = {
+        "size": 200,  # The maximum size of a page.
+        "user_field_names": "true",
+        f"filter__field_{department_field_id}__equal": department,
+    }
+
+    rows = get_rows(baserow_url, token, "hyui", "beds", params)
+    return [Bed.parse_obj(row) for row in rows]

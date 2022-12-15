@@ -20,11 +20,11 @@ from web.convert import parse_to_data_frame
 register_page(__name__)
 
 
-ward_radio_button = html.Div(
+department_radio_button = html.Div(
     [
         html.Div(
             [
-                ward_radio := dbc.RadioItems(
+                department_radio := dbc.RadioItems(
                     className="dbc d-grid d-md-flex justify-content-md-end btn-group",
                     inputClassName="btn-check",
                     labelClassName="btn btn-outline-primary",
@@ -58,7 +58,7 @@ card_table = dbc.Card(
 
 layout = html.Div(
     [
-        ward_radio_button,
+        department_radio_button,
         card_table,
     ],
 )
@@ -66,9 +66,9 @@ layout = html.Div(
 
 @callback(
     Output(bed_table, "children"),
-    Input(ward_radio, "value"),
+    Input(department_radio, "value"),
 )
-def gen_bed_table(ward: str):
+def gen_bed_table(department: str):
 
     columns = OrderedDict(
         {
@@ -80,7 +80,9 @@ def gen_bed_table(ward: str):
         }
     )
 
-    response = requests.get(f"{get_settings().api_url}/beds/", params={"ward": ward})
+    response = requests.get(
+        f"{get_settings().api_url}/beds/", params={"department": department}
+    )
 
     df = parse_to_data_frame(response.json(), Bed)
     df = df[columns.keys()]
