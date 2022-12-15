@@ -2,23 +2,22 @@
 sub-application for Beds
 use the base row API to create a skeleton bed table for any ward
 """
-import collections
 from collections import OrderedDict
 
 import dash_bootstrap_components as dbc
-import pandas as pd
+
 import requests
 
 from dash import Input, Output, callback
 from dash import dash_table as dt
 from dash import html, register_page
-from dash.dash_table.Format import Format, Scheme
 
 from web.config import get_settings
 
-register_page(__name__)
+from models.beds import Bed
+from web.convert import parse_to_data_frame
 
-BPID = "BEDS_"
+register_page(__name__)
 
 
 ward_radio_button = html.Div(
@@ -65,85 +64,34 @@ layout = html.Div(
 )
 
 
-def deep_update(source, overrides):
-    """
-    Update a nested dictionary or similar mapping.
-    Modify ``source`` in place.
-    via https://stackoverflow.com/a/30655448/992999
-    """
-    for key, value in overrides.items():
-        if isinstance(value, collections.abc.Mapping) and value:
-            # note recursive
-            returned = deep_update(source.get(key, {}), value)
-            source[key] = returned
-        else:
-            source[key] = overrides[key]
-    return source
-
-
-def get_dict_from_list(llist, kkey, vval):
-    """
-    Given a list of dictionaries, and a key:value pair, will return the matching
-    dictionary
-    """
-    matches = 0
-    for ddict in llist:
-        if ddict[kkey] == vval:
-            res = ddict
-            matches += 1
-    if matches == 0:
-        return {}
-    elif matches == 1:
-        return res
-    else:
-        raise ValueError(f"{matches} matches for {kkey}={vval}; expected only 1")
-
-
 @callback(
     Output(bed_table, "children"),
     Input(ward_radio, "value"),
 )
 def gen_bed_table(ward: str):
-    data = requests.get(f"{get_settings().api_url}/beds/", params={ward: ward}).json()[
-        "results"
-    ]
 
-    df = pd.DataFrame.from_records(data)
-    COLS = OrderedDict(
+    columns = OrderedDict(
         {
-            "unit_order": "Unit Order",
-            # "location_id": "Location ID",
-            "location_string": "Location string",
-            # "DepartmentName": "Ward",
+            "location_string": "Location String",
             "room": "Room",
             "bed": "Bed",
             "closed": "Closed",
             "covid": "COVID",
         }
     )
-    df = df[COLS.keys()]
-    df["unit_order"] = df["unit_order"].astype(int, errors="ignore")
+
+    response = requests.get(f"{get_settings().api_url}/beds/", params={"ward": ward})
+
+    df = parse_to_data_frame(response.json(), Bed)
+    df = df[columns.keys()]
     df["closed"] = df["closed"].astype(str)
     df["covid"] = df["covid"].astype(str)
 
-    # Prep columns with ids and names
-    COL_DICT = [{"name": v, "id": k} for k, v in COLS.items() if k in COLS]
-
-    deep_update(
-        get_dict_from_list(COL_DICT, "id", "unit_order"),
-        dict(type="numeric"),
-    )
-    deep_update(
-        get_dict_from_list(COL_DICT, "id", "unit_order"),
-        dict(format=Format(precision=0, scheme=Scheme.fixed)),
-    )
-
     return [
         dt.DataTable(
-            columns=COL_DICT,
+            columns=[{"name": v, "id": k} for k, v in columns.items() if k in columns],
             data=df.to_dict("records"),
             sort_action="native",
-            sort_by=[{"column_id": "unit_order", "direction": "asc"}],
             style_cell={
                 "font-family": "sans-serif",
                 "padding": "2px",
