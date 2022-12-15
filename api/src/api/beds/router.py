@@ -16,8 +16,8 @@ mock_router = APIRouter(
 @mock_router.get("/", response_model=list[Bed])
 def get_mock_beds(department: str) -> list[Bed]:
     return [
-        Bed(location_string="LOC1", room="ROOM1", bed="BED1", closed=False, covid=True),
-        Bed(location_string="LOC1", room="ROOM1", bed="BED2", closed=True, covid=False),
+        Bed(location_string="LOC1", room="ROOM1", closed=False, covid=True),
+        Bed(location_string="LOC1", room="ROOM1", closed=True, covid=False),
     ]
 
 
