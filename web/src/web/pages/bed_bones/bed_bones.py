@@ -11,17 +11,14 @@ import requests
 
 from dash import Input, Output, callback
 from dash import dash_table as dt
-from dash import dcc, html, register_page
+from dash import html, register_page
 from dash.dash_table.Format import Format, Scheme
 
 from web.config import get_settings
 
 register_page(__name__)
+
 BPID = "BONES_"
-
-
-# Caboodle data so refresh only needs to happen first thing
-REFRESH_INTERVAL = 1 * 60 * 60 * 1000  # milliseconds
 
 
 ward_radio_button = html.Div(
@@ -50,7 +47,7 @@ ward_radio_button = html.Div(
 
 card_table = dbc.Card(
     [
-        dbc.CardHeader(html.H5("Bed Bones demo")),
+        dbc.CardHeader(html.H5("Beds Demo")),
         dbc.CardBody(
             [
                 bed_table := html.Div(),
@@ -60,19 +57,10 @@ card_table = dbc.Card(
 )
 
 
-dash_only = html.Div(
-    [
-        query_interval := dcc.Interval(interval=REFRESH_INTERVAL, n_intervals=0),
-        request_data := dcc.Store(id=f"{BPID}request_data"),
-    ]
-)
-
-
 layout = html.Div(
     [
         ward_radio_button,
         card_table,
-        dash_only,
     ],
 )
 
@@ -112,60 +100,13 @@ def get_dict_from_list(llist, kkey, vval):
 
 
 @callback(
-    Output(request_data, "data"),
-    Input(query_interval, "n_intervals"),
+    Output(bed_table, "children"),
     Input(ward_radio, "value"),
 )
-def store_data(n_intervals: int, ward_radio_value: str):
-    """
-    Read data from API then store as JSON
-    """
-
-    return requests.get(f"{get_settings().api_url}/bedbones/beds").json()["results"]
-
-    # Get Rows
-    # API_URL = f"{BASEROW_API_URL}/database/rows/table/261/"
-    #
-    # try:
-    #     response = requests.get(
-    #         url=API_URL,
-    #         params={
-    #             "user_field_names": "true",
-    #             "filter__field_2051__equal": ward_radio_value,
-    #             "include": (
-    #                 "location_id,location_string,closed,unit_order,"
-    #                 "DepartmentName,room,bed,bed_physical,"
-    #                 "bed_functional,covid,LocationName"
-    #             ),
-    #             "include": (
-    #                 "location_id,location_string,closed,unit_order,"
-    #                 "DepartmentName,room,bed,bed_physical,"
-    #                 "bed_functional,covid,LocationName"
-    #             ),
-    #         },
-    #         headers={
-    #             "Authorization": f"Token {settings.BASEROW_READWRITE_TOKEN}",
-    #         },
-    #     )
-    # except requests.exceptions.RequestException:
-    #     warnings.warn("HTTP Request failed")
-
-    # content = response.json()
-
-    # requests.get(API_URL)
-    #
-    # if not content["count"]:
-    #     warnings.warn(f"No data found at URL {API_URL}")
-    # data = content["results"]
-    # return data
-
-
-@callback(
-    Output(bed_table, "children"),
-    Input(request_data, "data"),
-    prevent_initial_call=True,
-)
-def gen_bed_table(data: dict):
+def gen_bed_table(ward: str):
+    data = requests.get(
+        f"{get_settings().api_url}/bedbones/beds", params={ward: ward}
+    ).json()["results"]
 
     df = pd.DataFrame.from_records(data)
     COLS = OrderedDict(
