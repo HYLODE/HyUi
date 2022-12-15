@@ -74,7 +74,6 @@ def gen_bed_table(department: str):
         {
             "location_string": "Location String",
             "room": "Room",
-            "bed": "Bed",
             "closed": "Closed",
             "covid": "COVID",
         }
