@@ -71,5 +71,5 @@ app.include_router(mock_router)
 
 
 @app.get("/ping")
-async def pong():
+async def pong() -> dict[str, str]:
     return {"ping": "hyui pong!"}

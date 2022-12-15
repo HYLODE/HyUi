@@ -6,18 +6,18 @@ from api.census.wrangle import aggregate_by_department
 from api.main import app
 from fastapi.testclient import TestClient
 
-from models.census import CensusDepartment, CensusRow, ClosedBed
+from models.census import CensusDepartment, CensusRow
 
 client = TestClient(app)
 
 
-def test_fetch_mock_census():
-    census_rows = fetch_mock_census(wards.ALL, [])
+def test_fetch_mock_census() -> None:
+    census_rows = fetch_mock_census(list(wards.ALL), [])
     assert len(census_rows) > 0
 
 
-def test_aggregate_by_department():
-    census_rows = fetch_mock_census(wards.ALL, [])
+def test_aggregate_by_department() -> None:
+    census_rows = fetch_mock_census(list(wards.ALL), [])
 
     census_df = pd.DataFrame((row.dict() for row in census_rows))
     aggregated_df = aggregate_by_department(census_df)
@@ -25,7 +25,7 @@ def test_aggregate_by_department():
     assert len(aggregated_df.index) > 0
 
 
-def test_get_mock_departments():
+def test_get_mock_departments() -> None:
     response = client.get("/mock/census/departments")
     assert response.status_code == 200
 
@@ -33,7 +33,7 @@ def test_get_mock_departments():
     assert len(census_departments) > 0
 
 
-def test_get_mock_census():
+def test_get_mock_census() -> None:
     response = client.get(
         "/mock/census/", params={"departments": "UCH T03 INTENSIVE CARE"}
     )
@@ -41,11 +41,3 @@ def test_get_mock_census():
 
     census_rows = [CensusRow.parse_obj(row) for row in response.json()]
     assert len(census_rows) > 0
-
-
-def test_get_mock_beds_closed():
-    response = client.get("/mock/census/beds/closed/")
-    assert response.status_code == 200
-
-    closed_beds_rows = [ClosedBed.parse_obj(row) for row in response.json()]
-    assert len(closed_beds_rows) > 0
