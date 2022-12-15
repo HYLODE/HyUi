@@ -43,7 +43,7 @@ services:
     networks:
       - hyui
 
-  varnish:
+  cache:
     build:
       dockerfile: docker/cache/Dockerfile
       args:

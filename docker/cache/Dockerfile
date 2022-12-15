@@ -1,4 +1,4 @@
-FROM varnish:stable
+FROM varnish:7.2.1
 
 SHELL ["/bin/bash", "-o", "pipefail", "-e", "-u", "-x", "-c"]
 
