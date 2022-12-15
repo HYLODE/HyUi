@@ -3,15 +3,15 @@ from typing import Any
 from fastapi import APIRouter
 
 router = APIRouter(
-    prefix="/bedbones",
+    prefix="/beds",
 )
 
 mock_router = APIRouter(
-    prefix="/bedbones",
+    prefix="/beds",
 )
 
 
-@mock_router.get("/beds/")
+@mock_router.get("/")
 def get_mock_beds() -> dict[str, Any]:
     return {
         "count": 1,

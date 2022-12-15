@@ -551,6 +551,6 @@ def initialise_baserow():
     # Create the beds table.
     beds_rows = _fetch_beds()
     beds_table_id = _create_table(
-        settings.public_url, auth_token, application_id, "bed_bones", beds_rows
+        settings.public_url, auth_token, application_id, "beds", beds_rows
     )
     _add_beds_fields(settings.public_url, auth_token, beds_table_id)

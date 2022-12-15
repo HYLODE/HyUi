@@ -1,5 +1,5 @@
 """
-sub-application for Bed Bones
+sub-application for Beds
 use the base row API to create a skeleton bed table for any ward
 """
 import collections
@@ -18,7 +18,7 @@ from web.config import get_settings
 
 register_page(__name__)
 
-BPID = "BONES_"
+BPID = "BEDS_"
 
 
 ward_radio_button = html.Div(
@@ -104,9 +104,9 @@ def get_dict_from_list(llist, kkey, vval):
     Input(ward_radio, "value"),
 )
 def gen_bed_table(ward: str):
-    data = requests.get(
-        f"{get_settings().api_url}/bedbones/beds", params={ward: ward}
-    ).json()["results"]
+    data = requests.get(f"{get_settings().api_url}/beds/", params={ward: ward}).json()[
+        "results"
+    ]
 
     df = pd.DataFrame.from_records(data)
     COLS = OrderedDict(
