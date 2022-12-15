@@ -4,6 +4,8 @@ SHELL ["/bin/bash", "-o", "pipefail", "-e", "-u", "-x", "-c"]
 
 ARG HYLODE_UID
 
+USER root
+
 RUN export DEBIAN_FRONTEND=noninteractive && \
     export ACCEPT_EULA=Y && \
     apt-get update && \
