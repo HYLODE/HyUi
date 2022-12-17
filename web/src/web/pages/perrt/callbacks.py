@@ -69,6 +69,10 @@ def store_census(n_intervals: int, departments: list[str]):
     cpr = get_cpr_status(encounter_ids)
     df_cpr = to_data_frame(cpr, EmapCpr)
     df_cpr = df_cpr[CPR_COLS.keys()]
+    # return just the most recent CPR status per encounter
+    df_cpr = df_cpr.sort_values(
+        ["encounter", "status_change_datetime"], ascending=False
+    ).drop_duplicates("encounter")
     df = df.merge(df_cpr, how="left", on="encounter", suffixes=(None, "_cpr"))
     df.rename(columns={"name": "name_cpr"}, inplace=True)
 
