@@ -1,4 +1,6 @@
 from fastapi import APIRouter, Depends
+from pathlib import Path
+import json
 
 from api.baserow import get_fields, get_rows
 from api.config import get_settings, Settings
@@ -15,10 +17,12 @@ mock_router = APIRouter(
 
 @mock_router.get("/", response_model=list[Bed])
 def get_mock_beds(department: str) -> list[Bed]:
-    return [
-        Bed(location_string="LOC1", room="ROOM1", closed=False, covid=True),
-        Bed(location_string="LOC1", room="ROOM1", closed=True, covid=False),
-    ]
+    # FIXME: dependency between initialise and api modules
+    with open(
+        Path.cwd() / "initialise" / "src" / "initialise" / "bed_defaults.json", "r"
+    ) as f:
+        rows = json.load(f)
+    return [Bed.parse_obj(row).dict() for row in rows]
 
 
 @router.get("/", response_model=list[Bed])

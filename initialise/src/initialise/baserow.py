@@ -1,6 +1,7 @@
 import json
 import logging
 from typing import cast
+from pathlib import Path
 
 import pandas as pd
 import requests
@@ -247,10 +248,26 @@ def _merge_star_and_caboodle_beds(
     )
 
 
+def _merge_default_properties(beds_df: pd.DataFrame) -> pd.DataFrame:
+    """
+    appends default properties to beds
+    e.g. map positions, closed status etc.
+    """
+    with open(Path(__file__).parent / "bed_defaults.json", "r") as f:
+        defaults_df = pd.read_json(f, orient="records")
+    df = beds_df.merge(
+        defaults_df, how="left", left_on="location_string", right_on="location_string"
+    )
+    return df
+
+
 def _fetch_beds() -> list[list[str]]:
     star_locations_df = _star_locations()
     caboodle_departments_df = _caboodle_departments()
     beds_df = _merge_star_and_caboodle_beds(star_locations_df, caboodle_departments_df)
+    beds_df = _merge_default_properties(beds_df)
+    # JSON does not handle 'NaN' etc  https://stackoverflow.com/a/41213102/992999
+    beds_df = beds_df.fillna("")
 
     rows = [beds_df.columns.tolist()]
     rows.extend(beds_df.values.tolist())
@@ -483,8 +500,8 @@ def _add_table_field(
 
 
 def _add_beds_fields(base_url: str, auth_token: str, beds_table_id: int):
-    _add_table_field(base_url, auth_token, beds_table_id, "closed", "boolean", [])
-    _add_table_field(base_url, auth_token, beds_table_id, "covid", "boolean", [])
+    # _add_table_field(base_url, auth_token, beds_table_id, "closed", "boolean", [])
+    # _add_table_field(base_url, auth_token, beds_table_id, "covid", "boolean", [])
     _add_table_field(
         base_url,
         auth_token,
