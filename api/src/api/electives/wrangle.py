@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
-from api.convert import parse_to_data_frame
+from pydantic import BaseModel
+
+from api.convert import to_data_frame
 
 from models.electives import (
     CaboodleCaseBooking,
@@ -98,9 +100,9 @@ def process_join_preassess_data(
 
 
 def prepare_electives(
-    electives: list[dict],
-    pod: list[dict],
-    preassess: list[dict],
+    electives: list[type[BaseModel]],
+    pod: list[type[BaseModel]],
+    preassess: list[type[BaseModel]],
 ) -> pd.DataFrame:
     """
     Prepare elective case list
@@ -111,10 +113,10 @@ def prepare_electives(
 
     :returns:   merged dataframe
     """
-    electives_df = parse_to_data_frame(electives, CaboodleCaseBooking)
+    electives_df = to_data_frame(electives, CaboodleCaseBooking)
     # electives_df = parse_to_data_frame(electives, SurgData)
-    preassess_df = parse_to_data_frame(preassess, CaboodlePreassessment)
-    pod_df = parse_to_data_frame(pod, ClarityPostopDestination)
+    preassess_df = to_data_frame(preassess, CaboodlePreassessment)
+    pod_df = to_data_frame(pod, ClarityPostopDestination)
 
     # join caboodle case booking to preassess case
     dfca = process_join_preassess_data(electives_df, preassess_df)
@@ -142,13 +144,13 @@ def prepare_electives(
     return df
 
 
-def make_utc(df):
+def make_utc(df: pd.DataFrame) -> pd.DataFrame:
     for i in df.loc[:, df.columns.str.endswith("instant")]:
         df.loc[:, i + "_utc"] = pd.to_datetime(df[i], utc=True)
     return df
 
 
-def wrangle_surgical(df):
+def wrangle_surgical(df: pd.DataFrame) -> pd.DataFrame:
     terms_dict = {
         "priority": {
             "Two Week Wait": "Cancer Pathway",
@@ -207,7 +209,7 @@ def wrangle_surgical(df):
     return df
 
 
-def wrangle_preassess(df):
+def wrangle_preassess(df: pd.DataFrame) -> pd.DataFrame:
     categories = {
         "cardio": "PROBLEMS - CARDIOVASCULAR|EXERCISE L|CARDIAC|HEART|CHEST PAIN",
         "resp": "RESPIRATORY|COPD|BRONCHIECT",
@@ -357,7 +359,9 @@ def wrangle_preassess(df):
     return all_notes
 
 
-def merge_surg_preassess(surg_data, preassess_data):
+def merge_surg_preassess(
+    surg_data: pd.DataFrame, preassess_data: pd.DataFrame
+) -> pd.DataFrame:
     data_surg = wrangle_surgical(surg_data)
 
     data_preassess = wrangle_preassess(preassess_data)
@@ -375,7 +379,7 @@ def merge_surg_preassess(surg_data, preassess_data):
     return merged_df
 
 
-def wrangle_labs(df):
+def wrangle_labs(df: pd.DataFrame) -> pd.DataFrame:
     # this takes some particular lab results from 4 months prior to the operation.
 
     labs_limits = {
@@ -442,8 +446,8 @@ def wrangle_labs(df):
     return final_df
 
 
-def simple_sum(df):
-    surg_columns = []
+def simple_sum(df: pd.DataFrame) -> pd.DataFrame:
+    surg_columns: list[str] = []
     preassess_columns = [
         # "cardio",
         "resp",
@@ -477,7 +481,7 @@ def simple_sum(df):
     return df
 
 
-def j_wrangle_echo(df):
+def j_wrangle_echo(df: pd.DataFrame) -> pd.DataFrame:
     df["finding"] = df["finding_type"] + " " + df["finding_name"]
 
     findings_categorical = [
@@ -592,7 +596,7 @@ def j_wrangle_echo(df):
         "PH_string_value",
     ].apply(lambda x: [float(i) for i in x])
 
-    def get_first_above_8(list_of_nos):
+    def get_first_above_8(list_of_nos: list[float]) -> float:
         item = next((x for x in list_of_nos if ((x > 8) & (x < 80))), np.nan)
         return item
 
@@ -959,7 +963,7 @@ def j_wrangle_echo(df):
     return df_last_echo
 
 
-def j_wrangle_obs(caboodle_obs):
+def j_wrangle_obs(caboodle_obs: pd.DataFrame) -> pd.DataFrame:
 
     caboodle_obs.loc[:, "month_pre_theatre"] = caboodle_obs.loc[
         :, "planned_operation_start_instant"
@@ -1207,18 +1211,18 @@ def j_wrangle_obs(caboodle_obs):
 
 
 def prepare_draft(
-    electives: list[dict],
-    preassess: list[dict],
-    labs: list[dict],
-    echo: list[dict],
-    obs: list[dict],
+    electives: list[type[BaseModel]],
+    preassess: list[type[BaseModel]],
+    labs: list[type[BaseModel]],
+    echo: list[type[BaseModel]],
+    obs: list[type[BaseModel]],
 ) -> pd.DataFrame:
 
-    electives_df = parse_to_data_frame(electives, SurgData)
-    preassess_df = parse_to_data_frame(preassess, PreassessData)
-    labs_df = parse_to_data_frame(labs, LabData)
-    echo_df = parse_to_data_frame(echo, EchoData)
-    obs_df = parse_to_data_frame(obs, ObsData)
+    electives_df = to_data_frame(electives, SurgData)
+    preassess_df = to_data_frame(preassess, PreassessData)
+    labs_df = to_data_frame(labs, LabData)
+    echo_df = to_data_frame(echo, EchoData)
+    obs_df = to_data_frame(obs, ObsData)
 
     df = (
         merge_surg_preassess(surg_data=electives_df, preassess_data=preassess_df)

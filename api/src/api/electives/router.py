@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+from typing import cast
 
 import numpy as np
 import pandas as pd
@@ -30,27 +31,24 @@ router = APIRouter(
 mock_router = APIRouter(prefix="/electives")
 
 
-def _get_json_rows(filename: str):
+def _get_json_rows(filename: str) -> list[dict]:
     """
     Return mock data from adjacent mock.json file
     Assumes that data in nested object 'rows'
     """
     with open(Path(__file__).parent / filename, "r") as f:
         mock_json = json.load(f)
-    mock_table = mock_json["rows"]
-    return mock_table
+        return cast(list[dict], mock_json["rows"])
 
 
-def _get_mock_sql_rows(table: str, model):
+def _get_mock_sql_rows(table: str, model: type[BaseModel]) -> list[type[BaseModel]]:
 
     engine = create_engine(f"sqlite:///{Path(__file__).parent}/mock.db", future=True)
-    query = text(f"SELECT * FROM {table}")
 
-    with engine.connect() as conn:
-        df_result = pd.read_sql(query, conn)
-
-    json_result = [model.parse_obj(row) for row in df_result.to_dict(orient="records")]
-    return json_result
+    with Session(engine) as session:
+        query = text(f"SELECT * FROM {table}")
+        result = session.execute(query)
+        return [model.parse_obj(row) for row in result]
 
 
 def _parse_query(
@@ -73,79 +71,61 @@ def _parse_query(
 @router.get("/case_booking/", response_model=list[CaboodleCaseBooking])
 def get_caboodle_cases(
     session: Session = Depends(get_caboodle_session), days_ahead: int = 1
-):
+) -> list[CaboodleCaseBooking]:
     """
     Return caboodle case booking data
     """
     params = {"days_ahead": days_ahead}
-    res = _parse_query("live_case.sql", session, CaboodleCaseBooking, params)
-    return res
+    return _parse_query("live_case.sql", session, CaboodleCaseBooking, params)
 
 
-@mock_router.get(
-    "/case_booking/", response_model=list[SurgData]
-)  # response_model=list[CaboodleCaseBooking])
-def get_mock_caboodle_cases():
+@mock_router.get("/case_booking/", response_model=list[SurgData])
+def get_mock_caboodle_cases() -> list[SurgData]:
     """
     returns mock of caboodle query for elective cases
     :return:
     """
-    # rows = _get_json_rows("mock_case.json")
-    rows = _get_mock_sql_rows("surg", SurgData)
-    return rows
+    return _get_mock_sql_rows("surg", SurgData)
 
 
 @router.get("/postop_destination/", response_model=list[ClarityPostopDestination])
 def get_clarity_pod(
     session: Session = Depends(get_clarity_session), days_ahead: int = 1
-):
+) -> list[ClarityPostopDestination]:
     """
     Return clarity post op destination
     """
     params = {"days_ahead": days_ahead}
-    res = _parse_query("live_pod.sql", session, ClarityPostopDestination, params)
-    return res
+    return _parse_query("live_pod.sql", session, ClarityPostopDestination, params)
 
 
 @mock_router.get("/postop_destination/", response_model=list[ClarityPostopDestination])
-def get_mock_clarity_pod():
+def get_mock_clarity_pod() -> list[ClarityPostopDestination]:
     """
     returns mock of caboodle query for preassessment
     """
-    rows = _get_json_rows("mock_pod.json")
-    return rows
+    return _get_json_rows("mock_pod.json")
 
 
 @router.get("/preassessment/", response_model=list[CaboodlePreassessment])
 def get_caboodle_preassess(
     session: Session = Depends(get_caboodle_session), days_ahead: int = 1
-):
+) -> list[CaboodlePreassessment]:
     """
     Return caboodle preassessment data
     """
     params = {"days_ahead": days_ahead}
-    res = _parse_query("live_preassess.sql", session, CaboodlePreassessment, params)
-    return res
+    return _parse_query("live_preassess.sql", session, CaboodlePreassessment, params)
 
 
-@mock_router.get(
-    "/preassessment/", response_model=list[PreassessData]
-)  # response_model=list[CaboodlePreassessment])
-def get_mock_caboodle_preassess():
-    # rows = _get_json_rows("mock_preassess.json")
-    rows = _get_mock_sql_rows("preassess", PreassessData)
-
-    return rows
+@mock_router.get("/preassessment/", response_model=list[PreassessData])
+def get_mock_caboodle_preassess() -> list[PreassessData]:
+    return _get_mock_sql_rows("preassess", PreassessData)
 
 
-@mock_router.get(
-    "/labs/", response_model=list[LabData]
-)  # response_model=list[CaboodlePreassessment])
-def get_mock_labs():
-    # rows = _get_json_rows("mock_preassess.json")
-    rows = _get_mock_sql_rows("labs", LabData)
-
-    return rows
+@mock_router.get("/labs/", response_model=list[LabData])
+def get_mock_labs() -> list[LabData]:
+    return _get_mock_sql_rows("labs", LabData)
 
 
 @router.get("/", response_model=list[ElectiveSurgCase])
@@ -153,38 +133,36 @@ def get_electives(
     s_caboodle: Session = Depends(get_caboodle_session),
     s_clarity: Session = Depends(get_clarity_session),
     days_ahead: int = 3,
-):
+) -> list[ElectiveSurgCase]:
     """
     Returns elective surgical cases by wrangling together the three components
     """
     params = {"days_ahead": days_ahead}
-    _case = _parse_query("live_case.sql", s_caboodle, CaboodleCaseBooking, params)
-    _preassess = _parse_query(
+    case = _parse_query("live_case.sql", s_caboodle, CaboodleCaseBooking, params)
+    preassess = _parse_query(
         "live_preassess.sql", s_caboodle, CaboodlePreassessment, params
     )
-    _pod = _parse_query("live_pod.sql", s_clarity, ClarityPostopDestination, params)
+    pod = _parse_query("live_pod.sql", s_clarity, ClarityPostopDestination, params)
 
-    df = prepare_electives(_case, _pod, _preassess)
+    df = prepare_electives(case, pod, preassess)
     df = df.replace({np.nan: None})
     return [ElectiveSurgCase.parse_obj(row) for row in df.to_dict(orient="records")]
 
 
 @mock_router.get("/echo/", response_model=list[EchoData])
-def get_mock_echo():
-    rows = _get_mock_sql_rows("echo", EchoData)
-    return rows
+def get_mock_echo() -> list[EchoData]:
+    return _get_mock_sql_rows("echo", EchoData)
 
 
 @mock_router.get("/obs/", response_model=list[ObsData])
-def get_mock_obs():
-    rows = _get_mock_sql_rows("obs", ObsData)
-    return rows
+def get_mock_obs() -> list[ObsData]:
+    return _get_mock_sql_rows("obs", ObsData)
 
 
 @mock_router.get("/", response_model=list[MergedData])
 def get_mock_electives(
     #   days_ahead: int = 100,
-):
+) -> list[MergedData]:
 
     case = _get_mock_sql_rows("surg", SurgData)
     preassess = _get_mock_sql_rows("preassess", PreassessData)
