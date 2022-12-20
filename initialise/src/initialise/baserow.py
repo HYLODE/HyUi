@@ -258,11 +258,11 @@ class BaserowException(Exception):
         super().__init__(message)
         self.message = message
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.message
 
 
-def _create_admin_user(settings: BaserowSettings):
+def _create_admin_user(settings: BaserowSettings) -> None:
     logging.info("Creating admin user.")
     response = requests.post(
         f"{settings.public_url}/api/user/",
@@ -337,7 +337,7 @@ def _get_group_id(base_url: str, auth_token: str) -> int:
     return cast(int, group_id)
 
 
-def _delete_default_application(base_url: str, auth_token: str, group_id: int):
+def _delete_default_application(base_url: str, auth_token: str, group_id: int) -> None:
     response = requests.get(
         f"{base_url}/api/applications/group/{group_id}/",
         headers=_auth_headers(auth_token),
@@ -489,7 +489,7 @@ def _add_table_field(
     column_name: str,
     column_type: str,
     data: dict[str, Any],
-):
+) -> None:
     logging.info(f"Adding column {column_name} to table {table_id}.")
 
     data.update(
@@ -510,7 +510,9 @@ def _add_table_field(
         )
 
 
-def _add_table_row(base_url: str, auth_token: str, table_id: int, row: dict[str, Any]):
+def _add_table_row(
+    base_url: str, auth_token: str, table_id: int, row: dict[str, Any]
+) -> None:
     logging.info(f"Adding row table {table_id}.")
 
     response = requests.post(
@@ -524,7 +526,7 @@ def _add_table_row(base_url: str, auth_token: str, table_id: int, row: dict[str,
         )
 
 
-def _add_beds_fields(base_url: str, auth_token: str, beds_table_id: int):
+def _add_beds_fields(base_url: str, auth_token: str, beds_table_id: int) -> None:
     _add_table_field(base_url, auth_token, beds_table_id, "closed", "boolean", {})
     _add_table_field(base_url, auth_token, beds_table_id, "covid", "boolean", {})
     _add_table_field(
@@ -567,7 +569,7 @@ def _add_beds_fields(base_url: str, auth_token: str, beds_table_id: int):
     )
 
 
-def initialise_baserow():
+def initialise_baserow() -> None:
     settings = get_baserow_settings()
 
     logging.info("Starting Baserow initialisation.")
@@ -592,16 +594,6 @@ def initialise_baserow():
         "status",
         "text",
         {},
-    )
-
-    _add_table_row(
-        settings.public_url,
-        auth_token,
-        discharge_statuses_table_id,
-        {
-            "csn": "abc",
-            "status": "discharge_now",
-        },
     )
 
     # Create the beds table.
