@@ -2,7 +2,7 @@ from dash import html
 import dash_bootstrap_components as dbc
 from web.pages.sitrep import BPID
 
-ward_radio_button = html.Div(
+department_radio_button = html.Div(
     [
         html.Div(
             [

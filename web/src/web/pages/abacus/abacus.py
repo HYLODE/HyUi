@@ -209,15 +209,24 @@ cyto_map = html.Div(
         cyto.Cytoscape(
             id="bed_map",
             layout={"name": "preset"},
-            style={"width": "50%", "height": "80%", "position": "absolute"},
+            style={
+                "width": "42vw",
+                "height": "80vh",
+                "position": "absolute",
+                "top": "4vh",
+                "left": "4vw",
+            },
             stylesheet=[
                 {"selector": "node", "style": {"label": "data(label)"}},
                 {
                     "selector": "[?occupied]",
                     "style": {
                         "shape": "circle",
-                        "background-color": "#ff0000",
-                        "background-opacity": 1.0,
+                        # "background-color": "#ff0000",
+                        # "background-opacity": 1.0,
+                        "border-width": 2,
+                        "border-style": "solid",
+                        "border-color": "red",
                     },
                 },
                 {
@@ -231,17 +240,12 @@ cyto_map = html.Div(
                         "border-color": "black",
                     },
                 },
-                {
-                    "selector": "[?occupied]",
-                    "style": {
-                        "shape": "circle",
-                        "background-color": "#ff0000",
-                        "background-opacity": 1.0,
-                    },
-                },
             ],
             elements=nodes + edges,
             responsive=True,
+            autolock=True,
+            maxZoom=2,
+            minZoom=0.5,
         )
     ]
 )
