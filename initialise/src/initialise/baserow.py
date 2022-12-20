@@ -406,6 +406,25 @@ def _create_table(
     primary_field_name: str,
     primary_field_data: dict[str, Any],
 ) -> int:
+    """Creates a baserow table and returns the table ID. Baserow requires that
+    the table has at least one column but does not allow you to specify what
+    type that column should be on creation. Therefore, this function makes
+    another API call after the table is created to update the primary field
+    to the required type as described in `primary_field_data`.
+
+    :param base_url: The Baserow base URL without a trailing slash.
+    :param auth_token: Auth token to access Baserow API.
+    :param application_id: Application ID to create the table in.
+    :param table_name: The table name.
+    :param primary_field_name: The name of the primary field. This cannot be id
+        or order.
+    :param primary_field_data: The dictionary to pass in when updating the
+        primary field. Information of what can be used in this dictionary is
+        found in the Baserow documentation in the `update_database_table_field`
+        API documentation.
+
+    :return: The newly created database table ID.
+    """
     logging.info(f"Checking to see if {table_name} table already exists.")
     response = requests.get(
         f"{base_url}/api/database/tables/database/{application_id}/",
@@ -446,7 +465,6 @@ def _create_table(
     logging.info(f"Table called beds created with ID {table_id}.")
 
     # Update the primary field to be the required type.
-
     if not primary_field_data:
         return cast(int, table_id)
 
