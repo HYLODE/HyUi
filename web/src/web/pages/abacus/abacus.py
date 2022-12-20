@@ -23,10 +23,10 @@ DEPARTMENT = "UCH T03 INTENSIVE CARE"
 
 def get_sitrep_organ_support(department: str = DEPARTMENT) -> object:
     try:
+        # FIXME 2022-12-20 hack to keep this working whilst waiting on
         department = DEPARTMENT_WARD_MAPPINGS[department]
-        response = requests.get(
-            f"http://uclvlddpragae07:5006/sitrep/live/icu/{department}/ui"
-        )
+        response = requests.get(f"http://uclvlddpragae07:5006/live/icu/{department}/ui")
+        response = response.json().get("data")
         warnings.warn("Working from old hycastle sitrep", category=DeprecationWarning)
     except ConnectionError:
         try:
@@ -35,7 +35,8 @@ def get_sitrep_organ_support(department: str = DEPARTMENT) -> object:
             if department not in DEPARTMENT_WARD_MAPPINGS.values():
                 raise KeyError(f"{department} not recognised as valid department")
         response = requests.get(f"{get_settings().api_url}/sitrep/live/{department}/ui")
-    return [SitrepRow.parse_obj(row).dict() for row in response.json()]
+        response = response.json()
+    return [SitrepRow.parse_obj(row).dict() for row in response]
 
 
 def get_census(department: str = DEPARTMENT) -> object:
