@@ -8,6 +8,7 @@ import warnings
 import dash_bootstrap_components as dbc
 import dash_cytoscape as cyto
 import requests
+from requests.exceptions import ConnectionError
 from dash import Input, Output, callback, html, register_page
 
 from models.beds import Bed
@@ -23,10 +24,17 @@ DEPARTMENT = "UCH T03 INTENSIVE CARE"
 def get_sitrep_organ_support(department: str = DEPARTMENT) -> object:
     try:
         department = DEPARTMENT_WARD_MAPPINGS[department]
-    except KeyError:
-        if department not in DEPARTMENT_WARD_MAPPINGS.values():
-            raise KeyError(f"{department} not recognised as valid department")
-    response = requests.get(f"{get_settings().api_url}/sitrep/live/{department}/ui")
+        response = requests.get(
+            f"http://uclvlddpragae07:5006/sitrep/live/icu/{department}/ui"
+        )
+        warnings.warn("Working from old hycastle sitrep", category=DeprecationWarning)
+    except ConnectionError:
+        try:
+            department = DEPARTMENT_WARD_MAPPINGS[department]
+        except KeyError:
+            if department not in DEPARTMENT_WARD_MAPPINGS.values():
+                raise KeyError(f"{department} not recognised as valid department")
+        response = requests.get(f"{get_settings().api_url}/sitrep/live/{department}/ui")
     return [SitrepRow.parse_obj(row).dict() for row in response.json()]
 
 

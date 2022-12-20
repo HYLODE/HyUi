@@ -18,6 +18,7 @@ class SitrepRow(BaseModel):
     n_inotropes_1_4h: int
     had_rrt_1_4h: bool
     vent_type_1_4h: str
+    wim_1: int
 
 
 class IndividualDischargePrediction(BaseModel):
