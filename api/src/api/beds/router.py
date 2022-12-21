@@ -22,6 +22,9 @@ def get_mock_beds(department: str) -> list[Bed]:
         Path.cwd() / "initialise" / "src" / "initialise" / "bed_defaults.json", "r"
     ) as f:
         rows = json.load(f)
+    # mock return just T03 beds
+    _FILTER = "T03"
+    rows = [row for row in rows if _FILTER in row["location_string"]]
     return [Bed.parse_obj(row).dict() for row in rows]
 
 
@@ -49,12 +52,12 @@ def get_beds(department: str, settings: Settings = Depends(get_settings)) -> lis
 @mock_router.get("/closed/", response_model=list[Bed])
 def get_mock_closed_beds() -> list[Bed]:
     return [
-        Bed(location_string="LOC1", room="ROOM1", closed=True, covid=True),
-        Bed(location_string="LOC1", room="ROOM1", closed=True, covid=False),
+        Bed(location_string="LOC1", closed=True, covid=True, xpos=100, ypos=100),
+        Bed(location_string="LOC1", closed=True, covid=False, xpos=100, ypos=100),
     ]
 
 
-@router.get("/beds/closed/", response_model=list[Bed])
+@router.get("/closed/", response_model=list[Bed])
 def get_closed_beds(settings=Depends(get_settings)) -> list[Bed]:
     baserow_url = settings.baserow_url
     email = settings.baserow_email

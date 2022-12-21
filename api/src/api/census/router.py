@@ -53,7 +53,7 @@ def _fetch_census(
     return census_rows
 
 
-def fetch_mock_census(departments: list[str], locations: list[str]) -> list[CensusRow]:
+def _fetch_mock_census(departments: list[str], locations: list[str]) -> list[CensusRow]:
     engine = create_engine(f"sqlite:///{Path(__file__).parent}/mock.db", future=True)
 
     query = text(
@@ -72,7 +72,7 @@ def fetch_mock_census(departments: list[str], locations: list[str]) -> list[Cens
 
 @mock_router.get("/departments/", response_model=list[CensusDepartment])
 def get_mock_departments() -> list[CensusDepartment]:
-    census_rows = fetch_mock_census(list(wards.ALL), [])
+    census_rows = _fetch_mock_census(list(wards.ALL), [])
     census_df = pd.DataFrame((row.dict() for row in census_rows))
     departments_df = aggregate_by_department(census_df)
 
@@ -102,7 +102,7 @@ def get_mock_census(
     departments: list[str] = Query(default=[]),
     locations: list[str] = Query(default=[]),
 ) -> list[CensusRow]:
-    return fetch_mock_census(departments, locations)
+    return _fetch_mock_census(departments, locations)
 
 
 @router.get("/", response_model=list[CensusRow])

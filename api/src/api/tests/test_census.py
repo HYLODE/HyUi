@@ -1,7 +1,7 @@
 import pandas as pd
 
 from api import wards
-from api.census.router import fetch_mock_census
+from api.census.router import _fetch_mock_census
 from api.census.wrangle import aggregate_by_department
 from api.main import app
 from fastapi.testclient import TestClient
@@ -12,12 +12,12 @@ client = TestClient(app)
 
 
 def test_fetch_mock_census() -> None:
-    census_rows = fetch_mock_census(list(wards.ALL), [])
+    census_rows = _fetch_mock_census(list(wards.ALL), [])
     assert len(census_rows) > 0
 
 
 def test_aggregate_by_department() -> None:
-    census_rows = fetch_mock_census(list(wards.ALL), [])
+    census_rows = _fetch_mock_census(list(wards.ALL), [])
 
     census_df = pd.DataFrame((row.dict() for row in census_rows))
     aggregated_df = aggregate_by_department(census_df)

@@ -1,227 +1,99 @@
 """
-sub-application for the abacus endpoint
+Layout for sub-application for the abacus endpoint
 """
+# TODO: generalise to work with any ward using concentric lay out so strip
+#  out sitrep data for now; and store census data on the page
 
-import json
-import warnings
+DEBUG = False
 
 import dash_bootstrap_components as dbc
 import dash_cytoscape as cyto
-import requests
-from requests.exceptions import ConnectionError
-from dash import Input, Output, callback, html, register_page
+from dash import dcc, html, register_page
 
-from models.beds import Bed
-from models.census import CensusRow
-from models.sitrep import SitrepRow
-from web.config import get_settings
-from web.pages.abacus import DEPARTMENT_WARD_MAPPINGS, styles
+if DEBUG:
+    from . import BPID
+    import abacus.callbacks  # noqa
+else:
+    import web.pages.abacus.callbacks  # noqa: F401
+    from web.pages.abacus import BPID
 
-register_page(__name__, name="ABACUS")
+    register_page(__name__, name="ABACUS")
+
 DEPARTMENT = "UCH T03 INTENSIVE CARE"
+DEPARTMENTS = [DEPARTMENT, "GWB L01 CRITICAL CARE"]
+REFRESH_INTERVAL = 10 * 60 * 1000  # 10 mins in milliseconds
 
-
-def get_sitrep_organ_support(department: str = DEPARTMENT) -> object:
-    try:
-        # FIXME 2022-12-20 hack to keep this working whilst waiting on
-        department = DEPARTMENT_WARD_MAPPINGS[department]
-        response = requests.get(f"http://uclvlddpragae07:5006/live/icu/{department}/ui")
-        response = response.json().get("data")
-        warnings.warn("Working from old hycastle sitrep", category=DeprecationWarning)
-    except ConnectionError:
-        try:
-            department = DEPARTMENT_WARD_MAPPINGS[department]
-        except KeyError:
-            if department not in DEPARTMENT_WARD_MAPPINGS.values():
-                raise KeyError(f"{department} not recognised as valid department")
-        response = requests.get(f"{get_settings().api_url}/sitrep/live/{department}/ui")
-        response = response.json()
-    return [SitrepRow.parse_obj(row).dict() for row in response]
-
-
-def get_census(department: str = DEPARTMENT) -> object:
-    # note that the census API expects a list of departments but you only
-    # want one
-    departments = [department]
-    response = requests.get(
-        f"{get_settings().api_url}/census/", params={"departments": departments}
-    )
-    return [CensusRow.parse_obj(row).dict() for row in response.json()]
-
-
-def get_beds(department: str = DEPARTMENT):
-    response = requests.get(
-        f"{get_settings().api_url}/beds/", params={"department": department}
-    )
-    return [Bed.parse_obj(row).dict() for row in response.json()]
-
-
-def list_of_unique_rooms(beds: list) -> list:
-    rooms = [split_loc_str(bed["location_string"], "room") for bed in beds]
-    rooms = list(set(rooms))
-    return rooms
-
-
-def split_loc_str(s: str, part: str) -> str:
-    dept, room, bed = s.split("^")
-    if part == "dept":
-        return dept
-    elif part == "room":
-        return room
-    elif part == "bed":
-        return bed
-    else:
-        raise ValueError(f"{part} not one of dept/room/bed")
-
-
-def make_bed(d: dict):
-    bed = split_loc_str(d["location_string"], "bed")
-    pretty_bed = bed.split("-")[1]
-    room = split_loc_str(d["location_string"], "room")
-    return dict(
-        data=dict(
-            id=d["location_string"],
-            label=pretty_bed,
-            parent=room,
-            level="bed",
+building_radio_button = html.Div(
+    [
+        html.Div(
+            [
+                dbc.RadioItems(
+                    id=f"{BPID}building_radio",
+                    className="dbc d-grid d-md-flex "
+                    "justify-content-md-end btn-group",
+                    inline=True,
+                    options=[
+                        {"label": "Tower", "value": "tower"},
+                        {"label": "GWB", "value": "gwb"},
+                        {"label": "WMS", "value": "wms"},
+                        {"label": "NHNN", "value": "nhnn"},
+                    ],
+                    value="tower",
+                )
+            ],
+            className="dbc",
         ),
-        position=dict(x=d["xpos"] * 10, y=d["ypos"] * 10),
-    )
+    ],
+    className="radio-group",
+)
 
-
-def make_room(room: str) -> dict:
-    pretty_room = room.split(" ")[1]
-    sideroom = False
-    if pretty_room[:2] == "BY":
-        label = "Bay " + pretty_room[2:]
-    elif pretty_room[:2] == "SR":
-        label = "Room"
-        sideroom = True
-    else:
-        label = pretty_room
-
-    return dict(data=dict(id=room, label=label, sideroom=sideroom, level="room"))
-
-
-def populate_beds(bed_list: list[dict], census: list[dict]) -> list[dict]:
-    """
-    place patients in beds
-    :param bed_list: derived from baserow structure
-    :param census:
-    :return:
-    """
-    # convert to dictionary of dictionaries to search / merge
-    census = {i["location_string"]: i for i in census}
-    for bed in bed_list:
-        location_string = bed.get("data").get("id")
-        bed["data"]["census"] = census.get(location_string, {})
-        if bed.get("data").get("census").get("occupied"):
-            bed.get("data")["occupied"] = True
-        else:
-            bed.get("data")["occupied"] = False
-    return bed_list
-
-
-def _as_int(s: int | float | None) -> int | None:
-    if s is None:
-        return None
-    else:
-        return int(float(s))
-
-
-def provide_patient_detail(csn: int) -> str:
-    """
-    Provide as much detail on the specific patient as possible
-    :return:
-    """
-    # ensure that csn is an integer before using as key
-    if csn is None:
-        return json.dumps({})
-    csn = _as_int(csn)
-
-    # FIXME: DRY: save these calls as dcc.Store
-    census = get_census()
-    census = [i for i in census if _as_int(i["encounter"]) == csn]
-    if len(census) == 0:
-        raise ValueError(f"Episode {csn} not found in census")
-    elif len(census) == 1:
-        census = census[0]
-    else:
-        raise ValueError(f"Duplicate episodes for {csn} found in census")
-
-    organ_support = get_sitrep_organ_support()
-    organ_support = [i for i in organ_support if _as_int(i["csn"]) == csn]
-    if len(organ_support) == 0:
-        warnings.warn(f"Episode {csn} not found in organ support")
-        organ_support = {}
-    elif len(organ_support) == 1:
-        organ_support = organ_support[0]
-    else:
-        raise ValueError(f"Duplicate episodes for {csn} found in sitrep organ support")
-
-    # json dumps to convert to string since you're writing to html.Pre
-    # object has no attribute 'get': instantiates as object but convert to dict
-    return json.dumps(
-        dict(
-            csn=csn,
-            n_inotropes_1_4h=organ_support.get("n_inotropes_1_4h", ""),
-            had_rrt_1_4h=organ_support.get("had_rrt_1_4h", ""),
-            vent_type_1_4h=organ_support.get("vent_type_1_4h", ""),
-            mrn=census.get("mrn"),
-            encounter=census.get("encounter"),
-            date_of_birth=census.get("date_of_birth").strftime("%d %b %Y"),
-            lastname=census.get("lastname"),
-            firstname=census.get("firstname"),
-            sex=census.get("sex"),
+layout_radio_button = html.Div(
+    [
+        html.Div(
+            [
+                dbc.RadioItems(
+                    id=f"{BPID}layout_radio",
+                    className="dbc d-grid d-md-flex "
+                    "justify-content-md-end btn-group",
+                    inline=True,
+                    options=[
+                        {"label": "Map", "value": "preset"},
+                        {"label": "Circle", "value": "circle"},
+                        {"label": "Grid", "value": "grid"},
+                    ],
+                    value="circle",
+                )
+            ],
+            className="dbc",
         ),
-        indent=4,
-    )
-
-
-@callback(
-    Output("bed_inspector", "children"),
-    Input("bed_map", "tapNode"),
-    prevent_initial_callback=True,
+    ],
+    className="radio-group",
 )
-def displayTapNode(data):
-    if data:
-        csn = data.get("data").get("census").get("encounter")
-        return provide_patient_detail(csn)
-    else:
-        return json.dumps({}, indent=4)
 
-
-@callback(
-    Output("node_inspector", "children"),
-    Input("bed_map", "tapNode"),
-    prevent_initial_callback=True,
+dash_only = html.Div(
+    [
+        dcc.Interval(
+            id=f"{BPID}query_interval",
+            interval=REFRESH_INTERVAL,
+            n_intervals=0,
+        ),
+        dcc.Store(id=f"{BPID}departments"),
+        dcc.Store(id=f"{BPID}census"),
+        dcc.Store(id=f"{BPID}beds"),
+        dcc.Store(id=f"{BPID}patients_in_beds"),
+    ]
 )
-def displayTapNode(data):
-    return json.dumps(data, indent=4)
 
-
-beds = get_beds()
-room_list = [make_room(r) for r in list_of_unique_rooms(beds)]
-bed_list = [make_bed(i) for i in beds]
-
-census = get_census()
-bed_list = populate_beds(bed_list, census)
-
-organ_support = get_sitrep_organ_support()
-provide_patient_detail(census[1].get("encounter"))
-
-nodes = room_list + bed_list
-edges = []
-
-cyto_map = html.Div(
+ward_map = html.Div(
     [
         cyto.Cytoscape(
-            id="bed_map",
-            layout={"name": "preset"},
+            id=f"{BPID}bed_map",
             style={
+                # "width": "600px",
+                # "height": "600px",
                 "width": "42vw",
                 "height": "80vh",
-                "position": "absolute",
+                "position": "relative",
                 "top": "4vh",
                 "left": "4vw",
             },
@@ -230,7 +102,7 @@ cyto_map = html.Div(
                 {
                     "selector": "[?occupied]",
                     "style": {
-                        "shape": "circle",
+                        "shape": "ellipse",
                         # "background-color": "#ff0000",
                         # "background-opacity": 1.0,
                         "border-width": 2,
@@ -249,12 +121,18 @@ cyto_map = html.Div(
                         "border-color": "black",
                     },
                 },
+                {
+                    "selector": '[!visible][level="room"]',
+                    "style": {
+                        "background-opacity": 0.0,
+                        "border-opacity": 0.0,
+                    },
+                },
             ],
-            elements=nodes + edges,
             responsive=True,
-            autolock=True,
-            maxZoom=2,
-            minZoom=0.5,
+            maxZoom=1.0,
+            # zoom=1,
+            minZoom=0.2,
         )
     ]
 )
@@ -266,18 +144,53 @@ def layout():
             dbc.Row(
                 [
                     dbc.Col(
-                        [html.H2(DEPARTMENT), cyto_map],
-                        md={"size": 6},
+                        [
+                            # html.Div("Row 1 Column 1"),
+                            html.Div(id=f"{BPID}dept_title"),
+                            # html.Div(id=f"{BPID}ward_map"),
+                            ward_map,
+                        ],
+                        # width={"size": 6, "order": "first", "offset": 6},
                     ),
                     dbc.Col(
                         [
-                            html.H2("Bed Inspector"),
-                            html.Pre(id="bed_inspector", style=styles["pre"]),
-                            html.Pre(id="node_inspector", style=styles["pre"]),
+                            # html.Div("Row 1 Column 2"),
+                            # html.Button('Reset', id=f"{BPID}reset", n_clicks=0),
+                            building_radio_button,
+                            layout_radio_button,
+                            html.Div(id=f"{BPID}dept_dropdown_div"),
+                            # html.Pre(id="bed_inspector", style=styles["pre"]),
+                            # html.Pre(id="node_inspector", style=styles[
+                            # "pre"]),
                         ],
-                        md={"size": 6},
+                        # width={"size": 6, "order": "last", "offset": 6},
                     ),
                 ]
-            )
+            ),
+            html.Div(id=f"{BPID}ward_map"),
+            dash_only,
         ]
     )
+
+
+if DEBUG:
+    from dash import Dash
+
+    app = Dash(
+        __name__,
+        # server=server,
+        title="HYLODE",
+        update_title=None,
+        external_stylesheets=[
+            dbc.themes.LUX,
+            dbc.icons.FONT_AWESOME,
+        ],
+        suppress_callback_exceptions=True,
+        # use_pages=True,
+        # background_callback_manager=DiskcacheManager(cache),
+    )
+    server = app.server
+
+    if __name__ == "__main__":
+        app.layout = layout()
+        app.run_server(debug=True)

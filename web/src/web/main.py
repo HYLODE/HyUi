@@ -1,4 +1,5 @@
 import tempfile
+import os
 from typing import NamedTuple
 
 import dash_bootstrap_components as dbc
@@ -42,8 +43,8 @@ dropdown_dev = [
     NavbarDropdown("HYLODE", "http://172.16.149.202:5001/", False),
     NavbarDropdown("HYMIND Lab", "http://172.16.149.202:5009/", False),
     NavbarDropdown("HYUI API", "http://172.16.149.202:8094/docs", False),
-    NavbarDropdown("BaseRow", "http://172.16.149.202:8097", False),
-    NavbarDropdown("PGWeb", "http://172.16.149.202:8099", False),
+    NavbarDropdown("BaseRow", f"os.getenv('BASEROW_PUBLIC_URL', '')", False),
+    # NavbarDropdown("PGWeb", "http://172.16.149.202:8099", False),
 ]
 
 # Exposing the Flask Server to enable configuring it for logging in

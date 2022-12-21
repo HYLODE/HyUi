@@ -5,9 +5,9 @@ from web.config import get_settings
 from web.convert import to_data_frame
 
 
-def _get_closed_beds() -> list[ClosedBed]:
-    response = requests.get(f"{get_settings().api_url}/census/beds/closed/")
-    return [ClosedBed.parse_obj(row) for row in response.json()]
+# def _get_closed_beds() -> list[Bed]:
+#     response = requests.get(f"{get_settings().api_url}/beds/closed/")
+#     return [Bed.parse_obj(row) for row in response.json()]
 
 
 def _get_department_census() -> list[CensusDepartment]:
@@ -23,16 +23,19 @@ def fetch_department_census():
     departments = _get_department_census()
     departments_df = to_data_frame(departments, CensusDepartment)
 
+    # TODO: rebuild to capture the beds reported to be closed in baserow
     # Now update with closed beds from beds
-    closed_beds = _get_closed_beds()
-    closed_beds_df = to_data_frame(closed_beds, ClosedBed)
-
-    closed = closed_beds_df.groupby("department")["closed"].sum()
-    departments_df = departments_df.merge(closed, on="department", how="left")
-    departments_df["closed"].fillna(0, inplace=True)
+    # closed_beds = _get_closed_beds()
+    # closed_beds_df = to_data_frame(closed_beds, ClosedBed)
+    #
+    # closed = closed_beds_df.groupby("department")["closed"].sum()
+    # departments_df = departments_df.merge(closed, on="department", how="left")
+    # departments_df["closed"].fillna(0, inplace=True)
+    departments_df["closed"] = 0
+    departments_df.head()
 
     # Then update empties
-    departments_df["empties"] = departments_df["empties"] - departments_df["closed"]
+    # departments_df["empties"] = departments_df["empties"] - departments_df["closed"]
 
     return departments_df[
         [
