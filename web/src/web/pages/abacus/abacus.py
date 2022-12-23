@@ -80,7 +80,7 @@ dash_only = html.Div(
         dcc.Store(id=f"{BPID}departments"),
         dcc.Store(id=f"{BPID}census"),
         dcc.Store(id=f"{BPID}beds"),
-        dcc.Store(id=f"{BPID}sitrep"),
+        # dcc.Store(id=f"{BPID}sitrep"),
         dcc.Store(id=f"{BPID}patients_in_beds"),
     ]
 )

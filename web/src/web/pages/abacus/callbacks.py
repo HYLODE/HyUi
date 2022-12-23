@@ -69,12 +69,12 @@ def get_census(department: str) -> list[dict]:
     return census
 
 
-@callback(
-    Output(f"{BPID}sitrep", "data"),
-    Input(f"{BPID}dept_dropdown", "value"),
-)
-def get_sitrep(department: str) -> list[dict]:
-    return _get_sitrep_status(department=department)
+# @callback(
+#     Output(f"{BPID}sitrep", "data"),
+#     Input(f"{BPID}dept_dropdown", "value"),
+# )
+# def get_sitrep(department: str) -> list[dict]:
+#     return _get_sitrep_status(department=department)
 
 
 @callback(
