@@ -1,7 +1,7 @@
-from typing import Any
+import json
 import math
 
-from dash import Input, Output, callback, dcc, State
+from dash import Input, Output, callback, dcc
 from web.hospital import get_building_departments
 
 # callback functions created here will be labelled with BPID for abacus
@@ -9,10 +9,12 @@ from web.pages.abacus import BPID
 from web.pages.abacus.utils import (
     _get_beds,
     _get_census,
+    _get_sitrep_status,
     _make_bed,
     _populate_beds,
     _list_of_unique_rooms,
     _make_room,
+    _present_patient,
 )
 
 
@@ -53,7 +55,7 @@ def gen_dept_dropdown(building: str, building_departments):
     Output(f"{BPID}beds", "data"),
     Input(f"{BPID}dept_dropdown", "value"),
 )
-def get_beds(department: str) -> dict[str, Any]:
+def get_beds(department: str) -> list[dict]:
     beds = _get_beds(department=department)
     return beds
 
@@ -62,9 +64,17 @@ def get_beds(department: str) -> dict[str, Any]:
     Output(f"{BPID}census", "data"),
     Input(f"{BPID}dept_dropdown", "value"),
 )
-def get_census(department: str) -> dict[str, Any]:
+def get_census(department: str) -> list[dict]:
     census = _get_census(department=department)
     return census
+
+
+@callback(
+    Output(f"{BPID}sitrep", "data"),
+    Input(f"{BPID}dept_dropdown", "value"),
+)
+def get_sitrep(department: str) -> list[dict]:
+    return _get_sitrep_status(department=department)
 
 
 @callback(
@@ -110,120 +120,22 @@ def store_patients_in_beds(census, beds, layout):
     return nodes + edges
 
 
-# @callback([
-#     Output(f"{BPID}layout_radio", "value"),
-#     Output(f"{BPID}building_radio", "value"),
-#     Output(f"{BPID}department_dropdown", "value"),
-#     ],
-#     Input(f"{BPID}button", "n_clicks"),
-#     State(f"{BPID}departments", "data"),
-# )
-# def reset_all(n_clicks, departments):
-#     layout = "random"
-#     dept = departments["tower"][0]
-#     print(dept)
-#     return [
-#         layout,
-#         "tower",
-#         dept,
-#     ]
-
-# @callback(
-#     Output(f"{BPID}dept_title", "children"),
-#     Input(f"{BPID}dept_dropdown", "value"),
-# )
-# def display_dept_title(department: str):
-#     return html.H4(department.title())
-#
-#
-# # @callback(
-# #     Output("bed_inspector", "children"),
-# #     Input(f"{BPID}bed_map", "tapNode"),
-# #     prevent_initial_callback=True,
-# # )
-# # def tap_bed_inspector(data):
-# #     if data:
-# #         csn = data.get("data").get("census").get("encounter")
-# #         return _provide_patient_detail(csn)
-# #     else:
-# #         return json.dumps({}, indent=4)
-# #
-# #
-# # @callback(
-# #     Output("node_inspector", "children"),
-# #     Input(f"{BPID}bed_map", "tapNode"),
-# #     prevent_initial_callback=True,
-# # )
-# # def tap_node_inspector(data):
-# #     return json.dumps(data, indent=4)
-# #
-# #
+@callback(
+    Output(f"{BPID}bed_inspector", "children"),
+    Input(f"{BPID}bed_map", "tapNode"),
+    prevent_initial_callback=True,
+)
+def tap_bed_inspector(data):
+    if data:
+        return _present_patient(data.get("data").get("census"))
+    else:
+        return ""
 
 
-# @callback(
-#     Output(f"{BPID}bed_map", "elements"),
-#     Input(f"{BPID}patients_in_beds", "data"),
-#     State(f"{BPID}layout_radio", "value"),
-#     # prevent_initial_call=True,
-# )
-# def display_ward_map(
-#     elements,
-#     layout,
-# ):
-
-# @callback(
-#     Output(f"{BPID}ward_map", "children"),
-#     Input(f"{BPID}patients_in_beds", "data"),
-#     State(f"{BPID}layout_radio", "value"),
-#     prevent_initial_call=True,
-# )
-# def display_ward_map(
-#     elements,
-#     layout,
-# ):
-#     zoom = 1
-#     return cyto.Cytoscape(
-#         id=f"{BPID}bed_map",
-#         # layout={"name": layout, "fit": True, "padding": 80},
-#         layout={"name": layout},
-#         style={
-#             "width"   : "600px",
-#             "height"  : "600px",
-#             # "width"   : "42vw",
-#             # "height"  : "80vh",
-#             "position": "relative",
-#             # "top"     : "4vh",
-#             # "left"    : "4vw",
-#         },
-#         stylesheet=[
-#             {"selector": "node", "style": {"label": "data(label)"}},
-#             {
-#                 "selector": "[?occupied]",
-#                 "style"   : {
-#                     "shape"       : "ellipse",
-#                     # "background-color": "#ff0000",
-#                     # "background-opacity": 1.0,
-#                     "border-width": 2,
-#                     "border-style": "solid",
-#                     "border-color": "red",
-#                 },
-#             },
-#             {
-#                 "selector": '[!occupied][level="bed"]',
-#                 "style"   : {
-#                     "shape"             : "rectangle",
-#                     "background-color"  : "grey",
-#                     "background-opacity": 0.2,
-#                     "border-width"      : 2,
-#                     "border-style"      : "solid",
-#                     "border-color"      : "black",
-#                 },
-#             },
-#         ],
-#         elements=elements,
-#         # responsive=True,
-#         # autolock=True,
-#         # maxZoom=2,
-#         # zoom=zoom,
-#         # minZoom=0.2,
-#     )
+@callback(
+    Output(f"{BPID}node_inspector", "children"),
+    Input(f"{BPID}bed_map", "tapNode"),
+    prevent_initial_callback=True,
+)
+def tap_node_inspector(data):
+    return json.dumps(data, indent=4)

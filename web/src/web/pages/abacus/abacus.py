@@ -7,7 +7,7 @@ import dash_cytoscape as cyto
 from dash import dcc, html, register_page
 
 import web.pages.abacus.callbacks  # noqa: F401
-from web.pages.abacus import BPID
+from web.pages.abacus import BPID, styles
 
 register_page(__name__, name="ABACUS")
 
@@ -67,6 +67,9 @@ layout_radio_button = html.Div(
     className="radio-group",
 )
 
+bed_inspector = html.Pre(id=f"{BPID}bed_inspector", style=styles["pre"])
+# node_inspector = html.Pre(id=f"{BPID}node_inspector")
+
 dash_only = html.Div(
     [
         dcc.Interval(
@@ -77,6 +80,7 @@ dash_only = html.Div(
         dcc.Store(id=f"{BPID}departments"),
         dcc.Store(id=f"{BPID}census"),
         dcc.Store(id=f"{BPID}beds"),
+        dcc.Store(id=f"{BPID}sitrep"),
         dcc.Store(id=f"{BPID}patients_in_beds"),
     ]
 )
@@ -151,14 +155,11 @@ def layout():
                     ),
                     dbc.Col(
                         [
-                            # html.Div("Row 1 Column 2"),
-                            # html.Button('Reset', id=f"{BPID}reset", n_clicks=0),
                             building_radio_button,
                             layout_radio_button,
                             html.Div(id=f"{BPID}dept_dropdown_div"),
-                            # html.Pre(id="bed_inspector", style=styles["pre"]),
-                            # html.Pre(id="node_inspector", style=styles[
-                            # "pre"]),
+                            bed_inspector,
+                            # node_inspector,
                         ],
                         # width={"size": 6, "order": "last", "offset": 6},
                     ),

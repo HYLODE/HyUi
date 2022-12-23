@@ -1,6 +1,7 @@
 """
 assorted functions for preparing and running the sitrep data
 """
+import json
 import requests
 import warnings
 from requests.exceptions import ConnectionError
@@ -46,28 +47,35 @@ def _get_census(department: str) -> list[dict]:
     return [CensusRow.parse_obj(row).dict() for row in response.json()]
 
 
-def _get_sitrep_organ_support(department: str) -> object:
+def _get_sitrep_status(department: str) -> object:
     """
     get organ support data from old sitrep interface
     :param department:
-    :return:
+    :return: original covid sitrep organ support
     """
+    # FIXME 2022-12-20 hack to keep this working whilst waiting on
+    COVID_SITREP = True
+    warnings.warn("Working from old hycastle sitrep", category=DeprecationWarning)
+
+    def _which_sitrep(dept, covid_sitrep: bool = COVID_SITREP):
+        if covid_sitrep:
+            url = f"http://uclvlddpragae07:5006/live/icu/{dept}/ui"
+        else:
+            url = f"{get_settings().api_url}/sitrep/live/{dept}/ui"
+        return url
+
     try:
-        # FIXME 2022-12-20 hack to keep this working whilst waiting on
         department = DEPARTMENT_WARD_MAPPINGS[department]
-        response = requests.get(
-            f"http://uclvlddpragae07:5006/live/icu/" f"{department}/ui"
-        )  # type: ignore
-        response = response.json().get("data")  # type: ignore
-        warnings.warn("Working from old hycastle sitrep", category=DeprecationWarning)
+        sitrep_api = _which_sitrep(department)
+        response = requests.get(sitrep_api).json().get("data")
     except ConnectionError:
         try:
             department = DEPARTMENT_WARD_MAPPINGS[department]
         except KeyError:
             if department not in DEPARTMENT_WARD_MAPPINGS.values():
                 raise KeyError(f"{department} not recognised as valid department")
-        response = requests.get(f"{get_settings().api_url}/sitrep/live/{department}/ui")
-        response = response.json()
+        sitrep_api = _which_sitrep(department)
+        response = requests.get(sitrep_api).json()
     return [SitrepRow.parse_obj(row).dict() for row in response]
 
 
@@ -176,51 +184,29 @@ def _make_room(room: str, preset=True) -> dict:
     )
 
 
-# def _provide_patient_detail(csn: int) -> str:
-#     """
-#     Provide as much detail on the specific patient as possible
-#     :return:
-#     """
-# # ensure that csn is an integer before using as key
-# if csn is None:
-#     return json.dumps({})
-# csn = _as_int(csn)
+def _present_patient(census: dict) -> str:
+    """
+    Prettify node data
+    """
 
-# # FIXME: DRY: save these calls as dcc.Store
-# census = _get_census()
-# census = [i for i in census if _as_int(i["encounter"]) == csn]
-# if len(census) == 0:
-#     raise ValueError(f"Episode {csn} not found in census")
-# elif len(census) == 1:
-#     census = census[0]
-# else:
-#     raise ValueError(f"Duplicate episodes for {csn} found in census")
-
-# organ_support = _get_sitrep_organ_support()
-# organ_support = [i for i in organ_support if _as_int(i["csn"]) == csn]
-# if len(organ_support) == 0:
-#     warnings.warn(f"Episode {csn} not found in organ support")
-#     organ_support = {}
-# elif len(organ_support) == 1:
-#     organ_support = organ_support[0]
-# else:
-#     raise ValueError(
-#         f"Duplicate episodes for {csn} found in sitrep organ support")
-
-# json dumps to convert to string since you're writing to html.Pre
-# object has no attribute 'get': instantiates as object but convert to dict
-# return json.dumps(
-#     dict(
-#         csn=csn,
-#         # n_inotropes_1_4h=organ_support.get("n_inotropes_1_4h", ""),
-#         # had_rrt_1_4h=organ_support.get("had_rrt_1_4h", ""),
-#         # vent_type_1_4h=organ_support.get("vent_type_1_4h", ""),
-#         mrn=census.get("mrn"),
-#         encounter=census.get("encounter"),
-#         date_of_birth=census.get("date_of_birth").strftime("%d %b %Y"),
-#         lastname=census.get("lastname"),
-#         firstname=census.get("firstname"),
-#         sex=census.get("sex"),
-#     ),
-#     indent=4,
-# )
+    try:
+        date_of_birth = (census.get("date_of_birth").strftime("%d %b %Y"),)
+    except AttributeError:
+        date_of_birth = "Unknown"
+        # object has no attribute 'get': instantiates as object but convert
+        # to dict
+    return json.dumps(
+        dict(
+            csn=census.get("encounter"),
+            # n_inotropes_1_4h=organ_support.get("n_inotropes_1_4h", ""),
+            # had_rrt_1_4h=organ_support.get("had_rrt_1_4h", ""),
+            # vent_type_1_4h=organ_support.get("vent_type_1_4h", ""),
+            mrn=census.get("mrn"),
+            date_of_birth=date_of_birth,
+            encounter=census.get("encounter"),
+            lastname=census.get("lastname"),
+            firstname=census.get("firstname"),
+            sex=census.get("sex"),
+        ),
+        indent=4,
+    )
