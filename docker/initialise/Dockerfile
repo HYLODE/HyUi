@@ -30,9 +30,13 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH:/opt/mssql-tools18/bin"
 
 RUN pip install --no-cache-dir -U pip
 
+COPY --chown=hyui:root ./models/pyproject.toml /app/models/
+RUN pip install --no-cache-dir /app/models
+
 COPY --chown=hyui:root ./initialise/pyproject.toml /app/initialise/
 RUN pip install --no-cache-dir /app/initialise
 
+COPY --chown=hyui:root ./models/src/models /app/models
 COPY --chown=hyui:root ./initialise/src/initialise /app/initialise
 
 ENTRYPOINT ["python", "-m", "initialise.main"]

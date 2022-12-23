@@ -5,15 +5,16 @@ from typing import cast
 
 import pandas as pd
 import requests
-from initialise.config import BaserowSettings, get_baserow_settings
-from initialise.db import caboodle_engine, star_engine
+from models.beds import Bed
 
 from convert import parse_to_data_frame
-from models.beds import Bed
+from initialise.config import BaserowSettings, get_baserow_settings
+from initialise.db import caboodle_engine, star_engine
 from . import DEPARTMENTS, VIRTUAL_BEDS, VIRTUAL_ROOMS
 
 
 def _star_locations() -> pd.DataFrame:
+    # noinspection SqlResolve
     return pd.read_sql(
         """
     SELECT
@@ -37,6 +38,7 @@ def _star_locations() -> pd.DataFrame:
 
 
 def _caboodle_departments() -> pd.DataFrame:
+    # noinspection SqlResolve
     return pd.read_sql(
         """SELECT
             --DepartmentKey AS department_key,
@@ -197,7 +199,9 @@ def _create_admin_user(settings: BaserowSettings):
         return
     elif response.status_code != 200:
         raise BaserowException(
-            f"unexpected response {response.status_code}: " f"{str(response.content)}"
+            f"unexpected response {response.status_code}: "
+            f""
+            f"{str(response.content)}"
         )
 
     logging.info("Admin user created.")
@@ -217,7 +221,9 @@ def _get_admin_user_auth_token(settings: BaserowSettings) -> str:
 
     if response.status_code != 200:
         raise BaserowException(
-            f"unexpected response {response.status_code}: " f"{str(response.content)}"
+            f"unexpected response {response.status_code}: "
+            f""
+            f"{str(response.content)}"
         )
 
     return cast(str, response.json()["token"])
@@ -238,7 +244,9 @@ def _get_group_id(base_url: str, auth_token: str) -> int:
     )
     if response.status_code != 200:
         raise BaserowException(
-            f"unexpected response {response.status_code}: " f"{str(response.content)}"
+            f"unexpected response {response.status_code}: "
+            f""
+            f"{str(response.content)}"
         )
 
     data = response.json()
@@ -256,7 +264,9 @@ def _delete_default_application(base_url: str, auth_token: str, group_id: int):
     )
     if response.status_code != 200:
         raise BaserowException(
-            f"unexpected response {response.status_code}: " f"{str(response.content)}"
+            f"unexpected response {response.status_code}: "
+            f""
+            f"{str(response.content)}"
         )
 
     application_id = next(
@@ -273,7 +283,9 @@ def _delete_default_application(base_url: str, auth_token: str, group_id: int):
     )
     if response.status_code != 204:
         raise BaserowException(
-            f"unexpected response {response.status_code}: " f"{str(response.content)}"
+            f"unexpected response {response.status_code}: "
+            f""
+            f"{str(response.content)}"
         )
 
 
@@ -285,7 +297,9 @@ def _create_application(base_url: str, auth_token: str, group_id: int) -> int:
     )
     if response.status_code != 200:
         raise BaserowException(
-            f"unexpected response {response.status_code}: " f"{str(response.content)}"
+            f"unexpected response {response.status_code}: "
+            f""
+            f"{str(response.content)}"
         )
 
     application_id = next(
@@ -303,7 +317,9 @@ def _create_application(base_url: str, auth_token: str, group_id: int) -> int:
     )
     if response.status_code != 200:
         raise BaserowException(
-            f"unexpected response {response.status_code}: " f"{str(response.content)}"
+            f"unexpected response {response.status_code}: "
+            f""
+            f"{str(response.content)}"
         )
 
     return cast(int, response.json()["id"])
@@ -323,7 +339,9 @@ def _create_table(
     )
     if response.status_code != 200:
         raise BaserowException(
-            f"unexpected response {response.status_code}: " f"{str(response.content)}"
+            f"unexpected response {response.status_code}: "
+            f""
+            f"{str(response.content)}"
         )
 
     table_id = next(
@@ -348,7 +366,9 @@ def _create_table(
 
     if response.status_code != 200:
         raise BaserowException(
-            f"unexpected response {response.status_code}: " f"{str(response.content)}"
+            f"unexpected response {response.status_code}: "
+            f""
+            f"{str(response.content)}"
         )
 
     table_id = response.json()["id"]
@@ -385,7 +405,9 @@ def _add_table_field(
     )
     if response.status_code != 200:
         raise BaserowException(
-            f"unexpected response {response.status_code}: " f"{str(response.content)}"
+            f"unexpected response {response.status_code}: "
+            f""
+            f"{str(response.content)}"
         )
 
 
