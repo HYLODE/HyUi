@@ -43,7 +43,7 @@ dropdown_dev = [
     NavbarDropdown("HYLODE", "http://172.16.149.202:5001/", False),
     NavbarDropdown("HYMIND Lab", "http://172.16.149.202:5009/", False),
     NavbarDropdown("HYUI API", "http://172.16.149.202:8094/docs", False),
-    NavbarDropdown("BaseRow", f"os.getenv('BASEROW_PUBLIC_URL', '')", False),
+    NavbarDropdown("BaseRow", os.getenv("BASEROW_PUBLIC_URL", ""), False),
     # NavbarDropdown("PGWeb", "http://172.16.149.202:8099", False),
 ]
 

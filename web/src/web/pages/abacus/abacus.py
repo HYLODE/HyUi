@@ -1,26 +1,23 @@
 """
 Layout for sub-application for the abacus endpoint
 """
-# TODO: generalise to work with any ward using concentric lay out so strip
-#  out sitrep data for now; and store census data on the page
-
-DEBUG = False
 
 import dash_bootstrap_components as dbc
 import dash_cytoscape as cyto
 from dash import dcc, html, register_page
 
-if DEBUG:
-    from . import BPID
-    import abacus.callbacks  # noqa
-else:
-    import web.pages.abacus.callbacks  # noqa: F401
-    from web.pages.abacus import BPID
+import web.pages.abacus.callbacks  # noqa: F401
+from web.pages.abacus import BPID
 
-    register_page(__name__, name="ABACUS")
+register_page(__name__, name="ABACUS")
 
-DEPARTMENT = "UCH T03 INTENSIVE CARE"
-DEPARTMENTS = [DEPARTMENT, "GWB L01 CRITICAL CARE"]
+DEPARTMENTS = [
+    "WMS W01 CRITICAL CARE",
+    "GWB L01 CRITICAL CARE",
+    "UCH T03 INTENSIVE CARE",
+]
+DEPARTMENT = DEPARTMENTS[2]
+BUILDING = "tower"
 REFRESH_INTERVAL = 10 * 60 * 1000  # 10 mins in milliseconds
 
 building_radio_button = html.Div(
@@ -38,7 +35,7 @@ building_radio_button = html.Div(
                         {"label": "WMS", "value": "wms"},
                         {"label": "NHNN", "value": "nhnn"},
                     ],
-                    value="tower",
+                    value=BUILDING,
                 )
             ],
             className="dbc",
@@ -171,26 +168,3 @@ def layout():
             dash_only,
         ]
     )
-
-
-if DEBUG:
-    from dash import Dash
-
-    app = Dash(
-        __name__,
-        # server=server,
-        title="HYLODE",
-        update_title=None,
-        external_stylesheets=[
-            dbc.themes.LUX,
-            dbc.icons.FONT_AWESOME,
-        ],
-        suppress_callback_exceptions=True,
-        # use_pages=True,
-        # background_callback_manager=DiskcacheManager(cache),
-    )
-    server = app.server
-
-    if __name__ == "__main__":
-        app.layout = layout()
-        app.run_server(debug=True)

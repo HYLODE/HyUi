@@ -74,15 +74,16 @@ def get_census(department: str) -> dict[str, Any]:
 def update_layout(layout: str) -> dict:
     layouts = {
         "preset": {"name": "preset", "fit": True, "padding": 80},
-        "random": {"name": "random"},
+        "random": {"name": "random", "animate": True},
         "circle": {
             "name": "circle",
             "fit": True,
             "padding": 10,
             "startAngle": math.pi * 2 / 3,  # clockwise from 3 O'Clock
             "sweep": math.pi * 5 / 3,
+            "animate": True,
         },
-        "grid": {"name": "grid", "cols": 5, "fit": True},
+        "grid": {"name": "grid", "cols": 5, "fit": True, "animate": True},
     }
     return layouts.get(layout, "circle")
 
@@ -97,6 +98,7 @@ def update_layout(layout: str) -> dict:
 def store_patients_in_beds(census, beds, layout):
     preset = True if layout == "preset" else False
     bed_list = [_make_bed(i, preset) for i in beds]
+    bed_list.sort(key=lambda bed: bed.get("data").get("bed_index"))
 
     patient_list = _populate_beds(bed_list, census)
     room_list = [_make_room(r, preset) for r in _list_of_unique_rooms(beds)]

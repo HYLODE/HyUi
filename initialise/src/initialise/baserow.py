@@ -7,7 +7,7 @@ import pandas as pd
 import requests
 from models.beds import Bed
 
-from convert import parse_to_data_frame
+from initialise.convert import parse_to_data_frame
 from initialise.config import BaserowSettings, get_baserow_settings
 from initialise.db import caboodle_engine, star_engine
 from . import DEPARTMENTS, VIRTUAL_BEDS, VIRTUAL_ROOMS
