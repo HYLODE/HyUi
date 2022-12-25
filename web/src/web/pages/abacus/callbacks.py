@@ -139,7 +139,7 @@ def make_cytoscape_elements(census, beds, sitrep, layout):
     bed_list.sort(key=lambda bed: bed.get("data").get("bed_index"))
 
     bed_list = _populate_beds(bed_list, census)
-    if len(sitrep):
+    if sitrep and sum([len(i) for i in sitrep]):
         bed_list = _update_patients_with_sitrep(bed_list, sitrep)
 
     nodes = bed_list + room_list

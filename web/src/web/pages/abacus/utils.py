@@ -59,8 +59,9 @@ def _get_sitrep_status(department: str) -> list[dict]:
 
     """
     # FIXME 2022-12-20 hack to keep this working whilst waiting on
-    COVID_SITREP = False
-    warnings.warn("Working from old hycastle sitrep", category=DeprecationWarning)
+    COVID_SITREP = True
+    if COVID_SITREP:
+        warnings.warn("Working from old hycastle sitrep", category=DeprecationWarning)
 
     def _which_sitrep(dept, covid_sitrep: bool = COVID_SITREP):
         if covid_sitrep:
