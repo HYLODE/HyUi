@@ -10,7 +10,7 @@ from models.beds import Bed
 from models.census import CensusRow
 from models.sitrep import SitrepRow
 from web.config import get_settings
-from web.pages.abacus import DEPARTMENT_WARD_MAPPINGS
+from web.pages.abacus import SITREP_DEPT2WARD_MAPPING
 
 
 def _as_int(s: int | float | None) -> int | None:
@@ -47,14 +47,19 @@ def _get_census(department: str) -> list[dict]:
     return [CensusRow.parse_obj(row).dict() for row in response.json()]
 
 
-def _get_sitrep_status(department: str) -> object:
+def _get_sitrep_status(department: str) -> list[dict]:
     """
-    get organ support data from old sitrep interface
-    :param department:
-    :return: original covid sitrep organ support
+    Get sitrep data from the original API where that works
+
+    Args:
+        department: string e.g. 'T03'
+
+    Returns:
+        A dictionary per beds space keyed on CSN
+
     """
     # FIXME 2022-12-20 hack to keep this working whilst waiting on
-    COVID_SITREP = True
+    COVID_SITREP = False
     warnings.warn("Working from old hycastle sitrep", category=DeprecationWarning)
 
     def _which_sitrep(dept, covid_sitrep: bool = COVID_SITREP):
@@ -65,21 +70,23 @@ def _get_sitrep_status(department: str) -> object:
         return url
 
     try:
-        department = DEPARTMENT_WARD_MAPPINGS[department]
-        sitrep_api = _which_sitrep(department)
-        response = requests.get(sitrep_api).json().get("data")
-    except ConnectionError:
-        try:
-            department = DEPARTMENT_WARD_MAPPINGS[department]
-        except KeyError:
-            if department not in DEPARTMENT_WARD_MAPPINGS.values():
-                raise KeyError(f"{department} not recognised as valid department")
+        department = SITREP_DEPT2WARD_MAPPING[department]
         sitrep_api = _which_sitrep(department)
         response = requests.get(sitrep_api).json()
-    return [SitrepRow.parse_obj(row).dict() for row in response]
+    except ConnectionError:
+        if department not in SITREP_DEPT2WARD_MAPPING.values():
+            warnings.warn(
+                f"{department} not one of f" f"" f"{SITREP_DEPT2WARD_MAPPING.values()}"
+            )
+        sitrep_api = _which_sitrep(department)
+        response = requests.get(sitrep_api).json()
+
+    rows = response["data"] if COVID_SITREP else response
+
+    return [SitrepRow.parse_obj(row).dict() for row in rows]
 
 
-def _populate_beds(bed_list: list[dict], census_list: list[dict]) -> list[dict]:
+def _populate_beds(bl: list[dict], cl: list[dict]) -> list[dict]:
     """
     place patients in beds
     :param bed_list: derived from baserow structure
@@ -87,8 +94,6 @@ def _populate_beds(bed_list: list[dict], census_list: list[dict]) -> list[dict]:
     :return: a list of dictionaries to populate elements for Cytoscape
     """
     # copy the lists first since they are mutable
-    bl = bed_list.copy()
-    cl = census_list.copy()
 
     # convert to dictionary of dictionaries to search / merge
     cd = {i["location_string"]: i for i in cl}
@@ -96,7 +101,29 @@ def _populate_beds(bed_list: list[dict], census_list: list[dict]) -> list[dict]:
         location_string = bed.get("data").get("id")  # type: ignore
         census = cd.get(location_string, {})  # type: ignore
         bed["data"]["census"] = census
+        bed["data"]["encounter"] = _as_int(census.get("encounter", None))
         bed["data"]["occupied"] = True if census.get("occupied", None) else False
+    return bl
+
+
+def _update_patients_with_sitrep(bl: list[dict], sl: list[dict]) -> list[dict]:
+    """
+    Merge sitrep details on to patient list using encounter key
+    Args:
+        bl: beds with patients
+        sl: sitrep
+
+    Returns:
+        updated bed_list holding sitrep data
+
+    """
+
+    # convert to dictionary for searching simply
+    sd = {int(i["csn"]): i for i in sl if i["csn"]}
+    for bed in bl:
+        csn = bed.get("data").get("encounter")
+        sitrep = sd.get(csn, {})
+        bed["data"]["sitrep"] = sitrep
     return bl
 
 
@@ -184,25 +211,19 @@ def _make_room(room: str, preset=True) -> dict:
     )
 
 
-def _present_patient(census: dict) -> str:
+def _present_patient(census: dict, sitrep: dict) -> str:
     """
     Prettify node data
     """
 
-    try:
-        date_of_birth = (census.get("date_of_birth").strftime("%d %b %Y"),)
-    except AttributeError:
-        date_of_birth = "Unknown"
-        # object has no attribute 'get': instantiates as object but convert
-        # to dict
     return json.dumps(
         dict(
-            csn=census.get("encounter"),
-            # n_inotropes_1_4h=organ_support.get("n_inotropes_1_4h", ""),
-            # had_rrt_1_4h=organ_support.get("had_rrt_1_4h", ""),
-            # vent_type_1_4h=organ_support.get("vent_type_1_4h", ""),
+            csn=_as_int(census.get("encounter")),
+            n_inotropes_1_4h=sitrep.get("n_inotropes_1_4h", ""),
+            had_rrt_1_4h=sitrep.get("had_rrt_1_4h", ""),
+            vent_type_1_4h=sitrep.get("vent_type_1_4h", ""),
             mrn=census.get("mrn"),
-            date_of_birth=date_of_birth,
+            date_of_birth=census.get("date_of_birth"),
             encounter=census.get("encounter"),
             lastname=census.get("lastname"),
             firstname=census.get("firstname"),

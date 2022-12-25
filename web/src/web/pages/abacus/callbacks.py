@@ -1,7 +1,10 @@
+import warnings
+
 import json
 import math
 
-from dash import Input, Output, callback, dcc
+from . import SITREP_DEPT2WARD_MAPPING
+from dash import Input, Output, State, callback, dcc, ctx
 from web.hospital import get_building_departments
 
 # callback functions created here will be labelled with BPID for abacus
@@ -15,11 +18,12 @@ from web.pages.abacus.utils import (
     _list_of_unique_rooms,
     _make_room,
     _present_patient,
+    _update_patients_with_sitrep,
 )
 
 
 @callback(
-    Output(f"{BPID}departments", "data"), Input(f"{BPID}query_interval", "n_intervals")
+    Output(f"{BPID}departments", "data"), Input(f"{BPID}page_interval", "n_intervals")
 )
 def get_all_departments(n_intervals: int):
     building_departments = get_building_departments()
@@ -69,12 +73,31 @@ def get_census(department: str) -> list[dict]:
     return census
 
 
-# @callback(
-#     Output(f"{BPID}sitrep", "data"),
-#     Input(f"{BPID}dept_dropdown", "value"),
-# )
-# def get_sitrep(department: str) -> list[dict]:
-#     return _get_sitrep_status(department=department)
+@callback(
+    Output(f"{BPID}sitrep", "data"),
+    Input(f"{BPID}dept_dropdown", "value"),
+    prevent_initial_callback=True,
+)
+def get_sitrep(department: str) -> list[dict]:
+    """
+    Use census to provide the CSNs that can be used to query additional data
+    Args:
+        department: the department
+
+    Returns:
+        additonal patient level data
+
+    """
+
+    if department in SITREP_DEPT2WARD_MAPPING.keys():
+        # simulate delay in API request
+        # import time
+        # time.sleep(3)
+
+        return _get_sitrep_status(department=department)
+    else:
+        warnings.warn(f"No sitrep data available for {department}")
+        return [{}]
 
 
 @callback(
@@ -95,25 +118,31 @@ def update_layout(layout: str) -> dict:
         },
         "grid": {"name": "grid", "cols": 5, "fit": True, "animate": True},
     }
-    return layouts.get(layout, "circle")
+    return layouts.get(layout)
 
 
 @callback(
     Output(f"{BPID}bed_map", "elements"),
     Input(f"{BPID}census", "data"),
     Input(f"{BPID}beds", "data"),
+    Input(f"{BPID}sitrep", "data"),
     Input(f"{BPID}layout_radio", "value"),
     prevent_initial_call=True,
 )
-def store_patients_in_beds(census, beds, layout):
+def make_cytoscape_elements(census, beds, sitrep, layout):
+
     preset = True if layout == "preset" else False
+
+    room_list = [_make_room(r, preset) for r in _list_of_unique_rooms(beds)]
+
     bed_list = [_make_bed(i, preset) for i in beds]
     bed_list.sort(key=lambda bed: bed.get("data").get("bed_index"))
 
-    patient_list = _populate_beds(bed_list, census)
-    room_list = [_make_room(r, preset) for r in _list_of_unique_rooms(beds)]
+    bed_list = _populate_beds(bed_list, census)
+    if len(sitrep):
+        bed_list = _update_patients_with_sitrep(bed_list, sitrep)
 
-    nodes = patient_list + room_list
+    nodes = bed_list + room_list
 
     edges = []
 
@@ -127,7 +156,10 @@ def store_patients_in_beds(census, beds, layout):
 )
 def tap_bed_inspector(data):
     if data:
-        return _present_patient(data.get("data").get("census"))
+        return _present_patient(
+            census=data.get("data").get("census"),
+            sitrep=data.get("data").get("sitrep"),
+        )
     else:
         return ""
 

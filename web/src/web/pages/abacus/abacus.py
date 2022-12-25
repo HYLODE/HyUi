@@ -18,7 +18,8 @@ DEPARTMENTS = [
 ]
 DEPARTMENT = DEPARTMENTS[2]
 BUILDING = "tower"
-REFRESH_INTERVAL = 10 * 60 * 1000  # 10 mins in milliseconds
+PAGE_REFRESH_INTERVAL = 10 * 60 * 1000  # 10 mins in milliseconds
+DATA_REFRESH_INTERVAL = 1 * 1000  # 10 mins in milliseconds
 
 building_radio_button = html.Div(
     [
@@ -73,14 +74,14 @@ bed_inspector = html.Pre(id=f"{BPID}bed_inspector", style=styles["pre"])
 dash_only = html.Div(
     [
         dcc.Interval(
-            id=f"{BPID}query_interval",
-            interval=REFRESH_INTERVAL,
+            id=f"{BPID}page_interval",
+            interval=PAGE_REFRESH_INTERVAL,
             n_intervals=0,
         ),
         dcc.Store(id=f"{BPID}departments"),
         dcc.Store(id=f"{BPID}census"),
         dcc.Store(id=f"{BPID}beds"),
-        # dcc.Store(id=f"{BPID}sitrep"),
+        dcc.Store(id=f"{BPID}sitrep"),
         dcc.Store(id=f"{BPID}patients_in_beds"),
     ]
 )
