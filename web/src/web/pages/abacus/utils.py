@@ -216,6 +216,8 @@ def _present_patient(census: dict, sitrep: dict) -> str:
     """
     Prettify node data
     """
+    if not sitrep:
+        sitrep = {}
 
     return json.dumps(
         dict(
