@@ -2,38 +2,18 @@
 Entry point and main file for the FastAPI backend
 """
 
-from fastapi import FastAPI, APIRouter
+from fastapi import APIRouter, FastAPI
 from fastapi.responses import ORJSONResponse
 
-from api.bedbones.router import (
-    mock_router as mock_bedbones_router,
-    router as bedbones_router,
-)
+from api.beds.router import mock_router as mock_beds_router, router as beds_router
 from api.census.router import mock_router as mock_census_router, router as census_router
 from api.consults.router import router as consults_router
+from api.demo.router import mock_router as mock_demo_router, router as demo_router
 from api.ed.router import mock_router as mock_ed_router, router as ed_router
 from api.electives.router import (
     mock_router as mock_electives_router,
     router as electives_router,
 )
-
-from api.beds.router import (
-    router as beds_router,
-    mock_router as mock_beds_router,
-)
-from api.consults.router import router as consults_router
-from api.perrt.router import router as perrt_router
-from api.ros.router import router as ros_router
-from api.hymind.router import router as hymind_router
-from api.hospital.router import (
-    router as hospital_router,
-    mock_router as mock_hospital_router,
-)
-from api.demo.router import (
-    router as demo_router,
-    mock_router as mock_demo_router,
-)
-
 from api.hospital.router import (
     mock_router as mock_hospital_router,
     router as hospital_router,

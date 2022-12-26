@@ -19,7 +19,12 @@ mock_router = APIRouter(
 def get_mock_beds(department: str) -> list[Bed]:
     # FIXME: dependency between initialise and api modules
     with open(
-        Path.cwd() / "initialise" / "src" / "initialise" / "bed_defaults.json", "r"
+        Path(__file__).parents[4]
+        / "initialise"
+        / "src"
+        / "initialise"
+        / "bed_defaults.json",
+        "r",
     ) as f:
         rows = json.load(f)
     # mock return just T03 beds
