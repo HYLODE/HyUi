@@ -8,6 +8,7 @@ from requests.exceptions import ConnectionError
 
 from models.beds import Bed
 from models.census import CensusRow
+from models.perrt import EmapVitalsLong
 from models.sitrep import SitrepRow
 from web.config import get_settings
 from web.pages.abacus import SITREP_DEPT2WARD_MAPPING
@@ -77,7 +78,7 @@ def _get_sitrep_status(department: str) -> list[dict]:
     except ConnectionError:
         if department not in SITREP_DEPT2WARD_MAPPING.values():
             warnings.warn(
-                f"{department} not one of f" f"" f"{SITREP_DEPT2WARD_MAPPING.values()}"
+                f"{department} not one of {SITREP_DEPT2WARD_MAPPING.values()}"
             )
         sitrep_api = _which_sitrep(department)
         response = requests.get(sitrep_api).json()
@@ -85,6 +86,14 @@ def _get_sitrep_status(department: str) -> list[dict]:
     rows = response["data"] if COVID_SITREP else response
 
     return [SitrepRow.parse_obj(row).dict() for row in rows]
+
+
+def _get_perrt_long(encounter: int, hours: int = 6):
+    response = requests.get(
+        url=f"{get_settings().api_url}/perrt/vitals/long",
+        params={"encounter_ids": [encounter], "horizon_dt": hours},
+    )
+    return [EmapVitalsLong.parse_obj(row).dict() for row in response.json()]
 
 
 def _populate_beds(bl: list[dict], cl: list[dict]) -> list[dict]:
@@ -216,6 +225,9 @@ def _present_patient(census: dict, sitrep: dict) -> str:
     """
     Prettify node data
     """
+    if not census.get("occupied"):
+        return ""
+
     if not sitrep:
         sitrep = {}
 

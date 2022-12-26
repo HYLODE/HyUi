@@ -71,6 +71,8 @@ layout_radio_button = html.Div(
 bed_inspector = html.Pre(id=f"{BPID}bed_inspector", style=styles["pre"])
 # node_inspector = html.Pre(id=f"{BPID}node_inspector")
 
+patient_inspector = html.Pre(id=f"{BPID}patient_inspector", style=styles["pre"])
+
 dash_only = html.Div(
     [
         dcc.Interval(
@@ -83,6 +85,7 @@ dash_only = html.Div(
         dcc.Store(id=f"{BPID}beds"),
         dcc.Store(id=f"{BPID}sitrep"),
         dcc.Store(id=f"{BPID}patients_in_beds"),
+        dcc.Store(id=f"{BPID}patient_details"),
     ]
 )
 
@@ -160,6 +163,7 @@ def layout():
                             layout_radio_button,
                             html.Div(id=f"{BPID}dept_dropdown_div"),
                             bed_inspector,
+                            patient_inspector,
                             # node_inspector,
                         ],
                         # width={"size": 6, "order": "last", "offset": 6},

@@ -1,10 +1,8 @@
-import warnings
-
 import json
 import math
+import warnings
+from dash import Input, Output, callback, dcc
 
-from . import SITREP_DEPT2WARD_MAPPING
-from dash import Input, Output, State, callback, dcc, ctx
 from web.hospital import get_building_departments
 
 # callback functions created here will be labelled with BPID for abacus
@@ -12,14 +10,16 @@ from web.pages.abacus import BPID
 from web.pages.abacus.utils import (
     _get_beds,
     _get_census,
+    _get_perrt_long,
     _get_sitrep_status,
-    _make_bed,
-    _populate_beds,
     _list_of_unique_rooms,
+    _make_bed,
     _make_room,
+    _populate_beds,
     _present_patient,
     _update_patients_with_sitrep,
 )
+from . import SITREP_DEPT2WARD_MAPPING
 
 
 @callback(
@@ -101,6 +101,20 @@ def get_sitrep(department: str) -> list[dict]:
 
 
 @callback(
+    Output(f"{BPID}patient_details", "data"),
+    Input(f"{BPID}bed_map", "tapNode"),
+    prevent_initial_call=True,
+)
+def get_patient_details(element: dict) -> list[dict]:
+    """Run PERRT vitals long query and return to store"""
+    if not element.get("data").get("occupied"):
+        return [{}]
+    else:
+        encounter = element.get("data").get("encounter", None)
+        return _get_perrt_long(encounter, hours=6)
+
+
+@callback(
     Output(f"{BPID}bed_map", "layout"),
     Input(f"{BPID}layout_radio", "value"),
 )
@@ -130,7 +144,6 @@ def update_layout(layout: str) -> dict:
     prevent_initial_call=True,
 )
 def make_cytoscape_elements(census, beds, sitrep, layout):
-
     preset = True if layout == "preset" else False
 
     room_list = [_make_room(r, preset) for r in _list_of_unique_rooms(beds)]
@@ -160,6 +173,18 @@ def tap_bed_inspector(data):
             census=data.get("data").get("census"),
             sitrep=data.get("data").get("sitrep"),
         )
+    else:
+        return ""
+
+
+@callback(
+    Output(f"{BPID}patient_inspector", "children"),
+    Input(f"{BPID}patient_details", "data"),
+    prevent_initial_callback=True,
+)
+def patient_inspector(data):
+    if data:
+        return json.dumps(data, indent=4)
     else:
         return ""
 
