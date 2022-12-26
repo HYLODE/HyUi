@@ -1,6 +1,6 @@
 import requests
 
-from models.census import CensusDepartment, ClosedBed, CensusRow
+from models.census import CensusDepartment, CensusRow
 from web.config import get_settings
 from web.convert import to_data_frame
 
@@ -8,6 +8,14 @@ from web.convert import to_data_frame
 # def _get_closed_beds() -> list[Bed]:
 #     response = requests.get(f"{get_settings().api_url}/beds/closed/")
 #     return [Bed.parse_obj(row) for row in response.json()]
+
+
+def get_census(departments: list[str], locations: list[str] = None) -> list[CensusRow]:
+    response = requests.get(
+        url=f"{get_settings().api_url}/census/",
+        params={"departments": departments, "locations": locations},
+    )
+    return [CensusRow.parse_obj(row) for row in response.json()]
 
 
 def get_department_status() -> list[CensusDepartment]:
@@ -35,7 +43,8 @@ def fetch_department_census():
     departments_df.head()
 
     # Then update empties
-    # departments_df["empties"] = departments_df["empties"] - departments_df["closed"]
+    # departments_df["empties"] = departments_df["empties"] - departments_df[
+    # "closed"]
 
     return departments_df[
         [
