@@ -1,7 +1,7 @@
 import json
 import math
 import warnings
-from dash import Input, Output, callback, dcc
+from dash import Input, Output, callback, dcc, ctx
 
 from web.hospital import get_building_departments
 
@@ -106,11 +106,25 @@ def store_sitrep(department: str) -> list[dict]:
 
 
 @callback(
+    Output(f"{BPID}tap_node", "data"),
+    Input(f"{BPID}bed_map", "tapNode"),
+    Input(f"{BPID}dept_dropdown", "value"),
+    Input(f"{BPID}building_radio", "value"),
+    prevent_initial_call=True,
+)
+def store_tap_node(data: list[dict], dept: str, bldg: str) -> list[dict]:
+    if ctx.triggered_id == f"{BPID}bed_map":
+        return data
+    else:
+        return [{}]
+
+
+@callback(
     Output(f"{BPID}patient_details", "data"),
     Input(f"{BPID}bed_map", "tapNode"),
     prevent_initial_call=True,
 )
-def get_patient_details(element: dict) -> list[dict]:
+def store_patient_details(element: dict) -> list[dict]:
     """Run PERRT vitals long query and return to store"""
     if not element.get("data").get("occupied"):
         return [{}]
@@ -169,11 +183,11 @@ def make_cytoscape_elements(census, beds, sitrep, layout):
 
 @callback(
     Output(f"{BPID}bed_inspector", "children"),
-    Input(f"{BPID}bed_map", "tapNode"),
+    Input(f"{BPID}tap_node", "data"),
     prevent_initial_callback=True,
 )
-def tap_bed_inspector(data):
-    if data:
+def tap_bed_inspector(data: list[dict]):
+    if data and any(data):
         return _present_patient(
             census=data.get("data").get("census"),
             sitrep=data.get("data").get("sitrep"),
@@ -187,17 +201,20 @@ def tap_bed_inspector(data):
     Input(f"{BPID}patient_details", "data"),
     prevent_initial_callback=True,
 )
-def patient_inspector(data):
-    if data:
+def patient_inspector(data: list[dict]):
+    if data and any(data):
         return json.dumps(data, indent=4)
     else:
         return ""
 
 
 @callback(
-    Output(f"{BPID}node_inspector", "children"),
-    Input(f"{BPID}bed_map", "tapNode"),
+    Output(f"{BPID}node_inspector", "hidden"),
+    Input(f"{BPID}tap_node", "data"),
     prevent_initial_callback=True,
 )
-def tap_node_inspector(data):
-    return json.dumps(data, indent=4)
+def tap_node_inspector(data: list[dict]):
+    if data and any(data):
+        return False
+    else:
+        return True

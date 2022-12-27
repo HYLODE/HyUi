@@ -28,6 +28,7 @@ dash_only = html.Div(
         dcc.Store(id=f"{BPID}beds"),
         dcc.Store(id=f"{BPID}sitrep"),
         dcc.Store(id=f"{BPID}patients_in_beds"),
+        dcc.Store(id=f"{BPID}tap_node"),
         dcc.Store(id=f"{BPID}patient_details"),
     ]
 )
@@ -43,7 +44,8 @@ discharge_form = html.Div(
                 dbc.Button(
                     "Submit",
                     id=f"{BPID}discharge_submit_button",
-                    className="dbc d-grid d-md-flex justify-content-md-end btn-group",
+                    className="dbc d-grid d-md-flex justify-content-md-end "
+                    "btn-group",
                     color="danger",
                     outline=True,
                     size="sm",
@@ -117,12 +119,7 @@ def layout():
         [
             dbc.Row(
                 [
-                    dbc.Col(
-                        [
-                            # html.H2("some really big text across the page")
-                            layout_radio_button
-                        ]
-                    ),
+                    dbc.Col([layout_radio_button]),
                     dbc.Col([building_radio_button]),
                 ]
             ),
@@ -130,22 +127,23 @@ def layout():
                 [
                     dbc.Col(
                         [
-                            # html.Div("Row 1 Column 1"),
                             html.Div(id=f"{BPID}dept_title"),
-                            # html.Div(id=f"{BPID}ward_map"),
                             ward_map,
                         ],
                         # width={"size": 6, "order": "first", "offset": 6},
                     ),
                     dbc.Col(
                         [
-                            # building_radio_button,
-                            # layout_radio_button,
                             html.Div(id=f"{BPID}dept_dropdown_div"),
-                            bed_inspector,
-                            discharge_form,
-                            patient_inspector,
-                            # node_inspector,
+                            html.Div(
+                                id=f"{BPID}node_inspector",
+                                children=[
+                                    bed_inspector,
+                                    discharge_form,
+                                    patient_inspector,
+                                ],
+                                hidden=True,
+                            ),
                         ],
                         # width={"size": 6, "order": "last", "offset": 6},
                     ),
