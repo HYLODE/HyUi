@@ -7,73 +7,14 @@ import dash_cytoscape as cyto
 from dash import dcc, html, register_page
 
 import web.pages.abacus.callbacks  # noqa: F401
-from web.pages.abacus import BPID, styles
+from web.pages.abacus import BPID, PAGE_REFRESH_INTERVAL, styles
+from web.pages.abacus.widgets import (
+    building_radio_button,
+    discharge_radio_button,
+    layout_radio_button,
+)
 
 register_page(__name__, name="ABACUS")
-
-DEPARTMENTS = [
-    "WMS W01 CRITICAL CARE",
-    "GWB L01 CRITICAL CARE",
-    "UCH T03 INTENSIVE CARE",
-]
-DEPARTMENT = DEPARTMENTS[2]
-BUILDING = "tower"
-PAGE_REFRESH_INTERVAL = 10 * 60 * 1000  # 10 mins in milliseconds
-DATA_REFRESH_INTERVAL = 1 * 1000  # 10 mins in milliseconds
-
-building_radio_button = html.Div(
-    [
-        html.Div(
-            [
-                dbc.RadioItems(
-                    id=f"{BPID}building_radio",
-                    className="dbc d-grid d-md-flex "
-                    "justify-content-md-end btn-group",
-                    inline=True,
-                    options=[
-                        {"label": "Tower", "value": "tower"},
-                        {"label": "GWB", "value": "gwb"},
-                        {"label": "WMS", "value": "wms"},
-                        {"label": "NHNN", "value": "nhnn"},
-                    ],
-                    value=BUILDING,
-                )
-            ],
-            className="dbc",
-        ),
-    ],
-    className="radio-group",
-)
-
-layout_radio_button = html.Div(
-    [
-        html.Div(
-            [
-                dbc.RadioItems(
-                    id=f"{BPID}layout_radio",
-                    className="dbc d-grid d-md-flex "
-                    "justify-content-md-end btn-group",
-                    inline=True,
-                    options=[
-                        {"label": "Map", "value": "preset"},
-                        {"label": "Circle", "value": "circle"},
-                        {"label": "Grid", "value": "grid"},
-                    ],
-                    value="circle",
-                )
-            ],
-            className="dbc",
-        ),
-    ],
-    className="radio-group",
-)
-
-bed_inspector = html.Pre(id=f"{BPID}bed_inspector", style=styles["pre"])
-# node_inspector = html.Pre(id=f"{BPID}node_inspector")
-
-patient_inspector = dcc.Loading(
-    html.Pre(id=f"{BPID}patient_inspector", style=styles["pre"])
-)
 
 dash_only = html.Div(
     [
@@ -89,6 +30,32 @@ dash_only = html.Div(
         dcc.Store(id=f"{BPID}patients_in_beds"),
         dcc.Store(id=f"{BPID}patient_details"),
     ]
+)
+
+bed_inspector = html.Pre(id=f"{BPID}bed_inspector", style=styles["pre"])
+
+# using the term 'form' to indicate that this is for user input
+discharge_form = html.Div(
+    [
+        discharge_radio_button,
+        html.Div(
+            [
+                dbc.Button(
+                    "Submit",
+                    id=f"{BPID}discharge_submit_button",
+                    className="dbc d-grid d-md-flex justify-content-md-end btn-group",
+                    color="danger",
+                    outline=True,
+                    size="sm",
+                ),
+            ],
+            className="dbc d-grid d-md-flex justify-content-md-end",
+        ),
+    ]
+)
+
+patient_inspector = dcc.Loading(
+    html.Pre(id=f"{BPID}patient_inspector", style=styles["pre"])
 )
 
 ward_map = html.Div(
@@ -152,6 +119,17 @@ def layout():
                 [
                     dbc.Col(
                         [
+                            # html.H2("some really big text across the page")
+                            layout_radio_button
+                        ]
+                    ),
+                    dbc.Col([building_radio_button]),
+                ]
+            ),
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [
                             # html.Div("Row 1 Column 1"),
                             html.Div(id=f"{BPID}dept_title"),
                             # html.Div(id=f"{BPID}ward_map"),
@@ -161,10 +139,11 @@ def layout():
                     ),
                     dbc.Col(
                         [
-                            building_radio_button,
-                            layout_radio_button,
+                            # building_radio_button,
+                            # layout_radio_button,
                             html.Div(id=f"{BPID}dept_dropdown_div"),
                             bed_inspector,
+                            discharge_form,
                             patient_inspector,
                             # node_inspector,
                         ],
