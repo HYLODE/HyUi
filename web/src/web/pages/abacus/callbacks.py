@@ -1,7 +1,7 @@
 import json
 import math
 import warnings
-from dash import Input, Output, callback, dcc, ctx
+from dash import Input, Output, callback, ctx, dcc
 
 from web.hospital import get_building_departments
 
@@ -175,10 +175,15 @@ def make_cytoscape_elements(census, beds, sitrep, layout):
         bed_list = _update_patients_with_sitrep(bed_list, sitrep)
 
     nodes = bed_list + room_list
-
     edges = []
+    elements = nodes + edges
+    # Update elements so that none selected on first instantiation I think this
+    # works b/c elements is a mutable list so we are actually modifying its
+    # contents
+    for ele in elements:
+        ele["selected"] = False
 
-    return nodes + edges
+    return elements
 
 
 @callback(
