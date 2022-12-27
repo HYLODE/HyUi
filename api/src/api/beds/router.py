@@ -1,10 +1,11 @@
+import json
+from datetime import datetime
 from fastapi import APIRouter, Depends
 from pathlib import Path
-import json
 
-from api.baserow import get_fields, get_rows
-from api.config import get_settings, Settings
-from models.beds import Bed
+from api.baserow import get_fields, get_rows, post_row
+from api.config import Settings, get_settings
+from models.beds import Bed, DischargeStatus
 
 router = APIRouter(
     prefix="/beds",
@@ -35,7 +36,6 @@ def get_mock_beds(department: str) -> list[Bed]:
 
 @router.get("/", response_model=list[Bed])
 def get_beds(department: str, settings: Settings = Depends(get_settings)) -> list[Bed]:
-
     baserow_url = settings.baserow_url
     email = settings.baserow_email
     password = settings.baserow_password.get_secret_value()
@@ -45,7 +45,8 @@ def get_beds(department: str, settings: Settings = Depends(get_settings)) -> lis
     department_field_id = field_ids["department"]
 
     params = {
-        "size": 200,  # The maximum size of a page.
+        "size": 200,
+        # The maximum size of a page.
         "user_field_names": "true",
         f"filter__field_{department_field_id}__equal": department,
     }
@@ -73,10 +74,69 @@ def get_closed_beds(settings=Depends(get_settings)) -> list[Bed]:
     closed_field_id = field_ids["closed"]
 
     params = {
-        "size": 200,  # The maximum size of a page.
+        "size": 200,
+        # The maximum size of a page.
         "user_field_names": "true",
         f"filter__field_{closed_field_id}__boolean": True,
     }
 
     rows = get_rows(baserow_url, email, password, "hyui", "beds", params)
     return [Bed.parse_obj(row) for row in rows]
+
+
+@mock_router.post("/discharge_status/", response_model=DischargeStatus)
+def post_mock_discharge_status(settings=Depends(get_settings)) -> DischargeStatus:
+    # this function depends on having a local instance of baserow running
+    baserow_url = settings.baserow_url
+    email = settings.baserow_email
+    password = settings.baserow_password.get_secret_value()
+
+    params = {"user_field_names": True}
+
+    payload = {
+        "csn": 123,
+        "status": "ready",
+        "modified_at": datetime.utcnow().isoformat(),
+    }
+
+    result = post_row(
+        baserow_url,
+        email,
+        password,
+        "hyui",
+        "discharge_statuses",
+        params=params,
+        payload=payload,
+    )
+
+    return DischargeStatus.parse_obj(result)
+
+
+@router.post("/discharge_status/", response_model=DischargeStatus)
+def post_discharge_status(
+    csn: int, status: str, settings=Depends(get_settings)
+) -> DischargeStatus:
+
+    baserow_url = settings.baserow_url
+    email = settings.baserow_email
+    password = settings.baserow_password.get_secret_value()
+
+    params = {"user_field_names": True}
+
+    payload = {
+        "csn": csn,
+        "status": status,
+        "modified_at": datetime.utcnow().isoformat(),
+    }
+
+    result = post_row(
+        baserow_url,
+        email,
+        password,
+        "hyui",
+        "discharge_statuses",
+        params=params,
+        payload=payload,
+    )
+
+    return DischargeStatus.parse_obj(result)

@@ -1,4 +1,13 @@
+from datetime import datetime
 from pydantic import BaseModel, validator
+
+
+class DischargeStatus(BaseModel):
+    id: int
+    order: float
+    csn: int
+    status: str
+    modified_at: datetime
 
 
 class Bed(BaseModel):

@@ -1,7 +1,6 @@
 import json
-from typing import cast
-
 import requests
+from typing import cast
 
 
 class BaserowException(Exception):
@@ -22,7 +21,7 @@ def _get_user_auth_token(baserow_url: str, email: str, password: str) -> str:
 
     if response.status_code != 200:
         raise BaserowException(
-            f"unexpected response {response.status_code}: {str(response.content)}"
+            f"unexpected response {response.status_code}: " f"{str(response.content)}"
         )
 
     return cast(str, response.json()["token"])
@@ -45,7 +44,7 @@ def _get_application_id(
 
     if response.status_code != 200:
         raise BaserowException(
-            f"unexpected response {response.status_code}: {str(response.content)}"
+            f"unexpected response {response.status_code}: " f"{str(response.content)}"
         )
 
     return next(
@@ -68,7 +67,7 @@ def _get_table_id(
 
     if response.status_code != 200:
         raise BaserowException(
-            f"unexpected response {response.status_code}: {str(response.content)}"
+            f"unexpected response {response.status_code}: " f"{str(response.content)}"
         )
 
     return next(
@@ -98,7 +97,7 @@ def get_rows(
     table_id = _get_table_id(baserow_url, auth_token, application_id, table_name)
     if not table_id:
         raise BaserowException(
-            f"no table ID for application {application_name}, table {table_name}"
+            f"no table ID for application {application_name}, table " f"{table_name}"
         )
 
     rows_url = f"{baserow_url}/api/database/rows/table/{table_id}/"
@@ -115,7 +114,8 @@ def get_rows(
 
         if response.status_code != 200:
             raise BaserowException(
-                f"unexpected response {response.status_code}: {str(response.content)}"
+                f"unexpected response {response.status_code}: "
+                f"{str(response.content)}"
             )
 
         data = response.json()
@@ -139,7 +139,7 @@ def get_fields(
     table_id = _get_table_id(baserow_url, auth_token, application_id, table_name)
     if not table_id:
         raise BaserowException(
-            f"no table ID for application {application_name}, table {table_name}"
+            f"no table ID for application {application_name}, table " f"{table_name}"
         )
 
     url = f"{baserow_url}/api/database/fields/table/{table_id}/"
@@ -147,7 +147,42 @@ def get_fields(
 
     if response.status_code != 200:
         raise BaserowException(
-            f"unexpected response {response.status_code}: {str(response.content)}"
+            f"unexpected response {response.status_code}: " f"{str(response.content)}"
         )
 
     return {row["name"]: row["id"] for row in response.json()}
+
+
+def post_row(
+    baserow_url: str,
+    email: str,
+    password: str,
+    application_name: str,
+    table_name: str,
+    params: dict,
+    payload: dict,
+) -> dict[str, int]:
+    auth_token = _get_user_auth_token(baserow_url, email, password)
+
+    application_id = _get_application_id(baserow_url, auth_token, application_name)
+    if not application_id:
+        raise BaserowException(f"no application ID for application {application_name}")
+
+    table_id = _get_table_id(baserow_url, auth_token, application_id, table_name)
+    if not table_id:
+        raise BaserowException(
+            f"no table ID for application {application_name}, table {table_name}"
+        )
+
+    url = f"{baserow_url}/api/database/rows/table/{table_id}/"
+
+    response = requests.post(
+        url, headers=_auth_headers(auth_token), params=params, json=payload
+    )
+
+    if response.status_code != 200:
+        raise BaserowException(
+            f"unexpected response {response.status_code}: " f"{str(response.content)}"
+        )
+
+    return response.json()
