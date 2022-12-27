@@ -6,7 +6,7 @@ import requests
 import warnings
 from requests.exceptions import ConnectionError
 
-from models.beds import Bed
+from models.beds import Bed, DischargeStatus
 from models.census import CensusRow
 from models.perrt import EmapVitalsLong
 from models.sitrep import SitrepRow
@@ -246,3 +246,11 @@ def _present_patient(census: dict, sitrep: dict) -> str:
         ),
         indent=4,
     )
+
+
+def _post_discharge_status(csn: int, status: str) -> dict:
+    response = requests.post(
+        url=f"{get_settings().api_url}/beds/discharge_status",
+        params={"csn": csn, "status": status},
+    )
+    return DischargeStatus.parse_obj(response.json())

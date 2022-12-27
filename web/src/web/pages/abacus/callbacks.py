@@ -4,6 +4,7 @@ import warnings
 from dash import Input, Output, State, callback, ctx, dcc
 
 from web.hospital import get_building_departments
+
 # callback functions created here will be labelled with BPID for abacus
 from web.pages.abacus import BPID
 from web.pages.abacus.utils import (
@@ -17,6 +18,7 @@ from web.pages.abacus.utils import (
     _populate_beds,
     _present_patient,
     _update_patients_with_sitrep,
+    _post_discharge_status,
 )
 from . import SITREP_DEPT2WARD_MAPPING
 
@@ -141,14 +143,14 @@ def update_layout(layout: str) -> dict:
         "preset": {"name": "preset", "fit": True, "padding": 80},
         "random": {"name": "random", "animate": True},
         "circle": {
-            "name"      : "circle",
-            "fit"       : True,
-            "padding"   : 10,
+            "name": "circle",
+            "fit": True,
+            "padding": 10,
             "startAngle": math.pi * 2 / 3,  # clockwise from 3 O'Clock
-            "sweep"     : math.pi * 5 / 3,
-            "animate"   : True,
+            "sweep": math.pi * 5 / 3,
+            "animate": True,
         },
-        "grid"  : {"name": "grid", "cols": 5, "fit": True, "animate": True},
+        "grid": {"name": "grid", "cols": 5, "fit": True, "animate": True},
     }
     return layouts.get(layout)
 
@@ -249,9 +251,9 @@ def set_discharge_status(node: dict, discharge_update: dict):
 
 @callback(
     (
-            Output(f"{BPID}discharge_update", "data"),
-            Output(f"{BPID}discharge_submit_button", "disabled"),
-            Output(f"{BPID}discharge_submit_button", "color"),
+        Output(f"{BPID}discharge_update", "data"),
+        Output(f"{BPID}discharge_submit_button", "disabled"),
+        Output(f"{BPID}discharge_submit_button", "color"),
     ),
     Input(f"{BPID}discharge_submit_button", "n_clicks"),
     Input(f"{BPID}discharge_radio", "value"),
@@ -260,10 +262,8 @@ def set_discharge_status(node: dict, discharge_update: dict):
     prevent_initial_call=True,
 )
 def submit_discharge_status(
-        n_clicks: int,
-        discharge: str,
-        node: dict,
-        discharge_update: dict):
+    n_clicks: int, discharge: str, node: dict, discharge_update: dict
+):
     """Submit discharge status button"""
     disabled = True
 
@@ -278,18 +278,15 @@ def submit_discharge_status(
     encounter = node.get("data").get("encounter")
 
     # post to baserow table
-    msg = f"Discharge status for encounter {encounter} set to {discharge}"
-    print(msg)
+    # msg = f"Discharge status for encounter {encounter} set to {discharge}"
+    # print(msg)
 
-
-
-
+    res = _post_discharge_status(encounter, discharge)
+    saved_ok = True if res.dict().get("id") else False
 
     discharge_update = {encounter: discharge}
-    _update = True
-    saved = True if _update else False
 
-    if saved:
+    if saved_ok:
         return discharge_update, disabled, "success"
     else:
         return discharge_update, not disabled, "warning"
