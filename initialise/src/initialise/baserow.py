@@ -392,6 +392,7 @@ def _add_table_field(
         name=column_name,
         type=column_type,
     )
+    payload.update(column_details)
 
     # select_options: list[tuple[int, str, str]],
     if column_details.get("select_options"):
@@ -423,35 +424,39 @@ def _add_beds_fields(base_url: str, auth_token: str, beds_table_id: int):
         base_url,
         auth_token,
         beds_table_id,
-        "bed_physical",
-        "multiple_select",
-        [
-            (1, "sideroom", "red"),
-            (2, "ventilator", "red"),
-            (3, "monitored", "red"),
-            (4, "ensuite", "red"),
-            (5, "virtual", "red"),
-        ],
+        column_name="bed_physical",
+        column_type="multiple_select",
+        column_details={
+            "select_options": [
+                (1, "sideroom", "red"),
+                (2, "ventilator", "red"),
+                (3, "monitored", "red"),
+                (4, "ensuite", "red"),
+                (5, "virtual", "red"),
+            ]
+        },
     )
     _add_table_field(
         base_url,
         auth_token,
         beds_table_id,
-        "bed_functional",
-        "multiple_select",
-        [
-            (1, "periop", "red"),
-            (2, "ficm", "red"),
-            (3, "gwb", "red"),
-            (4, "wms", "red"),
-            (5, "t06", "red"),
-            (6, "north", "red"),
-            (7, "south", "red"),
-            (8, "plex", "red"),
-            (9, "nhnn", "red"),
-            (10, "hdu", "red"),
-            (11, "icu", "red"),
-        ],
+        column_name="bed_functional",
+        column_type="multiple_select",
+        column_details={
+            "select_options": [
+                (1, "periop", "red"),
+                (2, "ficm", "red"),
+                (3, "gwb", "red"),
+                (4, "wms", "red"),
+                (5, "t06", "red"),
+                (6, "north", "red"),
+                (7, "south", "red"),
+                (8, "plex", "red"),
+                (9, "nhnn", "red"),
+                (10, "hdu", "red"),
+                (11, "icu", "red"),
+            ]
+        },
     )
 
 
