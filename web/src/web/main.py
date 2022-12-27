@@ -1,10 +1,10 @@
-import tempfile
-import os
-from typing import NamedTuple
-
 import dash_bootstrap_components as dbc
+import diskcache
+import os
+import tempfile
 from dash import (
     Dash,
+    DiskcacheManager,
     Input,
     Output,
     State,
@@ -12,14 +12,19 @@ from dash import (
     html,
     page_container,
     page_registry,
-    DiskcacheManager,
 )
 from flask import Flask
 from flask_login import LoginManager, UserMixin, current_user, login_user
+from typing import NamedTuple
+from uuid import uuid4
 
 from web.config import get_settings
 
-import diskcache
+launch_uuid = uuid4()
+cache = diskcache.Cache(tempfile.TemporaryDirectory().name)
+background_callback_manager = DiskcacheManager(
+    cache, cache_by=[lambda: launch_uuid], expire=600  # seconds
+)
 
 
 class NavbarDropdown(NamedTuple):
@@ -51,8 +56,6 @@ dropdown_dev = [
 # https://github.com/AnnMarieW/dash-flask-login
 server = Flask(__name__)
 
-cache = diskcache.Cache(tempfile.TemporaryDirectory().name)
-
 app = Dash(
     __name__,
     server=server,
@@ -64,7 +67,7 @@ app = Dash(
     ],
     suppress_callback_exceptions=True,
     use_pages=True,
-    background_callback_manager=DiskcacheManager(cache),
+    background_callback_manager=background_callback_manager,
 )
 
 # Updating the Flask Server configuration with Secret Key to encrypt the user
@@ -105,7 +108,8 @@ def update_authentication_status(_):
 
 
 @app.callback(
-    Output("hidden_div_for_login_button_output", "children"),  # html.div on login.py
+    Output("hidden_div_for_login_button_output", "children"),
+    # html.div on login.py
     Input("login-button", "n_clicks"),
     State("uname-box", "value"),
     State("pwd-box", "value"),
@@ -193,13 +197,11 @@ app.layout = dbc.Container(
     className="dbc",
 )
 
-
 # standalone apps : please use ports fastapi 8200 and dash 8201
 # this is the callable object run by gunicorn
 # cd ./src/
 # gunicorn -w 4 --bind 0.0.0.0:8093 apps.app:server
 server = app.server
-
 
 if __name__ == "__main__":
     app.run_server(host="0.0.0.0", port=get_settings().development_port, debug=True)

@@ -23,9 +23,11 @@ from . import SITREP_DEPT2WARD_MAPPING
 
 
 @callback(
-    Output(f"{BPID}departments", "data"), Input(f"{BPID}page_interval", "n_intervals")
+    Output(f"{BPID}departments", "data"),
+    Input(f"{BPID}page_interval", "n_intervals"),
+    background=True,
 )
-def get_all_departments(n_intervals: int):
+def store_all_departments(n_intervals: int):
     building_departments = get_building_departments()
     return [bd.dict() for bd in building_departments]
 
@@ -58,8 +60,9 @@ def gen_dept_dropdown(building: str, building_departments):
 @callback(
     Output(f"{BPID}beds", "data"),
     Input(f"{BPID}dept_dropdown", "value"),
+    background=True,
 )
-def get_beds(department: str) -> list[dict]:
+def store_beds(department: str) -> list[dict]:
     beds = _get_beds(department=department)
     return beds
 
@@ -67,8 +70,9 @@ def get_beds(department: str) -> list[dict]:
 @callback(
     Output(f"{BPID}census", "data"),
     Input(f"{BPID}dept_dropdown", "value"),
+    background=True,
 )
-def get_census(department: str) -> list[dict]:
+def store_census(department: str) -> list[dict]:
     census = _get_census(department=department)
     return census
 
@@ -77,8 +81,9 @@ def get_census(department: str) -> list[dict]:
     Output(f"{BPID}sitrep", "data"),
     Input(f"{BPID}dept_dropdown", "value"),
     prevent_initial_callback=True,
+    background=True,
 )
-def get_sitrep(department: str) -> list[dict]:
+def store_sitrep(department: str) -> list[dict]:
     """
     Use census to provide the CSNs that can be used to query additional data
     Args:

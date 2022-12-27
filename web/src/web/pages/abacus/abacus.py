@@ -71,7 +71,9 @@ layout_radio_button = html.Div(
 bed_inspector = html.Pre(id=f"{BPID}bed_inspector", style=styles["pre"])
 # node_inspector = html.Pre(id=f"{BPID}node_inspector")
 
-patient_inspector = html.Pre(id=f"{BPID}patient_inspector", style=styles["pre"])
+patient_inspector = dcc.Loading(
+    html.Pre(id=f"{BPID}patient_inspector", style=styles["pre"])
+)
 
 dash_only = html.Div(
     [
