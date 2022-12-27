@@ -68,7 +68,7 @@ discharge_radio_button = html.Div(
                         {"label": "Review", "value": "review"},
                         {"label": "Ready", "value": "ready"},
                     ],
-                    value="no",
+                    # value="no",
                 )
             ],
             className="dbc",

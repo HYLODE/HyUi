@@ -1,10 +1,9 @@
 import json
 import math
 import warnings
-from dash import Input, Output, callback, ctx, dcc
+from dash import Input, Output, State, callback, ctx, dcc
 
 from web.hospital import get_building_departments
-
 # callback functions created here will be labelled with BPID for abacus
 from web.pages.abacus import BPID
 from web.pages.abacus.utils import (
@@ -142,14 +141,14 @@ def update_layout(layout: str) -> dict:
         "preset": {"name": "preset", "fit": True, "padding": 80},
         "random": {"name": "random", "animate": True},
         "circle": {
-            "name": "circle",
-            "fit": True,
-            "padding": 10,
+            "name"      : "circle",
+            "fit"       : True,
+            "padding"   : 10,
             "startAngle": math.pi * 2 / 3,  # clockwise from 3 O'Clock
-            "sweep": math.pi * 5 / 3,
-            "animate": True,
+            "sweep"     : math.pi * 5 / 3,
+            "animate"   : True,
         },
-        "grid": {"name": "grid", "cols": 5, "fit": True, "animate": True},
+        "grid"  : {"name": "grid", "cols": 5, "fit": True, "animate": True},
     }
     return layouts.get(layout)
 
@@ -191,7 +190,7 @@ def make_cytoscape_elements(census, beds, sitrep, layout):
     Input(f"{BPID}tap_node", "data"),
     prevent_initial_callback=True,
 )
-def tap_bed_inspector(data: list[dict]):
+def tap_bed_inspector(data: dict):
     if data and any(data):
         return _present_patient(
             census=data.get("data").get("census"),
@@ -218,8 +217,79 @@ def patient_inspector(data: list[dict]):
     Input(f"{BPID}tap_node", "data"),
     prevent_initial_callback=True,
 )
-def tap_node_inspector(data: list[dict]):
+def tap_node_inspector(data: dict):
+    """set the hidden property of the node_inspector div"""
+    visible = False  # easier than double negative hidden
     if data and any(data):
-        return False
+        return visible if data.get("data").get("occupied") else not visible
     else:
-        return True
+        return not visible
+
+
+@callback(
+    Output(f"{BPID}discharge_radio", "value"),
+    Input(f"{BPID}tap_node", "data"),
+    State(f"{BPID}discharge_update", "data"),
+    prevent_initial_call=True,
+)
+def set_discharge_status(node: dict, discharge_update: dict):
+    """sets discharge status"""
+    discharge_status = "no"
+
+    if not node or not all(node):
+        return discharge_status
+    else:
+        encounter = node.get("data").get("encounter")
+
+    if discharge_update:
+        discharge_status = discharge_update.get(encounter, discharge_status)
+
+    return discharge_status
+
+
+@callback(
+    (
+            Output(f"{BPID}discharge_update", "data"),
+            Output(f"{BPID}discharge_submit_button", "disabled"),
+            Output(f"{BPID}discharge_submit_button", "color"),
+    ),
+    Input(f"{BPID}discharge_submit_button", "n_clicks"),
+    Input(f"{BPID}discharge_radio", "value"),
+    Input(f"{BPID}tap_node", "data"),
+    State(f"{BPID}discharge_update", "data"),
+    prevent_initial_call=True,
+)
+def submit_discharge_status(
+        n_clicks: int,
+        discharge: str,
+        node: dict,
+        discharge_update: dict):
+    """Submit discharge status button"""
+    disabled = True
+
+    # disable the button on first load of status
+    if ctx.triggered_id == f"{BPID}tap_node":
+        return discharge_update, disabled, "primary"
+    # enable the button if the discharge radio changes
+    elif ctx.triggered_id == f"{BPID}discharge_radio":
+        return discharge_update, not disabled, "primary"
+
+    # Proceed if the trigger is the button itself
+    encounter = node.get("data").get("encounter")
+
+    # post to baserow table
+    msg = f"Discharge status for encounter {encounter} set to {discharge}"
+    print(msg)
+
+
+
+
+
+    discharge_update = {encounter: discharge}
+    _update = True
+    saved = True if _update else False
+
+    if saved:
+        return discharge_update, disabled, "success"
+    else:
+        return discharge_update, not disabled, "warning"

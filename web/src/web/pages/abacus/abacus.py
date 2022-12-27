@@ -30,6 +30,7 @@ dash_only = html.Div(
         dcc.Store(id=f"{BPID}patients_in_beds"),
         dcc.Store(id=f"{BPID}tap_node"),
         dcc.Store(id=f"{BPID}patient_details"),
+        dcc.Store(id=f"{BPID}discharge_update"),
     ]
 )
 
@@ -46,9 +47,9 @@ discharge_form = html.Div(
                     id=f"{BPID}discharge_submit_button",
                     className="dbc d-grid d-md-flex justify-content-md-end "
                     "btn-group",
-                    color="danger",
-                    outline=True,
                     size="sm",
+                    color="primary",
+                    disabled=True,
                 ),
             ],
             className="dbc d-grid d-md-flex justify-content-md-end",
