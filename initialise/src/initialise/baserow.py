@@ -7,8 +7,8 @@ import pandas as pd
 import requests
 from models.beds import Bed
 
-from initialise.convert import parse_to_data_frame
 from initialise.config import BaserowSettings, get_baserow_settings
+from initialise.convert import parse_to_data_frame
 from initialise.db import caboodle_engine, star_engine
 from . import DEPARTMENTS, VIRTUAL_BEDS, VIRTUAL_ROOMS
 
@@ -383,25 +383,28 @@ def _add_table_field(
     table_id: int,
     column_name: str,
     column_type: str,
-    select_options: list[tuple[int, str, str]],
+    column_details: dict = None,
 ):
     logging.info(f"Adding column {column_name} to table {table_id}.")
+    column_details = column_details if column_details else {}
 
-    select_options_dicts = [
-        {"id": option[0], "value": option[1], "color": option[2]}
-        for option in select_options
-    ]
+    payload = dict(
+        name=column_name,
+        type=column_type,
+    )
+
+    # select_options: list[tuple[int, str, str]],
+    if column_details.get("select_options"):
+        select_options_dicts = [
+            {"id": option[0], "value": option[1], "color": option[2]}
+            for option in column_details.get("select_options")
+        ]
+        payload["select_options"] = select_options_dicts
 
     response = requests.post(
         f"{base_url}/api/database/fields/table/{table_id}/",
         headers=_auth_headers(auth_token),
-        data=json.dumps(
-            {
-                "name": column_name,
-                "type": column_type,
-                "select_options": select_options_dicts,
-            }
-        ),
+        data=json.dumps(payload),
     )
     if response.status_code != 200:
         raise BaserowException(
@@ -476,7 +479,19 @@ def initialise_baserow():
         discharge_statuses_table_id,
         column_name="status",
         column_type="text",
-        select_options=[],
+    )
+
+    _add_table_field(
+        settings.public_url,
+        auth_token,
+        discharge_statuses_table_id,
+        column_name="modified_at",
+        column_type="date",
+        column_details={
+            "date_format": "ISO",
+            "date_include_time": True,
+            "date_time_format": "24",
+        },
     )
 
     # Create the beds table.
