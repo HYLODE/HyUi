@@ -1,5 +1,5 @@
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 from fastapi import APIRouter, Depends
 from pathlib import Path
 
@@ -144,3 +144,53 @@ def post_discharge_status(
     )
 
     return DischargeStatus.parse_obj(result)
+
+
+@mock_router.get("/discharge_status/", response_model=list[DischargeStatus])
+def get_mock_discharge_status(
+    delta_hours=72, settings=Depends(get_settings)
+) -> list[DischargeStatus]:
+    baserow_url = settings.baserow_url
+    email = settings.baserow_email
+    password = settings.baserow_password.get_secret_value()
+    _table = "discharge_statuses"
+
+    field_ids = get_fields(baserow_url, email, password, "hyui", _table)
+
+    modified_at_field_id = field_ids["modified_at"]
+    horizon = (datetime.utcnow() - timedelta(hours=float(delta_hours))).isoformat()
+
+    params = {
+        "size": 200,
+        # The maximum size of a page.
+        "user_field_names": "true",
+        f"filter__field_{modified_at_field_id}__date_after": horizon,
+    }
+
+    rows = get_rows(baserow_url, email, password, "hyui", _table, params)
+    return [DischargeStatus.parse_obj(row) for row in rows]
+
+
+@router.get("/discharge_status/", response_model=list[DischargeStatus])
+def get_discharge_status(
+    delta_hours=72, settings=Depends(get_settings)
+) -> list[DischargeStatus]:
+    baserow_url = settings.baserow_url
+    email = settings.baserow_email
+    password = settings.baserow_password.get_secret_value()
+    _table = "discharge_statuses"
+
+    field_ids = get_fields(baserow_url, email, password, "hyui", _table)
+
+    modified_at_field_id = field_ids["modified_at"]
+    horizon = (datetime.utcnow() - timedelta(hours=float(delta_hours))).isoformat()
+
+    params = {
+        "size": 200,
+        # The maximum size of a page.
+        "user_field_names": "true",
+        f"filter__field_{modified_at_field_id}__date_after": horizon,
+    }
+
+    rows = get_rows(baserow_url, email, password, "hyui", _table, params)
+    return [DischargeStatus.parse_obj(row) for row in rows]
