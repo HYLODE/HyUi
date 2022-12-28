@@ -31,6 +31,7 @@ dash_only = html.Div(
         dcc.Store(id=f"{BPID}tap_node"),
         dcc.Store(id=f"{BPID}patient_details"),
         dcc.Store(id=f"{BPID}discharge_update"),
+        dcc.Store(id=f"{BPID}discharge_statuses"),
     ]
 )
 
@@ -96,6 +97,17 @@ ward_map = html.Div(
                         "border-width": 2,
                         "border-style": "solid",
                         "border-color": "black",
+                    },
+                },
+                {
+                    "selector": '[?discharge][level="bed"]',
+                    "style": {
+                        "shape": "star",
+                        # "background-color": "grey",
+                        # "background-opacity": 0.2,
+                        # "border-width": 2,
+                        # "border-style": "solid",
+                        # "border-color": "black",
                     },
                 },
                 {

@@ -4,6 +4,7 @@ assorted functions for preparing and running the sitrep data
 import json
 import requests
 import warnings
+from datetime import datetime
 from requests.exceptions import ConnectionError
 
 from models.beds import Bed, DischargeStatus
@@ -11,6 +12,7 @@ from models.census import CensusRow
 from models.perrt import EmapVitalsLong
 from models.sitrep import SitrepRow
 from web.config import get_settings
+from web.convert import parse_to_data_frame
 from web.pages.abacus import SITREP_DEPT2WARD_MAPPING
 
 
@@ -19,6 +21,18 @@ def _as_int(s: int | float | None) -> int | None:
         return None
     else:
         return int(float(s))
+
+
+def _get_discharge_updates(delta_hours=72):
+    response = requests.get(
+        f"{get_settings().api_url}/beds/discharge_status",
+        params={"delta_hours": delta_hours},
+    )
+    df = parse_to_data_frame(response.json(), DischargeStatus)
+    # remove duplicates here
+    df = df.sort_values("modified_at", ascending=False)
+    df = df.groupby("csn").head(1)
+    return df.to_dict(orient="records")
 
 
 def _get_beds(department: str) -> list[dict]:
@@ -103,8 +117,6 @@ def _populate_beds(bl: list[dict], cl: list[dict]) -> list[dict]:
     :param census_list:
     :return: a list of dictionaries to populate elements for Cytoscape
     """
-    # copy the lists first since they are mutable
-
     # convert to dictionary of dictionaries to search / merge
     cd = {i["location_string"]: i for i in cl}
     for bed in bl:
@@ -113,6 +125,40 @@ def _populate_beds(bl: list[dict], cl: list[dict]) -> list[dict]:
         bed["data"]["census"] = census
         bed["data"]["encounter"] = _as_int(census.get("encounter", None))
         bed["data"]["occupied"] = True if census.get("occupied", None) else False
+    return bl
+
+
+def _update_discharges(bl: list[dict], discharges: list[dict]) -> list[dict]:
+    # convert to dictionary of dictionaries to search / merge
+    dd = {i["csn"]: i for i in discharges}
+    for bed in bl:
+        csn = bed.get("data").get("encounter")
+        # if there's a patient in the bed
+        if not csn:
+            continue
+        # pm = planned_move
+        pm_type = bed["data"]["census"].get("pm_type")
+        pm_modified = bed["data"]["census"].get("pm_datetime")
+        bed["data"]["discharge"] = True if pm_type == "OUTBOUND" else False
+
+        # if there's better info on discharge status
+        dc_status = dd.get(csn, {})
+        bed["data"]["dc_status"] = dc_status
+        if not len(dc_status):
+            continue
+        dc_modified = dc_status.get("modified_at")
+        if not pm_modified:
+            bed["data"]["discharge"] = (
+                True if dc_status.get("status") == "ready" else False
+            )
+        else:
+            dc_modified = datetime.fromisoformat(dc_modified)
+            pm_modified = datetime.fromisoformat(pm_modified)
+            if dc_modified > pm_modified:
+                bed["data"]["discharge"] = (
+                    True if dc_status.get("status") == "ready" else False
+                )
+
     return bl
 
 
@@ -221,12 +267,14 @@ def _make_room(room: str, preset=True) -> dict:
     )
 
 
-def _present_patient(census: dict, sitrep: dict) -> str:
+def _present_patient(data: dict) -> str:
     """
     Prettify node data
     """
-    if not census.get("occupied"):
+    if not data.get("occupied"):
         return ""
+    census = data.get("census")
+    sitrep = data.get("sitrep")
 
     if not sitrep:
         sitrep = {}
@@ -243,6 +291,7 @@ def _present_patient(census: dict, sitrep: dict) -> str:
             lastname=census.get("lastname"),
             firstname=census.get("firstname"),
             sex=census.get("sex"),
+            discharge=data.get("discharge"),
         ),
         indent=4,
     )

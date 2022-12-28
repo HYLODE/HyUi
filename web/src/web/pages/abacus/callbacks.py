@@ -19,6 +19,8 @@ from web.pages.abacus.utils import (
     _present_patient,
     _update_patients_with_sitrep,
     _post_discharge_status,
+    _get_discharge_updates,
+    _update_discharges,
 )
 from . import SITREP_DEPT2WARD_MAPPING
 
@@ -28,9 +30,18 @@ from . import SITREP_DEPT2WARD_MAPPING
     Input(f"{BPID}page_interval", "n_intervals"),
     background=True,
 )
-def store_all_departments(n_intervals: int):
+def store_all_departments(_: int):
     building_departments = get_building_departments()
     return [bd.dict() for bd in building_departments]
+
+
+@callback(
+    Output(f"{BPID}discharge_statuses", "data"),
+    Input(f"{BPID}page_interval", "n_intervals"),
+    background=True,
+)
+def store_discharge_statuses(_: int):
+    return _get_discharge_updates()
 
 
 @callback(
@@ -160,10 +171,11 @@ def update_layout(layout: str) -> dict:
     Input(f"{BPID}census", "data"),
     Input(f"{BPID}beds", "data"),
     Input(f"{BPID}sitrep", "data"),
+    Input(f"{BPID}discharge_statuses", "data"),
     Input(f"{BPID}layout_radio", "value"),
     prevent_initial_call=True,
 )
-def make_cytoscape_elements(census, beds, sitrep, layout):
+def make_cytoscape_elements(census, beds, sitrep, discharges, layout):
     preset = True if layout == "preset" else False
 
     room_list = [_make_room(r, preset) for r in _list_of_unique_rooms(beds)]
@@ -172,6 +184,9 @@ def make_cytoscape_elements(census, beds, sitrep, layout):
     bed_list.sort(key=lambda bed: bed.get("data").get("bed_index"))
 
     bed_list = _populate_beds(bed_list, census)
+    bed_list = _update_discharges(bed_list, discharges)
+
+    # if sitrep exists
     if sitrep and sum([len(i) for i in sitrep]):
         bed_list = _update_patients_with_sitrep(bed_list, sitrep)
 
@@ -192,12 +207,10 @@ def make_cytoscape_elements(census, beds, sitrep, layout):
     Input(f"{BPID}tap_node", "data"),
     prevent_initial_callback=True,
 )
-def tap_bed_inspector(data: dict):
-    if data and any(data):
-        return _present_patient(
-            census=data.get("data").get("census"),
-            sitrep=data.get("data").get("sitrep"),
-        )
+def tap_bed_inspector(element: dict):
+    if element and any(element):
+        data = element.get("data")
+        return _present_patient(data)
     else:
         return ""
 
