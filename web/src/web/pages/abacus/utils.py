@@ -5,6 +5,7 @@ import json
 import requests
 import warnings
 from datetime import datetime
+from pydantic import BaseModel
 from requests.exceptions import ConnectionError
 
 from models.beds import Bed, DischargeStatus
@@ -23,15 +24,21 @@ def _as_int(s: int | float | None) -> int | None:
         return int(float(s))
 
 
-def _get_discharge_updates(delta_hours=72):
+def _get_discharge_updates(delta_hours=48):
     response = requests.get(
         f"{get_settings().api_url}/beds/discharge_status",
         params={"delta_hours": delta_hours},
     )
-    df = parse_to_data_frame(response.json(), DischargeStatus)
+    return response.json()
+
+
+def _most_recent_row_only(
+    rows: list[dict], groupby_col: str, timestamp_col: str, data_model: BaseModel
+):
+    df = parse_to_data_frame(rows, data_model)
     # remove duplicates here
-    df = df.sort_values("modified_at", ascending=False)
-    df = df.groupby("csn").head(1)
+    df = df.sort_values(timestamp_col, ascending=False)
+    df = df.groupby(groupby_col).head(1)
     return df.to_dict(orient="records")
 
 
@@ -267,7 +274,7 @@ def _make_room(room: str, preset=True) -> dict:
     )
 
 
-def _present_patient(data: dict) -> str:
+def _display_patient(data: dict) -> str:
     """
     Prettify node data
     """
@@ -297,7 +304,7 @@ def _present_patient(data: dict) -> str:
     )
 
 
-def _post_discharge_status(csn: int, status: str) -> dict:
+def _post_discharge_status(csn: int, status: str) -> DischargeStatus:
     response = requests.post(
         url=f"{get_settings().api_url}/beds/discharge_status",
         params={"csn": csn, "status": status},

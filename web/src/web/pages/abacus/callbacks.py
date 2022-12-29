@@ -1,26 +1,30 @@
 import json
 import math
+import pytz
 import warnings
 from dash import Input, Output, State, callback, ctx, dcc
+from datetime import datetime
 
+from models.beds import DischargeStatus
 from web.hospital import get_building_departments
 
 # callback functions created here will be labelled with BPID for abacus
 from web.pages.abacus import BPID
 from web.pages.abacus.utils import (
+    _display_patient,
     _get_beds,
     _get_census,
+    _get_discharge_updates,
     _get_perrt_long,
     _get_sitrep_status,
     _list_of_unique_rooms,
     _make_bed,
     _make_room,
+    _most_recent_row_only,
     _populate_beds,
-    _present_patient,
-    _update_patients_with_sitrep,
     _post_discharge_status,
-    _get_discharge_updates,
     _update_discharges,
+    _update_patients_with_sitrep,
 )
 from . import SITREP_DEPT2WARD_MAPPING
 
@@ -31,17 +35,12 @@ from . import SITREP_DEPT2WARD_MAPPING
     background=True,
 )
 def store_all_departments(_: int):
+    """
+    Store a list of departments for the building
+    Triggers the update of most of the elements on the page
+    """
     building_departments = get_building_departments()
     return [bd.dict() for bd in building_departments]
-
-
-@callback(
-    Output(f"{BPID}discharge_statuses", "data"),
-    Input(f"{BPID}page_interval", "n_intervals"),
-    background=True,
-)
-def store_discharge_statuses(_: int):
-    return _get_discharge_updates()
 
 
 @callback(
@@ -210,7 +209,7 @@ def make_cytoscape_elements(census, beds, sitrep, discharges, layout):
 def tap_bed_inspector(element: dict):
     if element and any(element):
         data = element.get("data")
-        return _present_patient(data)
+        return _display_patient(data)
     else:
         return ""
 
@@ -242,64 +241,92 @@ def tap_node_inspector(data: dict):
 
 
 @callback(
+    Output(f"{BPID}discharge_statuses", "data"),
+    Input(f"{BPID}page_interval", "n_intervals"),
+    Input(f"{BPID}discharge_submit_button", "n_clicks"),
+    State(f"{BPID}discharge_statuses", "data"),
+    State(f"{BPID}discharge_radio", "value"),
+    State(f"{BPID}tap_node", "data"),
+    background=True,
+)
+def store_discharge_statuses(
+    n_intervals: int,
+    n_clicks: int,
+    dc_statuses: list[dict],
+    dc_radio: str,
+    node: dict,
+) -> list[dict]:
+    if ctx.triggered_id == f"{BPID}discharge_submit_button":
+        all_updates = dc_statuses
+        all_updates.append(
+            dict(
+                csn=node.get("data").get("encounter"),
+                status=dc_radio,
+                modified_at=datetime.now(tz=pytz.UTC).isoformat(),
+            )
+        )
+    else:
+        all_updates = _get_discharge_updates()
+    return _most_recent_row_only(
+        all_updates,
+        groupby_col="csn",
+        timestamp_col="modified_at",
+        data_model=DischargeStatus,  # noqa
+    )
+
+
+@callback(
     Output(f"{BPID}discharge_radio", "value"),
     Input(f"{BPID}tap_node", "data"),
-    State(f"{BPID}discharge_update", "data"),
     prevent_initial_call=True,
 )
-def set_discharge_status(node: dict, discharge_update: dict):
+def set_discharge_radio(node: dict):
     """sets discharge status"""
-    discharge_status = "no"
-
-    if not node or not all(node):
-        return discharge_status
-    else:
-        encounter = node.get("data").get("encounter")
-
-    if discharge_update:
-        discharge_status = discharge_update.get(encounter, discharge_status)
-
-    return discharge_status
+    status = None
+    if any(node) and node.get("data").get("dc_status"):
+        status = node.get("data").get("dc_status").get("status")
+        status = status if status else "no"
+    return status
 
 
 @callback(
     (
-        Output(f"{BPID}discharge_update", "data"),
         Output(f"{BPID}discharge_submit_button", "disabled"),
         Output(f"{BPID}discharge_submit_button", "color"),
     ),
     Input(f"{BPID}discharge_submit_button", "n_clicks"),
     Input(f"{BPID}discharge_radio", "value"),
     Input(f"{BPID}tap_node", "data"),
-    State(f"{BPID}discharge_update", "data"),
     prevent_initial_call=True,
 )
 def submit_discharge_status(
-    n_clicks: int, discharge: str, node: dict, discharge_update: dict
-):
-    """Submit discharge status button"""
-    disabled = True
-
-    # disable the button on first load of status
-    if ctx.triggered_id == f"{BPID}tap_node":
-        return discharge_update, disabled, "primary"
-    # enable the button if the discharge radio changes
-    elif ctx.triggered_id == f"{BPID}discharge_radio":
-        return discharge_update, not disabled, "primary"
-
-    # Proceed if the trigger is the button itself
-    encounter = node.get("data").get("encounter")
-
-    # post to baserow table
-    # msg = f"Discharge status for encounter {encounter} set to {discharge}"
-    # print(msg)
-
-    res = _post_discharge_status(encounter, discharge)
-    saved_ok = True if res.dict().get("id") else False
-
-    discharge_update = {encounter: discharge}
-
-    if saved_ok:
-        return discharge_update, disabled, "success"
+    n_clicks: int,
+    radio_status: str,
+    node: dict,
+) -> tuple[bool, str]:
+    """
+    Submit discharge status button
+    Function has two roles
+    1. submit using requests.post
+    2. manage the colour and enable/disable status of the submit button
+    """
+    if any(node):
+        node_status = node.get("data", {}).get("dc_status", {}).get("status", None)
     else:
-        return discharge_update, not disabled, "warning"
+        node_status = None
+    btn_disabled = True if radio_status == node_status else False
+    btn_color = "primary"
+
+    if ctx.triggered_id == f"{BPID}discharge_submit_button":
+        encounter = node.get("data").get("encounter")
+        res = _post_discharge_status(encounter, radio_status)
+        saved_ok = True if res.dict().get("id") else False
+        if saved_ok:
+            btn_disabled = True
+            btn_color = "success"
+        else:
+            # TODO: display some sort of alert as flash message
+            btn_disabled = True
+            btn_color = "warning"
+
+    return btn_disabled, btn_color

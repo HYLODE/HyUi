@@ -30,7 +30,6 @@ dash_only = html.Div(
         dcc.Store(id=f"{BPID}patients_in_beds"),
         dcc.Store(id=f"{BPID}tap_node"),
         dcc.Store(id=f"{BPID}patient_details"),
-        dcc.Store(id=f"{BPID}discharge_update"),
         dcc.Store(id=f"{BPID}discharge_statuses"),
     ]
 )
@@ -130,6 +129,12 @@ ward_map = html.Div(
 def layout():
     return html.Div(
         [
+            dbc.Row(
+                [
+                    # Placeholder for a row of summary data
+                    # e.g. how many patients? how mnay discharges etc.
+                ]
+            ),
             dbc.Row(
                 [
                     dbc.Col([layout_radio_button]),

@@ -3,8 +3,8 @@ from pydantic import BaseModel, validator
 
 
 class DischargeStatus(BaseModel):
-    id: int
-    order: float
+    id: int | None
+    order: float | None
     csn: int
     status: str
     modified_at: datetime
