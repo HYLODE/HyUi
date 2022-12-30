@@ -290,6 +290,15 @@ def set_discharge_radio(node: dict):
 
 
 @callback(
+    Output(f"{BPID}node_debug", "children"),
+    Input(f"{BPID}tap_node", "data"),
+    prevent_initial_callback=True,
+)
+def tap_node_inspector(data: dict):
+    return json.dumps(data, indent=4)
+
+
+@callback(
     (
         Output(f"{BPID}discharge_submit_button", "disabled"),
         Output(f"{BPID}discharge_submit_button", "color"),

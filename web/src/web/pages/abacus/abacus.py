@@ -46,7 +46,7 @@ discharge_form = html.Div(
                     "Submit",
                     id=f"{BPID}discharge_submit_button",
                     className="dbc d-grid d-md-flex justify-content-md-end "
-                    "btn-group",
+                              "btn-group",
                     size="sm",
                     color="primary",
                     disabled=True,
@@ -61,18 +61,20 @@ patient_inspector = dcc.Loading(
     html.Pre(id=f"{BPID}patient_inspector", style=styles["pre"])
 )
 
+node_debug = dcc.Loading(
+    html.Pre(id=f"{BPID}node_debug", style=styles["pre"])
+)
+
 ward_map = html.Div(
     [
         cyto.Cytoscape(
             id=f"{BPID}bed_map",
             style={
-                # "width": "600px",
-                # "height": "600px",
                 "width": "42vw",
-                "height": "80vh",
+                "height": "70vh",
                 "position": "relative",
-                "top": "4vh",
-                "left": "4vw",
+                "top": "1vh",
+                "left": "1vw",
             },
             stylesheet=[
                 {"selector": "node", "style": {"label": "data(label)"}},
@@ -100,7 +102,7 @@ ward_map = html.Div(
                 },
                 {
                     "selector": '[?discharge][level="bed"]',
-                    "style": {
+                    "style"   : {
                         "shape": "star",
                         # "background-color": "grey",
                         # "background-opacity": 0.2,
@@ -127,12 +129,24 @@ ward_map = html.Div(
 
 
 def layout():
-    return html.Div(
+    return dbc.Container(
         [
             dbc.Row(
                 [
                     # Placeholder for a row of summary data
                     # e.g. how many patients? how mnay discharges etc.
+                    dbc.Col(
+                        [html.P("2 admissions")],
+                        className="border rounded border-warning border-3" "h3 p-3",
+                    ),
+                    dbc.Col(
+                        [html.P("23 patients")],
+                        className="border rounded border-danger border-3" "h3 p-3",
+                    ),
+                    dbc.Col(
+                        [html.P("3 discharges")],
+                        className="border rounded border-success border-3" "h4 p-3",
+                    ),
                 ]
             ),
             dbc.Row(
@@ -153,6 +167,7 @@ def layout():
                     dbc.Col(
                         [
                             html.Div(id=f"{BPID}dept_dropdown_div"),
+                            # html.Div([node_debug]),
                             html.Div(
                                 id=f"{BPID}node_inspector",
                                 children=[

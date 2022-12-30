@@ -187,11 +187,21 @@ dash_only = html.Div(
     ]
 )
 
+footer = html.Div(
+    [
+        html.P(
+            "Built for the NHS | Made at UCLH | Funded by NHS-X and NIHR",
+            className="my-4 text-md-center",
+        )
+    ]
+)
+
 app.layout = dbc.Container(
     [
         navbar,
         page_container,
         dash_only,
+        footer,
     ],
     fluid=True,
     className="dbc",
