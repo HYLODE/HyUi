@@ -10,4 +10,10 @@ SITREP_DEPT2WARD_MAPPING = {
     "NHNN C1 NCCU": "NCCU1",
 }
 
+WARDS_WITH_MAPS = {
+    "UCH T03 INTENSIVE CARE",
+    "GWB L01 CRITICAL CARE",
+    "WMS W01 CRITICAL CARE",
+}
+
 styles = {"pre": {"border": "thin lightgrey solid", "overflowX": "scroll"}}

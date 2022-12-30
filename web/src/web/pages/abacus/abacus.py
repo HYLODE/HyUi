@@ -31,6 +31,7 @@ dash_only = html.Div(
         dcc.Store(id=f"{BPID}tap_node"),
         dcc.Store(id=f"{BPID}patient_details"),
         dcc.Store(id=f"{BPID}discharge_statuses"),
+        dcc.Store(id=f"{BPID}elements"),
     ]
 )
 
@@ -46,7 +47,7 @@ discharge_form = html.Div(
                     "Submit",
                     id=f"{BPID}discharge_submit_button",
                     className="dbc d-grid d-md-flex justify-content-md-end "
-                              "btn-group",
+                    "btn-group",
                     size="sm",
                     color="primary",
                     disabled=True,
@@ -61,9 +62,7 @@ patient_inspector = dcc.Loading(
     html.Pre(id=f"{BPID}patient_inspector", style=styles["pre"])
 )
 
-node_debug = dcc.Loading(
-    html.Pre(id=f"{BPID}node_debug", style=styles["pre"])
-)
+node_debug = dcc.Loading(html.Pre(id=f"{BPID}node_debug", style=styles["pre"]))
 
 ward_map = html.Div(
     [
@@ -102,7 +101,7 @@ ward_map = html.Div(
                 },
                 {
                     "selector": '[?discharge][level="bed"]',
-                    "style"   : {
+                    "style": {
                         "shape": "star",
                         # "background-color": "grey",
                         # "background-opacity": 0.2,
@@ -111,14 +110,8 @@ ward_map = html.Div(
                         # "border-color": "black",
                     },
                 },
-                {
-                    "selector": '[!visible][level="room"]',
-                    "style": {
-                        "background-opacity": 0.0,
-                        "border-opacity": 0.0,
-                    },
-                },
             ],
+            # autoRefreshLayout=True,
             responsive=True,
             maxZoom=1.0,
             # zoom=1,

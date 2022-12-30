@@ -39,12 +39,6 @@ layout_radio_button = html.Div(
                     className="dbc d-grid d-md-flex "
                     "justify-content-md-begin btn-group",
                     inline=True,
-                    options=[
-                        {"label": "Map", "value": "preset"},
-                        {"label": "Circle", "value": "circle"},
-                        {"label": "Grid", "value": "grid"},
-                    ],
-                    value="circle",
                 )
             ],
             className="dbc",

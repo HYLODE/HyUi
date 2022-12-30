@@ -119,10 +119,14 @@ def _get_perrt_long(encounter: int, hours: int = 6):
 
 def _populate_beds(bl: list[dict], cl: list[dict]) -> list[dict]:
     """
-    place patients in beds
-    :param bed_list: derived from baserow structure
-    :param census_list:
-    :return: a list of dictionaries to populate elements for Cytoscape
+    Place patients in beds
+
+    Args:
+        bl: bed_list
+        cl: census_list
+
+    Returns:
+        a list of dictionaries to populate elements for Cytoscape
     """
     # convert to dictionary of dictionaries to search / merge
     cd = {i["location_string"]: i for i in cl}
@@ -208,8 +212,17 @@ def _split_loc_str(s: str, part: str) -> str:
         raise ValueError(f"{part} not one of dept/room/bed")
 
 
-def _make_bed(bed: dict, preset: bool = True, scale: int = 9) -> dict:
+def _make_bed(
+    bed: dict, scale: int = 9, offset: tuple[int, int] = (-100, -100)
+) -> dict:
+    position = {}
+    if bed.get("xpos") and bed.get("ypos"):
+        position.update(x=bed.get("xpos") * scale + offset[0]),  # type: ignore
+        position.update(y=bed.get("ypos") * scale + offset[0]),  # type: ignore
+
     hl7_bed = _split_loc_str(bed["location_string"], "bed")
+    room = _split_loc_str(bed["location_string"], "room")
+
     try:
         pretty_bed = hl7_bed.split("-")[1]
         try:
@@ -218,7 +231,7 @@ def _make_bed(bed: dict, preset: bool = True, scale: int = 9) -> dict:
             bed_index = 0
     except IndexError:
         pretty_bed = hl7_bed
-    room = _split_loc_str(bed["location_string"], "room")
+
     data = dict(
         id=bed["location_string"],
         bed_index=bed_index,  # noqa
@@ -228,48 +241,34 @@ def _make_bed(bed: dict, preset: bool = True, scale: int = 9) -> dict:
         closed=bed.get("closed", False),
         covid=bed.get("covid", False),
     )
-    if preset:
-        if bed.get("xpos") and bed.get("ypos"):
-            position = dict(
-                x=bed.get("xpos") * scale,  # type: ignore
-                y=bed.get("ypos") * scale,  # type: ignore
-            )
-        else:
-            position = dict(
-                x=100,
-                y=100,
-            )
-        return dict(data=data, position=position)
-    else:
-        return dict(data=data)
+
+    return dict(data=data, position=position)
 
 
-def _make_room(room: str, preset=True) -> dict:
+def _make_room(room: str) -> dict:
     sideroom = False
-    label = ""
-    visible = False
-
-    if preset:
-        visible = True
-        try:
-            pretty_room = room.split(" ")[1]
-            room_type = pretty_room[:2]
-            room_number = pretty_room[2:]
-            if room_type == "BY":
-                label = "Bay "
-                sideroom = True
-            elif room_type == "SR":
-                label = "Room "
-            else:
-                label = ""
-            # noinspection PyAugmentAssignment
-            label = label + room_number
-        except IndexError:
-            label = room
+    try:
+        pretty_room = room.split(" ")[1]
+        room_type = pretty_room[:2]
+        room_number = pretty_room[2:]
+        if room_type == "BY":
+            label = "Bay "
+            sideroom = True
+        elif room_type == "SR":
+            label = "Room "
+        else:
+            label = ""
+        # noinspection PyAugmentAssignment
+        label = label + room_number
+    except IndexError:
+        label = room
 
     return dict(
         data=dict(
-            id=room, label=label, sideroom=sideroom, level="room", visible=visible
+            id=room,
+            label=label,
+            sideroom=sideroom,
+            level="room",
         )
     )
 

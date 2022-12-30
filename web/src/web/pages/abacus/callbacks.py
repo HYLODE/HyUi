@@ -26,7 +26,7 @@ from web.pages.abacus.utils import (
     _update_discharges,
     _update_patients_with_sitrep,
 )
-from . import SITREP_DEPT2WARD_MAPPING
+from . import SITREP_DEPT2WARD_MAPPING, WARDS_WITH_MAPS
 
 
 @callback(
@@ -145,43 +145,117 @@ def store_patient_details(element: dict) -> list[dict]:
 
 
 @callback(
+    (
+        Output(f"{BPID}layout_radio", "value"),
+        Output(f"{BPID}layout_radio", "options"),
+    ),
+    Input(f"{BPID}dept_dropdown", "value"),
+    Input(f"{BPID}layout_radio", "value"),
+    prevent_initial_call=True,
+)
+def set_layout_radio(dept: str, layout: int) -> tuple[str, list]:
+    """
+    Defaults to  Map option if possible and appends to list of radio buttons
+    """
+    options = [
+        {"label": "Circle", "value": "circle"},
+        {"label": "Grid", "value": "grid"},
+    ]
+
+    if dept in WARDS_WITH_MAPS:
+        options.append({"label": "Map", "value": "preset"})
+
+    if ctx.triggered_id == f"{BPID}dept_dropdown":
+        layout = "preset" if dept in WARDS_WITH_MAPS else "circle"
+
+    return layout, options
+
+
+@callback(
     Output(f"{BPID}bed_map", "layout"),
     Input(f"{BPID}layout_radio", "value"),
 )
 def update_layout(layout: str) -> dict:
+    """
+    Set cytoscape layout parameters
+    """
+
     layouts = {
-        "preset": {"name": "preset", "fit": True, "padding": 80},
-        "random": {"name": "random", "animate": True},
+        "preset": {
+            "name": "preset",
+            "animate": True,
+            "fit": True,
+            "padding": 10,
+        },
         "circle": {
             "name": "circle",
+            "animate": True,
             "fit": True,
             "padding": 10,
             "startAngle": math.pi * 2 / 3,  # clockwise from 3 O'Clock
             "sweep": math.pi * 5 / 3,
-            "animate": True,
         },
-        "grid": {"name": "grid", "cols": 5, "fit": True, "animate": True},
+        "grid": {
+            "name": "grid",
+            "animate": True,
+            "fit": True,
+            "padding": 10,
+            "cols": 5,
+        },
     }
+
     return layouts.get(layout)
 
 
 @callback(
     Output(f"{BPID}bed_map", "elements"),
+    Input(f"{BPID}layout_radio", "value"),
+    Input(f"{BPID}elements", "data"),
+    prevent_initial_call=True,
+)
+def update_elements_for_layout(
+    layout: str,
+    elements: list[dict],
+) -> list[dict]:
+    """
+    Updating the element ID to force a diff
+    ---------------------------------------
+    Detailed notes in comment below but in brief this forces the 'id' of the
+    element to be different for all 'non'-preset layouts; so when preset is
+    called cytoscape sees this as a new set of elements and redraws from scratch
+    """
+    # Switching _back_ to a preset layout has no effect as per
+    # https://github.com/plotly/react-cytoscapejs/issues/3#issuecomment
+    # -430070424
+    # b/c preset is a 'null-op' so only runs the first time
+    # see also
+    # https://github.com/plotly/react-cytoscapejs/issues/7
+    # https://github.com/plotly/dash-cytoscape/issues/33
+    # Fixes attempted
+    # - reload the whole page when preset layout selected
+    # - capture the renderedPosition of each element and use this
+    # - rebuild layout with some 'change' to force a diff
+
+    if layout != "preset":
+        elements = [e for e in elements if e.get("data").get("level") != "room"]
+        for e in elements:
+            e["data"]["id"] = e["data"]["id"] + "_"
+
+    return elements
+
+
+@callback(
+    Output(f"{BPID}elements", "data"),
     Input(f"{BPID}census", "data"),
     Input(f"{BPID}beds", "data"),
     Input(f"{BPID}sitrep", "data"),
     Input(f"{BPID}discharge_statuses", "data"),
-    Input(f"{BPID}layout_radio", "value"),
-    prevent_initial_call=True,
 )
-def make_cytoscape_elements(census, beds, sitrep, discharges, layout):
-    preset = True if layout == "preset" else False
+def make_cytoscape_elements(census, beds, sitrep, discharges):
+    room_list = [_make_room(r) for r in _list_of_unique_rooms(beds)]
 
-    room_list = [_make_room(r, preset) for r in _list_of_unique_rooms(beds)]
-
-    bed_list = [_make_bed(i, preset) for i in beds]
+    bed_list = [_make_bed(i) for i in beds]
     bed_list.sort(key=lambda bed: bed.get("data").get("bed_index"))
-
     bed_list = _populate_beds(bed_list, census)
     bed_list = _update_discharges(bed_list, discharges)
 
@@ -189,9 +263,8 @@ def make_cytoscape_elements(census, beds, sitrep, discharges, layout):
     if sitrep and sum([len(i) for i in sitrep]):
         bed_list = _update_patients_with_sitrep(bed_list, sitrep)
 
-    nodes = bed_list + room_list
-    edges = []
-    elements = nodes + edges
+    elements = bed_list + room_list
+
     # Update elements so that none selected on first instantiation I think this
     # works b/c elements is a mutable list so we are actually modifying its
     # contents
@@ -241,6 +314,15 @@ def tap_node_inspector(data: dict):
 
 
 @callback(
+    Output(f"{BPID}node_debug", "children"),
+    Input(f"{BPID}tap_node", "data"),
+    prevent_initial_callback=True,
+)
+def tap_node_inspector(data: dict):
+    return json.dumps(data, indent=4)
+
+
+@callback(
     Output(f"{BPID}discharge_statuses", "data"),
     Input(f"{BPID}page_interval", "n_intervals"),
     Input(f"{BPID}discharge_submit_button", "n_clicks"),
@@ -287,15 +369,6 @@ def set_discharge_radio(node: dict):
         status = node.get("data").get("dc_status").get("status")
         status = status if status else "no"
     return status
-
-
-@callback(
-    Output(f"{BPID}node_debug", "children"),
-    Input(f"{BPID}tap_node", "data"),
-    prevent_initial_callback=True,
-)
-def tap_node_inspector(data: dict):
-    return json.dumps(data, indent=4)
 
 
 @callback(
