@@ -7,6 +7,7 @@ from datetime import datetime
 
 from models.beds import DischargeStatus
 from web.hospital import get_building_departments
+
 # callback functions created here will be labelled with BPID for abacus
 from web.pages.abacus import BPID
 from web.pages.abacus.utils import (
@@ -44,8 +45,8 @@ def store_all_departments(_: int):
 
 @callback(
     (
-            Output(f"{BPID}dept_dropdown", "options"),
-            Output(f"{BPID}dept_dropdown", "value"),
+        Output(f"{BPID}dept_dropdown", "options"),
+        Output(f"{BPID}dept_dropdown", "value"),
     ),
     Input(f"{BPID}building_radio", "value"),
     Input(f"{BPID}departments", "data"),
@@ -143,8 +144,8 @@ def store_patient_details(element: dict) -> list[dict]:
 
 @callback(
     (
-            Output(f"{BPID}layout_radio", "value"),
-            Output(f"{BPID}layout_radio", "options"),
+        Output(f"{BPID}layout_radio", "value"),
+        Output(f"{BPID}layout_radio", "options"),
     ),
     Input(f"{BPID}dept_dropdown", "value"),
     Input(f"{BPID}layout_radio", "value"),
@@ -322,8 +323,8 @@ def set_discharge_radio(node: dict):
 
 @callback(
     (
-            Output(f"{BPID}discharge_submit_button", "disabled"),
-            Output(f"{BPID}discharge_submit_button", "color"),
+        Output(f"{BPID}discharge_submit_button", "disabled"),
+        Output(f"{BPID}discharge_submit_button", "color"),
     ),
     Input(f"{BPID}discharge_submit_button", "n_clicks"),
     Input(f"{BPID}discharge_radio", "value"),
@@ -342,8 +343,7 @@ def submit_discharge_status(
     2. manage the colour and enable/disable status of the submit button
     """
     if any(node):
-        node_status = node.get("data", {}).get("dc_status", {}).get("status",
-                                                                    None)
+        node_status = node.get("data", {}).get("dc_status", {}).get("status", None)
     else:
         node_status = None
     btn_disabled = True if radio_status == node_status else False

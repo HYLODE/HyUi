@@ -13,7 +13,7 @@ building_radio_button = html.Div(
                 dbc.RadioItems(
                     id=f"{BPID}building_radio",
                     className="dbc d-grid d-md-flex justify-content-md-begin "
-                              "btn-group p-1",
+                    "btn-group p-1",
                     inline=True,
                     options=[
                         {"label": "Tower", "value": "tower"},
@@ -53,7 +53,7 @@ department_dropdown = html.Div(
             id=f"{BPID}dept_dropdown",
             placeholder="Pick a department",
             multi=False,
-            className="p-0"
+            className="p-0",
         )
     ],
     className="dbc",
