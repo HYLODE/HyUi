@@ -2,12 +2,11 @@ import json
 import math
 import pytz
 import warnings
-from dash import Input, Output, State, callback, ctx, dcc
+from dash import Input, Output, State, callback, ctx
 from datetime import datetime
 
 from models.beds import DischargeStatus
 from web.hospital import get_building_departments
-
 # callback functions created here will be labelled with BPID for abacus
 from web.pages.abacus import BPID
 from web.pages.abacus.utils import (
@@ -44,7 +43,10 @@ def store_all_departments(_: int):
 
 
 @callback(
-    Output(f"{BPID}dept_dropdown_div", "children"),
+    (
+            Output(f"{BPID}dept_dropdown", "options"),
+            Output(f"{BPID}dept_dropdown", "value"),
+    ),
     Input(f"{BPID}building_radio", "value"),
     Input(f"{BPID}departments", "data"),
 )
@@ -58,14 +60,9 @@ def gen_dept_dropdown(building: str, building_departments):
         if bd["building"] == building:
             dropdown.extend(bd.get("departments"))
             break
+    options = [{"label": v, "value": v} for v in dropdown]
 
-    return dcc.Dropdown(
-        id=f"{BPID}dept_dropdown",
-        value=dropdown[0],
-        options=[{"label": v, "value": v} for v in dropdown],
-        placeholder="Pick a department",
-        multi=False,
-    )
+    return options, dropdown[0]
 
 
 @callback(
@@ -146,8 +143,8 @@ def store_patient_details(element: dict) -> list[dict]:
 
 @callback(
     (
-        Output(f"{BPID}layout_radio", "value"),
-        Output(f"{BPID}layout_radio", "options"),
+            Output(f"{BPID}layout_radio", "value"),
+            Output(f"{BPID}layout_radio", "options"),
     ),
     Input(f"{BPID}dept_dropdown", "value"),
     Input(f"{BPID}layout_radio", "value"),
@@ -275,54 +272,6 @@ def make_cytoscape_elements(census, beds, sitrep, discharges):
 
 
 @callback(
-    Output(f"{BPID}bed_inspector", "children"),
-    Input(f"{BPID}tap_node", "data"),
-    prevent_initial_callback=True,
-)
-def tap_bed_inspector(element: dict):
-    if element and any(element):
-        data = element.get("data")
-        return _display_patient(data)
-    else:
-        return ""
-
-
-@callback(
-    Output(f"{BPID}patient_inspector", "children"),
-    Input(f"{BPID}patient_details", "data"),
-    prevent_initial_callback=True,
-)
-def patient_inspector(data: list[dict]):
-    if data and any(data):
-        return json.dumps(data, indent=4)
-    else:
-        return ""
-
-
-@callback(
-    Output(f"{BPID}node_inspector", "hidden"),
-    Input(f"{BPID}tap_node", "data"),
-    prevent_initial_callback=True,
-)
-def tap_node_inspector(data: dict):
-    """set the hidden property of the node_inspector div"""
-    visible = False  # easier than double negative hidden
-    if data and any(data):
-        return visible if data.get("data").get("occupied") else not visible
-    else:
-        return not visible
-
-
-@callback(
-    Output(f"{BPID}node_debug", "children"),
-    Input(f"{BPID}tap_node", "data"),
-    prevent_initial_callback=True,
-)
-def tap_node_inspector(data: dict):
-    return json.dumps(data, indent=4)
-
-
-@callback(
     Output(f"{BPID}discharge_statuses", "data"),
     Input(f"{BPID}page_interval", "n_intervals"),
     Input(f"{BPID}discharge_submit_button", "n_clicks"),
@@ -373,8 +322,8 @@ def set_discharge_radio(node: dict):
 
 @callback(
     (
-        Output(f"{BPID}discharge_submit_button", "disabled"),
-        Output(f"{BPID}discharge_submit_button", "color"),
+            Output(f"{BPID}discharge_submit_button", "disabled"),
+            Output(f"{BPID}discharge_submit_button", "color"),
     ),
     Input(f"{BPID}discharge_submit_button", "n_clicks"),
     Input(f"{BPID}discharge_radio", "value"),
@@ -393,7 +342,8 @@ def submit_discharge_status(
     2. manage the colour and enable/disable status of the submit button
     """
     if any(node):
-        node_status = node.get("data", {}).get("dc_status", {}).get("status", None)
+        node_status = node.get("data", {}).get("dc_status", {}).get("status",
+                                                                    None)
     else:
         node_status = None
     btn_disabled = True if radio_status == node_status else False
@@ -412,3 +362,71 @@ def submit_discharge_status(
             btn_color = "warning"
 
     return btn_disabled, btn_color
+
+
+@callback(
+    Output(f"{BPID}bed_inspector", "children"),
+    Input(f"{BPID}tap_node", "data"),
+    prevent_initial_callback=True,
+)
+def tap_bed_inspector(element: dict):
+    if element and any(element):
+        data = element.get("data")
+        return _display_patient(data)
+    else:
+        return ""
+
+
+@callback(
+    Output(f"{BPID}patient_inspector", "children"),
+    Input(f"{BPID}patient_details", "data"),
+    prevent_initial_callback=True,
+)
+def patient_inspector(data: list[dict]):
+    if data and any(data):
+        return json.dumps(data, indent=4)
+    else:
+        return ""
+
+
+@callback(
+    Output(f"{BPID}node_inspector", "hidden"),
+    Input(f"{BPID}tap_node", "data"),
+    prevent_initial_callback=True,
+)
+def tap_node_inspector(data: dict):
+    """set the hidden property of the node_inspector div"""
+    visible = False  # easier than double negative hidden
+    if data and any(data):
+        return visible if data.get("data").get("occupied") else not visible
+    else:
+        return not visible
+
+
+@callback(
+    Output(f"{BPID}node_debug", "children"),
+    Input(f"{BPID}tap_node", "data"),
+    prevent_initial_callback=True,
+)
+def tap_debug_inspector(data: dict):
+    return json.dumps(data, indent=4)
+
+
+@callback(
+    Output(f"{BPID}show_pts_now_n", "children"),
+    Input(f"{BPID}elements", "data"),
+    prevent_initial_callback=True,
+)
+def show_patients_now_n(elements: dict):
+    n = [True for e in elements if e.get("data").get("occupied")]
+    return f"{sum(n)} current patients"
+
+
+@callback(
+    Output(f"{BPID}show_dcs_now_n", "children"),
+    Input(f"{BPID}elements", "data"),
+    prevent_initial_callback=True,
+)
+def show_discharges_now_n(elements: dict):
+    n = [True for e in elements if e.get("data").get("discharge")]
+    return f"{sum(n)} potential discharges"

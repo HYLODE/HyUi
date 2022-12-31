@@ -2,7 +2,7 @@
 Plotly dash layout components
 """
 import dash_bootstrap_components as dbc
-from dash import html
+from dash import html, dcc
 
 from web.pages.abacus import BPID
 
@@ -12,8 +12,8 @@ building_radio_button = html.Div(
             [
                 dbc.RadioItems(
                     id=f"{BPID}building_radio",
-                    className="dbc d-grid d-md-flex "
-                    "justify-content-md-end btn-group",
+                    className="dbc d-grid d-md-flex justify-content-md-begin "
+                              "btn-group p-1",
                     inline=True,
                     options=[
                         {"label": "Tower", "value": "tower"},
@@ -37,7 +37,7 @@ layout_radio_button = html.Div(
                 dbc.RadioItems(
                     id=f"{BPID}layout_radio",
                     className="dbc d-grid d-md-flex "
-                    "justify-content-md-begin btn-group",
+                    "justify-content-md-end btn-group p-1",
                     inline=True,
                 )
             ],
@@ -45,6 +45,18 @@ layout_radio_button = html.Div(
         ),
     ],
     className="radio-group",
+)
+
+department_dropdown = html.Div(
+    [
+        dcc.Dropdown(
+            id=f"{BPID}dept_dropdown",
+            placeholder="Pick a department",
+            multi=False,
+            className="p-0"
+        )
+    ],
+    className="dbc",
 )
 
 discharge_radio_button = html.Div(
