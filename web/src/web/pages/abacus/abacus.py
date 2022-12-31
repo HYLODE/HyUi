@@ -134,12 +134,13 @@ def layout():
                             html.Div(
                                 [
                                     html.P(
-                                        "Known admissions", className="w-100 text-end"
+                                        "Admissions confirmed",
+                                        className="w-100 text-end",
                                     ),
                                     dcc.Slider(
-                                        id=f"{BPID}show_adm_now_n",
+                                        id=f"{BPID}adm_confirmed",
                                         min=0,
-                                        max=6,
+                                        max=5,
                                         step=1,
                                         value=0,
                                         marks=None,
@@ -155,12 +156,105 @@ def layout():
                             html.Div(
                                 [
                                     html.P(
-                                        "Unknown admissions", className="w-100 text-end"
+                                        "Admissions expected",
+                                        className="w-100 text-end",
                                     ),
                                     dcc.Slider(
-                                        id=f"{BPID}show_adm_nxt_n",
+                                        id=f"{BPID}adm_expected",
                                         min=0,
-                                        max=6,
+                                        max=5,
+                                        step=1,
+                                        value=1,
+                                        marks=None,
+                                        tooltip={
+                                            "placement": "bottom",
+                                            "always_visible": True,
+                                        },
+                                        className="w-100",
+                                    ),
+                                ],
+                                className="hstack gap-3 pt-0",
+                            ),
+                        ],
+                        className="border rounded border-light border-1 p-3",
+                    ),
+                    dbc.Col(
+                        id=f"{BPID}occupancy_info",
+                        children=[
+                            html.Div(
+                                [
+                                    html.P(
+                                        "Current occupancy", className="w-100 text-end"
+                                    ),
+                                    dcc.Slider(
+                                        id=f"{BPID}pts_now_slider",
+                                        min=0,
+                                        step=1,
+                                        marks=None,
+                                        disabled=True,
+                                        tooltip={
+                                            "placement": "top",
+                                            "always_visible": True,
+                                        },
+                                        className="w-100",
+                                    ),
+                                ],
+                                className="hstack gap-3 pb-0",
+                            ),
+                            html.Div(
+                                [
+                                    html.P(
+                                        "Expected occupancy", className="w-100 text-end"
+                                    ),
+                                    dcc.Slider(
+                                        id=f"{BPID}pts_next_slider",
+                                        min=0,
+                                        step=1,
+                                        marks=None,
+                                        disabled=True,
+                                        tooltip={
+                                            "placement": "bottom",
+                                            "always_visible": True,
+                                        },
+                                        className="w-100",
+                                    ),
+                                ],
+                                className="hstack gap-3 pt-0",
+                            ),
+                        ],
+                        className="border rounded border-light border-1 p-3",
+                    ),
+                    dbc.Col(
+                        [
+                            html.Div(
+                                [
+                                    html.P(
+                                        "Discharges ready", className="w-100 text-end"
+                                    ),
+                                    dcc.Slider(
+                                        id=f"{BPID}dcs_ready",
+                                        min=0,
+                                        step=1,
+                                        marks=None,
+                                        disabled=True,
+                                        tooltip={
+                                            "placement": "top",
+                                            "always_visible": True,
+                                        },
+                                        className="w-100",
+                                    ),
+                                ],
+                                className="hstack gap-3 pb-0",
+                            ),
+                            html.Div(
+                                [
+                                    html.P(
+                                        "Discharges confirmed",
+                                        className="w-100 text-end",
+                                    ),
+                                    dcc.Slider(
+                                        id=f"{BPID}dcs_confirmed",
+                                        min=0,
                                         step=1,
                                         value=0,
                                         marks=None,
@@ -174,18 +268,10 @@ def layout():
                                 className="hstack gap-3 pt-0",
                             ),
                         ],
-                        className="border rounded border-warning border-3 p-3",
-                    ),
-                    dbc.Col(
-                        [html.Div(id=f"{BPID}show_pts_now_n")],
-                        className="border rounded border-warning border-3",
-                    ),
-                    dbc.Col(
-                        [html.Div(id=f"{BPID}show_dcs_now_n")],
-                        className="border rounded border-danger border-3",
+                        className="border rounded border-light border-1 p-3",
                     ),
                 ],
-                className="border rounded m-1",
+                className="border rounded bg-light",
             ),
             dbc.Row(
                 [
@@ -204,7 +290,7 @@ def layout():
                     ),
                     dbc.Col([layout_radio_button]),
                 ],
-                className="border rounded m-1 bg-light",
+                className="border rounded p-3 bg-light",
             ),
             dbc.Row(
                 [
@@ -231,10 +317,11 @@ def layout():
                         ],
                     ),
                 ],
-                className="border rounded m-1",
+                className="border rounded p-3",
             ),
             html.Div(id=f"{BPID}ward_map"),
             dash_only,
         ],
         className="dbc",
+        fluid=True,
     )

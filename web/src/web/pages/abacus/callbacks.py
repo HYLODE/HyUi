@@ -413,20 +413,78 @@ def tap_debug_inspector(data: dict):
 
 
 @callback(
-    Output(f"{BPID}show_pts_now_n", "children"),
+    (
+        Output(f"{BPID}pts_now_slider", "value"),
+        Output(f"{BPID}pts_now_slider", "max"),
+        Output(f"{BPID}pts_next_slider", "max"),
+    ),
     Input(f"{BPID}elements", "data"),
     prevent_initial_callback=True,
 )
-def show_patients_now_n(elements: dict):
-    n = [True for e in elements if e.get("data").get("occupied")]
-    return f"{sum(n)} current patients"
+def show_patients_now(elements: dict):
+    n = sum([True for e in elements if e.get("data").get("occupied")])
+    return n, 35, 35
 
 
 @callback(
-    Output(f"{BPID}show_dcs_now_n", "children"),
+    (Output(f"{BPID}pts_next_slider", "value"),),
+    Input(f"{BPID}pts_now_slider", "value"),
+    Input(f"{BPID}dcs_confirmed", "value"),
+    Input(f"{BPID}adm_confirmed", "value"),
+    Input(f"{BPID}adm_expected", "value"),
+    prevent_initial_callback=True,
+)
+def show_patients_next(now: int, dcs: int, adm_con: int, adm_exp: int):
+    next = now - dcs + adm_con + adm_exp
+    return (next,)
+
+
+@callback(
+    (
+        Output(f"{BPID}dcs_ready", "value"),
+        Output(f"{BPID}dcs_ready", "max"),
+        Output(f"{BPID}dcs_confirmed", "max"),
+    ),
     Input(f"{BPID}elements", "data"),
     prevent_initial_callback=True,
 )
-def show_discharges_now_n(elements: dict):
-    n = [True for e in elements if e.get("data").get("discharge")]
-    return f"{sum(n)} potential discharges"
+def show_dcs_ready(elements: dict):
+    n = sum([True for e in elements if e.get("data").get("discharge")])
+    n_max = 5 * ((n // 5) + 1)  # multiple of 5 above n
+    return n, n_max, n_max
+
+
+@callback(
+    Output(f"{BPID}dcs_confirmed", "value"),
+    Input(f"{BPID}dcs_ready", "value"),
+    State(f"{BPID}dcs_confirmed", "value"),
+    prevent_initial_callback=True,
+)
+def show_dcs_confirmed(ready: int, confirmed: int):
+    """
+    Placeholder callback that should query the number of confirmed discharges
+    """
+    if confirmed is not None:
+        return confirmed
+    else:
+        return 0
+
+
+# @callback(
+#     Output(f"{BPID}occupancy_info", "className"),
+#     Input(f"{BPID}pts_next_slider", "value"),
+#     Input(f"{BPID}pts_now_slider", "value"),
+#     State(f"{BPID}occupancy_info", "className"),
+#     prevent_initial_callback=True,
+# )
+# def show_highlight_occupancy(pts_next: int, pts_now: int, info_class: str):
+#     """
+#     """
+#     if pts_next > pts_now:
+#         color = "danger"
+#     elif pts_next < pts_now:
+#         color = "success"
+#     else:
+#         color = "info"
+#
+#     return "border-" + color + " " + info_class
