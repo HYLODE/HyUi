@@ -268,6 +268,8 @@ def make_cytoscape_elements(census, beds, sitrep, discharges):
     # contents
     for ele in elements:
         ele["selected"] = False
+        if ele.get("data").get("level") == "room":
+            ele["selectable"] = False
 
     return elements
 

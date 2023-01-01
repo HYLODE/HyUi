@@ -315,9 +315,9 @@ def _display_patient(data: dict) -> tuple[str, str]:
     if sex is None:
         sex = ""
     else:
-        sex = "M" if sex.lower() == "m" else sex == "F"
+        sex = "M" if sex.lower() == "m" else "F"
 
-    pt_title = f"{firstname} {lastname} | ({age}{sex}) | MRN: {mrn}"
+    pt_title = f"{firstname} {lastname} | {age}{sex} | {mrn}"
     pt_details = f"CSN: {encounter}"
     return pt_title, pt_details
 
