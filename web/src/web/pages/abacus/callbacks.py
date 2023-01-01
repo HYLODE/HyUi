@@ -365,7 +365,10 @@ def submit_discharge_status(
 
 
 @callback(
-    Output(f"{BPID}bed_inspector", "children"),
+    (
+        Output(f"{BPID}bed_inspector_header", "children"),
+        Output(f"{BPID}bed_inspector_body", "children"),
+    ),
     Input(f"{BPID}tap_node", "data"),
     prevent_initial_callback=True,
 )
@@ -374,7 +377,7 @@ def tap_bed_inspector(element: dict):
         data = element.get("data")
         return _display_patient(data)
     else:
-        return ""
+        return "", ""
 
 
 @callback(
@@ -416,18 +419,21 @@ def tap_debug_inspector(data: dict):
     (
         Output(f"{BPID}pts_now_slider", "value"),
         Output(f"{BPID}pts_now_slider", "max"),
-        Output(f"{BPID}pts_next_slider", "max"),
     ),
     Input(f"{BPID}elements", "data"),
     prevent_initial_callback=True,
 )
 def show_patients_now(elements: dict):
     n = sum([True for e in elements if e.get("data").get("occupied")])
-    return n, 35, 35
+    return n, 35
 
 
 @callback(
-    (Output(f"{BPID}pts_next_slider", "value"),),
+    (
+        Output(f"{BPID}pts_next_slider", "min"),
+        Output(f"{BPID}pts_next_slider", "value"),
+        Output(f"{BPID}pts_next_slider", "max"),
+    ),
     Input(f"{BPID}pts_now_slider", "value"),
     Input(f"{BPID}dcs_confirmed", "value"),
     Input(f"{BPID}adm_confirmed", "value"),
@@ -435,8 +441,25 @@ def show_patients_now(elements: dict):
     prevent_initial_callback=True,
 )
 def show_patients_next(now: int, dcs: int, adm_con: int, adm_exp: int):
+    """
+    Values to ba passed to the RangeSlider component
+    Args:
+        now:
+        dcs:
+        adm_con:
+        adm_exp:
+
+    Returns:
+
+    """
     next = now - dcs + adm_con + adm_exp
-    return (next,)
+    next_upper = next + 1
+    next_lower = next - 1
+
+    slider_min = next - 5
+    slider_max = next + 5
+
+    return 0, [next_lower, next_upper], 35
 
 
 @callback(
@@ -470,21 +493,22 @@ def show_dcs_confirmed(ready: int, confirmed: int):
         return 0
 
 
-# @callback(
-#     Output(f"{BPID}occupancy_info", "className"),
-#     Input(f"{BPID}pts_next_slider", "value"),
-#     Input(f"{BPID}pts_now_slider", "value"),
-#     State(f"{BPID}occupancy_info", "className"),
-#     prevent_initial_callback=True,
-# )
-# def show_highlight_occupancy(pts_next: int, pts_now: int, info_class: str):
-#     """
-#     """
-#     if pts_next > pts_now:
-#         color = "danger"
-#     elif pts_next < pts_now:
-#         color = "success"
-#     else:
-#         color = "info"
-#
-#     return "border-" + color + " " + info_class
+@callback(
+    Output(f"{BPID}ward_status", "className"),
+    Input(f"{BPID}pts_next_slider", "value"),
+    Input(f"{BPID}pts_now_slider", "value"),
+    State(f"{BPID}ward_status", "className"),
+    prevent_initial_callback=True,
+)
+def show_highlight_occupancy(pts_next: list[int], pts_now: int, info_class: str):
+    """ """
+    next_lower, next_upper = pts_next
+    if next_upper > pts_now:
+        color = "danger"
+    elif next_upper < pts_now:
+        color = "success"
+    else:
+        color = "info"
+
+    _default = "border rounded border-2 p-2"
+    return "border-" + color + " " + _default

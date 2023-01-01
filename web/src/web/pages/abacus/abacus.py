@@ -36,7 +36,13 @@ dash_only = html.Div(
     ]
 )
 
-bed_inspector = html.Pre(id=f"{BPID}bed_inspector", style=styles["pre"])
+# bed_inspector = html.Pre(id=f"{BPID}bed_inspector", style=styles["pre"])
+bed_inspector = dbc.Card(
+    [
+        dbc.CardHeader(html.H3(id=f"{BPID}bed_inspector_header")),
+        dbc.CardBody(html.P(id=f"{BPID}bed_inspector_body")),
+    ]
+)
 
 # using the term 'form' to indicate that this is for user input
 discharge_form = html.Div(
@@ -111,6 +117,18 @@ ward_map = html.Div(
                         # "border-color": "black",
                     },
                 },
+                {
+                    "selector": "[?closed]",
+                    "style": {
+                        "shape": "polygon",
+                        "shape-polygon-points": "-1 1 1 1 1 -1 -1 -1 -1 1 0.9 -0.9"
+                        # "background-color": "black",
+                        # "background-opacity": 0.2,
+                        # "border-width": 1,
+                        # "border-style": "solid",
+                        # "border-color": "red",
+                    },
+                },
             ],
             # autoRefreshLayout=True,
             responsive=True,
@@ -121,21 +139,32 @@ ward_map = html.Div(
     ]
 )
 
+_summ_col = ("border rounded border-light border-1 p-2",)
+_summ_slider_div = "hstack gap-3"
+_summ_slider_label = "w-25 text-end"
+
 
 def layout():
     return dbc.Container(
         [
             dbc.Row(
-                [
+                id=f"{BPID}ward_status",
+                children=[
                     # Status summary row
                     # ==================
                     dbc.Col(
                         [
                             html.Div(
                                 [
+                                    html.H5("Admissions", className="text-begin"),
+                                ],
+                                className="hstack p-0",
+                            ),
+                            html.Div(
+                                [
                                     html.P(
-                                        "Admissions confirmed",
-                                        className="w-100 text-end",
+                                        "Confirmed",
+                                        className=_summ_slider_label,
                                     ),
                                     dcc.Slider(
                                         id=f"{BPID}adm_confirmed",
@@ -151,13 +180,13 @@ def layout():
                                         className="w-100",
                                     ),
                                 ],
-                                className="hstack gap-3 pb-0",
+                                className=_summ_slider_div + "pb-0",
                             ),
                             html.Div(
                                 [
                                     html.P(
-                                        "Admissions expected",
-                                        className="w-100 text-end",
+                                        "Expected",
+                                        className=_summ_slider_label,
                                     ),
                                     dcc.Slider(
                                         id=f"{BPID}adm_expected",
@@ -173,25 +202,29 @@ def layout():
                                         className="w-100",
                                     ),
                                 ],
-                                className="hstack gap-3 pt-0",
+                                className=_summ_slider_div + "pt-0",
                             ),
                         ],
-                        className="border rounded border-light border-1 p-3",
+                        width=3,
+                        className=_summ_col,
                     ),
                     dbc.Col(
-                        id=f"{BPID}occupancy_info",
                         children=[
                             html.Div(
                                 [
-                                    html.P(
-                                        "Current occupancy", className="w-100 text-end"
-                                    ),
+                                    html.H5("Ward occupancy", className="text-begin"),
+                                ],
+                                className="hstack p-0",
+                            ),
+                            html.Div(
+                                [
+                                    html.P("Now", className="w-20 text-end"),
                                     dcc.Slider(
                                         id=f"{BPID}pts_now_slider",
                                         min=0,
                                         step=1,
                                         marks=None,
-                                        disabled=True,
+                                        disabled=False,
                                         tooltip={
                                             "placement": "top",
                                             "always_visible": True,
@@ -199,19 +232,18 @@ def layout():
                                         className="w-100",
                                     ),
                                 ],
-                                className="hstack gap-3 pb-0",
+                                className=_summ_slider_div + "pb-0",
                             ),
                             html.Div(
                                 [
                                     html.P(
-                                        "Expected occupancy", className="w-100 text-end"
+                                        "Next", className="fw-bold w-20 " "text-end"
                                     ),
-                                    dcc.Slider(
+                                    dcc.RangeSlider(
                                         id=f"{BPID}pts_next_slider",
-                                        min=0,
                                         step=1,
                                         marks=None,
-                                        disabled=True,
+                                        allowCross=False,
                                         tooltip={
                                             "placement": "bottom",
                                             "always_visible": True,
@@ -219,18 +251,23 @@ def layout():
                                         className="w-100",
                                     ),
                                 ],
-                                className="hstack gap-3 pt-0",
+                                className=_summ_slider_div + "pt-0",
                             ),
                         ],
-                        className="border rounded border-light border-1 p-3",
+                        width=6,
+                        className=_summ_col,
                     ),
                     dbc.Col(
                         [
                             html.Div(
                                 [
-                                    html.P(
-                                        "Discharges ready", className="w-100 text-end"
-                                    ),
+                                    html.H5("Discharges", className=""),
+                                ],
+                                className="hstack p-0",
+                            ),
+                            html.Div(
+                                [
+                                    html.P("Ready", className=_summ_slider_label),
                                     dcc.Slider(
                                         id=f"{BPID}dcs_ready",
                                         min=0,
@@ -244,14 +281,11 @@ def layout():
                                         className="w-100",
                                     ),
                                 ],
-                                className="hstack gap-3 pb-0",
+                                className=_summ_slider_div + "pb-0",
                             ),
                             html.Div(
                                 [
-                                    html.P(
-                                        "Discharges confirmed",
-                                        className="w-100 text-end",
-                                    ),
+                                    html.P("Confirmed", className=_summ_slider_label),
                                     dcc.Slider(
                                         id=f"{BPID}dcs_confirmed",
                                         min=0,
@@ -265,10 +299,11 @@ def layout():
                                         className="w-100",
                                     ),
                                 ],
-                                className="hstack gap-3 pt-0",
+                                className=_summ_slider_div + "pt-0",
                             ),
                         ],
-                        className="border rounded border-light border-1 p-3",
+                        width=3,
+                        className=_summ_col,
                     ),
                 ],
                 className="border rounded bg-light",
@@ -304,16 +339,16 @@ def layout():
                     ),
                     dbc.Col(
                         [
-                            # html.Div([node_debug]),
                             html.Div(
                                 id=f"{BPID}node_inspector",
                                 children=[
                                     bed_inspector,
                                     discharge_form,
-                                    patient_inspector,
+                                    # patient_inspector,
                                 ],
                                 hidden=True,
-                            )
+                            ),
+                            html.Div([node_debug]),
                         ],
                     ),
                 ],

@@ -1,7 +1,6 @@
 """
 assorted functions for preparing and running the sitrep data
 """
-import json
 import requests
 import warnings
 from datetime import datetime
@@ -273,7 +272,7 @@ def _make_room(room: str) -> dict:
     )
 
 
-def _display_patient(data: dict) -> str:
+def _display_patient(data: dict) -> tuple[str, str]:
     """
     Prettify node data
     """
@@ -285,22 +284,42 @@ def _display_patient(data: dict) -> str:
     if not sitrep:
         sitrep = {}
 
-    return json.dumps(
-        dict(
-            csn=_as_int(census.get("encounter")),
-            n_inotropes_1_4h=sitrep.get("n_inotropes_1_4h", ""),
-            had_rrt_1_4h=sitrep.get("had_rrt_1_4h", ""),
-            vent_type_1_4h=sitrep.get("vent_type_1_4h", ""),
-            mrn=census.get("mrn"),
-            date_of_birth=census.get("date_of_birth"),
-            encounter=census.get("encounter"),
-            lastname=census.get("lastname"),
-            firstname=census.get("firstname"),
-            sex=census.get("sex"),
-            discharge=data.get("discharge"),
-        ),
-        indent=4,
-    )
+    # return json.dumps(
+    #     dict(
+    #         csn=_as_int(census.get("encounter")),
+    #         n_inotropes_1_4h=sitrep.get("n_inotropes_1_4h", ""),
+    #         had_rrt_1_4h=sitrep.get("had_rrt_1_4h", ""),
+    #         vent_type_1_4h=sitrep.get("vent_type_1_4h", ""),
+    #         mrn=census.get("mrn"),
+    #         date_of_birth=census.get("date_of_birth"),
+    #         encounter=census.get("encounter"),
+    #         lastname=census.get("lastname"),
+    #         firstname=census.get("firstname"),
+    #         sex=census.get("sex"),
+    #         discharge=data.get("discharge"),
+    #     ),
+    #     indent=4,
+    # )
+
+    mrn = census.get("mrn", "")
+
+    encounter = str(census.get("encounter", ""))
+
+    lastname = census.get("lastname", "").upper()
+    firstname = census.get("firstname", "").title()
+
+    date_of_birth = census.get("date_of_birth")
+    age = int((datetime.utcnow() - datetime.fromisoformat(date_of_birth)).days / 365.25)
+
+    sex = census.get("sex")
+    if sex is None:
+        sex = ""
+    else:
+        sex = "M" if sex.lower() == "m" else sex == "F"
+
+    pt_title = f"{firstname} {lastname} | ({age}{sex}) | MRN: {mrn}"
+    pt_details = f"CSN: {encounter}"
+    return pt_title, pt_details
 
 
 def _post_discharge_status(csn: int, status: str) -> DischargeStatus:
