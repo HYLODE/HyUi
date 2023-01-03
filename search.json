@@ -1,5 +1,12 @@
 [
   {
+    "objectID": "user/index.html",
+    "href": "user/index.html",
+    "title": "User guide for HYLODE",
+    "section": "",
+    "text": "How to use HYLODE Limitations\n\napp urls: won’t work outside of UCLH"
+  },
+  {
     "objectID": "developer/workflow.html",
     "href": "developer/workflow.html",
     "title": "HYLODE documentation",
@@ -117,6 +124,55 @@
     "title": "HYLODE documentation",
     "section": "Ways of working",
     "text": "Ways of working\n\nPycharm\n\nsetup the FastAPI and Plotly Dash configurations so that you can see the changes as you work"
+  },
+  {
+    "objectID": "developer/index.html",
+    "href": "developer/index.html",
+    "title": "HyUI documentation",
+    "section": "",
+    "text": "User interface for the HYLODE project Much of the project structure is based on thegovcookiecutter template project but is adapted for the development of Plotly Dash apps within a hospital environment. A template application would be split into a frontend and a backend with communication between the two via HTTP, and the project orchestrated by docker-compose.\nThe file (./readme.md) is at the root of the project, but the application code including the backend is in ./src/api, and the application itself is kept in ./src/apps. An annotated figure of the directory structure is shown below."
+  },
+  {
+    "objectID": "developer/index.html#development",
+    "href": "developer/index.html#development",
+    "title": "HyUI documentation",
+    "section": "Development",
+    "text": "Development\nRefer to Dev Setup for details on setting up development environments."
+  },
+  {
+    "objectID": "developer/index.html#development-hospital",
+    "href": "developer/index.html#development-hospital",
+    "title": "HyUI documentation",
+    "section": "Development (Hospital)",
+    "text": "Development (Hospital)\nThere are two tasks that must happen within the hospital environment:\n\npreparing realistic mock data\ndeployment\n\nThe installation steps differ (from local development) because here we do not have sudo (root) access (admin privileges). This means work must be performed using a combination of the default command line tools and docker."
+  },
+  {
+    "objectID": "developer/index.html#deployment-hospital",
+    "href": "developer/index.html#deployment-hospital",
+    "title": "HyUI documentation",
+    "section": "Deployment (hospital)",
+    "text": "Deployment (hospital)\nSet the environment variable to prod, then run docker-compose.\nexport ENV=prod\npytest\ndocker-compose up -d --build && docker-compose logs -f\nYou will need create a local ./.env file with database credentials so preferably set the ENV to prod there.\n\nOrchestrating front and back end\nIMPORTANT: ensure you have created a ./.env file with at least the same info as the ./.env.example version\ndocker-compose down\ndocker-compose up -d --build && docker-compose logs -f"
+  },
+  {
+    "objectID": "developer/index.html#project-structure",
+    "href": "developer/index.html#project-structure",
+    "title": "HyUI documentation",
+    "section": "Project structure",
+    "text": "Project structure\n.\n|\n|-- readme.md           // this file and the project root\n|-- Makefile            // standard project commands to be run from the shell\n|-- config files        // e.g. requirements.txt, .gitignore\n|-- .secrets            // e.g. .secrets etc excluded from version control\n|-- secrets.example     // an example version of .secrets above\n|-- docker-compose.yml  // orchestrate front/backend\n|-- src\n    |-- frontend\n        |-- Dockerfile\n        |-- dash_app.py\n    |-- backend\n        |-- Dockerfile\n        |-- query.sql   // SQL used to drive the backend API\n|-- synth               // Synthetic data generation for testing\n    |-- work\n|-- tests\n|-- docs                // this Quarto website\n|-- data\n|-- outputs\n|-- notebooks           // jupyter notebooks etc\n|-- try                 // ideas playground"
+  },
+  {
+    "objectID": "developer/index.html#contributing",
+    "href": "developer/index.html#contributing",
+    "title": "HyUI documentation",
+    "section": "Contributing",
+    "text": "Contributing\nIf you want to help us build, and improve hyui, view our contributing guidelines."
+  },
+  {
+    "objectID": "developer/index.html#acknowledgements",
+    "href": "developer/index.html#acknowledgements",
+    "title": "HyUI documentation",
+    "section": "Acknowledgements",
+    "text": "Acknowledgements\nThis project structure is based on the govcookiecutter template project."
   },
   {
     "objectID": "developer/pycharm.html",
@@ -254,51 +310,9 @@
   {
     "objectID": "index.html",
     "href": "index.html",
-    "title": "HyUI documentation",
+    "title": "Hyperlocal Demand Forecasts",
     "section": "",
-    "text": "User interface for the HYLODE project Much of the project structure is based on thegovcookiecutter template project but is adapted for the development of Plotly Dash apps within a hospital environment. A template application would be split into a frontend and a backend with communication between the two via HTTP, and the project orchestrated by docker-compose.\nThe file (./readme.md) is at the root of the project, but the application code including the backend is in ./src/api, and the application itself is kept in ./src/apps. An annotated figure of the directory structure is shown below."
-  },
-  {
-    "objectID": "index.html#development",
-    "href": "index.html#development",
-    "title": "HyUI documentation",
-    "section": "Development",
-    "text": "Development\nRefer to Dev Setup for details on setting up development environments."
-  },
-  {
-    "objectID": "index.html#development-hospital",
-    "href": "index.html#development-hospital",
-    "title": "HyUI documentation",
-    "section": "Development (Hospital)",
-    "text": "Development (Hospital)\nThere are two tasks that must happen within the hospital environment:\n\npreparing realistic mock data\ndeployment\n\nThe installation steps differ (from local development) because here we do not have sudo (root) access (admin privileges). This means work must be performed using a combination of the default command line tools and docker."
-  },
-  {
-    "objectID": "index.html#deployment-hospital",
-    "href": "index.html#deployment-hospital",
-    "title": "HyUI documentation",
-    "section": "Deployment (hospital)",
-    "text": "Deployment (hospital)\nSet the environment variable to prod, then run docker-compose.\nexport ENV=prod\npytest\ndocker-compose up -d --build && docker-compose logs -f\nYou will need create a local ./.env file with database credentials so preferably set the ENV to prod there.\n\nOrchestrating front and back end\nIMPORTANT: ensure you have created a ./.env file with at least the same info as the ./.env.example version\ndocker-compose down\ndocker-compose up -d --build && docker-compose logs -f"
-  },
-  {
-    "objectID": "index.html#project-structure",
-    "href": "index.html#project-structure",
-    "title": "HyUI documentation",
-    "section": "Project structure",
-    "text": "Project structure\n.\n|\n|-- readme.md           // this file and the project root\n|-- Makefile            // standard project commands to be run from the shell\n|-- config files        // e.g. requirements.txt, .gitignore\n|-- .secrets            // e.g. .secrets etc excluded from version control\n|-- secrets.example     // an example version of .secrets above\n|-- docker-compose.yml  // orchestrate front/backend\n|-- src\n    |-- frontend\n        |-- Dockerfile\n        |-- dash_app.py\n    |-- backend\n        |-- Dockerfile\n        |-- query.sql   // SQL used to drive the backend API\n|-- synth               // Synthetic data generation for testing\n    |-- work\n|-- tests\n|-- docs                // this Quarto website\n|-- data\n|-- outputs\n|-- notebooks           // jupyter notebooks etc\n|-- try                 // ideas playground"
-  },
-  {
-    "objectID": "index.html#contributing",
-    "href": "index.html#contributing",
-    "title": "HyUI documentation",
-    "section": "Contributing",
-    "text": "Contributing\nIf you want to help us build, and improve hyui, view our contributing guidelines."
-  },
-  {
-    "objectID": "index.html#acknowledgements",
-    "href": "index.html#acknowledgements",
-    "title": "HyUI documentation",
-    "section": "Acknowledgements",
-    "text": "Acknowledgements\nThis project structure is based on the govcookiecutter template project."
+    "text": "Welcome to HYLODE!\n\nVisit the app!\nRead the user documentation\nExplore the developer guide"
   },
   {
     "objectID": "notes/provisioning.html",

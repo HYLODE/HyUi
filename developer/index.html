@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>HYLODE documentation – contributing</title>
+<title>HYLODE documentation - HyUI documentation</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -93,8 +93,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../contributor_guide/pre_commit_hooks.html" rel="next">
-<link href="../contributor_guide/CODE_OF_CONDUCT.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -170,7 +168,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     </nav>
   <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
     <div class="container-fluid d-flex justify-content-between">
-      <h1 class="quarto-secondary-nav-title"></h1>
+      <h1 class="quarto-secondary-nav-title">HyUI documentation</h1>
       <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
         <i class="bi bi-chevron-right"></i>
       </button>
@@ -228,7 +226,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../contributor_guide/CONTRIBUTING.html" class="sidebar-item-text sidebar-link active">Contributing</a>
+  <a href="../contributor_guide/CONTRIBUTING.html" class="sidebar-item-text sidebar-link">Contributing</a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -252,100 +250,107 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#contributing" id="toc-contributing" class="nav-link active" data-scroll-target="#contributing">Contributing</a>
+  <li><a href="#development" id="toc-development" class="nav-link active" data-scroll-target="#development">Development</a></li>
+  <li><a href="#development-hospital" id="toc-development-hospital" class="nav-link" data-scroll-target="#development-hospital">Development (Hospital)</a></li>
+  <li><a href="#deployment-hospital" id="toc-deployment-hospital" class="nav-link" data-scroll-target="#deployment-hospital">Deployment (hospital)</a>
   <ul class="collapse">
-  <li><a href="#code-of-conduct" id="toc-code-of-conduct" class="nav-link" data-scroll-target="#code-of-conduct">Code of Conduct</a></li>
-  <li><a href="#getting-started" id="toc-getting-started" class="nav-link" data-scroll-target="#getting-started">Getting started</a></li>
-  <li><a href="#code-conventions" id="toc-code-conventions" class="nav-link" data-scroll-target="#code-conventions">Code conventions</a>
-  <ul class="collapse">
-  <li><a href="#git-and-github" id="toc-git-and-github" class="nav-link" data-scroll-target="#git-and-github">Git and GitHub</a></li>
-  <li><a href="#python" id="toc-python" class="nav-link" data-scroll-target="#python">Python</a></li>
-  <li><a href="#markdown" id="toc-markdown" class="nav-link" data-scroll-target="#markdown">Markdown</a></li>
+  <li><a href="#orchestrating-front-and-back-end" id="toc-orchestrating-front-and-back-end" class="nav-link" data-scroll-target="#orchestrating-front-and-back-end">Orchestrating front and back end</a></li>
   </ul></li>
-  <li><a href="#testing" id="toc-testing" class="nav-link" data-scroll-target="#testing">Testing</a>
-  <ul class="collapse">
-  <li><a href="#code-coverage" id="toc-code-coverage" class="nav-link" data-scroll-target="#code-coverage">Code coverage</a></li>
-  </ul></li>
-  <li><a href="#documentation" id="toc-documentation" class="nav-link" data-scroll-target="#documentation">Documentation</a></li>
-  </ul></li>
+  <li><a href="#project-structure" id="toc-project-structure" class="nav-link" data-scroll-target="#project-structure">Project structure</a></li>
+  <li><a href="#contributing" id="toc-contributing" class="nav-link" data-scroll-target="#contributing">Contributing</a></li>
+  <li><a href="#acknowledgements" id="toc-acknowledgements" class="nav-link" data-scroll-target="#acknowledgements">Acknowledgements</a></li>
   </ul>
-<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hylode/hyui/edit/main/hyui/contributor_guide/CONTRIBUTING.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/hylode/hyui/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hylode/hyui/edit/main/hyui/developer/index.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/hylode/hyui/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title d-none d-lg-block">HyUI documentation</h1>
+</div>
 
 
-<section id="contributing" class="level1">
-<h1>Contributing</h1>
-<p>We love contributions! We’ve compiled this documentation to help you understand our contributing guidelines. <a href="mailto:doc@steveharris.me">If you still have questions, please contact us</a> and we’d be happy to help!</p>
-<section id="code-of-conduct" class="level2">
-<h2 class="anchored" data-anchor-id="code-of-conduct">Code of Conduct</h2>
-<p><a href="../contributor_guide/CODE_OF_CONDUCT.html">Please read <code>CODE_OF_CONDUCT.md</code> before contributing</a>.</p>
-</section>
-<section id="getting-started" class="level2">
-<h2 class="anchored" data-anchor-id="getting-started">Getting started</h2>
-<p>To start contributing, open your terminal, and install the required Python packages, and <a href="https://pre-commit.com/">pre-commit hooks</a> using:</p>
-<pre class="shell"><code>pip install -r requirements.txt
-pre-commit install</code></pre>
-<p>or the <code>make</code> command:</p>
-<pre class="shell"><code>make requirements</code></pre>
-<p>The pre-commit hooks are a security feature to ensure, for example, no secrets<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>, large data files, and Jupyter notebook outputs are accidentally committed into the repository. <a href="../contributor_guide/pre_commit_hooks.html">For more information on pre-commit hooks see our documentation</a>.</p>
-</section>
-<section id="code-conventions" class="level2">
-<h2 class="anchored" data-anchor-id="code-conventions">Code conventions</h2>
-<p><a href="https://gds-way.cloudapps.digital/">We mainly follow the GDS Way in our code conventions</a>.</p>
-<section id="git-and-github" class="level3">
-<h3 class="anchored" data-anchor-id="git-and-github">Git and GitHub</h3>
-<p>We use Git to version control the source code. <a href="https://gds-way.cloudapps.digital/standards/source-code.html">Please read the GDS Way for details on Git best practice</a>. This includes how to write good commit messages, use <code>git rebase</code> for local branches and <code>git merge --no-ff</code> for merges, as well as using <code>git push --force-with-lease</code> instead of <code>git push -f</code>.</p>
-<p><a href="../contributor_guide/updating_gitignore.html">If you want to modify the <code>.gitignore</code> files, see the template documentation</a> for further details.</p>
-<p>Our source code is stored on GitHub. Pull requests into <code>main</code> require at least one approved review.</p>
-</section>
-<section id="python" class="level3">
-<h3 class="anchored" data-anchor-id="python">Python</h3>
-<p>For Python code, <a href="https://gds-way.cloudapps.digital/manuals/programming-languages/python/python.html#python-style-guide">we follow the GDS Way Python style guide</a> with a line length of 88; the flake8 pre-commit hook should help with this!</p>
-</section>
-<section id="markdown" class="level3">
-<h3 class="anchored" data-anchor-id="markdown">Markdown</h3>
-<p>Local links can be written as normal, but external links should be referenced at the bottom of the Markdown file for clarity. For example:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode md code-with-copy"><code class="sourceCode markdown"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>Use a <span class="co">[</span><span class="ot">local link to reference the `README.md`</span><span class="co">](../../README.md)</span> file, but [an external</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>link for GOV.UK]<span class="co">[</span><span class="ot">gov-uk</span><span class="co">]</span>.</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="ot">[gov-uk]: https://www.gov.uk/</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>We also try to wrap Markdown to a line length of 88 characters, but this is not strictly enforced in all cases, for example with long hyperlinks.</p>
-</section>
-</section>
-<section id="testing" class="level2">
-<h2 class="anchored" data-anchor-id="testing">Testing</h2>
-<p><a href="https://docs.pytest.org/">Tests are written using the <code>pytest</code> framework</a>, with its configuration in the <code>pyproject.toml</code> file. Note, only tests in the <code>tests</code> folder are run. To run the tests, enter the following command in your terminal:</p>
-<pre class="shell"><code>pytest</code></pre>
-<section id="code-coverage" class="level3">
-<h3 class="anchored" data-anchor-id="code-coverage">Code coverage</h3>
-<p><a href="https://coverage.readthedocs.io/">Code coverage of Python scripts is measured using the <code>coverage</code> Python package</a>; its configuration can be found in <code>pyproject.toml</code>. Note coverage only extends to Python scripts in the <code>src</code> folder.</p>
-<p>To run code coverage, and view it as an HTML report, enter the following command in your terminal:</p>
-<pre class="shell"><code>coverage run -m pytest
-coverage html</code></pre>
-<p>or use the <code>make</code> command:</p>
-<pre class="shell"><code>make coverage_html</code></pre>
-<p>The HTML report can be accessed at <code>htmlcov/index.html</code>.</p>
-</section>
-</section>
-<section id="documentation" class="level2">
-<h2 class="anchored" data-anchor-id="documentation">Documentation</h2>
-<p><a href="https://myst-parser.readthedocs.io/">We write our documentation in MyST Markdown for use in Sphinx</a>. This is mainly stored in the <code>docs</code> folder, unless it’s more appropriate to store it elsewhere, like this file.</p>
-<p>[Please read our guidance on how to write accessible documentation][docs-write-accessible-documentation], as well as our [guidance on writing Sphinx documentation][docs-write-sphinx-documentation]. This allows you to build the documentation into an accessible, searchable website.</p>
 
+<div class="quarto-title-meta">
 
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<p>User interface for the HYLODE project Much of the project structure is based on the<a href="https://github.com/best-practice-and-impact/govcookiecutter"><code>govcookiecutter</code> template project</a> but is adapted for the development of Plotly Dash apps within a hospital environment. A template application would be split into a frontend and a backend with communication between the two via HTTP, and the project orchestrated by docker-compose.</p>
+<p>The file (<code>./readme.md</code>) is at the root of the project, but the application code including the backend is in <code>./src/api</code>, and the application itself is kept in <code>./src/apps</code>. An annotated figure of the directory structure is shown below.</p>
+<section id="development" class="level2">
+<h2 class="anchored" data-anchor-id="development">Development</h2>
+<p>Refer to <a href="../developer/setup.html">Dev Setup</a> for details on setting up development environments.</p>
 </section>
-</section>
-
-
-<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
-
-<ol>
-<li id="fn1"><p><a href="../contributor_guide/pre_commit_hooks.html#definition-of-a-secret-according-to-detect-secrets">Only secrets of specific patterns are detected by the pre-commit hooks</a>.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<section id="development-hospital" class="level2">
+<h2 class="anchored" data-anchor-id="development-hospital">Development (Hospital)</h2>
+<p>There are two tasks that <em>must</em> happen within the hospital environment:</p>
+<ol type="1">
+<li>preparing realistic mock data</li>
+<li>deployment</li>
 </ol>
-</section></div></main> <!-- /main -->
+<p>The installation steps differ (from local development) because here we do not have <strong>sudo</strong> (root) access (admin privileges). This means work must be performed using a combination of the default command line tools and docker.</p>
+</section>
+<section id="deployment-hospital" class="level2">
+<h2 class="anchored" data-anchor-id="deployment-hospital">Deployment (hospital)</h2>
+<p>Set the environment variable to <em>prod</em>, then run <em>docker-compose</em>.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">ENV</span><span class="op">=</span>prod</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pytest</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">docker-compose</span> up <span class="at">-d</span> <span class="at">--build</span> <span class="kw">&amp;&amp;</span> <span class="ex">docker-compose</span> logs <span class="at">-f</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>You will need create a local <code>./.env</code> file with database credentials so preferably set the <em>ENV</em> to <code>prod</code> there.</p>
+<section id="orchestrating-front-and-back-end" class="level3">
+<h3 class="anchored" data-anchor-id="orchestrating-front-and-back-end">Orchestrating front and back end</h3>
+<p><strong>IMPORTANT</strong>: ensure you have created a ./.env file with at least the same info as the ./.env.example version</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker-compose</span> down</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker-compose</span> up <span class="at">-d</span> <span class="at">--build</span> <span class="kw">&amp;&amp;</span> <span class="ex">docker-compose</span> logs <span class="at">-f</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="project-structure" class="level2">
+<h2 class="anchored" data-anchor-id="project-structure">Project structure</h2>
+<pre><code>.
+|
+|-- readme.md           // this file and the project root
+|-- Makefile            // standard project commands to be run from the shell
+|-- config files        // e.g. requirements.txt, .gitignore
+|-- .secrets            // e.g. .secrets etc excluded from version control
+|-- secrets.example     // an example version of .secrets above
+|-- docker-compose.yml  // orchestrate front/backend
+|-- src
+    |-- frontend
+        |-- Dockerfile
+        |-- dash_app.py
+    |-- backend
+        |-- Dockerfile
+        |-- query.sql   // SQL used to drive the backend API
+|-- synth               // Synthetic data generation for testing
+    |-- work
+|-- tests
+|-- docs                // this Quarto website
+|-- data
+|-- outputs
+|-- notebooks           // jupyter notebooks etc
+|-- try                 // ideas playground
+
+</code></pre>
+</section>
+<section id="contributing" class="level2">
+<h2 class="anchored" data-anchor-id="contributing">Contributing</h2>
+<p><a href="./docs/contributor_guide/CONTRIBUTING.qmd">If you want to help us build, and improve <code>hyui</code>, view our contributing guidelines</a>.</p>
+</section>
+<section id="acknowledgements" class="level2">
+<h2 class="anchored" data-anchor-id="acknowledgements">Acknowledgements</h2>
+<p><a href="https://github.com/best-practice-and-impact/govcookiecutter">This project structure is based on the <code>govcookiecutter</code> template project</a>.</p>
+
+
+</section>
+
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
@@ -479,18 +484,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script>
-<nav class="page-navigation">
-  <div class="nav-page nav-page-previous">
-      <a href="../contributor_guide/CODE_OF_CONDUCT.html" class="pagination-link">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Code of conduct for <code>hyui</code></span>
-      </a>          
-  </div>
-  <div class="nav-page nav-page-next">
-      <a href="../contributor_guide/pre_commit_hooks.html" class="pagination-link">
-        <span class="nav-page-text">Pre-commit hooks</span> <i class="bi bi-arrow-right-short"></i>
-      </a>
-  </div>
-</nav>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
