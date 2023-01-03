@@ -1,0 +1,7 @@
+---
+title: User guide for HYLODE
+---
+
+
+- the application is only accessible from within the UCLH network
+- usernames and passwords are available after training from the development team

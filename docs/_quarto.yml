@@ -1,50 +1,60 @@
 project:
   type: website
-  title: "HYLODE documentation"
   preview:
-    port: 8100
+    port: 8304
 
 execute:
   freeze: auto
 
 website:
-  title: "HYLODE documentation"
+  title: "HYLODE"
+  description: Hyperlocal Demand Forecasts for better bed management in the NHS
   navbar:
     left:
       - href: index.qmd
         text: Home
-      - href: vignettes/vignettes.qmd
-        text: Vignettes
-      - about.qmd
+      - href: http://172.16.149.202:6001
+        text: Application
+      - href: user/user.qmd
+        text: Documentation
+      - href: about.qmd
+        text: About
     right:
       - icon: github
         href: https://github.com/HYLODE/HyUI
         aria-label: GitHub
   page-navigation: true  # navigate from one page to the next
   page-footer: |
-    Hyperlocal Bed Demand Forecasts
-    A project deployed at UCLH supported by NIHR and NHS-X. (2022)
+    Built for the NHS | Developed at UCLH | Supprted by NHS-X and NIHR | 2021-2023
   sidebar:
     style: "docked"
     contents:
+      - section: "User"
+        contents:
+          - user/user.qmd
       - section: "Developer"
         contents:
           - developer/setup.qmd
-          - developer/workflow.qmd
+          - developer/demo.qmd
+          - developer/deployment.qmd
           - developer/documentation.qmd
-          - developer/synthetic-data.qmd
-      - section: "Contributing"
+      - section: "Vignettes"
         contents:
-          - contributor_guide/CODE_OF_CONDUCT.qmd
-          - contributor_guide/CONTRIBUTING.qmd
-          - contributor_guide/pre_commit_hooks.qmd
-          - contributor_guide/updating_gitignore.qmd
+          - vignettes/vignettes.qmd
+      # - section: "Contributing"
+      #   contents:
+      #     - contributor_guide/CODE_OF_CONDUCT.qmd
+      #     - contributor_guide/CONTRIBUTING.qmd
+      #     - contributor_guide/pre_commit_hooks.qmd
+      #     - contributor_guide/updating_gitignore.qmd
   repo-url: https://github.com/hylode/hyui
   repo-actions: [edit, issue]
   repo-subdir: hyui
 
 format:
   html:
-    theme: cosmo
+    theme:
+      light: flatly
+      dark: darkly
     css: styles.css
     toc: true

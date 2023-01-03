@@ -1,4 +1,6 @@
-# Developing For HyUi
+---
+title: Setting up development for HyUi
+---
 
 ## Architecture
 
@@ -7,6 +9,7 @@ The root directory contains all the libraries that are used to power the HyUi da
 - `api`: This is a FastAPI app that does all the data wrangling and accessing of external sources such as to databases and web services. For each route there should be an equivalent mock route that allows this app to serve mock data when run in development. For example, if there is a `/census/` endpoint then there should be a corresponding `/mock/census` endpoint that only serves mock data.
 - `web`: This is contains the Plotly Dash web server code. It should *only* communicate with the `api` service. This allows the `api` service to provide mock data seamlessly when developing without needing to spin up other services to help development.
 - `models`: This contains all the Pydantic models that are used to share data between the `api` and `web`.
+- `initialise`: This sets-up the BaseRow instance that is used for configuration by the user.
 
 ### Architecture Ideals
 - `web` should only communicate with `api` for data. This allows us to entirely mock data for `web` when developing.
