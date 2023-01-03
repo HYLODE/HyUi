@@ -10,7 +10,7 @@ from dash import Input, Output, callback, dash_table as dt, dcc, html, register_
 from dash.dash_table.Format import Format, Scheme
 from flask_login import current_user
 
-# makes all functions in callbacks.py available to the app
+# makes all functions in map.py available to the app
 import web.pages.perrt.callbacks  # noqa: F401
 from web.pages.perrt import (
     BPID,

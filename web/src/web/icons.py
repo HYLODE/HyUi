@@ -43,6 +43,22 @@ def aki(level: str) -> str:
     return icon_string
 
 
+def aki_dbc(level: bool) -> str:
+    icon = "fa fa-flask"
+
+    if type(level) is not bool:
+        colour = "text-dark"
+    elif level is False:
+        colour = "text-success"
+    elif level is True:
+        colour = "text-danger"
+    else:
+        colour = "text-info"
+
+    icon_string = f"{icon} {colour}"
+    return icon_string
+
+
 def rs(level: str) -> str:
     icon = "fa fa-lungs"
 
@@ -63,6 +79,27 @@ def rs(level: str) -> str:
     return icon_string
 
 
+def rs_dbc(level: str) -> str:
+    """dash bootstrap component version"""
+    icon = "fa fa-lungs"
+
+    try:
+        level = level.lower()
+    except AttributeError:
+        level = "unknown"
+
+    if level in ["unknown", "room air"]:
+        colour = "text-light"
+    elif level in ["oxygen"]:
+        colour = "text-success"
+    elif level in ["hfno", "niv", "cpap"]:
+        colour = "text-warning"
+    else:
+        colour = "text-danger"
+    icon_string = f"{icon} {colour}"
+    return icon_string
+
+
 def cvs(level: str) -> str:
     icon = "fa fa-heart"
     try:
@@ -76,4 +113,22 @@ def cvs(level: str) -> str:
     else:
         colour = COLOUR_RED
     icon_string = f'<i class="{icon}" style="color: {colour};"></i>'
+    return icon_string
+
+
+def cvs_dbc(level: int) -> str:
+    icon = "fa fa-heart"
+
+    if type(level) is not int:
+        colour = "text-dark"
+    elif level == 0:
+        colour = "text-success"
+    elif level == 1:
+        colour = "text-warning"
+    elif level > 1:
+        colour = "text-danger"
+    else:
+        colour = "text-info"
+
+    icon_string = f"{icon} {colour}"
     return icon_string

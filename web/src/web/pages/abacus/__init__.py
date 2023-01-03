@@ -15,5 +15,3 @@ WARDS_WITH_MAPS = {
     "GWB L01 CRITICAL CARE",
     "WMS W01 CRITICAL CARE",
 }
-
-styles = {"pre": {"border": "thin lightgrey solid", "overflowX": "scroll"}}
