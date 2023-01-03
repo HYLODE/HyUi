@@ -1,0 +1,97 @@
+---
+title: HyUI documentation
+---
+
+User interface for the HYLODE project Much of the project structure is based on
+the[`govcookiecutter` template project][govcookiecutter] but is adapted for the
+development of Plotly Dash apps within a hospital environment. A template
+application would be split into a frontend and a backend with communication
+between the two via HTTP, and the project orchestrated by docker-compose.
+
+The file (`./readme.md`) is at the root of the project, but the application
+code including the backend is in `./src/api`, and the application itself is
+kept in `./src/apps`. An annotated figure of the directory structure is shown
+below.
+
+
+## Development
+
+Refer to [Dev Setup](setup.qmd) for details on setting up development environments.
+
+## Development (Hospital)
+
+There are two tasks that _must_ happen within the hospital environment:
+
+1. preparing realistic mock data
+2. deployment
+
+The installation steps differ (from local development) because here we do not
+have **sudo** (root) access (admin privileges). This means work must be
+performed using a combination of the default command line tools and docker.
+
+
+## Deployment (hospital)
+
+Set the environment variable to *prod*, then run *docker-compose*.
+
+```sh
+export ENV=prod
+pytest
+docker-compose up -d --build && docker-compose logs -f
+```
+
+You will need create a local `./.env` file with database credentials so preferably set the *ENV* to `prod` there.
+
+### Orchestrating front and back end
+
+**IMPORTANT**: ensure you have created a ./.env file with at least the same info as the ./.env.example version
+
+```bash
+docker-compose down
+docker-compose up -d --build && docker-compose logs -f
+```
+
+## Project structure
+
+```
+.
+|
+|-- readme.md           // this file and the project root
+|-- Makefile            // standard project commands to be run from the shell
+|-- config files        // e.g. requirements.txt, .gitignore
+|-- .secrets            // e.g. .secrets etc excluded from version control
+|-- secrets.example     // an example version of .secrets above
+|-- docker-compose.yml  // orchestrate front/backend
+|-- src
+    |-- frontend
+        |-- Dockerfile
+        |-- dash_app.py
+    |-- backend
+        |-- Dockerfile
+        |-- query.sql   // SQL used to drive the backend API
+|-- synth               // Synthetic data generation for testing
+    |-- work
+|-- tests
+|-- docs                // this Quarto website
+|-- data
+|-- outputs
+|-- notebooks           // jupyter notebooks etc
+|-- try                 // ideas playground
+
+
+```
+
+## Contributing
+
+[If you want to help us build, and improve `hyui`, view our
+contributing guidelines][contributing].
+
+## Acknowledgements
+
+[This project structure is based on the `govcookiecutter` template
+project][govcookiecutter].
+
+[contributing]: ./docs/contributor_guide/CONTRIBUTING.qmd
+[govcookiecutter]: https://github.com/best-practice-and-impact/govcookiecutter
+[docs-loading-environment-variables]: ./docs/developer/environment_variables.qmd
+[docs-loading-environment-variables-secrets]: ./docs/developer/environment_variables.md#storing-secrets-and-credentials
