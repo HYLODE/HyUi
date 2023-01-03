@@ -46,7 +46,7 @@ abacus_row = dbc.Row(
                 html.Div(
                     [
                         html.P(
-                            "Known",
+                            "Accepted",
                             className=_summ_slider_label,
                         ),
                         dcc.Slider(
@@ -60,7 +60,7 @@ abacus_row = dbc.Row(
                                 "placement": "top",
                                 "always_visible": True,
                             },
-                            className="w-100",
+                            className="w-75",
                         ),
                     ],
                     className=_summ_slider_div + "pb-0",
@@ -68,7 +68,7 @@ abacus_row = dbc.Row(
                 html.Div(
                     [
                         html.P(
-                            "Unknown",
+                            "Emergency beds",
                             className=_summ_slider_label,
                         ),
                         dcc.Slider(
@@ -82,7 +82,7 @@ abacus_row = dbc.Row(
                                 "placement": "bottom",
                                 "always_visible": True,
                             },
-                            className="w-100",
+                            className="w-75",
                         ),
                     ],
                     className=_summ_slider_div + "pt-0",

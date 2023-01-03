@@ -52,45 +52,61 @@ stores = html.Div(
 
 
 def layout():
-    return dbc.Container(
+    return html.Div(
         [
-            dbc.Row(
+            # NOTE: wrapping in a separate container _seems_ to fix a problem
+            # with cytoscape elements not being 'tap-able' when the
+            # abacus_row was at the top of the page
+            dbc.Container(
                 [
-                    dbc.Col(
+                    # abacus
+                    abacus_row,
+                    # ward selector
+                    dbc.Row(
                         [
-                            radio_icu,
-                        ]
-                    ),
-                    dbc.Col(
-                        [
-                            dropdown_dept,
-                        ]
-                    ),
-                    dbc.Col([radio_cyto_layout]),
-                ],
-                className="border rounded p-3 bg-light",
-            ),
-            dbc.Row(
-                [
-                    dbc.Col(
-                        [
-                            html.Div(id=f"{BPID}dept_title"),
-                            map_cyto_beds,
-                        ]
-                    ),
-                    dbc.Col(
-                        [
-                            card_node,
-                            card_details,
-                            # node_debug,
+                            dbc.Col(
+                                [
+                                    radio_icu,
+                                ]
+                            ),
+                            dbc.Col(
+                                [
+                                    dropdown_dept,
+                                ]
+                            ),
+                            dbc.Col([radio_cyto_layout]),
                         ],
+                        className="border rounded p-3 bg-light",
                     ),
                 ],
-                className="border rounded p-3",
+                fluid=True,
+            ),
+            dbc.Container(
+                [
+                    # map and node details
+                    dbc.Row(
+                        [
+                            dbc.Col(
+                                [
+                                    html.Div(id=f"{BPID}dept_title"),
+                                    map_cyto_beds,
+                                ]
+                            ),
+                            dbc.Col(
+                                [
+                                    card_node,
+                                    card_details,
+                                    # node_debug,
+                                ],
+                            ),
+                        ],
+                        className="border rounded p-3",
+                    ),
+                ],
+                fluid=True,
             ),
             # placing this at the bottom else it interferes with cytoscape
             # map interactions
-            abacus_row,
             html.Div(
                 [
                     refresh_timer,
@@ -98,6 +114,4 @@ def layout():
                 ]
             ),
         ],
-        className="dbc",
-        fluid=True,
     )
