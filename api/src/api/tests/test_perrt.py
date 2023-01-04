@@ -62,4 +62,6 @@ def test_wrangle() -> None:
         }
     )
     df_r = wng.wrangle(df)
-    pd.testing.assert_series_equal(df_r["value"], pd.Series[11.0, 2.0])
+    pd.testing.assert_series_equal(
+        df_r["news_scale_1_max"], pd.Series([1.0, 2.0]), check_names=False
+    )
