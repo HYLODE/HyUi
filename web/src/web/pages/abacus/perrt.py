@@ -81,6 +81,7 @@ def _plot_perrt(perrt):
 
     df = parse_to_data_frame(perrt, EmapVitalsLong)
     df_hr = df[df["id_in_application"] == "8"]
+    df_hr.sort_values(by="observation_datetime", inplace=True)
     fig = px.line(df_hr, x="observation_datetime", y="value_as_real")
     # plotly express returns a plotly.go object so use same approach to
     # modifying

@@ -50,11 +50,11 @@ _cyto_stylesheet = [
         "selector": "[?occupied]",
         "style": {
             "shape": "ellipse",
-            "border-width": 1,
+            "border-width": 2,
             "border-style": "solid",
             "background-opacity": 1.0,
             "background-color": "mapData(wim, 0, 5, #FFD441, #FF2841)",
-            "border-color": "black",
+            "border-color": "#416CFF",
         },
     },
     {
