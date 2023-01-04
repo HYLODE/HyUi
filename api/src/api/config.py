@@ -1,6 +1,6 @@
 from functools import lru_cache
 
-from pydantic import BaseSettings, PostgresDsn, AnyUrl, AnyHttpUrl
+from pydantic import BaseSettings, PostgresDsn, AnyUrl, AnyHttpUrl, SecretStr
 
 
 class Settings(BaseSettings):
@@ -9,8 +9,8 @@ class Settings(BaseSettings):
     clarity_dsn: AnyUrl
 
     baserow_url: AnyHttpUrl
-    baserow_read_write_token: str
-    baserow_beds_table_id: int
+    baserow_email: str
+    baserow_password: SecretStr
 
     hycastle_url: AnyHttpUrl
     hymind_url: AnyHttpUrl

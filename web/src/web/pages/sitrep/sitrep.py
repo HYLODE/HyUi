@@ -256,7 +256,7 @@ def layout():
             dbc.Row(
                 [
                     dbc.Col(
-                        [widgets.ward_radio_button],
+                        [widgets.department_radio_button],
                         width={"size": 6, "order": "last", "offset": 6},
                     ),
                 ]

@@ -7,10 +7,8 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy import create_engine, text, bindparam
 from sqlalchemy.orm import Session
 
-from api.baserow import get_fields, get_rows
-from api.config import get_settings
 from api.wards import MISSING_LOCATION_DEPARTMENTS, MISSING_DEPARTMENT_LOCATIONS
-from models.census import CensusDepartment, CensusRow, ClosedBed
+from models.census import CensusDepartment, CensusRow
 from api.db import get_star_session
 
 from api.census.wrangle import aggregate_by_department
@@ -23,110 +21,6 @@ router = APIRouter(
 mock_router = APIRouter(
     prefix="/census",
 )
-
-
-@router.get("/beds/closed/", response_model=list[ClosedBed])
-def get_closed_beds(settings=Depends(get_settings)):
-    baserow_url = settings.baserow_url
-    token = settings.baserow_read_write_token
-    beds_table_id = settings.baserow_beds_table_id
-    field_ids = get_fields(baserow_url, token, beds_table_id)
-
-    closed_field_id = field_ids["closed"]
-
-    params = {
-        "size": 200,  # The maximum size of a page.
-        "user_field_names": "true",
-        f"filter__field_{closed_field_id}__boolean": True,
-    }
-
-    return get_rows(baserow_url, token, beds_table_id, params)
-
-
-@mock_router.get("/beds/closed/", response_model=list[ClosedBed])
-def get_mock_closed_beds():
-    data = [
-        {
-            "department": "UCH T03 INTENSIVE CARE",
-            "closed": False,
-        },
-        {
-            "department": "UCH T01 ACUTE MEDICAL",
-            "closed": True,
-        },
-    ]
-    return [ClosedBed.parse_obj(row) for row in data]
-
-
-@router.get("/beds/", response_model=list[dict])
-def get_beds_list(department: str, settings=Depends(get_settings)):
-    baserow_url = settings.baserow_url
-    token = settings.baserow_read_write_token
-    beds_table_id = settings.baserow_beds_table_id
-
-    field_ids = get_fields(baserow_url, token, beds_table_id)
-
-    department_field_id = field_ids["department"]
-
-    params = {
-        "size": 200,  # The maximum size of a page.
-        "user_field_names": "true",
-        f"filter__field_{department_field_id}__equal": department,
-    }
-
-    return get_rows(baserow_url, token, beds_table_id, params)
-
-
-@mock_router.get("/beds/", response_model=list[dict])
-def get_mock_beds_list(department: str):
-    return [
-        {
-            "BedEpicId": "6959",
-            "BedInCensus": "0",
-            "BedName": "Lounge",
-            "DepartmentExternalName": "UCH Tower 6th Floor Gynaecology (T06G)",
-            "DepartmentKey": "31146",
-            "DepartmentLevelOfCareGrouper": "Surgical",
-            "DepartmentName": "UCH T06 GYNAE (T06G)",
-            "DepartmentServiceGrouper": "Gynaecology",
-            "DepartmentSpecialty": "Gynaecology - General",
-            "DepartmentType": "HOD",
-            "DischargeReady": "No",
-            "IsBed": "1",
-            "IsCareArea": "0",
-            "IsDepartment": "0",
-            "IsRoom": "0",
-            "LocationName": "UNIVERSITY COLLEGE HOSPITAL CAMPUS",
-            "Name": "Lounge",
-            "ParentLocationName": "UCLH PARENT HOSPITAL",
-            "RoomName": "Patient Lounge",
-            "_CreationInstant": "47:26.0",
-            "_LastUpdatedInstant": "06:27.0",
-            "_merge": "both",
-            "bed": "Lounge",
-            "bed_functional": [],
-            "bed_id": "332107431",
-            "bed_physical": [],
-            "closed": False,
-            "covid": False,
-            "department": "UCH T06 GYNAE (T06G)",
-            "department_id": "331969463",
-            "dept": "T06G",
-            "id": 1,
-            "loc2merge": (
-                "gynaecology - general __ uch t06 "
-                "gynae (t06g) __ patient lounge __ lounge"
-            ),
-            "location_id": "332107428",
-            "location_string": "T06G^PATIENT LOUNGE^Lounge",
-            "order": "1.00000000000000000000",
-            "room": "Patient Lounge",
-            "room_hl7": "PATIENT LOUNGE",
-            "room_id": "332107429",
-            "speciality": "Gynaecology - General",
-            "unit_order": None,
-        },
-    ]
 
 
 def _fetch_census(

@@ -5,8 +5,6 @@ REFRESH_INTERVAL = 15 * MINUTES
 
 CACHE_TIMEOUT = 5 * 60  # seconds!!!
 
-BED_BONES_TABLE_ID = 261
-
 
 DEPT_COLS = [
     {"id": "department", "name": "department"},
@@ -70,5 +68,5 @@ BEDS_KEEP_COLS = [
     "bed_functional",
     "bed_physical",
     "DischargeReady",
-    "closed",  # only exists after merging with bed_bones
+    "closed",  # only exists after merging with beds
 ]

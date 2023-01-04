@@ -1,6 +1,6 @@
 import json
 import logging
-from typing import cast
+from typing import cast, Any
 
 import pandas as pd
 import requests
@@ -127,7 +127,7 @@ def _star_locations() -> pd.DataFrame:
         """
     SELECT
         lo.location_id,
-        lo.location_string,
+        lo.location_string AS location,
         SPLIT_PART(lo.location_string, '^', 1) AS hl7_department,
         SPLIT_PART(lo.location_string, '^', 2) AS hl7_room,
         SPLIT_PART(lo.location_string, '^', 3) AS hl7_bed,
@@ -247,14 +247,10 @@ def _merge_star_and_caboodle_beds(
     )
 
 
-def _fetch_beds() -> list[list[str]]:
+def _fetch_beds() -> pd.DataFrame:
     star_locations_df = _star_locations()
     caboodle_departments_df = _caboodle_departments()
-    beds_df = _merge_star_and_caboodle_beds(star_locations_df, caboodle_departments_df)
-
-    rows = [beds_df.columns.tolist()]
-    rows.extend(beds_df.values.tolist())
-    return rows
+    return _merge_star_and_caboodle_beds(star_locations_df, caboodle_departments_df)
 
 
 class BaserowException(Exception):
@@ -262,11 +258,11 @@ class BaserowException(Exception):
         super().__init__(message)
         self.message = message
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.message
 
 
-def _create_admin_user(settings: BaserowSettings):
+def _create_admin_user(settings: BaserowSettings) -> None:
     logging.info("Creating admin user.")
     response = requests.post(
         f"{settings.public_url}/api/user/",
@@ -341,7 +337,7 @@ def _get_group_id(base_url: str, auth_token: str) -> int:
     return cast(int, group_id)
 
 
-def _delete_default_application(base_url: str, auth_token: str, group_id: int):
+def _delete_default_application(base_url: str, auth_token: str, group_id: int) -> None:
     response = requests.get(
         f"{base_url}/api/applications/group/{group_id}/",
         headers=_auth_headers(auth_token),
@@ -407,8 +403,28 @@ def _create_table(
     auth_token: str,
     application_id: int,
     table_name: str,
-    data: list[list[str]],
+    primary_field_name: str,
+    primary_field_data: dict[str, Any],
 ) -> int:
+    """Creates a baserow table and returns the table ID. Baserow requires that
+    the table has at least one column but does not allow you to specify what
+    type that column should be on creation. Therefore, this function makes
+    another API call after the table is created to update the primary field
+    to the required type as described in `primary_field_data`.
+
+    :param base_url: The Baserow base URL without a trailing slash.
+    :param auth_token: Auth token to access Baserow API.
+    :param application_id: Application ID to create the table in.
+    :param table_name: The table name.
+    :param primary_field_name: The name of the primary field. This cannot be id
+        or order.
+    :param primary_field_data: The dictionary to pass in when updating the
+        primary field. Information of what can be used in this dictionary is
+        found in the Baserow documentation in the `update_database_table_field`
+        API documentation.
+
+    :return: The newly created database table ID.
+    """
     logging.info(f"Checking to see if {table_name} table already exists.")
     response = requests.get(
         f"{base_url}/api/database/tables/database/{application_id}/",
@@ -433,7 +449,7 @@ def _create_table(
         data=json.dumps(
             {
                 "name": table_name,
-                "data": data,
+                "data": [[primary_field_name]],
                 "first_row_header": True,
             }
         ),
@@ -447,6 +463,40 @@ def _create_table(
     table_id = response.json()["id"]
 
     logging.info(f"Table called beds created with ID {table_id}.")
+
+    # Update the primary field to be the required type.
+    if not primary_field_data:
+        return cast(int, table_id)
+
+    response = requests.get(
+        f"{base_url}/api/database/fields/table/{table_id}/",
+        headers=_auth_headers(auth_token),
+    )
+
+    if response.status_code != 200:
+        raise BaserowException(
+            f"unexpected response {response.status_code}: {str(response.content)}"
+        )
+
+    primary_field_id = next(
+        (row["id"] for row in response.json() if row["name"] == primary_field_name),
+        None,
+    )
+
+    if not primary_field_id:
+        raise BaserowException("expected dummy_field_id")
+
+    response = requests.patch(
+        f"{base_url}/api/database/fields/{primary_field_id}/",
+        headers=_auth_headers(auth_token),
+        data=json.dumps(primary_field_data),
+    )
+
+    if response.status_code != 200:
+        raise BaserowException(
+            f"unexpected response {response.status_code}: {str(response.content)}"
+        )
+
     return cast(int, table_id)
 
 
@@ -456,25 +506,21 @@ def _add_table_field(
     table_id: int,
     column_name: str,
     column_type: str,
-    select_options: list[tuple[int, str, str]],
-):
+    data: dict[str, Any],
+) -> None:
     logging.info(f"Adding column {column_name} to table {table_id}.")
 
-    select_options_dicts = [
-        {"id": option[0], "value": option[1], "color": option[2]}
-        for option in select_options
-    ]
+    data.update(
+        {
+            "name": column_name,
+            "type": column_type,
+        }
+    )
 
     response = requests.post(
         f"{base_url}/api/database/fields/table/{table_id}/",
         headers=_auth_headers(auth_token),
-        data=json.dumps(
-            {
-                "name": column_name,
-                "type": column_type,
-                "select_options": select_options_dicts,
-            }
-        ),
+        data=json.dumps(data),
     )
     if response.status_code != 200:
         raise BaserowException(
@@ -482,22 +528,40 @@ def _add_table_field(
         )
 
 
-def _add_beds_fields(base_url: str, auth_token: str, beds_table_id: int):
-    _add_table_field(base_url, auth_token, beds_table_id, "closed", "boolean", [])
-    _add_table_field(base_url, auth_token, beds_table_id, "covid", "boolean", [])
+def _add_table_row(
+    base_url: str, auth_token: str, table_id: int, row: dict[str, Any]
+) -> None:
+    logging.info(f"Adding row table {table_id}.")
+
+    response = requests.post(
+        f"{base_url}/api/database/rows/table/{table_id}/?user_field_names=true",
+        headers=_auth_headers(auth_token),
+        data=json.dumps(row),
+    )
+    if response.status_code != 200:
+        raise BaserowException(
+            f"unexpected response {response.status_code}: {str(response.content)}"
+        )
+
+
+def _add_beds_fields(base_url: str, auth_token: str, beds_table_id: int) -> None:
+    _add_table_field(base_url, auth_token, beds_table_id, "closed", "boolean", {})
+    _add_table_field(base_url, auth_token, beds_table_id, "covid", "boolean", {})
     _add_table_field(
         base_url,
         auth_token,
         beds_table_id,
         "bed_physical",
         "multiple_select",
-        [
-            (1, "sideroom", "red"),
-            (2, "ventilator", "red"),
-            (3, "monitored", "red"),
-            (4, "ensuite", "red"),
-            (5, "virtual", "red"),
-        ],
+        {
+            "select_options": [
+                {"id": 1, "value": "sideroom", "color": "red"},
+                {"id": 2, "value": "ventilator", "color": "red"},
+                {"id": 3, "value": "monitored", "color": "red"},
+                {"id": 4, "value": "ensuite", "color": "red"},
+                {"id": 5, "value": "virtual", "color": "red"},
+            ]
+        },
     )
     _add_table_field(
         base_url,
@@ -505,23 +569,25 @@ def _add_beds_fields(base_url: str, auth_token: str, beds_table_id: int):
         beds_table_id,
         "bed_functional",
         "multiple_select",
-        [
-            (1, "periop", "red"),
-            (2, "ficm", "red"),
-            (3, "gwb", "red"),
-            (4, "wms", "red"),
-            (5, "t06", "red"),
-            (6, "north", "red"),
-            (7, "south", "red"),
-            (8, "plex", "red"),
-            (9, "nhnn", "red"),
-            (10, "hdu", "red"),
-            (11, "icu", "red"),
-        ],
+        {
+            "select_options": [
+                {"id": 1, "value": "periop", "color": "red"},
+                {"id": 2, "value": "ficm", "color": "red"},
+                {"id": 3, "value": "gwb", "color": "red"},
+                {"id": 4, "value": "wms", "color": "red"},
+                {"id": 5, "value": "t06", "color": "red"},
+                {"id": 6, "value": "north", "color": "red"},
+                {"id": 7, "value": "south", "color": "red"},
+                {"id": 8, "value": "plex", "color": "red"},
+                {"id": 9, "value": "nhnn", "color": "red"},
+                {"id": 10, "value": "hdu", "color": "red"},
+                {"id": 11, "value": "icu", "color": "red"},
+            ]
+        },
     )
 
 
-def initialise_baserow():
+def initialise_baserow() -> None:
     settings = get_baserow_settings()
 
     logging.info("Starting Baserow initialisation.")
@@ -537,20 +603,26 @@ def initialise_baserow():
 
     # Create the discharge_statuses table.
     discharge_statuses_table_id = _create_table(
-        settings.public_url, auth_token, application_id, "discharge_statuses", [["csn"]]
+        settings.public_url, auth_token, application_id, "discharge_statuses", "csn", {}
     )
     _add_table_field(
         settings.public_url,
         auth_token,
         discharge_statuses_table_id,
-        column_name="status",
-        column_type="text",
-        select_options=[],
+        "status",
+        "text",
+        {},
     )
 
     # Create the beds table.
-    beds_rows = _fetch_beds()
     beds_table_id = _create_table(
-        settings.public_url, auth_token, application_id, "bed_bones", beds_rows
+        settings.public_url, auth_token, application_id, "beds", "location", {}
     )
     _add_beds_fields(settings.public_url, auth_token, beds_table_id)
+
+    beds_df = _fetch_beds()
+
+    for row in beds_df.itertuples():
+        _add_table_row(
+            settings.public_url, auth_token, beds_table_id, {"location": row.location}
+        )
