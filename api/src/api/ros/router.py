@@ -1,4 +1,5 @@
 from collections import namedtuple
+from typing import Any
 
 from fastapi import APIRouter, Depends
 from sqlmodel import Session
@@ -12,12 +13,12 @@ router = APIRouter(
 
 
 @router.get("/", response_model=list[RosRead])
-def read_ros(session: Session = Depends(get_star_session)):
+def read_ros(session: Session = Depends(get_star_session)) -> list[Any]:
     """
     Returns Ros data
     """
     q = prepare_query("ros", "FIXME")
     results = session.exec(q)  # type: ignore
     Record = namedtuple("Record", results.keys())  # type: ignore
-    records = [Record(*r) for r in results.fetchall()]
+    records = [Record(*r) for r in results.fetchall()]  # type: ignore
     return records

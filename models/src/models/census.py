@@ -73,7 +73,8 @@ class CensusBed(BaseModel):
     dept: Any
     room_hl7: str
     bed: str
-    # loc2merge: "critical care - gwb l01 icu __ gwb l01 critical care __ sr04 __ sr04-04",
+    # loc2merge: "critical care - gwb l01 \
+    #   icu __ gwb l01 critical care __ sr04 __ sr04-04",
     DepartmentKey: Any
     BedEpicId: Any
     Name: str

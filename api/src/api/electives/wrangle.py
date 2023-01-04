@@ -1,8 +1,7 @@
-from typing import Dict, List
-
 import numpy as np
 import pandas as pd
 from api.convert import parse_to_data_frame
+from pydantic import BaseModel
 
 from models.electives import (
     CaboodleCaseBooking,
@@ -90,9 +89,9 @@ def process_join_preassess_data(
 
 
 def prepare_electives(
-    electives: List[Dict],
-    pod: List[Dict],
-    preassess: List[Dict],
+    electives: list[BaseModel],
+    pod: list[BaseModel],
+    preassess: list[BaseModel],
 ) -> pd.DataFrame:
     """
     Prepare elective case list

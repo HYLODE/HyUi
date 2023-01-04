@@ -21,25 +21,25 @@ class Bed(BaseModel):
     #  to define type when doing a bulk upload of data; these validators
     #  convert strings to the appropriate 'missing' type
     @validator("closed", "covid", pre=True)
-    def empty_string_to_false(cls, v):
+    def empty_string_to_false(cls, value: str) -> bool:
         """convert empty string to false"""
-        if v == "" or v is None:
+        if value == "" or value is None:
             return False
-        if type(v) is str and v.lower() == "true":
+        if type(value) is str and value.lower() == "true":
             return True
         try:
-            v = int(float(v))
-            return True if v else False
+            int_value = int(float(value))
+            return True if int_value else False
         except ValueError:
             return False
 
     @validator("xpos", "ypos", pre=True)
-    def empty_string_to_minus_one(cls, v):
+    def empty_string_to_minus_one(cls, value: str) -> int:
         """convert empty string to zero"""
-        if v == "" or v is None:
+        if value == "" or value is None:
             return -1
         try:
-            v = int(float(v))
-            return v
+            int_value = int(float(value))
+            return int_value
         except ValueError:
             return -1
