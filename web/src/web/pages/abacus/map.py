@@ -271,6 +271,7 @@ def _make_bed(
             bed_index = 0
     except IndexError:
         pretty_bed = hl7_bed
+        bed_index = 0
 
     data = dict(
         id=bed["location_string"],

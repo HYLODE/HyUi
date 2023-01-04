@@ -92,7 +92,7 @@ def _store_sitrep(department: str) -> list[dict]:
     try:
         rows = response["data"] if covid_sitrep and not mock else response
     except KeyError as e:
-        warnings.warn("No data returned")
+        warnings.warn("No data returned for sitrep")
         print(e)
         return [{}]
     return [SitrepRow.parse_obj(row).dict() for row in rows]
