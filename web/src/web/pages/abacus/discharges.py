@@ -46,7 +46,10 @@ form_discharge = html.Div(
         html.Div(
             [
                 dbc.Button(
-                    "Submit",
+                    [
+                        # dbc.Spinner(size="sm"),
+                        "Submit",
+                    ],
                     id=f"{BPID}discharge_submit_button",
                     className="dbc d-grid d-md-flex justify-content-md-end "
                     "btn-group",

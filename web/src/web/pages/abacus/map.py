@@ -127,19 +127,25 @@ radio_cyto_layout = html.Div(
     className="radio-group",
 )
 
-map_cyto_beds = cyto.Cytoscape(
-    id=f"{BPID}bed_map",
-    style={
-        "width": "42vw",
-        "height": "70vh",
-        "position": "relative",
-        "top": "1vh",
-        "left": "1vw",
-    },
-    stylesheet=_cyto_stylesheet,
-    responsive=True,
-    maxZoom=1.0,
-    minZoom=0.2,
+map_cyto_beds = dbc.Card(
+    dbc.CardBody(
+        [
+            cyto.Cytoscape(
+                id=f"{BPID}bed_map",
+                style={
+                    "width": "42vw",
+                    "height": "70vh",
+                    "position": "relative",
+                    "top": "1vh",
+                    "left": "1vw",
+                },
+                stylesheet=_cyto_stylesheet,
+                responsive=True,
+                maxZoom=1.0,
+                minZoom=0.2,
+            )
+        ]
+    )
 )
 
 

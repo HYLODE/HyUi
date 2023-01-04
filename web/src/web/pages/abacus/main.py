@@ -50,6 +50,9 @@ stores = html.Div(
     ]
 )
 
+# TODO: use dbc.Tabs to create a separate view of admissions and discharges
+#  for the ward in question
+
 
 def layout():
     return html.Div(
