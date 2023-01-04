@@ -89,5 +89,10 @@ def _store_sitrep(department: str) -> list[dict]:
         url = f"{get_settings().api_url}/sitrep/live/{department}/ui"
 
     response = requests.get(url).json()
-    rows = response["data"] if covid_sitrep and not mock else response
+    try:
+        rows = response["data"] if covid_sitrep and not mock else response
+    except KeyError as e:
+        warnings.warn("No data returned")
+        print(e)
+        return [{}]
     return [SitrepRow.parse_obj(row).dict() for row in rows]

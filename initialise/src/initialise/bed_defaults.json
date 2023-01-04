@@ -605,14 +605,6 @@
     "closed": ""
   },
   {
-    "location_string": "1020200074^C0NCCU WAITING^C0 WAIT",
-    "department": "NHNN C0 NCCU",
-    "hl7_bed": "C0 WAIT",
-    "xpos": "",
-    "ypos": "",
-    "closed": ""
-  },
-  {
     "location_string": "1020200075^C1NCCU HDU1^HDU1-10",
     "department": "NHNN C1 NCCU",
     "hl7_bed": "HDU1-10",
@@ -762,14 +754,6 @@
     "hl7_bed": "ICU-09 SR",
     "xpos": "100",
     "ypos": "40",
-    "closed": ""
-  },
-  {
-    "location_string": "1020200075^C1NCCU WAITING^C1 WAIT",
-    "department": "NHNN C1 NCCU",
-    "hl7_bed": "C1 WAIT",
-    "xpos": "",
-    "ypos": "",
     "closed": ""
   }
 ]

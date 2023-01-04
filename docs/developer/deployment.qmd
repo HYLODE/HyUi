@@ -21,6 +21,8 @@ Ensure that you use a unique name for your `[project name]`. The production serv
 
 This should be done the first time you stand up the services. It populates the Baserow database with the tables and static data required to run the rest of the HyUi services. You will also need to do this when you update your configuration (loading) data for Baserow. That is, you should consider Baserow as a temporary scratch pad, and mapping changes etc. will live in code (see `initialise/src/initialise/bed_defaults.json`). Before you 'redeploy', you must manually delete the tables from Baserow.
 
+You may also want to register the license for the self hosted version. To do this, check that the 'instance id' available on the admin pages is copied from the self-hosted version to the web / hosted version; then regenerate the license key on the hosted version; then copy that license key back to the self-hosted; then add the user to the 'seat' created by that registered version. This enables 'export to JSON' functionality etc.
+
 
 ```sh
 ./bin/initialise.sh --operation baserow
