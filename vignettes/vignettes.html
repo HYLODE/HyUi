@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>HYLODE documentation - Vignettes</title>
+<title>HYLODE - Vignettes</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -30,6 +30,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
+<link href="../developer/documentation.html" rel="prev">
 <script src="../site_libs/quarto-listing/list.min.js"></script>
 <script src="../site_libs/quarto-listing/quarto-listing.js"></script>
 <script src="../site_libs/quarto-html/quarto.js"></script>
@@ -37,10 +38,12 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -103,7 +106,7 @@ ul.task-list li input[type="checkbox"] {
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container">
     <a class="navbar-brand" href="../index.html">
-    <span class="navbar-title">HYLODE documentation</span>
+    <span class="navbar-title">HYLODE</span>
     </a>
   </div>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
@@ -116,8 +119,12 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="../vignettes/vignettes.html" aria-current="page">
- <span class="menu-text">Vignettes</span></a>
+    <a class="nav-link" href="http://172.16.149.202:6001">
+ <span class="menu-text">Application</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../user/user.html" aria-current="page">
+ <span class="menu-text">Documentation</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../about.html">
@@ -131,6 +138,9 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text"></span></a>
   </li>  
 </ul>
+              <div class="quarto-toggle-container">
+                  <a href="" class="quarto-color-scheme-toggle nav-link" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+              </div>
               <div id="quarto-search" class="" title="Search"></div>
           </div> <!-- /navcollapse -->
       </div> <!-- /container-fluid -->
@@ -152,7 +162,7 @@ ul.task-list li input[type="checkbox"] {
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Developer</a>
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">User</a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -160,29 +170,14 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../developer/setup.html" class="sidebar-item-text sidebar-link">Developing For HyUi</a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../developer/workflow.html" class="sidebar-item-text sidebar-link">Development workflow</a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../developer/documentation.html" class="sidebar-item-text sidebar-link">Writing documentation</a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../developer/synthetic-data.html" class="sidebar-item-text sidebar-link">Synthetic data</a>
+  <a href="../user/user.html" class="sidebar-item-text sidebar-link">User guide for HYLODE</a>
   </div>
 </li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">Contributing</a>
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">Developer</a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -190,22 +185,37 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../contributor_guide/CODE_OF_CONDUCT.html" class="sidebar-item-text sidebar-link">Code of conduct for <code>hyui</code></a>
+  <a href="../developer/setup.html" class="sidebar-item-text sidebar-link">Setting up development for HyUi</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../contributor_guide/CONTRIBUTING.html" class="sidebar-item-text sidebar-link">Contributing</a>
+  <a href="../developer/demo.html" class="sidebar-item-text sidebar-link">Backend to frontend demonstration vignette</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../contributor_guide/pre_commit_hooks.html" class="sidebar-item-text sidebar-link">Pre-commit hooks</a>
+  <a href="../developer/deployment.html" class="sidebar-item-text sidebar-link">Deployment</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../contributor_guide/updating_gitignore.html" class="sidebar-item-text sidebar-link">Updating the <code>.gitignore</code> file</a>
+  <a href="../developer/documentation.html" class="sidebar-item-text sidebar-link">Writing documentation</a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">Vignettes</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../vignettes/vignettes.html" class="sidebar-item-text sidebar-link active">Vignettes</a>
   </div>
 </li>
       </ul>
@@ -274,42 +284,42 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 </thead>
 <tbody class="list">
-<tr data-index="0" data-listing-file-modified-sort="1672737266086" data-listing-reading-time-sort="1.015" data-listing-title-sort="Working notes on merging Caboodle and EMAP (NHNN)" data-listing-filename-sort="beds_v3NHNN.ipynb">
+<tr data-index="0" data-listing-file-modified-sort="1672840555987" data-listing-reading-time-sort="1.015" data-listing-title-sort="Working notes on merging Caboodle and EMAP (NHNN)" data-listing-filename-sort="beds_v3NHNN.ipynb">
 <td class="listing-title">
 <a href="../vignettes/beds_v3NHNN.html" class="title">Working notes on merging Caboodle and EMAP (NHNN)</a>
 </td>
 <td class="listing-author">
 </td>
 </tr>
-<tr data-index="1" data-listing-file-modified-sort="1672737266086" data-listing-reading-time-sort="0.99" data-listing-title-sort="Working notes on merging caboodle info on beds with EMAP (UCLH)" data-listing-filename-sort="beds_v3UCLH.ipynb">
+<tr data-index="1" data-listing-file-modified-sort="1672840555987" data-listing-reading-time-sort="0.99" data-listing-title-sort="Working notes on merging caboodle info on beds with EMAP (UCLH)" data-listing-filename-sort="beds_v3UCLH.ipynb">
 <td class="listing-title">
 <a href="../vignettes/beds_v3UCLH.html" class="title">Working notes on merging caboodle info on beds with EMAP (UCLH)</a>
 </td>
 <td class="listing-author">
 </td>
 </tr>
-<tr data-index="2" data-listing-file-modified-sort="1672737266086" data-listing-reading-time-sort="0.005" data-listing-title-sort="ICU aggregate probabilities" data-listing-filename-sort="icu-tap-aggregate-probs.ipynb">
+<tr data-index="2" data-listing-file-modified-sort="1672840555987" data-listing-reading-time-sort="0.005" data-listing-title-sort="ICU aggregate probabilities" data-listing-filename-sort="icu-tap-aggregate-probs.ipynb">
 <td class="listing-title">
 <a href="../vignettes/icu-tap-aggregate-probs.html" class="title">ICU aggregate probabilities</a>
 </td>
 <td class="listing-author">
 </td>
 </tr>
-<tr data-index="3" data-listing-file-modified-sort="1672737266086" data-listing-reading-time-sort="1.875" data-listing-title-sort="Make predictions using a saved binomial model for ICU elective admission" data-listing-filename-sort="icu-tap-elective-predictions.ipynb">
+<tr data-index="3" data-listing-file-modified-sort="1672840555987" data-listing-reading-time-sort="1.875" data-listing-title-sort="Make predictions using a saved binomial model for ICU elective admission" data-listing-filename-sort="icu-tap-elective-predictions.ipynb">
 <td class="listing-title">
 <a href="../vignettes/icu-tap-elective-predictions.html" class="title">Make predictions using a saved binomial model for ICU elective admission</a>
 </td>
 <td class="listing-author">
 </td>
 </tr>
-<tr data-index="4" data-listing-file-modified-sort="1672737266090" data-listing-reading-time-sort="1.81" data-listing-title-sort="Make predictions using a saved poisson model for ICU non-elective admission" data-listing-filename-sort="icu-tap-emergency-predictions.ipynb">
+<tr data-index="4" data-listing-file-modified-sort="1672840555987" data-listing-reading-time-sort="1.81" data-listing-title-sort="Make predictions using a saved poisson model for ICU non-elective admission" data-listing-filename-sort="icu-tap-emergency-predictions.ipynb">
 <td class="listing-title">
 <a href="../vignettes/icu-tap-emergency-predictions.html" class="title">Make predictions using a saved poisson model for ICU non-elective admission</a>
 </td>
 <td class="listing-author">
 </td>
 </tr>
-<tr data-index="5" data-listing-file-modified-sort="1672737266090" data-listing-reading-time-sort="0.445" data-listing-title-sort="Wrangle live beds into a simple census" data-listing-filename-sort="wrangle_beds.ipynb">
+<tr data-index="5" data-listing-file-modified-sort="1672840555987" data-listing-reading-time-sort="0.445" data-listing-title-sort="Wrangle live beds into a simple census" data-listing-filename-sort="wrangle_beds.ipynb">
 <td class="listing-title">
 <a href="../vignettes/wrangle_beds.html" class="title">Wrangle live beds into a simple census</a>
 </td>
@@ -343,6 +353,121 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
   }
   toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  let localAlternateSentinel = 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
   const icon = "";
   const anchorJS = new window.AnchorJS();
   anchorJS.options = {
@@ -456,10 +581,19 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../developer/documentation.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Writing documentation</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+  </div>
+</nav>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
-      <div class="nav-footer-center">Hyperlocal Bed Demand Forecasts A project deployed at UCLH supported by NIHR and NHS-X. (2022)</div>
+      <div class="nav-footer-center">Built for the NHS | Developed at UCLH | Supported by NHS-X and NIHR | 2021-2023</div>
   </div>
 </footer>
 
