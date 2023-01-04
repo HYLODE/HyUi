@@ -45,8 +45,7 @@ def get_beds(department: str, settings: Settings = Depends(get_settings)) -> lis
     department_field_id = field_ids["department"]
 
     params = {
-        "size": 200,
-        # The maximum size of a page.
+        "size": 200,  # The maximum size of a page.
         "user_field_names": "true",
         f"filter__field_{department_field_id}__equal": department,
     }
@@ -64,7 +63,7 @@ def get_mock_closed_beds() -> list[Bed]:
 
 
 @router.get("/closed/", response_model=list[Bed])
-def get_closed_beds(settings=Depends(get_settings)) -> list[Bed]:
+def get_closed_beds(settings: Settings = Depends(get_settings)) -> list[Bed]:
     baserow_url = settings.baserow_url
     email = settings.baserow_email
     password = settings.baserow_password.get_secret_value()
@@ -74,8 +73,7 @@ def get_closed_beds(settings=Depends(get_settings)) -> list[Bed]:
     closed_field_id = field_ids["closed"]
 
     params = {
-        "size": 200,
-        # The maximum size of a page.
+        "size": 200,  # The maximum size of a page.
         "user_field_names": "true",
         f"filter__field_{closed_field_id}__boolean": True,
     }
@@ -86,7 +84,7 @@ def get_closed_beds(settings=Depends(get_settings)) -> list[Bed]:
 
 @mock_router.post("/discharge_status/", response_model=DischargeStatus)
 def post_mock_discharge_status(
-    csn: int, status: str, settings=Depends(get_settings)
+    csn: int, status: str, settings: Settings = Depends(get_settings)
 ) -> DischargeStatus:
     # this function depends on having a local instance of baserow running
     baserow_url = settings.baserow_url
@@ -113,13 +111,13 @@ def post_mock_discharge_status(
         params=params,
         payload=payload,
     )
-
-    return DischargeStatus.parse_obj(result)
+    output = DischargeStatus.parse_obj(result)  # type: DischargeStatus
+    return output
 
 
 @router.post("/discharge_status/", response_model=DischargeStatus)
 def post_discharge_status(
-    csn: int, status: str, settings=Depends(get_settings)
+    csn: int, status: str, settings: Settings = Depends(get_settings)
 ) -> DischargeStatus:
     baserow_url = settings.baserow_url
     email = settings.baserow_email
@@ -143,12 +141,13 @@ def post_discharge_status(
         payload=payload,
     )
 
-    return DischargeStatus.parse_obj(result)
+    output = DischargeStatus.parse_obj(result)  # type: DischargeStatus
+    return output
 
 
 @mock_router.get("/discharge_status/", response_model=list[DischargeStatus])
 def get_mock_discharge_status(
-    delta_hours=72, settings=Depends(get_settings)
+    delta_hours: int = 72, settings: Settings = Depends(get_settings)
 ) -> list[DischargeStatus]:
     baserow_url = settings.baserow_url
     email = settings.baserow_email
@@ -173,7 +172,7 @@ def get_mock_discharge_status(
 
 @router.get("/discharge_status/", response_model=list[DischargeStatus])
 def get_discharge_status(
-    delta_hours=72, settings=Depends(get_settings)
+    delta_hours: int = 72, settings: Settings = Depends(get_settings)
 ) -> list[DischargeStatus]:
     baserow_url = settings.baserow_url
     email = settings.baserow_email

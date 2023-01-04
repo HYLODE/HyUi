@@ -1,7 +1,7 @@
 import json
 import logging
 from pathlib import Path
-from typing import cast
+from typing import cast, Any
 
 import pandas as pd
 import requests
@@ -19,7 +19,7 @@ def _star_locations() -> pd.DataFrame:
         """
     SELECT
         lo.location_id,
-        lo.location_string,
+        lo.location_string AS location,
         SPLIT_PART(lo.location_string, '^', 1) AS hl7_department,
         SPLIT_PART(lo.location_string, '^', 2) AS hl7_room,
         SPLIT_PART(lo.location_string, '^', 3) AS hl7_bed,
@@ -153,7 +153,7 @@ def _merge_default_properties(beds_df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def _fetch_beds() -> list[list[str]]:
+def _fetch_beds() -> pd.dataframe:
     star_locations_df = _star_locations()
     caboodle_departments_df = _caboodle_departments()
     beds_df = _merge_star_and_caboodle_beds(star_locations_df, caboodle_departments_df)
@@ -162,9 +162,7 @@ def _fetch_beds() -> list[list[str]]:
     # https://stackoverflow.com/a/41213102/992999
     beds_df = beds_df.fillna("")
 
-    rows = [beds_df.columns.tolist()]
-    rows.extend(beds_df.values.tolist())
-    return rows
+    return beds_df
 
 
 class BaserowException(Exception):
@@ -172,11 +170,11 @@ class BaserowException(Exception):
         super().__init__(message)
         self.message = message
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.message
 
 
-def _create_admin_user(settings: BaserowSettings):
+def _create_admin_user(settings: BaserowSettings) -> None:
     logging.info("Creating admin user.")
     response = requests.post(
         f"{settings.public_url}/api/user/",
@@ -257,7 +255,7 @@ def _get_group_id(base_url: str, auth_token: str) -> int:
     return cast(int, group_id)
 
 
-def _delete_default_application(base_url: str, auth_token: str, group_id: int):
+def _delete_default_application(base_url: str, auth_token: str, group_id: int) -> None:
     response = requests.get(
         f"{base_url}/api/applications/group/{group_id}/",
         headers=_auth_headers(auth_token),
@@ -330,8 +328,28 @@ def _create_table(
     auth_token: str,
     application_id: int,
     table_name: str,
-    data: list[list[str]],
+    primary_field_name: str,
+    primary_field_data: dict[str, Any],
 ) -> int:
+    """Creates a baserow table and returns the table ID. Baserow requires that
+    the table has at least one column but does not allow you to specify what
+    type that column should be on creation. Therefore, this function makes
+    another API call after the table is created to update the primary field
+    to the required type as described in `primary_field_data`.
+
+    :param base_url: The Baserow base URL without a trailing slash.
+    :param auth_token: Auth token to access Baserow API.
+    :param application_id: Application ID to create the table in.
+    :param table_name: The table name.
+    :param primary_field_name: The name of the primary field. This cannot be id
+        or order.
+    :param primary_field_data: The dictionary to pass in when updating the
+        primary field. Information of what can be used in this dictionary is
+        found in the Baserow documentation in the `update_database_table_field`
+        API documentation.
+
+    :return: The newly created database table ID.
+    """
     logging.info(f"Checking to see if {table_name} table already exists.")
     response = requests.get(
         f"{base_url}/api/database/tables/database/{application_id}/",
@@ -358,7 +376,7 @@ def _create_table(
         data=json.dumps(
             {
                 "name": table_name,
-                "data": data,
+                "data": [[primary_field_name]],
                 "first_row_header": True,
             }
         ),
@@ -374,6 +392,40 @@ def _create_table(
     table_id = response.json()["id"]
 
     logging.info(f"Table called beds created with ID {table_id}.")
+
+    # Update the primary field to be the required type.
+    if not primary_field_data:
+        return cast(int, table_id)
+
+    response = requests.get(
+        f"{base_url}/api/database/fields/table/{table_id}/",
+        headers=_auth_headers(auth_token),
+    )
+
+    if response.status_code != 200:
+        raise BaserowException(
+            f"unexpected response {response.status_code}: {str(response.content)}"
+        )
+
+    primary_field_id = next(
+        (row["id"] for row in response.json() if row["name"] == primary_field_name),
+        None,
+    )
+
+    if not primary_field_id:
+        raise BaserowException("expected dummy_field_id")
+
+    response = requests.patch(
+        f"{base_url}/api/database/fields/{primary_field_id}/",
+        headers=_auth_headers(auth_token),
+        data=json.dumps(primary_field_data),
+    )
+
+    if response.status_code != 200:
+        raise BaserowException(
+            f"unexpected response {response.status_code}: {str(response.content)}"
+        )
+
     return cast(int, table_id)
 
 
@@ -383,22 +435,24 @@ def _add_table_field(
     table_id: int,
     column_name: str,
     column_type: str,
-    column_details: dict = None,
-):
+    column_details: dict | None,
+) -> None:
     logging.info(f"Adding column {column_name} to table {table_id}.")
-    column_details = column_details if column_details else {}
+    details = {}
+    if column_details:
+        details = column_details
 
     payload = dict(
         name=column_name,
         type=column_type,
-    )
-    payload.update(column_details)
+    )  # type: dict[str, Any]
+    payload.update(details)
 
-    # select_options: list[tuple[int, str, str]],
-    if column_details.get("select_options"):
+    select_options = details.get("select_options")  # type: ignore
+    if select_options:
         select_options_dicts = [
             {"id": option[0], "value": option[1], "color": option[2]}
-            for option in column_details.get("select_options")
+            for option in select_options
         ]
         payload["select_options"] = select_options_dicts
 
@@ -415,11 +469,25 @@ def _add_table_field(
         )
 
 
-def _add_beds_fields(base_url: str, auth_token: str, beds_table_id: int):
-    # _add_table_field(base_url, auth_token, beds_table_id, "closed",
-    # "boolean", [])
-    # _add_table_field(base_url, auth_token, beds_table_id, "covid",
-    # "boolean", [])
+def _add_table_row(
+    base_url: str, auth_token: str, table_id: int, row: dict[str, Any]
+) -> None:
+    logging.info(f"Adding row table {table_id}.")
+
+    response = requests.post(
+        f"{base_url}/api/database/rows/table/{table_id}/?user_field_names=true",
+        headers=_auth_headers(auth_token),
+        data=json.dumps(row),
+    )
+    if response.status_code != 200:
+        raise BaserowException(
+            f"unexpected response {response.status_code}: {str(response.content)}"
+        )
+
+
+def _add_beds_fields(base_url: str, auth_token: str, beds_table_id: int) -> None:
+    _add_table_field(base_url, auth_token, beds_table_id, "closed", "boolean", {})
+    _add_table_field(base_url, auth_token, beds_table_id, "covid", "boolean", {})
     _add_table_field(
         base_url,
         auth_token,
@@ -460,7 +528,7 @@ def _add_beds_fields(base_url: str, auth_token: str, beds_table_id: int):
     )
 
 
-def initialise_baserow():
+def initialise_baserow() -> None:
     settings = get_baserow_settings()
 
     logging.info("Starting Baserow initialisation.")
@@ -476,7 +544,7 @@ def initialise_baserow():
 
     # Create the discharge_statuses table.
     discharge_statuses_table_id = _create_table(
-        settings.public_url, auth_token, application_id, "discharge_statuses", [["csn"]]
+        settings.public_url, auth_token, application_id, "discharge_statuses", "csn", {}
     )
     _add_table_field(
         settings.public_url,
@@ -484,6 +552,7 @@ def initialise_baserow():
         discharge_statuses_table_id,
         column_name="status",
         column_type="text",
+        column_details=None,
     )
 
     _add_table_field(
@@ -500,8 +569,15 @@ def initialise_baserow():
     )
 
     # Create the beds table.
-    beds_rows = _fetch_beds()
     beds_table_id = _create_table(
-        settings.public_url, auth_token, application_id, "beds", beds_rows
+        settings.public_url, auth_token, application_id, "beds", "location", {}
     )
+
     _add_beds_fields(settings.public_url, auth_token, beds_table_id)
+
+    beds_df = _fetch_beds()
+
+    for row in beds_df.itertuples():
+        _add_table_row(
+            settings.public_url, auth_token, beds_table_id, {"location": row.location}
+        )

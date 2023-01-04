@@ -1,4 +1,5 @@
 import requests
+from typing import Any
 
 from models.census import CensusDepartment, CensusRow
 from web.config import get_settings
@@ -23,7 +24,7 @@ def get_department_status() -> list[CensusDepartment]:
     return [CensusDepartment.parse_obj(row) for row in response.json()]
 
 
-def fetch_department_census():
+def fetch_department_census() -> Any:
     """
     Stores data from census api (i.e. skeleton)
     Also reaches out to beds and pulls in additional closed beds

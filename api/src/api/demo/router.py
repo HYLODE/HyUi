@@ -15,7 +15,7 @@ mock_router = APIRouter(prefix="/demo")
 
 
 @mock_router.get("/", response_model=list[ClarityOrCase])
-def get_mock_demo_rows():
+def get_mock_demo_rows() -> list[ClarityOrCase]:
     """
     Return mock data from adjacent mock.json file
     """
@@ -26,7 +26,9 @@ def get_mock_demo_rows():
 
 
 @router.get("/", response_model=list[ClarityOrCase])
-def get_demo_rows(session: Session = Depends(get_clarity_session), days_ahead: int = 1):
+def get_demo_rows(
+    session: Session = Depends(get_clarity_session), days_ahead: int = 1
+) -> list[ClarityOrCase]:
     """
     Return mock data by running query in anger
     response_model defines the data type (model) of the response
