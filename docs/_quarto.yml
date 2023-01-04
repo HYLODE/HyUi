@@ -25,7 +25,7 @@ website:
         aria-label: GitHub
   page-navigation: true  # navigate from one page to the next
   page-footer: |
-    Built for the NHS | Developed at UCLH | Supprted by NHS-X and NIHR | 2021-2023
+    Built for the NHS | Developed at UCLH | Supported by NHS-X and NIHR | 2021-2023
   sidebar:
     style: "docked"
     contents:
