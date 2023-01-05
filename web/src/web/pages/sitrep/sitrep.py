@@ -11,7 +11,6 @@ from web.pages.sitrep import (
     BPID,
     widgets,
 )
-
 import web.pages.sitrep.callbacks  # noqa
 
 from web import icons
@@ -61,7 +60,7 @@ STYLE_CELL_CONDITIONAL = [
     Input(f"{BPID}ward_data", "data"),
     # prevent_initial_call=True,
 )
-def gen_fancy_table(data: dict):
+def gen_fancy_table(data: dict) -> dbc.Container:
     df = pd.DataFrame.from_records(data)
 
     df["bed_label"] = df["bed"].str.split(pat="-", expand=True).iloc[:, 1]
@@ -248,7 +247,7 @@ dash_only = html.Div(
 )
 
 
-def layout():
+def layout() -> html.Div:
     if not current_user.is_authenticated:
         return html.Div(["Please ", dcc.Link("login", href="/login"), " to continue"])
     return html.Div(
@@ -256,7 +255,7 @@ def layout():
             dbc.Row(
                 [
                     dbc.Col(
-                        [widgets.department_radio_button],
+                        [widgets.ward_radio_button],
                         width={"size": 6, "order": "last", "offset": 6},
                     ),
                 ]

@@ -1,5 +1,4 @@
 from datetime import date, datetime
-
 from pydantic import BaseModel
 
 
@@ -46,3 +45,8 @@ class CensusDepartment(BaseModel):
     closed_temp: bool
     closed_perm: bool | None
     modified_at: datetime
+
+
+class ClosedBed(BaseModel):
+    department: str
+    closed: bool
