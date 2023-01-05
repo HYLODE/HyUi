@@ -1,5 +1,5 @@
 from datetime import date, datetime
-
+from typing import Any
 from pydantic import BaseModel
 
 
@@ -46,3 +46,74 @@ class CensusDepartment(BaseModel):
     closed_temp: bool
     closed_perm: bool | None
     modified_at: datetime
+
+
+class ClosedBed(BaseModel):
+    department: str
+    closed: bool
+
+
+class CensusBed(BaseModel):
+    """Bed model as defined in baserow"""
+
+    id: int
+    order: Any
+    location_string: str
+    location_id: int
+    department_id: int
+    room_id: int
+    bed_id: int
+    department: str
+    speciality: str
+    room: str
+    dept: Any
+    room_hl7: str
+    bed: str
+    # loc2merge: "critical care - gwb l01 \
+    #   icu __ gwb l01 critical care __ sr04 __ sr04-04",
+    DepartmentKey: Any
+    BedEpicId: Any
+    Name: str
+    DepartmentName: str
+    RoomName: str
+    BedName: str
+    IsBed: bool
+    BedInCensus: bool
+    IsDepartment: bool
+    IsRoom: bool
+    IsCareArea: bool
+    DepartmentExternalName: str
+    DepartmentSpecialty: str
+    DepartmentType: str
+    DepartmentServiceGrouper: str
+    DepartmentLevelOfCareGrouper: str
+    LocationName: str
+    ParentLocationName: str
+    _CreationInstant: datetime
+    _LastUpdatedInstant: datetime
+    # _merge: "both",
+    unit_order: Any
+    closed: bool
+    covid: bool
+    # DischargeReady: str
+    bed_physical: list[dict]
+    # "bed_physical": [
+    #     {
+    #         "id": 981,
+    #         "value": "sideroom",
+    #         "color": "dark-red"
+    #     }
+    # ],
+    bed_functional: list[dict]
+    # "bed_functional": [
+    #     {
+    #         "id": 986,
+    #         "value": "ficm",
+    #         "color": "dark-green"
+    #     },
+    #     {
+    #         "id": 987,
+    #         "value": "gwb",
+    #         "color": "light-orange"
+    #     }
+    # ],
