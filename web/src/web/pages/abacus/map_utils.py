@@ -1,3 +1,7 @@
+from datetime import datetime
+import warnings
+
+
 def _as_int(s: int | float | None) -> int | None:
     if s is None:
         return None
@@ -23,7 +27,7 @@ def _split_loc_str(s: str, part: str) -> str:
         raise ValueError(f"{part} not one of dept/room/bed")
 
 
-def _filter_non_beds(beds):
+def _filter_non_beds(beds: list) -> list:
     just_beds = []
     for bed in beds:
         location_string = bed.get("location_string", "").lower()
@@ -37,10 +41,10 @@ def _filter_non_beds(beds):
 def _make_bed(
     bed: dict, scale: int = 9, offset: tuple[int, int] = (-100, -100)
 ) -> dict:
-    location_string = bed.get("location_string")
+    location_string = bed.get("location_string", "")
     hl7_bed = _split_loc_str(location_string, "bed")
 
-    position = {}
+    position: dict = {}
     if bed.get("xpos") and bed.get("ypos"):
         position.update(x=bed.get("xpos") * scale + offset[0]),  # type: ignore
         position.update(y=bed.get("ypos") * scale + offset[1]),  # type: ignore
@@ -135,7 +139,7 @@ def _update_patients_with_sitrep(bl: list[dict], sl: list[dict]) -> list[dict]:
     # convert to dictionary for searching simply
     sd = {int(i["csn"]): i for i in sl if i["csn"]}
     for bed in bl:
-        csn = bed.get("data").get("encounter")
+        csn = bed.get("data", {}).get("encounter")
         sitrep = sd.get(csn, {})
         bed["data"]["sitlist"] = sitrep
         bed["data"]["wim"] = sitrep.get("wim_1")
@@ -146,31 +150,46 @@ def _update_discharges(bl: list[dict], discharges: list[dict]) -> list[dict]:
     # convert to dictionary of dictionaries to search / merge
     dd = {i["csn"]: i for i in discharges}
     for bed in bl:
-        csn = bed.get("data").get("encounter")
         # if there's a patient in the bed
+        csn = bed.get("data", {}).get("encounter")
         if not csn:
             continue
-        # pm = planned_move
-        pm_type = bed["data"]["census"].get("pm_type")
-        pm_modified = bed["data"]["census"].get("pm_datetime")
-        bed["data"]["discharge"] = True if pm_type == "OUTBOUND" else False
 
-        # if there's better info on discharge status
-        dc_status = dd.get(csn, {})
-        bed["data"]["dc_status"] = dc_status
-        if not len(dc_status):
-            continue
-        dc_modified = dc_status.get("modified_at")
-        if not pm_modified:
-            bed["data"]["discharge"] = (
-                True if dc_status.get("status") == "ready" else False
-            )
-        else:
-            dc_modified = datetime.fromisoformat(dc_modified)
-            pm_modified = datetime.fromisoformat(pm_modified)
-            if dc_modified > pm_modified:
-                bed["data"]["discharge"] = (
-                    True if dc_status.get("status") == "ready" else False
+        bed["data"]["dc_status"] = dd.get(csn, {})
+
+        planned_move = True if bed["data"]["census"].get("pm_type") else False
+        discharge_status = True if dd.get(csn) else False
+
+        if planned_move and not discharge_status:
+            planned_move_type = bed["data"]["census"].get("pm_type")
+            res = True if planned_move_type == "OUTBOUND" else False
+
+        elif not planned_move and discharge_status:
+            res = True if dd.get(csn, {}).get("status") == "ready" else False
+
+        elif planned_move and discharge_status:
+            try:
+                planned_move_modified = bed["data"]["census"].get("pm_datetime", "")
+                planned_move_modified = datetime.fromisoformat(planned_move_modified)
+
+                discharge_status_modified = dd.get(csn, {}).get("modified_at", "")
+                discharge_status_modified = datetime.fromisoformat(
+                    discharge_status_modified
                 )
+
+                if discharge_status_modified > planned_move_modified:
+                    res = True if dd.get(csn, {}).get("status") == "ready" else False
+
+            except ValueError as e:
+                warnings.warn(
+                    "Value error probably raised b/c modified "
+                    "timestamps do not exist or cannot be converted"
+                )
+                print(e)
+
+        else:
+            res = False
+
+        bed["data"]["discharge"] = res if res else False
 
     return bl
