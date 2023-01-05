@@ -10,6 +10,7 @@ def _as_int(s: int | float | None) -> int | None:
 
 
 def _list_of_unique_rooms(beds: list) -> list:
+    beds = _filter_non_beds(beds)
     rooms = [_split_loc_str(bed["location_string"], "room") for bed in beds]
     rooms = list(set(rooms))
     return rooms
