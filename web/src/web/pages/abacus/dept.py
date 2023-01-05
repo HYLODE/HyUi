@@ -59,7 +59,7 @@ dropdown_dept = html.Div(
     Input(f"{BPID}page_interval", "n_intervals"),
     background=True,
 )
-def _store_all_departments(_: int):
+def _store_all_departments(_: int) -> list[dict]:
     """
     Store a list of departments for the building
     Triggers the update of most of the elements on the page
@@ -77,7 +77,9 @@ def _store_all_departments(_: int):
     Input(f"{BPID}icu_radio", "value"),
     Input(f"{BPID}departments", "data"),
 )
-def _gen_dept_dropdown(icu_radio: str, building_departments):
+def _gen_dept_dropdown(
+    icu_radio: str, building_departments: list
+) -> tuple[list[dict], bool, str]:
     """
     Dynamically build department picker list
     """
@@ -98,7 +100,7 @@ def _gen_dept_dropdown(icu_radio: str, building_departments):
     Input(f"{BPID}icu_radio", "value"),
     Input(f"{BPID}dept_dropdown", "value"),
 )
-def _store_active_department(icu: str, dept: str):
+def _store_active_department(icu: str, dept: str) -> str:
     if icu != "other":
         return icu
     else:

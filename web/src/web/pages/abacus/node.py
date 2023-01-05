@@ -7,12 +7,12 @@ Exposes
 """
 import dash_bootstrap_components as dbc
 import json
-from dash import Output, callback, html
+from dash import Input, Output, callback, html
 from datetime import datetime
 
 from web import icons
 from web.pages.abacus.discharges import form_discharge
-from web.pages.abacus.map import input_tapnode, input_selected_nodes
+from web.pages.abacus.map import input_selected_nodes, input_tapnode
 from . import BPID
 
 styles = {"debug": {"border": "thin lightgrey solid", "overflowX": "scroll"}}
@@ -40,6 +40,26 @@ card_node = html.Div(
         ]
     ),
 )
+
+debug_toggle = html.Div(
+    [
+        dbc.Switch(
+            id=f"{BPID}debug_node_switch",
+            # options=[{"label": "Debug", "value": True}],
+            label=" Debug",
+            value=False,
+            className="d-grid d-md-flex justify-content-md-end btn-group " "gx-3 pt-1",
+        ),
+    ]
+)
+
+
+@callback(
+    Output(f"{BPID}node_debug_fade", "is_in"),
+    Input(f"{BPID}debug_node_switch", "value"),
+)
+def toggle_debug(value: bool):
+    return value
 
 
 @callback(

@@ -13,25 +13,18 @@ import math
 from dash import Input, Output, State, callback, ctx, dcc, html
 
 from web.pages.abacus import BPID
-
 # Interfaces with out modules
 # ---------------------------
 from web.pages.abacus.dept import input_active_dept
+from web.pages.abacus.map_utils import (_filter_non_beds, _list_of_unique_rooms,
+                                        _make_bed, _make_room, _populate_beds,
+                                        _update_discharges,
+                                        _update_patients_with_sitrep)
 from web.pages.abacus.stores import (
     input_beds_data,
     input_census_data,
     input_sitrep_data,
 )
-from web.pages.abacus.map_utils import (
-    _make_bed,
-    _make_room,
-    _list_of_unique_rooms,
-    _populate_beds,
-    _update_discharges,
-    _update_patients_with_sitrep,
-    _filter_non_beds,
-)
-
 # NOTE: the following fails b/c circular so must fall back on string identifer
 # from web.pages.abacus.discharges import input_discharges
 from . import WARDS_WITH_MAPS
@@ -125,7 +118,7 @@ radio_cyto_layout = html.Div(
                 dbc.RadioItems(
                     id=f"{BPID}layout_radio",
                     className="dbc d-grid d-md-flex "
-                    "justify-content-md-end btn-group p-1",
+                              "justify-content-md-end btn-group p-1",
                     inline=True,
                 )
             ],
@@ -160,14 +153,14 @@ map_cyto_beds = dbc.Card(
 
 @callback(
     (
-        Output(f"{BPID}layout_radio", "value"),
-        Output(f"{BPID}layout_radio", "options"),
+            Output(f"{BPID}layout_radio", "value"),
+            Output(f"{BPID}layout_radio", "options"),
     ),
     input_active_dept,
     Input(f"{BPID}layout_radio", "value"),
     prevent_initial_call=True,
 )
-def _gen_layout_radio(dept: str, layout: int) -> tuple[str, list]:
+def _gen_layout_radio(dept: str, layout: str) -> tuple[str, list[dict]]:
     """
     Defaults to  Map option if possible and appends to list of radio buttons
     """
@@ -218,7 +211,7 @@ def _update_layout(layout: str) -> dict:
         },
     }
 
-    return layouts.get(layout)
+    return layouts.get(layout, {})
 
 
 @callback(
@@ -255,17 +248,18 @@ def _update_elements_for_layout(
 
     if layout != "preset":
         tag_string = "_"
-        elements = [e for e in elements if e.get("data").get("level") != "room"]
+        elements = [e for e in elements if
+                    e.get("data", {}).get("level") != "room"]
         for e in elements:
             e["data"]["id"] = e["data"]["id"] + tag_string
     else:
         tag_string = ""
 
     if tap_node:
-        selected_id = tap_node.get("data").get("id") + tag_string
+        selected_id = tap_node.get("data", {}).get("id") + tag_string
         for ele in elements:
             ele["selected"] = (
-                True if ele.get("data").get("id") == selected_id else False
+                True if ele.get("data", {}).get("id") == selected_id else False
             )
 
     return elements
@@ -278,11 +272,16 @@ def _update_elements_for_layout(
     input_sitrep_data,
     Input(f"{BPID}discharge_statuses", "data"),
 )
-def make_cytoscape_elements(census, beds, sitrep, discharges):
+def make_cytoscape_elements(
+    census: list[dict],
+    beds: list[dict],
+    sitrep: list[dict],
+    discharges: list[dict],
+) -> list[dict]:
     room_list = [_make_room(r) for r in _list_of_unique_rooms(beds)]
 
     bed_list = [_make_bed(i) for i in _filter_non_beds(beds)]
-    bed_list.sort(key=lambda bed: bed.get("data").get("bed_index"))
+    bed_list.sort(key=lambda bed: bed.get("data", {}).get("bed_index"))
     bed_list = _populate_beds(bed_list, census)
     bed_list = _update_discharges(bed_list, discharges)
 
@@ -294,7 +293,7 @@ def make_cytoscape_elements(census, beds, sitrep, discharges):
 
     for ele in elements:
         # ele["selected"] = False
-        if ele.get("data").get("level") == "room":
+        if ele.get("data", {}).get("level") == "room":
             ele["selectable"] = False
 
     return elements
@@ -306,7 +305,7 @@ def make_cytoscape_elements(census, beds, sitrep, discharges):
     input_active_dept,
     prevent_initial_call=True,
 )
-def _store_node(node: dict, _: str) -> dict | None:
+def _store_tap_node(node: dict, _: str) -> dict | None:
     if ctx.triggered_id == f"{BPID}bed_map":
         return node
     else:
@@ -319,7 +318,7 @@ def _store_node(node: dict, _: str) -> dict | None:
     input_active_dept,
     prevent_initial_call=True,
 )
-def _store_node(nodes: list[dict], _: str) -> list[dict] | None:
+def _store_selected_nodes(nodes: list[dict], _: str) -> list[dict] | None:
     "Use this to define how many nodes are selected"
     # if nodes:
     #     print(len(nodes))
@@ -337,6 +336,6 @@ def _store_node(nodes: list[dict], _: str) -> list[dict] | None:
 )
 def _store_encounter(node: dict, _: str) -> str | None:
     if ctx.triggered_id == f"{BPID}bed_map":
-        return node.get("data").get("encounter", None)
+        return node.get("data", {}).get("encounter", None)  # noqa
     else:
         return None

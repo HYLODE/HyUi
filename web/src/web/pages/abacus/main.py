@@ -23,10 +23,10 @@ from web.pages.abacus.map import (
     store_selected_nodes,
     store_tapnode,
 )
-from web.pages.login import not_logged_in_div_content
-from web.pages.abacus.node import card_node
+from web.pages.abacus.node import card_node, debug_toggle, node_debug
 from web.pages.abacus.perrt import card_details, store_perrt_long
 from web.pages.abacus.stores import store_beds, store_census, store_sitrep
+from web.pages.login import not_logged_in_div_content
 
 register_page(__name__, name="SITREP")
 
@@ -76,15 +76,29 @@ def layout():
                             dbc.Col(
                                 [
                                     radio_icu,
-                                ]
+                                ],
+                                width=4,
                             ),
                             dbc.Col(
                                 [
                                     dropdown_dept,
-                                ]
+                                ],
+                                width=2,
                             ),
-                            dbc.Col([radio_cyto_layout]),
+                            dbc.Col(
+                                [
+                                    radio_cyto_layout,
+                                ],
+                                width=5,
+                            ),
+                            dbc.Col(
+                                [
+                                    debug_toggle,
+                                ],
+                                width=1,
+                            ),
                         ],
+                        justify="between",
                         className="border rounded p-3 bg-light",
                     ),
                 ],
@@ -105,7 +119,12 @@ def layout():
                                 [
                                     card_node,
                                     card_details,
-                                    # node_debug,
+                                    dbc.Fade(
+                                        node_debug,
+                                        id=f"{BPID}node_debug_fade",
+                                        is_in=False,
+                                        appear=False,
+                                    ),
                                 ],
                             ),
                         ],
@@ -114,8 +133,6 @@ def layout():
                 ],
                 fluid=True,
             ),
-            # placing this at the bottom else it interferes with cytoscape
-            # map interactions
             html.Div(
                 [
                     refresh_timer,

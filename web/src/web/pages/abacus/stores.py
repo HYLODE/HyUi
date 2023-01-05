@@ -59,17 +59,17 @@ def _store_census(department: str) -> list[dict]:
     prevent_initial_callback=True,
     background=True,
 )
-def _store_sitrep(department: str) -> list[dict]:
+def _store_sitrep(dept: str) -> list[dict]:
     """
     Use census to provide the CSNs that can be used to query additional data
     Args:
-        department: the department
+        dept: the department
 
     Returns:
         additonal patient level data
 
     """
-    department = SITREP_DEPT2WARD_MAPPING.get(department)
+    department = SITREP_DEPT2WARD_MAPPING.get(dept)
     if not department:
         warnings.warn(f"No sitrep data available for {department}")
         return [{}]

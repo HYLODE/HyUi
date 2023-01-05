@@ -199,7 +199,7 @@ abacus_row = dbc.Row(
     Input(f"{BPID}elements", "data"),
     prevent_initial_callback=True,
 )
-def show_patients_now(elements: dict):
+def show_patients_now(elements: dict) -> tuple[int, int]:
     n = sum([True for e in elements if e.get("data").get("occupied")])
     return n, 35
 
@@ -216,7 +216,9 @@ def show_patients_now(elements: dict):
     Input(f"{BPID}adm_expected", "value"),
     prevent_initial_callback=True,
 )
-def show_patients_next(now: int, dcs: int, adm_con: int, adm_exp: int):
+def show_patients_next(
+    now: int, dcs: int, adm_con: int, adm_exp: int
+) -> tuple[int, list, int]:
     """
     Values to ba passed to the RangeSlider component
     Args:
@@ -247,7 +249,7 @@ def show_patients_next(now: int, dcs: int, adm_con: int, adm_exp: int):
     Input(f"{BPID}elements", "data"),
     prevent_initial_callback=True,
 )
-def show_dcs_ready(elements: dict):
+def show_dcs_ready(elements: dict) -> tuple[int, int, int]:
     n = sum([True for e in elements if e.get("data").get("discharge")])
     n_max = 5 * ((n // 5) + 1)  # multiple of 5 above n
     return n, n_max, n_max
@@ -259,7 +261,7 @@ def show_dcs_ready(elements: dict):
     State(f"{BPID}dcs_confirmed", "value"),
     prevent_initial_callback=True,
 )
-def show_dcs_confirmed(ready: int, confirmed: int):
+def show_dcs_confirmed(_: int, confirmed: int) -> int:
     """
     Placeholder callback that should query the number of confirmed discharges
     """
@@ -276,7 +278,7 @@ def show_dcs_confirmed(ready: int, confirmed: int):
     State(f"{BPID}ward_status", "className"),
     prevent_initial_callback=True,
 )
-def show_highlight_occupancy(pts_next: list[int], pts_now: int, info_class: str):
+def show_highlight_occupancy(pts_next: list[int], pts_now: int, info_class: str) -> str:
     """ """
     next_lower, next_upper = pts_next
     if next_upper > pts_now:
