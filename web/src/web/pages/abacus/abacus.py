@@ -3,7 +3,7 @@ from dash import html, dcc, Input, Output, State, callback
 from . import BPID
 
 _summ_col = ("border rounded border-light border-1 p-2",)
-_summ_slider_div = "hstack gap-3"
+_summ_slider_div = "hstack gap-2"
 _summ_slider_label = "w-25 text-end"
 
 
@@ -14,39 +14,39 @@ abacus_row = dbc.Row(
         # ==================
         dbc.Col(
             [
-                html.Div(
-                    [
-                        html.Div(
-                            [
-                                html.H5(
-                                    [
-                                        "Admissions ",
-                                        html.I(
-                                            className="fas fa-question-circle",
-                                            id="admissions_tip",
-                                        ),
-                                    ],
-                                    className="text-begin",
-                                ),
-                                dbc.Tooltip(
-                                    "Known admissions are those "
-                                    "accepted. Unknown admissions are "
-                                    "those emergencies anticipated in the "
-                                    "course of a normal day. The default "
-                                    "is 1 emergency bed",
-                                    target="admissions_tip",
-                                    placement="right",
-                                    className="text-start",
-                                ),
-                            ]
-                        ),
-                    ],
-                    className="hstack gap-1 p-0",
-                ),
+                # html.Div(
+                #     [
+                #         html.Div(
+                #             [
+                #                 html.H5(
+                #                     [
+                #                         "Admissions ",
+                #                         html.I(
+                #                             className="fas fa-question-circle",
+                #                             id="admissions_tip",
+                #                         ),
+                #                     ],
+                #                     className="text-begin",
+                #                 ),
+                #                 dbc.Tooltip(
+                #                     "Known admissions are those "
+                #                     "accepted. Unknown admissions are "
+                #                     "those emergencies anticipated in the "
+                #                     "course of a normal day. The default "
+                #                     "is 1 emergency bed",
+                #                     target="admissions_tip",
+                #                     placement="right",
+                #                     className="text-start",
+                #                 ),
+                #             ]
+                #         ),
+                #     ],
+                #     className="hstack gap-1 p-0",
+                # ),
                 html.Div(
                     [
                         html.P(
-                            "Accepted",
+                            "Agreed admissions",
                             className=_summ_slider_label,
                         ),
                         dcc.Slider(
@@ -93,15 +93,15 @@ abacus_row = dbc.Row(
         ),
         dbc.Col(
             children=[
+                # html.Div(
+                #     [
+                #         html.H5("Ward occupancy", className="text-begin"),
+                #     ],
+                #     className="hstack p-0",
+                # ),
                 html.Div(
                     [
-                        html.H5("Ward occupancy", className="text-begin"),
-                    ],
-                    className="hstack p-0",
-                ),
-                html.Div(
-                    [
-                        html.P("Now", className="w-20 text-end"),
+                        html.P("Occupancy now", className="w-20 text-end"),
                         dcc.Slider(
                             id=f"{BPID}pts_now_slider",
                             min=0,
@@ -119,7 +119,7 @@ abacus_row = dbc.Row(
                 ),
                 html.Div(
                     [
-                        html.P("Next", className="fw-bold w-20 " "text-end"),
+                        html.P("Occupancy next", className="fw-bold w-20 " "text-end"),
                         dcc.RangeSlider(
                             id=f"{BPID}pts_next_slider",
                             step=1,
@@ -140,15 +140,15 @@ abacus_row = dbc.Row(
         ),
         dbc.Col(
             [
+                # html.Div(
+                #     [
+                #         html.H5("Discharges", className=""),
+                #     ],
+                #     className="hstack p-0",
+                # ),
                 html.Div(
                     [
-                        html.H5("Discharges", className=""),
-                    ],
-                    className="hstack p-0",
-                ),
-                html.Div(
-                    [
-                        html.P("Ready", className=_summ_slider_label),
+                        html.P("Ready to discharge", className=_summ_slider_label),
                         dcc.Slider(
                             id=f"{BPID}dcs_ready",
                             min=0,
@@ -166,7 +166,7 @@ abacus_row = dbc.Row(
                 ),
                 html.Div(
                     [
-                        html.P("Confirmed", className=_summ_slider_label),
+                        html.P("Beds confirmed", className=_summ_slider_label),
                         dcc.Slider(
                             id=f"{BPID}dcs_confirmed",
                             min=0,
