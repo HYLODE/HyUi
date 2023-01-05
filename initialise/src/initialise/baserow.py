@@ -153,7 +153,7 @@ def _merge_default_properties(beds_df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def _fetch_beds() -> pd.dataframe:
+def _fetch_beds() -> pd.DataFrame:
     star_locations_df = _star_locations()
     caboodle_departments_df = _caboodle_departments()
     beds_df = _merge_star_and_caboodle_beds(star_locations_df, caboodle_departments_df)
