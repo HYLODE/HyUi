@@ -113,7 +113,7 @@ def _node_title(node: dict):
     if not node_data.get("occupied"):
         return bed_title
 
-    sitrep = node_data.get("sitrep")
+    sitrep = node_data.get("sitlist")
 
     mrn = census.get("mrn", "")
     encounter = str(census.get("encounter", ""))
@@ -196,7 +196,7 @@ def _node_body(node: dict):
     else:
         census_rows = []
 
-    sitrep = node_data.get("sitrep")
+    sitrep = node_data.get("sitlist")
     if sitrep:
         rs = html.Tr(
             [html.Td("Respiratory Support"), html.Td(sitrep.get("vent_type_1_4h", ""))]

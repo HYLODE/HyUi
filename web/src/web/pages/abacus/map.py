@@ -180,13 +180,13 @@ def _populate_beds(bl: list[dict], cl: list[dict]) -> list[dict]:
 
 def _update_patients_with_sitrep(bl: list[dict], sl: list[dict]) -> list[dict]:
     """
-    Merge sitrep details on to patient list using encounter key
+    Merge sitlist details on to patient list using encounter key
     Args:
         bl: beds with patients
-        sl: sitrep
+        sl: sitlist
 
     Returns:
-        updated bed_list holding sitrep data
+        updated bed_list holding sitlist data
 
     """
 
@@ -195,7 +195,7 @@ def _update_patients_with_sitrep(bl: list[dict], sl: list[dict]) -> list[dict]:
     for bed in bl:
         csn = bed.get("data").get("encounter")
         sitrep = sd.get(csn, {})
-        bed["data"]["sitrep"] = sitrep
+        bed["data"]["sitlist"] = sitrep
         bed["data"]["wim"] = sitrep.get("wim_1")
     return bl
 
@@ -442,7 +442,7 @@ def make_cytoscape_elements(census, beds, sitrep, discharges):
     bed_list = _populate_beds(bed_list, census)
     bed_list = _update_discharges(bed_list, discharges)
 
-    # if sitrep exists
+    # if sitlist exists
     if sitrep and sum([len(i) for i in sitrep]):
         bed_list = _update_patients_with_sitrep(bed_list, sitrep)
 

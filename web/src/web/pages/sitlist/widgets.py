@@ -1,6 +1,6 @@
 from dash import html
 import dash_bootstrap_components as dbc
-from web.pages.sitrep import BPID
+from web.pages.sitlist import BPID
 
 department_radio_button = html.Div(
     [

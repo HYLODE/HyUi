@@ -1,5 +1,5 @@
 """
-sub-application for ros
+sub-application for ipc
 """
 from typing import Any
 
@@ -13,9 +13,10 @@ from flask_login import current_user
 from datetime import datetime, date, timedelta
 
 from models.ros import RosRead
+from web.pages.login import not_logged_in_div_content
 from web.config import get_settings
 
-register_page(__name__, name="ROS")
+register_page(__name__, name="IPC")
 BPID = "ROS_"
 
 
@@ -66,9 +67,12 @@ dash_only = html.Div(
 )
 
 
+not_logged_in_container = html.Div([not_logged_in_div_content, dash_only])
+
+
 def layout():
     if not current_user.is_authenticated:
-        return html.Div(["Please ", dcc.Link("login", href="/login"), " to continue"])
+        return not_logged_in_container
     return html.Div(
         [
             ward_radio_button,
@@ -104,7 +108,7 @@ def store_data(n_intervals: int) -> dict[str, Any]:
     Read data from API then store as JSON
     """
 
-    response = requests.get(f"{get_settings().api_url}/ros/")
+    response = requests.get(f"{get_settings().api_url}/ipc/")
     data = [RosRead.parse_obj(row) for row in response.json()]
 
     pts_by_department: dict[

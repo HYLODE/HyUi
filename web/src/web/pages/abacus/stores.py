@@ -24,8 +24,8 @@ input_beds_data = Input(f"{BPID}beds", "data")
 store_census = dcc.Store(id=f"{BPID}census")
 input_census_data = Input(f"{BPID}census", "data")
 
-store_sitrep = dcc.Store(id=f"{BPID}sitrep")
-input_sitrep_data = Input(f"{BPID}sitrep", "data")
+store_sitrep = dcc.Store(id=f"{BPID}sitlist")
+input_sitrep_data = Input(f"{BPID}sitlist", "data")
 
 
 @callback(
@@ -54,7 +54,7 @@ def _store_census(department: str) -> list[dict]:
 
 
 @callback(
-    Output(f"{BPID}sitrep", "data"),
+    Output(f"{BPID}sitlist", "data"),
     input_active_dept,
     prevent_initial_callback=True,
     background=True,
@@ -71,28 +71,28 @@ def _store_sitrep(department: str) -> list[dict]:
     """
     department = SITREP_DEPT2WARD_MAPPING.get(department)
     if not department:
-        warnings.warn(f"No sitrep data available for {department}")
+        warnings.warn(f"No sitlist data available for {department}")
         return [{}]
 
     # FIXME 2022-12-20 hack to keep this working whilst waiting on
     covid_sitrep = True
 
     if covid_sitrep:
-        warnings.warn("Working from old hycastle sitrep", category=DeprecationWarning)
+        warnings.warn("Working from old hycastle sitlist", category=DeprecationWarning)
         if "mock" in str(get_settings().api_url):
             mock = True
-            url = f"{get_settings().api_url}/sitrep/live/{department}/ui"
+            url = f"{get_settings().api_url}/sitlist/live/{department}/ui"
         else:
             mock = False
             url = f"http://uclvlddpragae07:5006/live/icu/{department}/ui"
     else:
-        url = f"{get_settings().api_url}/sitrep/live/{department}/ui"
+        url = f"{get_settings().api_url}/sitlist/live/{department}/ui"
 
     response = requests.get(url).json()
     try:
         rows = response["data"] if covid_sitrep and not mock else response
     except KeyError as e:
-        warnings.warn("No data returned for sitrep")
+        warnings.warn("No data returned for sitlist")
         print(e)
         return [{}]
     return [SitrepRow.parse_obj(row).dict() for row in rows]

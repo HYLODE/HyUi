@@ -2,21 +2,22 @@
 sub-application for PERRT
 """
 
-import warnings
-
 import dash_bootstrap_components as dbc
 import pandas as pd
+import warnings
 from dash import Input, Output, callback, dash_table as dt, dcc, html, register_page
 from dash.dash_table.Format import Format, Scheme
-from flask_login import current_user
+
+import web.pages.perrt.callbacks  # noqa: F401
 
 # makes all functions in map.py available to the app
-import web.pages.perrt.callbacks  # noqa: F401
 from web.pages.perrt import (
     BPID,
     REFRESH_INTERVAL,
     widgets,
 )
+from flask_login import current_user
+from web.pages.login import not_logged_in_div_content
 
 register_page(__name__)
 
@@ -143,10 +144,12 @@ dash_only = html.Div(
     ]
 )
 
+not_logged_in_container = html.Div([not_logged_in_div_content, dash_only])
+
 
 def layout():
     if not current_user.is_authenticated:
-        return html.Div(["Please ", dcc.Link("login", href="/login"), " to continue"])
+        return not_logged_in_container
 
     return html.Div(
         [

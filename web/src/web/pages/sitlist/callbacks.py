@@ -9,7 +9,7 @@ from models.sitrep import SitrepRow, IndividualDischargePrediction, BedRow
 from models.census import CensusRow
 from web.config import get_settings
 from web.convert import to_data_frame
-from web.pages.sitrep import (
+from web.pages.sitlist import (
     BPID,
 )
 

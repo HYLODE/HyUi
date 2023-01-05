@@ -5,6 +5,7 @@ from dash import Input, Output, callback
 from dash import dash_table as dt
 from dash import dcc, html, register_page
 from flask_login import current_user
+from web.pages.login import not_logged_in_div_content
 
 from models.electives import ElectiveSurgCase
 from web.config import get_settings
@@ -15,7 +16,7 @@ from web.pages.electives import (
     STYLE_CELL_CONDITIONAL,
 )
 
-register_page(__name__)
+register_page(__name__, name="PACU")
 
 card_fig = dbc.Card(
     [
@@ -91,9 +92,13 @@ dash_only = html.Div(
 )
 
 
+not_logged_in_container = html.Div([not_logged_in_div_content, dash_only])
+
+
 def layout():
     if not current_user.is_authenticated:
-        return html.Div(["Please ", dcc.Link("login", href="/login"), " to continue"])
+        return not_logged_in_container
+
     return html.Div(
         [
             main,

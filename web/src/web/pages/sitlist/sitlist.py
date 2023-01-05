@@ -7,16 +7,16 @@ from dash import html, dcc, register_page
 from dash.dash_table import FormatTemplate
 from flask_login import current_user
 
-from web.pages.sitrep import (
+from web.pages.sitlist import (
     BPID,
     widgets,
 )
 
-import web.pages.sitrep.callbacks  # noqa
+import web.pages.sitlist.callbacks  # noqa
 
 from web import icons
 
-register_page(__name__)
+register_page(__name__, name="sitlist")
 
 STYLE_CELL_CONDITIONAL = [
     {
@@ -108,6 +108,7 @@ def gen_fancy_table(data: dict):
         aki = icons.aki(t.had_rrt_1_4h)
 
         icon_string = f"{rs}{cvs}{aki}"
+        # noinspection PyProtectedMember
         ti = t._replace(organ_icons=icon_string)
         llist.append(ti)
     df = pd.DataFrame(llist, columns=df.columns)

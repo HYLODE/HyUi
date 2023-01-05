@@ -9,6 +9,7 @@ import dash_bootstrap_components as dbc
 
 from models.ed import EmergencyDepartmentPatient, AggregateAdmissionRow
 from web.config import get_settings
+from web.pages.login import not_logged_in_div_content
 
 register_page(__name__, name="Ed")
 
@@ -51,6 +52,9 @@ def beds_required(title: Any) -> Any:
 def _prettify_datetime(s: datetime) -> str:
     """Private method to format string"""
     return s.strftime("%H:%M %a %d %b")
+
+
+not_logged_in_container = html.Div([not_logged_in_div_content])
 
 
 def layout():
