@@ -188,8 +188,6 @@ def prepare_draft(
             how="left",
         )
     )
-
-    df
     # create pacu label
     df["pacu"] = False
     df["pacu"] = np.where(

@@ -10,20 +10,23 @@ from sqlalchemy import text, create_engine
 from sqlmodel import Session
 
 from api.db import get_caboodle_session, get_clarity_session
-from api.electives.wrangle import prepare_draft, prepare_electives
+from api.electives.wrangle import prepare_draft  # , prepare_electives
 from models.electives import (
     CaboodleCaseBooking,
     CaboodlePreassessment,
     ClarityPostopDestination,
-    ElectiveSurgCase,
+    # ElectiveSurgCase,
     SurgData,
     PreassessData,
     MergedData,
     LabData,
     EchoData,
-    # EchoWithAbnormalData,
+    EchoWithAbnormalData,
     ObsData,
 )
+
+from datetime import timedelta, date
+
 
 router = APIRouter(
     prefix="/electives",
@@ -65,19 +68,31 @@ def _parse_query(
     :return:
     """
     query = text((Path(__file__).parent / query_file).read_text())
-    df = pd.read_sql(query, session.connection(), params=params)
+
+    start_date = date.today().strftime("%Y-%m-%d")
+    end_date = (date.today() + timedelta(days=params["days_ahead"])).strftime(
+        "%Y-%m-%d"
+    )
+
+    df = pd.read_sql(query, session.connection(), params=[start_date, end_date])
+
     return [model.parse_obj(row) for row in df.to_dict(orient="records")]
 
 
-@router.get("/case_booking/", response_model=list[CaboodleCaseBooking])
+@router.get("/case_booking/", response_model=list[SurgData])
 def get_caboodle_cases(
     session: Session = Depends(get_caboodle_session), days_ahead: int = 1
 ) -> list[CaboodleCaseBooking]:
     """
     Return caboodle case booking data
     """
-    params = {"days_ahead": days_ahead}
-    return _parse_query("live_case.sql", session, CaboodleCaseBooking, params)
+
+    return _parse_query(
+        "live_sql/get_surg.sql",
+        session,
+        CaboodleCaseBooking,
+        params={"days_ahead": days_ahead},
+    )
 
 
 @mock_router.get("/case_booking/", response_model=list[SurgData])
@@ -87,6 +102,14 @@ def get_mock_caboodle_cases() -> list[type[SurgData]]:
     :return:
     """
     return _get_mock_sql_rows("surg", SurgData)
+
+
+@mock_router.get("/postop_destination/", response_model=list[ClarityPostopDestination])
+def get_mock_clarity_pod() -> list[dict]:
+    """
+    returns mock of caboodle query for preassessment
+    """
+    return _get_json_rows("mock_pod.json")
 
 
 @router.get("/postop_destination/", response_model=list[ClarityPostopDestination])
@@ -100,15 +123,12 @@ def get_clarity_pod(
     return _parse_query("live_pod.sql", session, ClarityPostopDestination, params)
 
 
-@mock_router.get("/postop_destination/", response_model=list[ClarityPostopDestination])
-def get_mock_clarity_pod() -> list[dict]:
-    """
-    returns mock of caboodle query for preassessment
-    """
-    return _get_json_rows("mock_pod.json")
+@mock_router.get("/preassessment/", response_model=list[PreassessData])
+def get_mock_caboodle_preassess() -> list[type[PreassessData]]:
+    return _get_mock_sql_rows("preassess", PreassessData)
 
 
-@router.get("/preassessment/", response_model=list[CaboodlePreassessment])
+@router.get("/preassessment/", response_model=list[PreassessData])
 def get_caboodle_preassess(
     session: Session = Depends(get_caboodle_session), days_ahead: int = 1
 ) -> list[CaboodlePreassessment]:
@@ -116,12 +136,7 @@ def get_caboodle_preassess(
     Return caboodle preassessment data
     """
     params = {"days_ahead": days_ahead}
-    return _parse_query("live_preassess.sql", session, CaboodlePreassessment, params)
-
-
-@mock_router.get("/preassessment/", response_model=list[PreassessData])
-def get_mock_caboodle_preassess() -> list[type[PreassessData]]:
-    return _get_mock_sql_rows("preassess", PreassessData)
+    return _parse_query("live_sql/get_preassess.sql", session, PreassessData, params)
 
 
 @mock_router.get("/labs/", response_model=list[LabData])
@@ -129,25 +144,15 @@ def get_mock_labs() -> list[type[LabData]]:
     return _get_mock_sql_rows("labs", LabData)
 
 
-@router.get("/", response_model=list[ElectiveSurgCase])
-def get_electives(
-    s_caboodle: Session = Depends(get_caboodle_session),
-    s_clarity: Session = Depends(get_clarity_session),
-    days_ahead: int = 3,
-) -> list[ElectiveSurgCase]:
+@router.get("/labs/", response_model=list[LabData])
+def get_caboodle_labs(
+    session: Session = Depends(get_caboodle_session), days_ahead: int = 1
+) -> list[CaboodlePreassessment]:
     """
-    Returns elective surgical cases by wrangling together the three components
+    Return caboodle preassessment data
     """
     params = {"days_ahead": days_ahead}
-    case = _parse_query("live_case.sql", s_caboodle, CaboodleCaseBooking, params)
-    preassess = _parse_query(
-        "live_preassess.sql", s_caboodle, CaboodlePreassessment, params
-    )
-    pod = _parse_query("live_pod.sql", s_clarity, ClarityPostopDestination, params)
-
-    df = prepare_electives(case, pod, preassess)
-    df = df.replace({np.nan: None})
-    return [ElectiveSurgCase.parse_obj(row) for row in df.to_dict(orient="records")]
+    return _parse_query("live_sql/get_labs.sql", session, LabData, params)
 
 
 @mock_router.get("/echo/", response_model=list[EchoData])
@@ -155,9 +160,53 @@ def get_mock_echo() -> list[type[EchoData]]:
     return _get_mock_sql_rows("echo", EchoData)
 
 
+@router.get("/echo/", response_model=list[EchoWithAbnormalData])
+def get_caboodle_echo(
+    session: Session = Depends(get_caboodle_session), days_ahead: int = 1
+) -> list[CaboodlePreassessment]:
+    """
+    Return caboodle preassessment data
+    """
+    params = {"days_ahead": days_ahead}
+    return _parse_query(
+        "live_sql/get_echo_2.sql", session, EchoWithAbnormalData, params
+    )
+
+
 @mock_router.get("/obs/", response_model=list[ObsData])
 def get_mock_obs() -> list[type[ObsData]]:
     return _get_mock_sql_rows("obs", ObsData)
+
+
+@router.get("/obs/", response_model=list[ObsData])
+def get_caboodle_obs(
+    session: Session = Depends(get_caboodle_session), days_ahead: int = 1
+) -> list[CaboodlePreassessment]:
+    """
+    Return caboodle preassessment data
+    """
+    params = {"days_ahead": days_ahead}
+    return _parse_query("live_sql/get_obs.sql", session, ObsData, params)
+
+
+@router.get("/", response_model=list[MergedData])
+def get_electives(
+    #  s_caboodle: Session = Depends(get_caboodle_session),
+    #  s_clarity: Session = Depends(get_clarity_session),
+    days_ahead: int = 3,
+) -> list[MergedData]:
+
+    case = get_caboodle_cases(days_ahead=days_ahead)
+    preassess = get_caboodle_preassess(days_ahead=days_ahead)
+    labs = get_caboodle_labs(days_ahead=days_ahead)
+    echo = get_caboodle_echo(days_ahead=days_ahead)
+    obs = get_caboodle_obs(days_ahead=days_ahead)
+
+    # pod = _parse_query("live_pod.sql", s_clarity, ClarityPostopDestination, params)
+
+    df = prepare_draft(case, preassess, labs, echo, obs)
+    df = df.replace({np.nan: None})
+    return [MergedData.parse_obj(row) for row in df.to_dict(orient="records")]
 
 
 @mock_router.get("/", response_model=list[MergedData])
@@ -168,7 +217,7 @@ def get_mock_electives(
     case = _get_mock_sql_rows("surg", SurgData)
     preassess = _get_mock_sql_rows("preassess", PreassessData)
     labs = _get_mock_sql_rows("labs", LabData)
-    echo = _get_mock_sql_rows("echo", EchoData)
+    echo = _get_mock_sql_rows("echo", EchoWithAbnormalData)
     obs = _get_mock_sql_rows("obs", ObsData)
 
     df = prepare_draft(case, preassess, labs, echo, obs)

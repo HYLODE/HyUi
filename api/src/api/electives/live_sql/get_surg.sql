@@ -87,8 +87,7 @@ WHERE scf.[PatientDurableKey] > 0
 	AND dd.[DepartmentName] != 'NHNN THEATRE SUITE'
 	AND dd.[DepartmentName] != 'RNTNE THEATRE SUITE'
 	AND dd.[DepartmentName] != 'EGA E02 LABOUR WARD'
-	AND dd.[DepartmentName] != 'MCC H-1 THEATRE SUITE'
-	AND dd.[DepartmentName] != 'UCH P02 ENDOSCOPY'
+	AND dd.[DepartmentName] != 'MCC H-1 THEATRE SUITE' -- AND dd.[DepartmentName] != 'UCH P02 ENDOSCOPY'
 	AND dd.[DepartmentName] != 'UCH ANAESTHESIA DEPT'
 	AND patd.[AgeInYears] >= 18
 	AND scufx.[PlannedOperationStartInstant] >= ?
