@@ -1,15 +1,35 @@
 # Deployment
 
 
-### Setup environment
+## Setup environment
 
 - Clone the repository on an NHS server `git clone https://github.com/HYLODE/HyUi.git`.
 - Configure your `.env` variables using `.env.example` as a template.
 - Configure `docker/initialise/.env` variables using `docker/initialise/.env.example.`
 
-### Run the Docker Compose services
+### Using the http cache
 
-In the `code` directory:
+We use [Varnish](https://varnish-cache.org) as a HTTP cache to speed up some of the slower API calls made by the front end. The default behaviour provided by Varnish is to cache everything, which is the approach we are following here.
+
+The cache is brought up with other services and is represented in `compose.yml`, which uses `docker/cache/Dockerfile`.
+The only change required to utilise caching is within the base `.env` file. The `WEB_API_URL` environment variable should be set to `http://cache:8000`, or `http://cache:8000/mock` for local development.
+
+Cache configuration is set in `cache/default.vcl` and contains some additional configuration with respect to a basic varnish configuration. The time to live (TTL) setting (representing the lifetime of an object in the cache) defaults to 2 minutes, but is increased in HyUI to **5 minutes** in the configuration file with
+
+```
+sub vcl_backend_response {
+    set beresp.ttl = 5m;
+}
+```
+The first request made to an uncached API endpoint will not see any speed up - subsequent requests within the TTL will use the cached object and will see a speedier response.
+
+Additional configuration is provided for endpoints that absolutely must return live data from the API. In this case, adding `X-Varnish-Nuke:1` to the request header will force the cache to query the live value.
+
+By relying on the default behaviour of Varnish to cache all and optionally skip the cache with an additional header, the hope is that any changes to `default.vcl` should be minimal.
+
+## Run the Docker Compose services
+
+In the base directory (containing `compose.yml`)
 
 ```sh
 docker compose --project-name [project name] up --build
@@ -17,7 +37,7 @@ docker compose --project-name [project name] up --build
 
 Ensure that you use a unique name for your `[project name]`. The production service should be named `hyui-prod`.
 
-### Initialise services
+## Initialise services
 
 This should be done the first time you stand up the services. It populates the Baserow database with the tables and static data required to run the rest of the HyUi services.
 
@@ -25,7 +45,7 @@ This should be done the first time you stand up the services. It populates the B
 ./bin/initialise.sh --operation baserow
 ```
 
-### Stop And Remove Docker Containers
+## Stop And Remove Docker Containers
 
 ```sh
 docker compose --project-name [project name] down
