@@ -35,5 +35,7 @@ app = dash.Dash(
 app.config.suppress_callback_exceptions = True
 app.layout = create_appshell([dash.page_registry.values()])
 
+server = app.server
+
 if __name__ == "__main__":
     app.run_server(host="0.0.0.0", port=get_settings().development_port, debug=True)

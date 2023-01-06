@@ -37,4 +37,4 @@ RUN pip install --no-cache-dir /app/web
 COPY --chown=hyui:root ./models/src/models /app/models
 COPY --chown=hyui:root ./web/src/web /app/web
 
-ENTRYPOINT ["gunicorn", "--bind", "0.0.0.0", "web.main:server"]
+ENTRYPOINT ["gunicorn", "--bind", "0.0.0.0", "web.app:server"]
