@@ -1,19 +1,19 @@
-import json
-from pathlib import Path
-from typing import Any
-
 import pandas as pd
 from fastapi import APIRouter, Depends, Query
-
-from sqlalchemy import create_engine, text, bindparam
+from pathlib import Path
+from sqlalchemy import bindparam, create_engine, text
 from sqlalchemy.orm import Session
+from typing import Any
 
-from api.wards import MISSING_LOCATION_DEPARTMENTS, MISSING_DEPARTMENT_LOCATIONS
-from models.census import CensusDepartment, CensusRow
-from api.db import get_star_session
-
-from api.census.wrangle import aggregate_by_department
 from api import wards
+from api.census.wrangle import aggregate_by_department
+from api.db import get_star_session
+from api.wards import (
+    CAMPUSES,
+    MISSING_DEPARTMENT_LOCATIONS,
+    MISSING_LOCATION_DEPARTMENTS,
+)
+from models.census import CensusDepartment, CensusRow
 
 router = APIRouter(
     prefix="/census",
@@ -54,6 +54,7 @@ def _fetch_census(
     return census_rows
 
 
+# noinspection SqlResolve
 def _fetch_mock_census(departments: list[str], locations: list[str]) -> list[CensusRow]:
     engine = create_engine(f"sqlite:///{Path(__file__).parent}/mock.db", future=True)
 
@@ -113,4 +114,30 @@ def get_census(
     locations: list[str] = Query(default=[]),
 ) -> list[CensusRow]:
     query = text((Path(__file__).parent / "live.sql").read_text())
+    return _fetch_census(session, query, departments, locations)
+
+
+@mock_router.get("/campus", response_model=list[CensusRow])
+def get_mock_census_by_campus(
+    campuses: list[str] = Query(default=[]),
+) -> list[CensusRow]:
+    locations: list = []
+    departments: list = []
+    for campus in campuses:
+        departments.extend(CAMPUSES.get(campus, []))
+
+    return _fetch_mock_census(departments, locations)
+
+
+@router.get("/campus", response_model=list[CensusRow])
+def get_census_by_campus(
+    session: Session = Depends(get_star_session),
+    campuses: list[str] = Query(default=[]),
+) -> list[CensusRow]:
+    query = text((Path(__file__).parent / "live.sql").read_text())
+    locations: list = []
+    departments: list = []
+    for campus in campuses:
+        departments.extend(CAMPUSES.get(campus, []))
+
     return _fetch_census(session, query, departments, locations)

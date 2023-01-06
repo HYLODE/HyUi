@@ -96,6 +96,14 @@ NHNN = (
 
 ALL = TOWER + GWB + WMS + NHNN
 
+CAMPUSES = {
+    "UCH": TOWER,
+    "WMS": WMS,
+    "GWB": GWB,
+    "NHNN": NHNN,
+}
+
+
 # Departments that have locations (beds) which incorrectly don't show up in
 # Epic as part of that department.
 MISSING_DEPARTMENT_LOCATIONS = MappingProxyType(
