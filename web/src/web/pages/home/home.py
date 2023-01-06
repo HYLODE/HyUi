@@ -1,69 +1,30 @@
 import json
+
 import dash
 import dash_cytoscape as cyto
 import dash_mantine_components as dmc
-import requests
-from dash import Input, Output, callback, dcc, html
+from dash import dcc, html
 
-from models.census import CensusRow
-from web.config import get_settings
+from web.pages.home import ids
+import web.pages.home.callbacks  # noqa
+from pathlib import Path
+
+with open(Path(__file__).parent / "cyto_style_sheet.json") as f:
+    cyto_style_sheet = json.load(f)
+
 
 dash.register_page(__name__, path="/", name="Home")
 
-
-@callback(
-    Output("store-census", "data"),
-    Input("campus-multi-select", "value"),
-    background=True,
+debug_inspector = html.Div(
+    [dmc.Prism(language="json", id=ids.DEBUG_NODE_INSPECTOR, children="")]
 )
-def _store_census(value: list[str] | str) -> list[dict]:
-    if type(value) is str:
-        campuses = [value]
-    else:
-        campuses = value  # type:ignore
-
-    response = requests.get(
-        f"{get_settings().api_url}/census/campus/", params={"campuses": campuses}
-    )
-    return [CensusRow.parse_obj(row).dict() for row in response.json()]
-
-
-@callback(
-    Output("cytoscape-census", "elements"),
-    Input("store-census", "data"),
-    background=True,
-)
-def _prepare_cyto_elements(data: list[dict]) -> list[dict]:
-    elements = list()
-    for d in data:
-        d = dict(
-            id=d.get("location_string"),
-            occupied=d.get("occupied"),
-        )
-        element = dict(data=d)
-        elements.append(element)
-    return elements
-
-
-@callback(
-    Output("node-debug", "children"),
-    Input("cytoscape-census", "tapNode"),
-    prevent_initial_callback=True,
-)
-def tap_debug_inspector(data: dict) -> str:
-    if data:
-        data.pop("style", None)
-    return json.dumps(data, indent=4)
-
-
-debug_inspector = html.Div([dmc.Prism(language="python", id="node-debug", children="")])
 
 campus_selector = html.Div(
     [
         dmc.MultiSelect(
             label="Select campus",
             placeholder="Select all you like!",
-            id="campus-multi-select",
+            id=ids.CAMPUS_SELECTOR,
             value=["WMS"],
             data=["GWB", "NHNN", "UCH", "WMS"],
             style={"width": 400, "marginBottom": 10},
@@ -71,28 +32,27 @@ campus_selector = html.Div(
     ]
 )
 
-cyto_style_sheet = [
-    {
-        "selector": "[?occupied]",
-        "style": {
-            "background-color": "red",
-        },
-    },
-    {
-        "selector": ":selected:",
-        "style": {
-            "shape": "star",
-            "background-color": "blue",
-        },
-    },
-]
-
-census_cyto = cyto.Cytoscape(
-    id="cytoscape-census",
-    stylesheet=cyto_style_sheet,
+layout_selector = html.Div(
+    [
+        dmc.SegmentedControl(
+            id=ids.LAYOUT_SELECTOR,
+            value="grid",
+            data=[
+                "grid",
+                "circle",
+                "random",
+            ],
+        )
+    ]
 )
 
-stores = html.Div(dcc.Store(id="store-census"))
+census_cyto = cyto.Cytoscape(
+    id=ids.CYTO_MAP,
+    stylesheet=cyto_style_sheet,
+    responsive=True,
+)
+
+stores = html.Div(dcc.Store(id=ids.CENSUS_STORE))
 
 body = html.Div(
     [
@@ -101,6 +61,7 @@ body = html.Div(
             mt=0,
             children=[
                 campus_selector,
+                layout_selector,
                 census_cyto,
                 debug_inspector,
             ],

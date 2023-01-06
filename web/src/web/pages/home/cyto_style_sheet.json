@@ -1,0 +1,15 @@
+[
+  {
+    "selector": "[?occupied]",
+    "style": {
+      "background-color": "red"
+    }
+  },
+  {
+    "selector": ":selected:",
+    "style": {
+      "shape": "star",
+      "background-color": "blue"
+    }
+  }
+]
