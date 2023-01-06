@@ -211,6 +211,16 @@ class EchoData(CabData):
     planned_operation_start_instant: datetime
 
 
+class EchoWithAbnormalData(CabData):
+    imaging_key: int
+    narrative: str
+    finalizing_date_key: date
+    date_value: date
+    is_abnormal: bool
+    planned_operation_start_instant: datetime
+    touch_time_start_instant: datetime
+
+
 class ObsData(CabData):
     planned_operation_start_instant: datetime
     value: str

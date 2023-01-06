@@ -21,6 +21,7 @@ from models.electives import (
     MergedData,
     LabData,
     EchoData,
+    # EchoWithAbnormalData,
     ObsData,
 )
 
@@ -80,7 +81,7 @@ def get_caboodle_cases(
 
 
 @mock_router.get("/case_booking/", response_model=list[SurgData])
-def get_mock_caboodle_cases() -> list[SurgData]:
+def get_mock_caboodle_cases() -> list[type[SurgData]]:
     """
     returns mock of caboodle query for elective cases
     :return:
@@ -100,7 +101,7 @@ def get_clarity_pod(
 
 
 @mock_router.get("/postop_destination/", response_model=list[ClarityPostopDestination])
-def get_mock_clarity_pod() -> list[ClarityPostopDestination]:
+def get_mock_clarity_pod() -> list[dict]:
     """
     returns mock of caboodle query for preassessment
     """
@@ -119,12 +120,12 @@ def get_caboodle_preassess(
 
 
 @mock_router.get("/preassessment/", response_model=list[PreassessData])
-def get_mock_caboodle_preassess() -> list[PreassessData]:
+def get_mock_caboodle_preassess() -> list[type[PreassessData]]:
     return _get_mock_sql_rows("preassess", PreassessData)
 
 
 @mock_router.get("/labs/", response_model=list[LabData])
-def get_mock_labs() -> list[LabData]:
+def get_mock_labs() -> list[type[LabData]]:
     return _get_mock_sql_rows("labs", LabData)
 
 
@@ -150,12 +151,12 @@ def get_electives(
 
 
 @mock_router.get("/echo/", response_model=list[EchoData])
-def get_mock_echo() -> list[EchoData]:
+def get_mock_echo() -> list[type[EchoData]]:
     return _get_mock_sql_rows("echo", EchoData)
 
 
 @mock_router.get("/obs/", response_model=list[ObsData])
-def get_mock_obs() -> list[ObsData]:
+def get_mock_obs() -> list[type[ObsData]]:
     return _get_mock_sql_rows("obs", ObsData)
 
 

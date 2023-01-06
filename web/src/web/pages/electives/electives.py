@@ -15,6 +15,9 @@ from web.pages.electives import (
     STYLE_CELL_CONDITIONAL,
 )
 
+from pydantic import BaseModel
+
+
 register_page(__name__)
 
 card_fig = dbc.Card(
@@ -91,7 +94,7 @@ dash_only = html.Div(
 )
 
 
-def layout():
+def layout() -> html.Div:
     if not current_user.is_authenticated:
         return html.Div(["Please ", dcc.Link("login", href="/login"), " to continue"])
     return html.Div(
@@ -106,29 +109,29 @@ def layout():
     Output(request_data, "data"),
     Input(days_ahead_slider, "value"),
 )
-def store_data(days_ahead: int):
+def store_data(days_ahead: int) -> list[type[BaseModel]]:
     response = requests.get(
         f"{get_settings().api_url}/electives/", params={"days_ahead": days_ahead}
     )
     return [MergedData.parse_obj(row).dict() for row in response.json()]
 
 
-@callback(
-    Output(filtered_data, "data"),
-    Input(service_picker, "value"),
-    Input(pacu_checklist, "value"),
-    Input(request_data, "data"),
-)
-def filter_data(service: list[str], pacu: list[bool], data: list[dict]):
-    """
-    Update data based on picker
-    """
+# @callback(
+#     Output(filtered_data, "data"),
+#     Input(service_picker, "value"),
+#     Input(pacu_checklist, "value"),
+#     Input(request_data, "data"),
+# )
+# def filter_data(service: list[str], pacu: list[bool], data: list[dict]):
+#     """
+#     Update data based on picker
+#     """
 
-    # TODO: Fix this.
-    # data = [row for row in data if row["pacu"] in pacu]
-    if service:
-        return [row for row in data if row["primary_service"] in service]
-    return data
+#     # TODO: Fix this.
+#     # data = [row for row in data if row["pacu"] in pacu]
+#     # if service:
+#     #     return [row for row in data if row["primary_service"] in service]
+#     return data
 
 
 @callback(
@@ -136,7 +139,7 @@ def filter_data(service: list[str], pacu: list[bool], data: list[dict]):
     Input(filtered_data, "data"),
     prevent_initial_call=True,
 )
-def gen_surgeries_over_time(data: list[dict]):
+def gen_surgeries_over_time(data: list[dict]) -> dcc.Graph:
     """
     Plot stacked bar
     """
@@ -145,7 +148,7 @@ def gen_surgeries_over_time(data: list[dict]):
 
     df = parse_to_data_frame(data, SurgData)
     df = (
-        df.groupby("pacu")
+        df.groupby("primary_service")
         .resample("24H", on="planned_operation_start_instant")
         .agg({"patient_durable_key": "size"})
     )
@@ -154,7 +157,7 @@ def gen_surgeries_over_time(data: list[dict]):
         df,
         x="planned_operation_start_instant",
         y="patient_durable_key",
-        color="pacu",
+        color="primary_service",
     )
     return dcc.Graph(id=f"{BPID}fig", figure=fig)
 
@@ -163,7 +166,7 @@ def gen_surgeries_over_time(data: list[dict]):
     Output(table_electives, "children"),
     Input(filtered_data, "data"),
 )
-def gen_table_consults(data: list[dict]):
+def gen_table_consults(data: list[dict]) -> dbc.Container:
     if not data:
         return html.H2("No data to tabulate")
 
@@ -175,7 +178,7 @@ def gen_table_consults(data: list[dict]):
         axis=1,
     )
 
-    def _display_name(row):
+    def _display_name(row: dict) -> str:
         FirstName = row["first_name"].title()
         LastName = row["last_name"].upper()
         return f"{FirstName} {LastName}"
@@ -204,15 +207,15 @@ def gen_table_consults(data: list[dict]):
                 {"id": "surgery_date", "name": "Date"},
                 {"id": "pacu", "name": "pacu"},
                 {"id": "primary_service", "name": "Specialty"},
-                {"id": "RoomName", "name": "Theatre"},
+                {"id": "patient_friendly_name", "name": "Operation"},
                 {"id": "age_sex", "name": ""},
                 {"id": "name", "name": "Full Name"},
                 {"id": "primary_mrn", "name": "MRN"},
                 {"id": "preassess_date", "name": "Pre-assess Date"},
-                {"id": "asa", "name": "asa"},
-                {"id": "c_line", "name": "Central line consent"},
-                {"id": "resp", "name": "resp condition count"},
-                {"id": "simple_score", "name": "simple_score"},
+                # {"id": "asa", "name": "asa"},
+                #          {"id": "c_line", "name": "Central line consent"},
+                {"id": "resp", "name": "num_resp_conditions"},
+                {"id": "simple_score", "name": "ICU_probability"},
             ],
             data=dfo.to_dict("records"),
             style_table={"width": "100%", "minWidth": "100%", "maxWidth": "100%"},
@@ -231,13 +234,13 @@ def gen_table_consults(data: list[dict]):
                     "if": {"row_index": "odd"},
                     "backgroundColor": "rgb(220, 220, 220)",
                 },
-                {
-                    "if": {
-                        "filter_query": "{pacu} contains 'PACU'",
-                        # "column_id": "closed"
-                    },
-                    "color": "maroon",
-                },
+                # {
+                #     "if": {
+                #         "filter_query": "{pacu} contains 'PACU'",
+                #         # "column_id": "closed"
+                #     },
+                #     "color": "maroon",
+                # },
             ],
             filter_action="native",
             sort_action="native",
@@ -250,7 +253,6 @@ def gen_table_consults(data: list[dict]):
     Input(request_data, "data"),
     prevent_initial_call=True,
 )
-def update_service_dropdown(data: list[dict]):
-
+def update_service_dropdown(data: list[dict]) -> dt.DataTable:
     df = parse_to_data_frame(data, MergedData)
     return df["primary_service"].sort_values().unique()

@@ -28,39 +28,37 @@ WITH surgical_pts AS (
         AND scufx.[PlannedOperationStartInstant] >= ?
         AND scufx.[PlannedOperationStartInstant] < ?
 )
-SELECT surgical_pts.[SurgicalCaseKey],
-    surgical_pts.[PlannedOperationStartInstant],
-    lcrf.[ResultStatus],
-    lcd.[Name],
-    lcrf.[Value],
-    lcrf.[NumericValue],
-    lcrf.[ResultInstant]
-FROM [CABOODLE_REPORT].[dbo].[LabComponentResultFact] lcrf
-    LEFT JOIN [CABOODLE_REPORT].[dbo].[LabComponentDim] lcd ON lcrf.[LabComponentKey] = lcd.[LabComponentKey]
-    LEFT JOIN surgical_pts ON surgical_pts.[PatientDurableKey] = lcrf.[PatientDurableKey]
-WHERE lcrf.[PatientDurableKey] > 1
-    AND surgical_pts.[SurgicalCaseKey] IS NOT NULL
-    AND surgical_pts.[PlannedOperationStartInstant] IS NOT NULL
-    AND lcrf.[ResultInstant] < CONVERT(
-        date,
-        surgical_pts.[PlannedOperationStartInstant]
+SELECT DISTINCT ef.[EncounterKey],
+    ef.[PatientKey],
+    ef.[PatientDurableKey] --      ,ef.[DateKey]
+,
+    ddim.[DateValue] AS StartDate --      ,ef.[EndDateKey]
+,
+    ddim2.[DateValue] AS EndDate,
+    ef.[DepartmentKey],
+    depdim.[DepartmentSpecialty],
+    ef.[Type],
+    ef.[EncounterEpicCsn] --      ,ef.[Date]
+,
+    ef.[EndInstant] --     ,ef.[DerivedEncounterStatus]
+,
+    ef.[PatientClass],
+    ef.[IsHospitalAdmission],
+    ef.[IsEdVisit],
+    ef.[IsOutpatientFaceToFaceVisit],
+    surgical_pts.[SurgicalCaseKey],
+    surgical_pts.[PlannedOperationStartInstant]
+FROM [CABOODLE_REPORT].[dbo].[EncounterFact] ef
+    LEFT JOIN [CABOODLE_REPORT].[dbo].[DateDim] ddim ON ddim.[DateKey] = ef.[DateKey]
+    LEFT JOIN [CABOODLE_REPORT].[dbo].[DateDim] ddim2 ON ddim2.[DateKey] = ef.[EndDateKey]
+    LEFT JOIN surgical_pts ON surgical_pts.[PatientDurableKey] = ef.[PatientDurableKey]
+    LEFT JOIN [CABOODLE_REPORT].[dbo].[DepartmentDim] depdim ON ef.[DepartmentKey] = depdim.[DepartmentKey]
+WHERE surgical_pts.[PlannedOperationStartInstant] IS NOT NULL
+    AND (
+        ef.[EndInstant] < surgical_pts.[PlannedOperationStartInstant]
     )
-    AND lcrf.[ResultInstant] > DATEADD(
-        month,
-        -4,
-        CONVERT(
-            date,
-            surgical_pts.[PlannedOperationStartInstant]
-        )
-    )
-    AND lcd.[Name] IN (
-        'Creatinine',
-        'Haemoglobin (g/L)',
-        'White cell count',
-        'Platelet count',
-        'Sodium',
-        'Albumin',
-        'Bilirubin (total)',
-        'INR',
-        'C-reactive protein'
+    AND (
+        (ef.[IsEdVisit] = '1')
+        OR (ef.[IsOutpatientFaceToFaceVisit] = '1')
+        OR (ef.[IsHospitalAdmission] = '1')
     )
