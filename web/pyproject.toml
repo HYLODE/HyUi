@@ -9,6 +9,8 @@ dependencies = [
     "hyui-models",
     "dash[diskcache] == 2.7.1",
     "dash-bootstrap-components == 1.2.1",
+    "dash-mantine-components == 0.11.1",
+    "dash-iconify == 0.1.2",
     "dash-cytoscape == 0.3.0",
     "dash-daq == 0.5.0",
     "Flask == 2.2.2",

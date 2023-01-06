@@ -13,18 +13,25 @@ import math
 from dash import Input, Output, State, callback, ctx, dcc, html
 
 from web.pages.abacus import BPID
+
 # Interfaces with out modules
 # ---------------------------
 from web.pages.abacus.dept import input_active_dept
-from web.pages.abacus.map_utils import (_filter_non_beds, _list_of_unique_rooms,
-                                        _make_bed, _make_room, _populate_beds,
-                                        _update_discharges,
-                                        _update_patients_with_sitrep)
+from web.pages.abacus.map_utils import (
+    _filter_non_beds,
+    _list_of_unique_rooms,
+    _make_bed,
+    _make_room,
+    _populate_beds,
+    _update_discharges,
+    _update_patients_with_sitrep,
+)
 from web.pages.abacus.stores import (
     input_beds_data,
     input_census_data,
     input_sitrep_data,
 )
+
 # NOTE: the following fails b/c circular so must fall back on string identifer
 # from web.pages.abacus.discharges import input_discharges
 from . import WARDS_WITH_MAPS
@@ -118,7 +125,7 @@ radio_cyto_layout = html.Div(
                 dbc.RadioItems(
                     id=f"{BPID}layout_radio",
                     className="dbc d-grid d-md-flex "
-                              "justify-content-md-end btn-group p-1",
+                    "justify-content-md-end btn-group p-1",
                     inline=True,
                 )
             ],
@@ -153,8 +160,8 @@ map_cyto_beds = dbc.Card(
 
 @callback(
     (
-            Output(f"{BPID}layout_radio", "value"),
-            Output(f"{BPID}layout_radio", "options"),
+        Output(f"{BPID}layout_radio", "value"),
+        Output(f"{BPID}layout_radio", "options"),
     ),
     input_active_dept,
     Input(f"{BPID}layout_radio", "value"),
@@ -248,8 +255,7 @@ def _update_elements_for_layout(
 
     if layout != "preset":
         tag_string = "_"
-        elements = [e for e in elements if
-                    e.get("data", {}).get("level") != "room"]
+        elements = [e for e in elements if e.get("data", {}).get("level") != "room"]
         for e in elements:
             e["data"]["id"] = e["data"]["id"] + tag_string
     else:
