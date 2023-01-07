@@ -52,7 +52,17 @@ census_cyto = cyto.Cytoscape(
     responsive=True,
 )
 
-stores = html.Div(dcc.Store(id=ids.CENSUS_STORE))
+timers = html.Div([])
+
+stores = html.Div(
+    [
+        dcc.Store(id=ids.CENSUS_STORE),
+        dcc.Store(id=ids.ROOM_SET_STORE),
+        dcc.Store(id=ids.DEPT_SET_STORE),
+        dcc.Store(id=ids.DEPTS_OPEN_STORE),
+    ]
+)
+
 
 body = html.Div(
     [
@@ -73,6 +83,7 @@ body = html.Div(
 def layout() -> dash.html.Div:
     return html.Div(
         children=[
+            timers,
             stores,
             body,
         ]

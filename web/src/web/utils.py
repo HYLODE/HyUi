@@ -5,6 +5,12 @@ import numpy as np
 import pandas as pd
 
 
+def gen_id(name: str, dunder_name: str) -> str:
+    module_name = dunder_name.split(".")[-2]
+    name = name.replace("_", "-").replace(" ", "-").replace(".", "-")
+    return f"{module_name}-{name}"
+
+
 def time_since(when: pd.Series, units: str = "D") -> pd.Series:
     """
     Time since 'when' in units as per np.timedelta64
@@ -31,6 +37,7 @@ def unpack_nested_baserow_dict(
     subkey: str,
     new_name: str = "",
 ) -> list[dict]:
+    # noinspection GrazieInspection,DuplicatedCode
     """
     Unpack fields with nested dictionaries into a pipe separated string
 
