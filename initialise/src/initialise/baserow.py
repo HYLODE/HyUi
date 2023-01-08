@@ -1,169 +1,11 @@
 import json
 import logging
-import warnings
-from pathlib import Path
 from typing import Any, cast
 
 import pandas as pd
 import requests
-from initialise.config import BaserowSettings, get_baserow_settings
-from initialise.convert import parse_to_data_frame
-from initialise.db import caboodle_engine, star_engine
-from models.beds import Bed
 
-from . import DEPARTMENTS, VIRTUAL_BEDS, VIRTUAL_ROOMS
-
-
-def _star_locations() -> pd.DataFrame:
-    # noinspection SqlResolve
-    return pd.read_sql(
-        """
-    SELECT
-        lo.location_id,
-        lo.location_string AS location,
-        SPLIT_PART(lo.location_string, '^', 1) AS hl7_department,
-        SPLIT_PART(lo.location_string, '^', 2) AS hl7_room,
-        SPLIT_PART(lo.location_string, '^', 3) AS hl7_bed,
-        lo.department_id,
-        lo.room_id,
-        lo.bed_id,
-        dept.name AS department,
-        dept.speciality,
-        room.name room
-    FROM star.location lo
-    INNER JOIN star.department dept ON lo.department_id = dept.department_id
-    INNER JOIN star.room ON lo.room_id = room.room_id
-    """,
-        star_engine(),
-    )
-
-
-def _caboodle_departments() -> pd.DataFrame:
-    # noinspection SqlResolve
-    return pd.read_sql(
-        """SELECT
-            --DepartmentKey AS department_key,
-            --BedEpicId AS bed_epic_id,
-            Name AS name,
-            DepartmentName AS department_name,
-            RoomName AS room_name,
-            BedName AS bed_name,
-            --BedInCensus AS bed_in_census,
-            IsRoom AS is_room,
-            IsCareArea AS is_care_area,
-            DepartmentExternalName AS department_external_name,
-            DepartmentSpecialty AS department_speciality,
-            DepartmentType AS department_type,
-            DepartmentServiceGrouper AS department_service_grouper,
-            DepartmentLevelOfCareGrouper AS department_level_of_care_grouper,
-            LocationName AS location_name,
-            ParentLocationName AS parent_location_name,
-            _CreationInstant AS creation_instant,
-            _LastUpdatedInstant AS last_updated_instant
-        FROM dbo.DepartmentDim
-        WHERE IsBed = 1
-        AND Name <> 'Wait'
-        AND DepartmentType <> 'OR'
-        ORDER BY DepartmentName, RoomName, BedName, _CreationInstant""",
-        caboodle_engine(),
-    )
-
-
-def _merge_star_and_caboodle_beds(
-    star_locations_df: pd.DataFrame,
-    caboodle_departments_df: pd.DataFrame,
-) -> pd.DataFrame:
-    star_locations_df = star_locations_df.copy()
-    caboodle_departments_df = caboodle_departments_df.copy()
-
-    # Limit departments to those we are interested in.
-    star_locations_df = star_locations_df.loc[
-        star_locations_df["department"].isin(DEPARTMENTS), :
-    ]
-    caboodle_departments_df = caboodle_departments_df.loc[
-        caboodle_departments_df["department_name"].isin(DEPARTMENTS), :
-    ]
-
-    # Remove virtual rooms and beds.
-    star_locations_df = star_locations_df.loc[
-        ~star_locations_df["hl7_room"].isin(VIRTUAL_ROOMS), :
-    ]
-    star_locations_df = star_locations_df.loc[
-        ~star_locations_df["hl7_bed"].isin(VIRTUAL_BEDS), :
-    ]
-
-    # Make key to merge and force to lower etc.
-    star_locations_df["merge_key"] = star_locations_df.agg(
-        lambda x: (
-            x["speciality"],
-            x["department"],
-            x["room"],
-            x["hl7_bed"].lower(),
-        ),
-        axis=1,
-    )
-
-    # Still left with dups so now choose the most recent
-    caboodle_departments_df.sort_values(
-        by=["department_name", "room_name", "bed_name", "creation_instant"],
-        inplace=True,
-    )
-    caboodle_departments_df.drop_duplicates(
-        subset=["department_name", "room_name", "bed_name"], keep="last", inplace=True
-    )
-
-    # Make key to merge and force to lower etc
-    caboodle_departments_df["merge_key"] = caboodle_departments_df.agg(
-        lambda x: (
-            x["department_speciality"],
-            x["department_name"],
-            x["room_name"],
-            x["name"].lower(),
-        ),
-        axis=1,
-    )
-
-    return star_locations_df.merge(
-        caboodle_departments_df,
-        how="inner",
-        on="merge_key",
-    ).drop(
-        [
-            "merge_key",
-            "last_updated_instant",
-            "creation_instant",
-            "name",
-            "room_name",
-            "bed_name",
-        ],
-        axis="columns",
-    )
-
-
-def _merge_default_properties(beds_df: pd.DataFrame) -> pd.DataFrame:
-    """
-    appends default properties to beds
-    e.g. map positions, closed status etc.
-    """
-    with open(Path(__file__).parent / "bed_defaults.json", "r") as f:
-        defaults = json.load(f)
-    defaults_df = parse_to_data_frame(defaults, Bed)
-    df = beds_df.merge(
-        defaults_df, how="left", left_on="location_string", right_on="location_string"
-    )
-    return df
-
-
-def _fetch_beds() -> pd.DataFrame:
-    star_locations_df = _star_locations()
-    caboodle_departments_df = _caboodle_departments()
-    beds_df = _merge_star_and_caboodle_beds(star_locations_df, caboodle_departments_df)
-    beds_df = _merge_default_properties(beds_df)
-    # JSON does not handle 'NaN' etc
-    # https://stackoverflow.com/a/41213102/992999
-    beds_df = beds_df.fillna("")
-
-    return beds_df
+from .config import BaserowSettings
 
 
 class BaserowException(Exception):
@@ -415,7 +257,9 @@ def _create_table(
 
     if response.status_code != 200:
         raise BaserowException(
-            f"unexpected response {response.status_code}: " f"{str(response.content)}"
+            f"unexpected response {response.status_code}: "
+            f""
+            f"{str(response.content)}"
         )
 
     primary_field_id = next(
@@ -434,7 +278,9 @@ def _create_table(
 
     if response.status_code != 200:
         raise BaserowException(
-            f"unexpected response {response.status_code}: " f"{str(response.content)}"
+            f"unexpected response {response.status_code}: "
+            f""
+            f"{str(response.content)}"
         )
 
     return cast(int, table_id)
@@ -492,7 +338,9 @@ def _add_table_row(
     )
     if response.status_code != 200:
         raise BaserowException(
-            f"unexpected response {response.status_code}: " f"{str(response.content)}"
+            f"unexpected response {response.status_code}: "
+            f""
+            f"{str(response.content)}"
         )
 
 
@@ -510,232 +358,7 @@ def _add_table_row_batch(
     )
     if response.status_code != 200:
         raise BaserowException(
-            f"unexpected response {response.status_code}: " f"{str(response.content)}"
+            f"unexpected response {response.status_code}: "
+            f""
+            f"{str(response.content)}"
         )
-
-
-def _add_beds_fields(base_url: str, auth_token: str, beds_table_id: int) -> None:
-    _add_table_field(base_url, auth_token, beds_table_id, "closed", "boolean", {})
-    _add_table_field(base_url, auth_token, beds_table_id, "covid", "boolean", {})
-    _add_table_field(
-        base_url,
-        auth_token,
-        beds_table_id,
-        column_name="bed_physical",
-        column_type="multiple_select",
-        column_details={
-            "select_options": [
-                (1, "sideroom", "red"),
-                (2, "ventilator", "red"),
-                (3, "monitored", "red"),
-                (4, "ensuite", "red"),
-                (5, "virtual", "red"),
-            ]
-        },
-    )
-    _add_table_field(
-        base_url,
-        auth_token,
-        beds_table_id,
-        column_name="bed_functional",
-        column_type="multiple_select",
-        column_details={
-            "select_options": [
-                (1, "periop", "red"),
-                (2, "ficm", "red"),
-                (3, "gwb", "red"),
-                (4, "wms", "red"),
-                (5, "t06", "red"),
-                (6, "north", "red"),
-                (7, "south", "red"),
-                (8, "plex", "red"),
-                (9, "nhnn", "red"),
-                (10, "hdu", "red"),
-                (11, "icu", "red"),
-            ]
-        },
-    )
-
-
-def initialise_baserow() -> None:
-    """
-    First run initialisation of Baserow
-    - creates the beds table (from the caboodle/emap wrangling)
-    - creates an empty discharge status table
-
-    Returns:
-
-    """
-    settings = get_baserow_settings()
-
-    logging.info("Starting Baserow initialisation.")
-
-    _create_admin_user(settings)
-    auth_token = _get_admin_user_auth_token(settings)
-
-    group_id = _get_group_id(settings.public_url, auth_token)
-
-    _delete_default_application(settings.public_url, auth_token, group_id)
-
-    application_id = _create_application(settings.public_url, auth_token, group_id)
-
-    try:
-        logging.info("Creating discharge_statuses table")
-        discharge_statuses_table_id = _create_table(
-            settings.public_url,
-            auth_token,
-            application_id,
-            "discharge_statuses",
-            "csn",
-            {},
-        )
-        _add_table_field(
-            settings.public_url,
-            auth_token,
-            discharge_statuses_table_id,
-            column_name="status",
-            column_type="text",
-            column_details=None,
-        )
-
-        _add_table_field(
-            settings.public_url,
-            auth_token,
-            discharge_statuses_table_id,
-            column_name="modified_at",
-            column_type="date",
-            column_details={
-                "date_format": "ISO",
-                "date_include_time": True,
-                "date_time_format": "24",
-            },
-        )
-    except BaserowException as e:
-        print(e)
-        warnings.warn("discharge_statuses table NOT created")
-
-    try:
-        logging.info("Creating beds table")
-        # Create the beds table.
-        beds_table_id = _create_table(
-            settings.public_url, auth_token, application_id, "beds", "location", {}
-        )
-
-        _add_beds_fields(settings.public_url, auth_token, beds_table_id)
-
-        beds_df = _fetch_beds()
-
-        for row in beds_df.itertuples():
-            _add_table_row(
-                settings.public_url,
-                auth_token,
-                beds_table_id,
-                {"location": row.location},
-            )
-    except BaserowException as e:
-        print(e)
-        warnings.warn("beds table NOT created")
-
-
-def recreate_defaults() -> None:
-    """
-    Update an existing instance of baserow adjustments to default tables
-    - loads fresh versions of the default tables including
-        - departments
-    Returns:
-    """
-    settings = get_baserow_settings()
-
-    logging.info(
-        "Starting Baserow updates. WARNING this is destructive and "
-        "will delete the existing department table"
-    )
-
-    auth_token = _get_admin_user_auth_token(settings)
-    group_id = _get_group_id(settings.public_url, auth_token)
-    application_id = _create_application(settings.public_url, auth_token, group_id)
-
-    try:
-        logging.info("Creating departments table")
-        departments_table_id = _create_table(
-            settings.public_url,
-            auth_token,
-            application_id,
-            "departments",
-            "hl7_department",
-            {},
-            replace=True,
-        )
-
-        _add_table_field(
-            settings.public_url,
-            auth_token,
-            departments_table_id,
-            column_name="department_id",
-            column_type="number",
-            column_details={"number_negative": True},
-        )
-
-        _add_table_field(
-            settings.public_url,
-            auth_token,
-            departments_table_id,
-            column_name="floor",
-            column_type="number",
-            column_details={"number_negative": True},
-        )
-
-        _add_table_field(
-            settings.public_url,
-            auth_token,
-            departments_table_id,
-            column_name="closed_perm_01",
-            column_type="boolean",
-            column_details=None,
-        )
-
-        text_cols = [
-            "department",
-            "service_by_hand",
-            "location_name",
-            "department_external_name",
-        ]
-        for col in text_cols:
-            _add_table_field(
-                settings.public_url,
-                auth_token,
-                departments_table_id,
-                column_name=col,
-                column_type="text",
-                column_details=None,
-            )
-
-        df = pd.read_json(Path(__file__).parent / "department_defaults.json")
-        df.fillna(
-            value={
-                "department_id": -1,
-                "floor": -1,
-            },
-            inplace=True,
-        )
-        df["department_id"] = df["department_id"].astype(int)
-        df["floor"] = df["floor"].astype(int)
-        df["closed_perm_01"] = df["closed_perm_01"] == 1
-
-        df = df[
-            [
-                "hl7_department",
-                "department",
-                "department_id",
-                "floor",
-                "closed_perm_01",
-                "service_by_hand",
-                "location_name",
-                "department_external_name",
-            ]
-        ]
-
-        _add_table_row_batch(settings.public_url, auth_token, departments_table_id, df)
-
-    except BaserowException as e:
-        print(e)
