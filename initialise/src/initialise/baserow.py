@@ -1,15 +1,16 @@
 import json
 import logging
+import warnings
 from pathlib import Path
-from typing import cast, Any
+from typing import Any, cast
 
 import pandas as pd
 import requests
-from models.beds import Bed
-
 from initialise.config import BaserowSettings, get_baserow_settings
 from initialise.convert import parse_to_data_frame
 from initialise.db import caboodle_engine, star_engine
+from models.beds import Bed
+
 from . import DEPARTMENTS, VIRTUAL_BEDS, VIRTUAL_ROOMS
 
 
@@ -330,6 +331,7 @@ def _create_table(
     table_name: str,
     primary_field_name: str,
     primary_field_data: dict[str, Any],
+    replace: bool = False,
 ) -> int:
     """Creates a baserow table and returns the table ID. Baserow requires that
     the table has at least one column but does not allow you to specify what
@@ -347,6 +349,7 @@ def _create_table(
         primary field. Information of what can be used in this dictionary is
         found in the Baserow documentation in the `update_database_table_field`
         API documentation.
+    :param replace: replace any pre-existing table with the same name
 
     :return: The newly created database table ID.
     """
@@ -366,9 +369,17 @@ def _create_table(
         (row["id"] for row in response.json() if row["name"] == table_name), None
     )
     if table_id:
-        raise BaserowException(
-            f"table called {table_name} already exists with id {table_id}"
-        )
+        if replace:
+            response = requests.delete(
+                f"{base_url}/api/database/tables/{table_id}/",
+                headers=_auth_headers(auth_token),
+            )
+            if response.status_code != 204:
+                raise BaserowException(f"Failed to delete {table_name}")
+        else:
+            raise BaserowException(
+                f"table called {table_name} already exists with id {table_id}"
+            )
 
     response = requests.post(
         f"{base_url}/api/database/tables/database/{application_id}/",
@@ -404,7 +415,7 @@ def _create_table(
 
     if response.status_code != 200:
         raise BaserowException(
-            f"unexpected response {response.status_code}: {str(response.content)}"
+            f"unexpected response {response.status_code}: " f"{str(response.content)}"
         )
 
     primary_field_id = next(
@@ -423,7 +434,7 @@ def _create_table(
 
     if response.status_code != 200:
         raise BaserowException(
-            f"unexpected response {response.status_code}: {str(response.content)}"
+            f"unexpected response {response.status_code}: " f"{str(response.content)}"
         )
 
     return cast(int, table_id)
@@ -481,7 +492,25 @@ def _add_table_row(
     )
     if response.status_code != 200:
         raise BaserowException(
-            f"unexpected response {response.status_code}: {str(response.content)}"
+            f"unexpected response {response.status_code}: " f"{str(response.content)}"
+        )
+
+
+def _add_table_row_batch(
+    base_url: str, auth_token: str, table_id: int, df: pd.DataFrame
+) -> None:
+    rows = df.to_dict(orient="records")
+    logging.info(f"Adding {len(rows)} rows to table {table_id}.")
+
+    response = requests.post(
+        f"{base_url}/api/database/rows/table/"
+        f"{table_id}/batch/?user_field_names=true",
+        headers=_auth_headers(auth_token),
+        json=dict(items=rows),
+    )
+    if response.status_code != 200:
+        raise BaserowException(
+            f"unexpected response {response.status_code}: " f"{str(response.content)}"
         )
 
 
@@ -529,6 +558,14 @@ def _add_beds_fields(base_url: str, auth_token: str, beds_table_id: int) -> None
 
 
 def initialise_baserow() -> None:
+    """
+    First run initialisation of Baserow
+    - creates the beds table (from the caboodle/emap wrangling)
+    - creates an empty discharge status table
+
+    Returns:
+
+    """
     settings = get_baserow_settings()
 
     logging.info("Starting Baserow initialisation.")
@@ -542,42 +579,163 @@ def initialise_baserow() -> None:
 
     application_id = _create_application(settings.public_url, auth_token, group_id)
 
-    # Create the discharge_statuses table.
-    discharge_statuses_table_id = _create_table(
-        settings.public_url, auth_token, application_id, "discharge_statuses", "csn", {}
-    )
-    _add_table_field(
-        settings.public_url,
-        auth_token,
-        discharge_statuses_table_id,
-        column_name="status",
-        column_type="text",
-        column_details=None,
-    )
-
-    _add_table_field(
-        settings.public_url,
-        auth_token,
-        discharge_statuses_table_id,
-        column_name="modified_at",
-        column_type="date",
-        column_details={
-            "date_format": "ISO",
-            "date_include_time": True,
-            "date_time_format": "24",
-        },
-    )
-
-    # Create the beds table.
-    beds_table_id = _create_table(
-        settings.public_url, auth_token, application_id, "beds", "location", {}
-    )
-
-    _add_beds_fields(settings.public_url, auth_token, beds_table_id)
-
-    beds_df = _fetch_beds()
-
-    for row in beds_df.itertuples():
-        _add_table_row(
-            settings.public_url, auth_token, beds_table_id, {"location": row.location}
+    try:
+        logging.info("Creating discharge_statuses table")
+        discharge_statuses_table_id = _create_table(
+            settings.public_url,
+            auth_token,
+            application_id,
+            "discharge_statuses",
+            "csn",
+            {},
         )
+        _add_table_field(
+            settings.public_url,
+            auth_token,
+            discharge_statuses_table_id,
+            column_name="status",
+            column_type="text",
+            column_details=None,
+        )
+
+        _add_table_field(
+            settings.public_url,
+            auth_token,
+            discharge_statuses_table_id,
+            column_name="modified_at",
+            column_type="date",
+            column_details={
+                "date_format": "ISO",
+                "date_include_time": True,
+                "date_time_format": "24",
+            },
+        )
+    except BaserowException as e:
+        print(e)
+        warnings.warn("discharge_statuses table NOT created")
+
+    try:
+        logging.info("Creating beds table")
+        # Create the beds table.
+        beds_table_id = _create_table(
+            settings.public_url, auth_token, application_id, "beds", "location", {}
+        )
+
+        _add_beds_fields(settings.public_url, auth_token, beds_table_id)
+
+        beds_df = _fetch_beds()
+
+        for row in beds_df.itertuples():
+            _add_table_row(
+                settings.public_url,
+                auth_token,
+                beds_table_id,
+                {"location": row.location},
+            )
+    except BaserowException as e:
+        print(e)
+        warnings.warn("beds table NOT created")
+
+
+def recreate_defaults() -> None:
+    """
+    Update an existing instance of baserow adjustments to default tables
+    - loads fresh versions of the default tables including
+        - departments
+    Returns:
+    """
+    settings = get_baserow_settings()
+
+    logging.info(
+        "Starting Baserow updates. WARNING this is destructive and "
+        "will delete the existing department table"
+    )
+
+    auth_token = _get_admin_user_auth_token(settings)
+    group_id = _get_group_id(settings.public_url, auth_token)
+    application_id = _create_application(settings.public_url, auth_token, group_id)
+
+    try:
+        logging.info("Creating departments table")
+        departments_table_id = _create_table(
+            settings.public_url,
+            auth_token,
+            application_id,
+            "departments",
+            "hl7_department",
+            {},
+            replace=True,
+        )
+
+        _add_table_field(
+            settings.public_url,
+            auth_token,
+            departments_table_id,
+            column_name="department_id",
+            column_type="number",
+            column_details={"number_negative": True},
+        )
+
+        _add_table_field(
+            settings.public_url,
+            auth_token,
+            departments_table_id,
+            column_name="floor",
+            column_type="number",
+            column_details={"number_negative": True},
+        )
+
+        _add_table_field(
+            settings.public_url,
+            auth_token,
+            departments_table_id,
+            column_name="closed_perm_01",
+            column_type="boolean",
+            column_details=None,
+        )
+
+        text_cols = [
+            "department",
+            "service_by_hand",
+            "location_name",
+            "department_external_name",
+        ]
+        for col in text_cols:
+            _add_table_field(
+                settings.public_url,
+                auth_token,
+                departments_table_id,
+                column_name=col,
+                column_type="text",
+                column_details=None,
+            )
+
+        df = pd.read_json(Path(__file__).parent / "department_defaults.json")
+        df.fillna(
+            value={
+                "department_id": -1,
+                "floor": -1,
+            },
+            inplace=True,
+        )
+        df["department_id"] = df["department_id"].astype(int)
+        df["floor"] = df["floor"].astype(int)
+        df["closed_perm_01"] = df["closed_perm_01"] == 1
+
+        df = df[
+            [
+                "hl7_department",
+                "department",
+                "department_id",
+                "floor",
+                "closed_perm_01",
+                "service_by_hand",
+                "location_name",
+                "department_external_name",
+            ]
+        ]
+
+        _add_table_row_batch(settings.public_url, auth_token, departments_table_id, df)
+
+    except BaserowException as e:
+        print(e)

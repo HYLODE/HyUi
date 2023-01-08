@@ -923,3 +923,6 @@ docs/_linkcheck/
 
 # ignore generated data
 src/api/perrt/admission_probability/generated_data
+
+# local jupyter lab for exploratory work
+jupyter/
