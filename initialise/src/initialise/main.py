@@ -12,7 +12,12 @@ from .baserow import (
     _get_admin_user_auth_token,
     _get_group_id,
 )
-from .beds import _add_beds_fields, _create_beds_table
+from .beds import (
+    _add_beds_user_fields,
+    _create_beds_ee_table,
+    _create_beds_user_table,
+    _load_beds_user_defaults,
+)
 from .beds_build import _fetch_beds
 from .config import get_baserow_settings
 from .departments import (
@@ -76,11 +81,9 @@ def initialise_baserow() -> None:
 
     try:
         logging.info("Creating beds table")
-        beds_table_id = _create_beds_table(
+        beds_table_id = _create_beds_ee_table(
             settings.public_url, auth_token, application_id
         )
-
-        _add_beds_fields(settings.public_url, auth_token, beds_table_id)
 
         beds_df = _fetch_beds()
 
@@ -89,7 +92,9 @@ def initialise_baserow() -> None:
                 settings.public_url,
                 auth_token,
                 beds_table_id,
-                {"location": row["location"]},
+                # TODO: ask Jon: why this approach? assume this creates the
+                #  fields as it populates?
+                {"location": row.location},
             )
     except BaserowException as e:
         print(e)
@@ -123,6 +128,23 @@ def recreate_defaults() -> None:
         df = _load_department_defaults()
 
         _add_table_row_batch(settings.public_url, auth_token, departments_table_id, df)
+
+    except BaserowException as e:
+        print(e)
+
+    try:
+        logging.info("Creating (user) beds table")
+        beds_table_id = _create_beds_user_table(
+            settings.public_url, auth_token, application_id
+        )
+        _add_beds_user_fields(settings.public_url, auth_token, beds_table_id)
+        df = _load_beds_user_defaults()
+        # need to chunk this up as the batch load is limited to 200 rows
+        while df.shape[0] > 0:
+            _add_table_row_batch(
+                settings.public_url, auth_token, beds_table_id, df[:200]
+            )
+            df = df[200:]
 
     except BaserowException as e:
         print(e)

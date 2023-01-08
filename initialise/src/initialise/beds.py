@@ -1,20 +1,103 @@
 """
 Prepare beds table
 """
+from pathlib import Path
+
+import pandas as pd
+
 from .baserow import _add_table_field, _create_table
 
 
-# Create the beds table.
-def _create_beds_table(
+def _create_beds_ee_table(
     base_url: str,
     auth_token: str,
     application_id: int,
 ) -> int:
-    return _create_table(base_url, auth_token, application_id, "beds", "location", {})
+    """Create the beds table derived from epic and emap merge"""
+    return _create_table(
+        base_url, auth_token, application_id, "beds_ee", "location", {}
+    )
 
 
-def _add_beds_fields(base_url: str, auth_token: str, table_id: int) -> None:
-    _add_table_field(base_url, auth_token, table_id, "closed", "boolean", {})
+def _load_beds_user_defaults() -> pd.DataFrame:
+    df = pd.read_json(Path(__file__).parent / "bed_defaults.json")
+    df.fillna(
+        value={
+            # fill na with -1 since json will convert integers to float
+            # otherwise
+            "location_id": -1,
+            "department_id": -1,
+            "room_id": -1,
+            "bed_id": -1,
+            "bed_index": -1,
+            "xpos": -1,
+            "ypos": -1,
+            # bool
+            "closed": False,
+        },
+        inplace=True,
+    )
+    df["xpos"] = df["xpos"].astype(int)
+    df["ypos"] = df["ypos"].astype(int)
+
+    return df
+
+
+def _create_beds_user_table(
+    base_url: str,
+    auth_token: str,
+    application_id: int,
+) -> int:
+    """Create the user configurable beds table"""
+    return _create_table(
+        base_url,
+        auth_token,
+        application_id,
+        "beds",
+        "location_string",
+        {},
+        replace=True,
+    )
+
+
+def _add_beds_user_fields(base_url: str, auth_token: str, table_id: int) -> None:
+
+    text_cols = [
+        "department",
+        "room",
+        "hl7_bed",
+        "hl7_room",
+        "hl7_department",
+    ]
+    for col in text_cols:
+        _add_table_field(
+            base_url,
+            auth_token,
+            table_id,
+            column_name=col,
+            column_type="text",
+            column_details=None,
+        )
+
+    integer_cols = [
+        "location_id",
+        "department_id",
+        "room_id",
+        "bed_id",
+        "bed_index",
+        "xpos",
+        "ypos",
+    ]
+    for col in integer_cols:
+        _add_table_field(
+            base_url,
+            auth_token,
+            table_id,
+            column_name=col,
+            column_type="number",
+            column_details={"number_negative": True},
+        )
+
     _add_table_field(base_url, auth_token, table_id, "covid", "boolean", {})
 
     _add_table_field(

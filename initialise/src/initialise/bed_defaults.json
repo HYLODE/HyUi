@@ -12,8 +12,8 @@
     "bed_id": 415542089,
     "bed_index": 1,
     "closed": false,
-    "xpos": 10.0,
-    "ypos": 10.0
+    "xpos": 10,
+    "ypos": 10
   },
   {
     "department": "GWB L01 CRITICAL CARE",
@@ -28,8 +28,8 @@
     "bed_id": 415542043,
     "bed_index": 2,
     "closed": false,
-    "xpos": 30.0,
-    "ypos": 10.0
+    "xpos": 30,
+    "ypos": 10
   },
   {
     "department": "GWB L01 CRITICAL CARE",
@@ -44,8 +44,8 @@
     "bed_id": 415542083,
     "bed_index": 3,
     "closed": false,
-    "xpos": 40.0,
-    "ypos": 10.0
+    "xpos": 40,
+    "ypos": 10
   },
   {
     "department": "GWB L01 CRITICAL CARE",
@@ -60,8 +60,8 @@
     "bed_id": 415542023,
     "bed_index": 4,
     "closed": false,
-    "xpos": 60.0,
-    "ypos": 10.0
+    "xpos": 60,
+    "ypos": 10
   },
   {
     "department": "GWB L01 CRITICAL CARE",
@@ -76,8 +76,8 @@
     "bed_id": 415542065,
     "bed_index": 5,
     "closed": false,
-    "xpos": 70.0,
-    "ypos": 10.0
+    "xpos": 70,
+    "ypos": 10
   },
   {
     "department": "GWB L01 CRITICAL CARE",
@@ -92,8 +92,8 @@
     "bed_id": 415542105,
     "bed_index": 6,
     "closed": false,
-    "xpos": 80.0,
-    "ypos": 10.0
+    "xpos": 80,
+    "ypos": 10
   },
   {
     "department": "GWB L01 CRITICAL CARE",
@@ -108,8 +108,8 @@
     "bed_id": 415542055,
     "bed_index": 7,
     "closed": false,
-    "xpos": 80.0,
-    "ypos": 40.0
+    "xpos": 80,
+    "ypos": 40
   },
   {
     "department": "GWB L01 CRITICAL CARE",
@@ -124,8 +124,8 @@
     "bed_id": 415542152,
     "bed_index": 8,
     "closed": false,
-    "xpos": 70.0,
-    "ypos": 40.0
+    "xpos": 70,
+    "ypos": 40
   },
   {
     "department": "GWB L01 CRITICAL CARE",
@@ -140,8 +140,8 @@
     "bed_id": 415542146,
     "bed_index": 9,
     "closed": false,
-    "xpos": 60.0,
-    "ypos": 40.0
+    "xpos": 60,
+    "ypos": 40
   },
   {
     "department": "GWB L01 CRITICAL CARE",
@@ -156,8 +156,8 @@
     "bed_id": 415542095,
     "bed_index": 10,
     "closed": false,
-    "xpos": 30.0,
-    "ypos": 40.0
+    "xpos": 30,
+    "ypos": 40
   },
   {
     "department": "GWB L01 ELECTIVE SURG",
@@ -2348,8 +2348,8 @@
     "bed_id": 415559910,
     "bed_index": 26,
     "closed": false,
-    "xpos": 30.0,
-    "ypos": 30.0
+    "xpos": 30,
+    "ypos": 30
   },
   {
     "department": "NHNN C0 NCCU",
@@ -2364,8 +2364,8 @@
     "bed_id": 415559949,
     "bed_index": 27,
     "closed": false,
-    "xpos": 40.0,
-    "ypos": 30.0
+    "xpos": 40,
+    "ypos": 30
   },
   {
     "department": "NHNN C0 NCCU",
@@ -2380,8 +2380,8 @@
     "bed_id": 415559855,
     "bed_index": 28,
     "closed": false,
-    "xpos": 50.0,
-    "ypos": 30.0
+    "xpos": 50,
+    "ypos": 30
   },
   {
     "department": "NHNN C0 NCCU",
@@ -2396,8 +2396,8 @@
     "bed_id": 415560116,
     "bed_index": 25,
     "closed": false,
-    "xpos": 10.0,
-    "ypos": 30.0
+    "xpos": 10,
+    "ypos": 30
   },
   {
     "department": "NHNN C0 NCCU",
@@ -2412,8 +2412,8 @@
     "bed_id": 415559898,
     "bed_index": 21,
     "closed": false,
-    "xpos": 30.0,
-    "ypos": 10.0
+    "xpos": 30,
+    "ypos": 10
   },
   {
     "department": "NHNN C0 NCCU",
@@ -2428,8 +2428,8 @@
     "bed_id": 415559938,
     "bed_index": 22,
     "closed": false,
-    "xpos": 40.0,
-    "ypos": 10.0
+    "xpos": 40,
+    "ypos": 10
   },
   {
     "department": "NHNN C0 NCCU",
@@ -2444,8 +2444,8 @@
     "bed_id": 415559982,
     "bed_index": 23,
     "closed": false,
-    "xpos": 50.0,
-    "ypos": 10.0
+    "xpos": 50,
+    "ypos": 10
   },
   {
     "department": "NHNN C0 NCCU",
@@ -2460,8 +2460,8 @@
     "bed_id": 415560026,
     "bed_index": 20,
     "closed": false,
-    "xpos": 10.0,
-    "ypos": 10.0
+    "xpos": 10,
+    "ypos": 10
   },
   {
     "department": "NHNN C0 NCCU",
@@ -2476,8 +2476,8 @@
     "bed_id": 415560081,
     "bed_index": 24,
     "closed": false,
-    "xpos": 70.0,
-    "ypos": 10.0
+    "xpos": 70,
+    "ypos": 10
   },
   {
     "department": "NHNN C0 NCCU",
@@ -2492,8 +2492,8 @@
     "bed_id": 415559956,
     "bed_index": 29,
     "closed": false,
-    "xpos": 70.0,
-    "ypos": 30.0
+    "xpos": 70,
+    "ypos": 30
   },
   {
     "department": "NHNN C0 NCCU",
@@ -2524,8 +2524,8 @@
     "bed_id": 415560040,
     "bed_index": 10,
     "closed": false,
-    "xpos": 90.0,
-    "ypos": 50.0
+    "xpos": 90,
+    "ypos": 50
   },
   {
     "department": "NHNN C1 NCCU",
@@ -2540,8 +2540,8 @@
     "bed_id": 415560068,
     "bed_index": 11,
     "closed": false,
-    "xpos": 70.0,
-    "ypos": 50.0
+    "xpos": 70,
+    "ypos": 50
   },
   {
     "department": "NHNN C1 NCCU",
@@ -2556,8 +2556,8 @@
     "bed_id": 415559994,
     "bed_index": 12,
     "closed": false,
-    "xpos": 60.0,
-    "ypos": 50.0
+    "xpos": 60,
+    "ypos": 50
   },
   {
     "department": "NHNN C1 NCCU",
@@ -2572,8 +2572,8 @@
     "bed_id": 415560001,
     "bed_index": 13,
     "closed": false,
-    "xpos": 60.0,
-    "ypos": 40.0
+    "xpos": 60,
+    "ypos": 40
   },
   {
     "department": "NHNN C1 NCCU",
@@ -2588,8 +2588,8 @@
     "bed_id": 415560055,
     "bed_index": 14,
     "closed": false,
-    "xpos": 30.0,
-    "ypos": 20.0
+    "xpos": 30,
+    "ypos": 20
   },
   {
     "department": "NHNN C1 NCCU",
@@ -2604,8 +2604,8 @@
     "bed_id": 415560086,
     "bed_index": 15,
     "closed": false,
-    "xpos": 20.0,
-    "ypos": 20.0
+    "xpos": 20,
+    "ypos": 20
   },
   {
     "department": "NHNN C1 NCCU",
@@ -2620,8 +2620,8 @@
     "bed_id": 415560095,
     "bed_index": 16,
     "closed": false,
-    "xpos": 10.0,
-    "ypos": 10.0
+    "xpos": 10,
+    "ypos": 10
   },
   {
     "department": "NHNN C1 NCCU",
@@ -2636,8 +2636,8 @@
     "bed_id": 415560123,
     "bed_index": 17,
     "closed": false,
-    "xpos": 20.0,
-    "ypos": 10.0
+    "xpos": 20,
+    "ypos": 10
   },
   {
     "department": "NHNN C1 NCCU",
@@ -2652,8 +2652,8 @@
     "bed_id": 415560144,
     "bed_index": 18,
     "closed": false,
-    "xpos": 30.0,
-    "ypos": 10.0
+    "xpos": 30,
+    "ypos": 10
   },
   {
     "department": "NHNN C1 NCCU",
@@ -2668,8 +2668,8 @@
     "bed_id": 415560181,
     "bed_index": 19,
     "closed": false,
-    "xpos": 40.0,
-    "ypos": 10.0
+    "xpos": 40,
+    "ypos": 10
   },
   {
     "department": "NHNN C1 NCCU",
@@ -2684,8 +2684,8 @@
     "bed_id": 415560109,
     "bed_index": 1,
     "closed": false,
-    "xpos": 70.0,
-    "ypos": 20.0
+    "xpos": 70,
+    "ypos": 20
   },
   {
     "department": "NHNN C1 NCCU",
@@ -2700,8 +2700,8 @@
     "bed_id": 415560136,
     "bed_index": 2,
     "closed": false,
-    "xpos": 60.0,
-    "ypos": 20.0
+    "xpos": 60,
+    "ypos": 20
   },
   {
     "department": "NHNN C1 NCCU",
@@ -2716,8 +2716,8 @@
     "bed_id": 415560228,
     "bed_index": 3,
     "closed": false,
-    "xpos": 60.0,
-    "ypos": 10.0
+    "xpos": 60,
+    "ypos": 10
   },
   {
     "department": "NHNN C1 NCCU",
@@ -2732,8 +2732,8 @@
     "bed_id": 415560243,
     "bed_index": 4,
     "closed": false,
-    "xpos": 70.0,
-    "ypos": 10.0
+    "xpos": 70,
+    "ypos": 10
   },
   {
     "department": "NHNN C1 NCCU",
@@ -2748,8 +2748,8 @@
     "bed_id": 415560164,
     "bed_index": 5,
     "closed": false,
-    "xpos": 80.0,
-    "ypos": 10.0
+    "xpos": 80,
+    "ypos": 10
   },
   {
     "department": "NHNN C1 NCCU",
@@ -2764,8 +2764,8 @@
     "bed_id": 415560271,
     "bed_index": 6,
     "closed": false,
-    "xpos": 90.0,
-    "ypos": 10.0
+    "xpos": 90,
+    "ypos": 10
   },
   {
     "department": "NHNN C1 NCCU",
@@ -2780,8 +2780,8 @@
     "bed_id": 415560176,
     "bed_index": 7,
     "closed": false,
-    "xpos": 100.0,
-    "ypos": 10.0
+    "xpos": 100,
+    "ypos": 10
   },
   {
     "department": "NHNN C1 NCCU",
@@ -2796,8 +2796,8 @@
     "bed_id": 415560221,
     "bed_index": 8,
     "closed": false,
-    "xpos": 100.0,
-    "ypos": 20.0
+    "xpos": 100,
+    "ypos": 20
   },
   {
     "department": "NHNN C1 NCCU",
@@ -2812,8 +2812,8 @@
     "bed_id": 415560261,
     "bed_index": 9,
     "closed": false,
-    "xpos": 100.0,
-    "ypos": 40.0
+    "xpos": 100,
+    "ypos": 40
   },
   {
     "department": "NHNN C1 NCCU",
@@ -8012,8 +8012,8 @@
     "bed_id": 415467786,
     "bed_index": 11,
     "closed": false,
-    "xpos": 70.0,
-    "ypos": 30.0
+    "xpos": 70,
+    "ypos": 30
   },
   {
     "department": "UCH T03 INTENSIVE CARE",
@@ -8028,8 +8028,8 @@
     "bed_id": 415468046,
     "bed_index": 12,
     "closed": false,
-    "xpos": 80.0,
-    "ypos": 30.0
+    "xpos": 80,
+    "ypos": 30
   },
   {
     "department": "UCH T03 INTENSIVE CARE",
@@ -8044,8 +8044,8 @@
     "bed_id": 415467817,
     "bed_index": 14,
     "closed": false,
-    "xpos": 90.0,
-    "ypos": 30.0
+    "xpos": 90,
+    "ypos": 30
   },
   {
     "department": "UCH T03 INTENSIVE CARE",
@@ -8060,8 +8060,8 @@
     "bed_id": 415468191,
     "bed_index": 15,
     "closed": false,
-    "xpos": 80.0,
-    "ypos": 40.0
+    "xpos": 80,
+    "ypos": 40
   },
   {
     "department": "UCH T03 INTENSIVE CARE",
@@ -8076,8 +8076,8 @@
     "bed_id": 415467841,
     "bed_index": 16,
     "closed": false,
-    "xpos": 70.0,
-    "ypos": 40.0
+    "xpos": 70,
+    "ypos": 40
   },
   {
     "department": "UCH T03 INTENSIVE CARE",
@@ -8092,8 +8092,8 @@
     "bed_id": 415467868,
     "bed_index": 17,
     "closed": false,
-    "xpos": 70.0,
-    "ypos": 60.0
+    "xpos": 70,
+    "ypos": 60
   },
   {
     "department": "UCH T03 INTENSIVE CARE",
@@ -8108,8 +8108,8 @@
     "bed_id": 415467899,
     "bed_index": 18,
     "closed": false,
-    "xpos": 80.0,
-    "ypos": 60.0
+    "xpos": 80,
+    "ypos": 60
   },
   {
     "department": "UCH T03 INTENSIVE CARE",
@@ -8124,8 +8124,8 @@
     "bed_id": 415467928,
     "bed_index": 19,
     "closed": false,
-    "xpos": 90.0,
-    "ypos": 70.0
+    "xpos": 90,
+    "ypos": 70
   },
   {
     "department": "UCH T03 INTENSIVE CARE",
@@ -8140,8 +8140,8 @@
     "bed_id": 415468329,
     "bed_index": 20,
     "closed": false,
-    "xpos": 80.0,
-    "ypos": 70.0
+    "xpos": 80,
+    "ypos": 70
   },
   {
     "department": "UCH T03 INTENSIVE CARE",
@@ -8156,8 +8156,8 @@
     "bed_id": 415468349,
     "bed_index": 21,
     "closed": false,
-    "xpos": 70.0,
-    "ypos": 70.0
+    "xpos": 70,
+    "ypos": 70
   },
   {
     "department": "UCH T03 INTENSIVE CARE",
@@ -8172,8 +8172,8 @@
     "bed_id": 415467962,
     "bed_index": 22,
     "closed": false,
-    "xpos": 70.0,
-    "ypos": 80.0
+    "xpos": 70,
+    "ypos": 80
   },
   {
     "department": "UCH T03 INTENSIVE CARE",
@@ -8188,8 +8188,8 @@
     "bed_id": 415467993,
     "bed_index": 23,
     "closed": false,
-    "xpos": 80.0,
-    "ypos": 80.0
+    "xpos": 80,
+    "ypos": 80
   },
   {
     "department": "UCH T03 INTENSIVE CARE",
@@ -8204,8 +8204,8 @@
     "bed_id": 415468022,
     "bed_index": 24,
     "closed": false,
-    "xpos": 90.0,
-    "ypos": 90.0
+    "xpos": 90,
+    "ypos": 90
   },
   {
     "department": "UCH T03 INTENSIVE CARE",
@@ -8220,8 +8220,8 @@
     "bed_id": 415468240,
     "bed_index": 25,
     "closed": false,
-    "xpos": 80.0,
-    "ypos": 90.0
+    "xpos": 80,
+    "ypos": 90
   },
   {
     "department": "UCH T03 INTENSIVE CARE",
@@ -8236,8 +8236,8 @@
     "bed_id": 415468236,
     "bed_index": 26,
     "closed": false,
-    "xpos": 70.0,
-    "ypos": 90.0
+    "xpos": 70,
+    "ypos": 90
   },
   {
     "department": "UCH T03 INTENSIVE CARE",
@@ -8252,8 +8252,8 @@
     "bed_id": 415468296,
     "bed_index": 27,
     "closed": false,
-    "xpos": 70.0,
-    "ypos": 100.0
+    "xpos": 70,
+    "ypos": 100
   },
   {
     "department": "UCH T03 INTENSIVE CARE",
@@ -8268,8 +8268,8 @@
     "bed_id": 415468062,
     "bed_index": 28,
     "closed": false,
-    "xpos": 80.0,
-    "ypos": 100.0
+    "xpos": 80,
+    "ypos": 100
   },
   {
     "department": "UCH T03 INTENSIVE CARE",
@@ -8284,8 +8284,8 @@
     "bed_id": 415468325,
     "bed_index": 29,
     "closed": false,
-    "xpos": 90.0,
-    "ypos": 100.0
+    "xpos": 90,
+    "ypos": 100
   },
   {
     "department": "UCH T03 INTENSIVE CARE",
@@ -8300,8 +8300,8 @@
     "bed_id": 415468197,
     "bed_index": 30,
     "closed": false,
-    "xpos": 80.0,
-    "ypos": 110.0
+    "xpos": 80,
+    "ypos": 110
   },
   {
     "department": "UCH T03 INTENSIVE CARE",
@@ -8316,8 +8316,8 @@
     "bed_id": 415468353,
     "bed_index": 31,
     "closed": false,
-    "xpos": 70.0,
-    "ypos": 110.0
+    "xpos": 70,
+    "ypos": 110
   },
   {
     "department": "UCH T03 INTENSIVE CARE",
@@ -8332,8 +8332,8 @@
     "bed_id": 415468445,
     "bed_index": 33,
     "closed": true,
-    "xpos": 30.0,
-    "ypos": 110.0
+    "xpos": 30,
+    "ypos": 110
   },
   {
     "department": "UCH T03 INTENSIVE CARE",
@@ -8348,8 +8348,8 @@
     "bed_id": 415468089,
     "bed_index": 34,
     "closed": true,
-    "xpos": 20.0,
-    "ypos": 110.0
+    "xpos": 20,
+    "ypos": 110
   },
   {
     "department": "UCH T03 INTENSIVE CARE",
@@ -8364,8 +8364,8 @@
     "bed_id": 415468502,
     "bed_index": 35,
     "closed": true,
-    "xpos": 20.0,
-    "ypos": 100.0
+    "xpos": 20,
+    "ypos": 100
   },
   {
     "department": "UCH T03 INTENSIVE CARE",
@@ -8380,8 +8380,8 @@
     "bed_id": 415468380,
     "bed_index": 36,
     "closed": true,
-    "xpos": 20.0,
-    "ypos": 90.0
+    "xpos": 20,
+    "ypos": 90
   },
   {
     "department": "UCH T03 INTENSIVE CARE",
@@ -8396,8 +8396,8 @@
     "bed_id": 415468116,
     "bed_index": 1,
     "closed": false,
-    "xpos": 20.0,
-    "ypos": 20.0
+    "xpos": 20,
+    "ypos": 20
   },
   {
     "department": "UCH T03 INTENSIVE CARE",
@@ -8412,8 +8412,8 @@
     "bed_id": 415468142,
     "bed_index": 2,
     "closed": false,
-    "xpos": 20.0,
-    "ypos": 10.0
+    "xpos": 20,
+    "ypos": 10
   },
   {
     "department": "UCH T03 INTENSIVE CARE",
@@ -8428,8 +8428,8 @@
     "bed_id": 415468168,
     "bed_index": 3,
     "closed": false,
-    "xpos": 30.0,
-    "ypos": 10.0
+    "xpos": 30,
+    "ypos": 10
   },
   {
     "department": "UCH T03 INTENSIVE CARE",
@@ -8444,8 +8444,8 @@
     "bed_id": 415468217,
     "bed_index": 4,
     "closed": false,
-    "xpos": 40.0,
-    "ypos": 10.0
+    "xpos": 40,
+    "ypos": 10
   },
   {
     "department": "UCH T03 INTENSIVE CARE",
@@ -8460,8 +8460,8 @@
     "bed_id": 415468280,
     "bed_index": 5,
     "closed": false,
-    "xpos": 50.0,
-    "ypos": 10.0
+    "xpos": 50,
+    "ypos": 10
   },
   {
     "department": "UCH T03 INTENSIVE CARE",
@@ -8476,8 +8476,8 @@
     "bed_id": 415468308,
     "bed_index": 6,
     "closed": false,
-    "xpos": 60.0,
-    "ypos": 10.0
+    "xpos": 60,
+    "ypos": 10
   },
   {
     "department": "UCH T03 INTENSIVE CARE",
@@ -8492,8 +8492,8 @@
     "bed_id": 415468248,
     "bed_index": 7,
     "closed": false,
-    "xpos": 70.0,
-    "ypos": 10.0
+    "xpos": 70,
+    "ypos": 10
   },
   {
     "department": "UCH T03 INTENSIVE CARE",
@@ -8508,8 +8508,8 @@
     "bed_id": 415468274,
     "bed_index": 8,
     "closed": false,
-    "xpos": 80.0,
-    "ypos": 10.0
+    "xpos": 80,
+    "ypos": 10
   },
   {
     "department": "UCH T03 INTENSIVE CARE",
@@ -8524,8 +8524,8 @@
     "bed_id": 415468302,
     "bed_index": 9,
     "closed": false,
-    "xpos": 90.0,
-    "ypos": 10.0
+    "xpos": 90,
+    "ypos": 10
   },
   {
     "department": "UCH T03 INTENSIVE CARE",
@@ -8540,8 +8540,8 @@
     "bed_id": 415468441,
     "bed_index": 10,
     "closed": false,
-    "xpos": 90.0,
-    "ypos": 20.0
+    "xpos": 90,
+    "ypos": 20
   },
   {
     "department": "UCH T03 INTENSIVE CARE",
@@ -8556,8 +8556,8 @@
     "bed_id": 415468335,
     "bed_index": 32,
     "closed": true,
-    "xpos": 60.0,
-    "ypos": 110.0
+    "xpos": 60,
+    "ypos": 110
   },
   {
     "department": "UCH T06 CENTRAL (T06C)",
@@ -9612,8 +9612,8 @@
     "bed_id": 415556893,
     "bed_index": 32,
     "closed": true,
-    "xpos": 10.0,
-    "ypos": 20.0
+    "xpos": 10,
+    "ypos": 20
   },
   {
     "department": "UCH T06 SOUTH PACU",
@@ -9628,8 +9628,8 @@
     "bed_id": 415556924,
     "bed_index": 33,
     "closed": true,
-    "xpos": 10.0,
-    "ypos": 10.0
+    "xpos": 10,
+    "ypos": 10
   },
   {
     "department": "UCH T06 SOUTH PACU",
@@ -9644,8 +9644,8 @@
     "bed_id": 415556998,
     "bed_index": 35,
     "closed": true,
-    "xpos": 20.0,
-    "ypos": 20.0
+    "xpos": 20,
+    "ypos": 20
   },
   {
     "department": "UCH T06 SOUTH PACU",
@@ -9660,8 +9660,8 @@
     "bed_id": 415557077,
     "bed_index": 36,
     "closed": true,
-    "xpos": 30.0,
-    "ypos": 20.0
+    "xpos": 30,
+    "ypos": 20
   },
   {
     "department": "UCH T06 SOUTH PACU",
@@ -9676,8 +9676,8 @@
     "bed_id": 415556913,
     "bed_index": 37,
     "closed": true,
-    "xpos": 40.0,
-    "ypos": 10.0
+    "xpos": 40,
+    "ypos": 10
   },
   {
     "department": "UCH T06 SOUTH PACU",
@@ -9692,8 +9692,8 @@
     "bed_id": 415556966,
     "bed_index": 38,
     "closed": true,
-    "xpos": 40.0,
-    "ypos": 20.0
+    "xpos": 40,
+    "ypos": 20
   },
   {
     "department": "UCH T06 SOUTH PACU",
@@ -9708,8 +9708,8 @@
     "bed_id": 415553112,
     "bed_index": 40,
     "closed": true,
-    "xpos": 70.0,
-    "ypos": 10.0
+    "xpos": 70,
+    "ypos": 10
   },
   {
     "department": "UCH T06 SOUTH PACU",
@@ -9724,8 +9724,8 @@
     "bed_id": 415553159,
     "bed_index": 41,
     "closed": true,
-    "xpos": 70.0,
-    "ypos": 20.0
+    "xpos": 70,
+    "ypos": 20
   },
   {
     "department": "UCH T06 SOUTH PACU",
@@ -9740,8 +9740,8 @@
     "bed_id": 415553229,
     "bed_index": 46,
     "closed": false,
-    "xpos": 70.0,
-    "ypos": 100.0
+    "xpos": 70,
+    "ypos": 100
   },
   {
     "department": "UCH T06 SOUTH PACU",
@@ -9756,8 +9756,8 @@
     "bed_id": 415553118,
     "bed_index": 47,
     "closed": false,
-    "xpos": 60.0,
-    "ypos": 100.0
+    "xpos": 60,
+    "ypos": 100
   },
   {
     "department": "UCH T06 SOUTH PACU",
@@ -9772,8 +9772,8 @@
     "bed_id": 415553132,
     "bed_index": 48,
     "closed": false,
-    "xpos": 40.0,
-    "ypos": 100.0
+    "xpos": 40,
+    "ypos": 100
   },
   {
     "department": "UCH T06 SOUTH PACU",
@@ -9788,8 +9788,8 @@
     "bed_id": 415553128,
     "bed_index": 49,
     "closed": false,
-    "xpos": 30.0,
-    "ypos": 100.0
+    "xpos": 30,
+    "ypos": 100
   },
   {
     "department": "UCH T06 SOUTH PACU",
@@ -9804,8 +9804,8 @@
     "bed_id": 415553124,
     "bed_index": 50,
     "closed": true,
-    "xpos": 30.0,
-    "ypos": 90.0
+    "xpos": 30,
+    "ypos": 90
   },
   {
     "department": "UCH T06 SOUTH PACU",
@@ -9820,8 +9820,8 @@
     "bed_id": 415553171,
     "bed_index": 51,
     "closed": false,
-    "xpos": 20.0,
-    "ypos": 90.0
+    "xpos": 20,
+    "ypos": 90
   },
   {
     "department": "UCH T06 SOUTH PACU",
@@ -9836,8 +9836,8 @@
     "bed_id": 415553276,
     "bed_index": 52,
     "closed": true,
-    "xpos": 20.0,
-    "ypos": 100.0
+    "xpos": 20,
+    "ypos": 100
   },
   {
     "department": "UCH T06 SOUTH PACU",
@@ -9852,8 +9852,8 @@
     "bed_id": 415553240,
     "bed_index": 53,
     "closed": false,
-    "xpos": 10.0,
-    "ypos": 100.0
+    "xpos": 10,
+    "ypos": 100
   },
   {
     "department": "UCH T06 SOUTH PACU",
@@ -9868,8 +9868,8 @@
     "bed_id": 415553356,
     "bed_index": 39,
     "closed": true,
-    "xpos": 50.0,
-    "ypos": 10.0
+    "xpos": 50,
+    "ypos": 10
   },
   {
     "department": "UCH T06 SOUTH PACU",
@@ -9884,8 +9884,8 @@
     "bed_id": 415553321,
     "bed_index": 42,
     "closed": false,
-    "xpos": 70.0,
-    "ypos": 40.0
+    "xpos": 70,
+    "ypos": 40
   },
   {
     "department": "UCH T06 SOUTH PACU",
@@ -9900,8 +9900,8 @@
     "bed_id": 415553182,
     "bed_index": 43,
     "closed": false,
-    "xpos": 70.0,
-    "ypos": 50.0
+    "xpos": 70,
+    "ypos": 50
   },
   {
     "department": "UCH T06 SOUTH PACU",
@@ -9916,8 +9916,8 @@
     "bed_id": 415553251,
     "bed_index": 44,
     "closed": false,
-    "xpos": 70.0,
-    "ypos": 60.0
+    "xpos": 70,
+    "ypos": 60
   },
   {
     "department": "UCH T06 SOUTH PACU",
@@ -9932,8 +9932,8 @@
     "bed_id": 415553266,
     "bed_index": 45,
     "closed": false,
-    "xpos": 70.0,
-    "ypos": 70.0
+    "xpos": 70,
+    "ypos": 70
   },
   {
     "department": "UCH T07 CV SURGE",
@@ -21388,8 +21388,8 @@
     "bed_id": 415485024,
     "bed_index": 1,
     "closed": false,
-    "xpos": 10.0,
-    "ypos": 10.0
+    "xpos": 10,
+    "ypos": 10
   },
   {
     "department": "WMS W01 CRITICAL CARE",
@@ -21404,8 +21404,8 @@
     "bed_id": 415485086,
     "bed_index": 2,
     "closed": false,
-    "xpos": 20.0,
-    "ypos": 10.0
+    "xpos": 20,
+    "ypos": 10
   },
   {
     "department": "WMS W01 CRITICAL CARE",
@@ -21420,8 +21420,8 @@
     "bed_id": 415485062,
     "bed_index": 3,
     "closed": false,
-    "xpos": 30.0,
-    "ypos": 10.0
+    "xpos": 30,
+    "ypos": 10
   },
   {
     "department": "WMS W01 CRITICAL CARE",
@@ -21436,8 +21436,8 @@
     "bed_id": 415485048,
     "bed_index": 4,
     "closed": false,
-    "xpos": 40.0,
-    "ypos": 10.0
+    "xpos": 40,
+    "ypos": 10
   },
   {
     "department": "WMS W01 CRITICAL CARE",
@@ -21452,8 +21452,8 @@
     "bed_id": 415485100,
     "bed_index": 5,
     "closed": false,
-    "xpos": 50.0,
-    "ypos": 10.0
+    "xpos": 50,
+    "ypos": 10
   },
   {
     "department": "WMS W01 CRITICAL CARE",
@@ -21468,8 +21468,8 @@
     "bed_id": 415484899,
     "bed_index": 7,
     "closed": false,
-    "xpos": 50.0,
-    "ypos": 40.0
+    "xpos": 50,
+    "ypos": 40
   },
   {
     "department": "WMS W01 CRITICAL CARE",
@@ -21484,8 +21484,8 @@
     "bed_id": 415485042,
     "bed_index": 8,
     "closed": false,
-    "xpos": 40.0,
-    "ypos": 40.0
+    "xpos": 40,
+    "ypos": 40
   },
   {
     "department": "WMS W01 CRITICAL CARE",
@@ -21500,8 +21500,8 @@
     "bed_id": 415485092,
     "bed_index": 9,
     "closed": false,
-    "xpos": 30.0,
-    "ypos": 40.0
+    "xpos": 30,
+    "ypos": 40
   },
   {
     "department": "WMS W01 CRITICAL CARE",
@@ -21516,8 +21516,8 @@
     "bed_id": 415484971,
     "bed_index": 6,
     "closed": false,
-    "xpos": 60.0,
-    "ypos": 40.0
+    "xpos": 60,
+    "ypos": 40
   },
   {
     "department": "WMS W02 SHORT STAY",
