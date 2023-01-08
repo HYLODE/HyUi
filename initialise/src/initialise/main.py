@@ -105,6 +105,21 @@ def initialise_baserow() -> None:
             "parent_location_name",
         ]
 
+        beds_df.fillna(
+            {
+                "bed_id": -1,
+                "department_id": -1,
+                "location_id": -1,
+                "room_id": -1,
+            },
+            inplace=True,
+        )
+
+        cols_bool = [
+            "is_room",
+            "is_care_area",
+        ]
+
         cols_int = [
             "location_id",
             "department_id",
@@ -112,10 +127,11 @@ def initialise_baserow() -> None:
             "bed_id",
         ]
 
-        cols_bool = [
-            "is_room",
-            "is_care_area",
-        ]
+        # handle missingness in integers;
+        # avoid decimal places if derived from floats
+        for col in cols_int:
+            beds_df[col].fillna(-1, inplace=True)
+            beds_df[col] = beds_df[col].astype(int)
 
         _add_misc_fields(
             settings.public_url,
