@@ -15,7 +15,7 @@ def _create_bed_bones_table(
 ) -> int:
     """Create the beds table derived from epic and emap merge"""
     return _create_table(
-        base_url, auth_token, application_id, "beds_bones", "location", {}
+        base_url, auth_token, application_id, "beds_bones", "location", {}, replace=True
     )
 
 
