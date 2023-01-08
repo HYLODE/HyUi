@@ -1,5 +1,5 @@
 from datetime import datetime
-from pydantic import BaseModel, validator
+from pydantic import BaseModel
 
 
 class DischargeStatus(BaseModel):
@@ -11,35 +11,31 @@ class DischargeStatus(BaseModel):
 
 
 class Bed(BaseModel):
-    location_string: str
+    department: str | None
+    room: str | None
+    hl7_bed: str | None
+    location_string: str | None
+    hl7_department: str | None
+    hl7_room: str | None
+    location_id: int | None
+    department_id: int | None
+    room_id: int | None
+    bed_id: int | None
+    bed_index: int | None
     closed: bool | None
-    covid: bool | None
     xpos: int | None
     ypos: int | None
 
-    # FIXME: Baserow data is stored as strings as there does not to be a way
-    #  to define type when doing a bulk upload of data; these validators
-    #  convert strings to the appropriate 'missing' type
-    @validator("closed", "covid", pre=True)
-    def empty_string_to_false(cls, value: str) -> bool:
-        """convert empty string to false"""
-        if value == "" or value is None:
-            return False
-        if type(value) is str and value.lower() == "true":
-            return True
-        try:
-            int_value = int(float(value))
-            return True if int_value else False
-        except ValueError:
-            return False
 
-    @validator("xpos", "ypos", pre=True)
-    def empty_string_to_minus_one(cls, value: str) -> int:
-        """convert empty string to zero"""
-        if value == "" or value is None:
-            return -1
-        try:
-            int_value = int(float(value))
-            return int_value
-        except ValueError:
-            return -1
+class Department(BaseModel):
+    department: str | None
+    hl7_department: str | None
+    department_id: int | None
+    floor: int | None
+    closed_perm_01: bool | None
+    service_by_hand: str | None
+    department_external_name: str | None
+    department_speciality: str | None
+    department_service_grouper: str | None
+    department_level_of_care_grouper: str | None
+    location_name: str | None

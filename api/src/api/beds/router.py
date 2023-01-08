@@ -1,11 +1,11 @@
 import json
 from datetime import datetime, timedelta
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from pathlib import Path
 
 from api.baserow import get_fields, get_rows, post_row
 from api.config import Settings, get_settings
-from models.beds import Bed, DischargeStatus
+from models.beds import Bed, Department, DischargeStatus
 
 router = APIRouter(
     prefix="/beds",
@@ -16,41 +16,89 @@ mock_router = APIRouter(
 )
 
 
-@mock_router.get("/", response_model=list[Bed])
-def get_mock_beds(department: str) -> list[Bed]:
-    # FIXME: dependency between initialise and api modules
-    with open(
-        Path(__file__).parents[4]
-        / "initialise"
-        / "src"
-        / "initialise"
-        / "bed_defaults.json",
-        "r",
-    ) as f:
+@mock_router.get("/departments", response_model=list[Department])
+def get_mock_departments() -> list[Department]:
+    with open(Path(__file__).parent / "department_defaults.json", "r") as f:
         rows = json.load(f)
-    # mock return just T03 beds
-    _FILTER = "T03"
-    rows = [row for row in rows if _FILTER in row["location_string"]]
-    return [Bed.parse_obj(row).dict() for row in rows]
+    return [Department.parse_obj(row) for row in rows]
 
 
-@router.get("/", response_model=list[Bed])
-def get_beds(department: str, settings: Settings = Depends(get_settings)) -> list[Bed]:
+@router.get("/departments", response_model=list[Department])
+def get_departments(settings: Settings = Depends(get_settings)) -> list[Department]:
+    baserow_url = settings.baserow_url
+    email = settings.baserow_email
+    password = settings.baserow_password.get_secret_value()
+
+    params = {
+        "size": 200,  # The maximum size of a page.
+        "user_field_names": "true",
+    }
+
+    rows = get_rows(baserow_url, email, password, "hyui", "departments", params)
+
+    # drop baserow id and order fields
+    for row in rows:
+        row.pop("id")
+        row.pop("order")
+
+    return [Department.parse_obj(row) for row in rows]
+
+
+@mock_router.get("/beds", response_model=list[Bed])
+def get_mock_beds(
+    departments: list[str] = Query(default=[]),
+    locations: list[str] = Query(default=[]),
+) -> list[Bed]:
+    with open(Path(__file__).parent / "bed_defaults.json", "r") as f:
+        rows = json.load(f)
+
+    if len(departments):
+        rows = [row for row in rows if row.get("department") in departments]
+    if len(locations):
+        rows = [row for row in rows if row.get("location_string") in departments]
+
+    return [Bed.parse_obj(row) for row in rows]
+
+
+@router.get("/beds", response_model=list[Bed])
+def get_beds(
+    departments: list[str] = Query(default=[]),
+    locations: list[str] = Query(default=[]),
+    settings: Settings = Depends(get_settings),
+) -> list[Bed]:
     baserow_url = settings.baserow_url
     email = settings.baserow_email
     password = settings.baserow_password.get_secret_value()
 
     field_ids = get_fields(baserow_url, email, password, "hyui", "beds")
-
-    department_field_id = field_ids["department"]
-
     params = {
         "size": 200,  # The maximum size of a page.
         "user_field_names": "true",
-        f"filter__field_{department_field_id}__equal": department,
     }
 
-    rows = get_rows(baserow_url, email, password, "hyui", "beds", params)
+    if len(departments) or len(locations):
+        rows = []
+        for department in departments:
+            department_field_id = field_ids["department"]
+            params[f"filter__field_{department_field_id}__equal"] = department
+            rows.extend(get_rows(baserow_url, email, password, "hyui", "beds", params))
+            params.pop(f"filter__field_{department_field_id}__equal")
+
+        for location in locations:
+            location_string_field_id = field_ids["location_string"]
+            params[f"filter__field_{location_string_field_id}__equal"] = location
+            rows.extend(get_rows(baserow_url, email, password, "hyui", "beds", params))
+            params.pop(f"filter__field_{location_string_field_id}__equal")
+
+    else:
+        # get everything
+        rows = get_rows(baserow_url, email, password, "hyui", "beds", params)
+
+    # drop baserow id and order fields
+    for row in rows:
+        row.pop("id")
+        row.pop("order")
+
     return [Bed.parse_obj(row) for row in rows]
 
 
