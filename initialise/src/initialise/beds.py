@@ -8,14 +8,14 @@ import pandas as pd
 from .baserow import _add_table_field, _create_table
 
 
-def _create_beds_ee_table(
+def _create_bed_bones_table(
     base_url: str,
     auth_token: str,
     application_id: int,
 ) -> int:
     """Create the beds table derived from epic and emap merge"""
     return _create_table(
-        base_url, auth_token, application_id, "beds_ee", "location", {}
+        base_url, auth_token, application_id, "beds_bones", "location", {}
     )
 
 
@@ -61,7 +61,6 @@ def _create_beds_user_table(
 
 
 def _add_beds_user_fields(base_url: str, auth_token: str, table_id: int) -> None:
-
     text_cols = [
         "department",
         "room",
@@ -98,6 +97,7 @@ def _add_beds_user_fields(base_url: str, auth_token: str, table_id: int) -> None
             column_details={"number_negative": True},
         )
 
+    _add_table_field(base_url, auth_token, table_id, "closed", "boolean", {})
     _add_table_field(base_url, auth_token, table_id, "covid", "boolean", {})
 
     _add_table_field(

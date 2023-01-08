@@ -4,7 +4,7 @@ import warnings
 
 from .baserow import (
     BaserowException,
-    _add_table_row,
+    _add_misc_fields,
     _add_table_row_batch,
     _create_admin_user,
     _create_application,
@@ -14,7 +14,7 @@ from .baserow import (
 )
 from .beds import (
     _add_beds_user_fields,
-    _create_beds_ee_table,
+    _create_bed_bones_table,
     _create_beds_user_table,
     _load_beds_user_defaults,
 )
@@ -81,24 +81,61 @@ def initialise_baserow() -> None:
 
     try:
         logging.info("Creating beds table")
-        beds_table_id = _create_beds_ee_table(
+        bed_bones_table_id = _create_bed_bones_table(
             settings.public_url, auth_token, application_id
         )
 
         beds_df = _fetch_beds()
 
-        for row in beds_df.itertuples():
-            _add_table_row(
-                settings.public_url,
-                auth_token,
-                beds_table_id,
-                # TODO: ask Jon: why this approach? assume this creates the
-                #  fields as it populates?
-                {"location": row.location},
+        cols_text = [
+            "location_string",
+            "hl7_department",
+            "hl7_room",
+            "hl7_bed",
+            "department",
+            "speciality",
+            "room",
+            "department_name",
+            "department_external_name",
+            "department_speciality",
+            "department_type",
+            "department_service_grouper",
+            "department_level_of_care_grouper",
+            "location_name",
+            "parent_location_name",
+        ]
+
+        cols_int = [
+            "location_id",
+            "department_id",
+            "room_id",
+            "bed_id",
+        ]
+
+        cols_bool = [
+            "is_room",
+            "is_care_area",
+        ]
+
+        _add_misc_fields(
+            settings.public_url,
+            auth_token,
+            bed_bones_table_id,
+            cols_int=cols_int,
+            cols_bool=cols_bool,
+            cols_text=cols_text,
+        )
+        # TODO:
+        # 2. then use the batch update approach to load 200 rows at a time
+        while beds_df.shape[0] > 0:
+            _add_table_row_batch(
+                settings.public_url, auth_token, bed_bones_table_id, beds_df[:200]
             )
+            beds_df = beds_df[200:]
+
     except BaserowException as e:
         print(e)
-        warnings.warn("beds table NOT created")
+        warnings.warn("beds bones table NOT created")
 
 
 def recreate_defaults() -> None:

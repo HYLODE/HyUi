@@ -1,3 +1,8 @@
+"""
+Functions for managing the Baserow API
+"""
+# TODO: refactor: repeated code and complex long functions
+
 import json
 import logging
 from typing import Any, cast
@@ -362,3 +367,46 @@ def _add_table_row_batch(
             f""
             f"{str(response.content)}"
         )
+
+
+def _add_misc_fields(
+    base_url: str,
+    auth_token: str,
+    table_id: int,
+    cols_int: list[str],
+    cols_bool: list[str],
+    cols_text: list[str],
+) -> None:
+    """given lists of field names then creates fields"""
+    # TODO: a better version would take a data frame and work this out for
+    #  itself based on the existing dtypes
+
+    cols_text = [
+        "department",
+        "room",
+        "hl7_bed",
+        "hl7_room",
+        "hl7_department",
+    ]
+    for col in cols_text:
+        _add_table_field(
+            base_url,
+            auth_token,
+            table_id,
+            column_name=col,
+            column_type="text",
+            column_details=None,
+        )
+
+    for col in cols_int:
+        _add_table_field(
+            base_url,
+            auth_token,
+            table_id,
+            column_name=col,
+            column_type="number",
+            column_details={"number_negative": True},
+        )
+
+    for col in cols_bool:
+        _add_table_field(base_url, auth_token, table_id, col, "boolean", {})
