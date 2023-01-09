@@ -1,8 +1,10 @@
-FROM varnish:stable
+FROM varnish:7.2.1
 
 SHELL ["/bin/bash", "-o", "pipefail", "-e", "-u", "-x", "-c"]
 
 ARG HYLODE_UID
+
+USER root
 
 RUN export DEBIAN_FRONTEND=noninteractive && \
     export ACCEPT_EULA=Y && \

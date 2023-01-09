@@ -16,9 +16,9 @@ from api.ed.router import (
     mock_router as mock_ed_router,
 )
 
-from api.bedbones.router import (
-    router as bedbones_router,
-    mock_router as mock_bedbones_router,
+from api.beds.router import (
+    router as beds_router,
+    mock_router as mock_beds_router,
 )
 from api.consults.router import router as consults_router
 from api.perrt.router import router as perrt_router
@@ -57,8 +57,8 @@ mock_router.include_router(mock_electives_router)
 app.include_router(ed_router)
 mock_router.include_router(mock_ed_router)
 
-app.include_router(bedbones_router)
-mock_router.include_router(mock_bedbones_router)
+app.include_router(beds_router)
+mock_router.include_router(mock_beds_router)
 
 app.include_router(consults_router)
 
@@ -71,5 +71,5 @@ app.include_router(mock_router)
 
 
 @app.get("/ping")
-async def pong():
+async def pong() -> dict[str, str]:
     return {"ping": "hyui pong!"}

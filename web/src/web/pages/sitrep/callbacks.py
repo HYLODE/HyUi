@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import requests
+from typing import Any
 from dash import Input, Output, State, callback
 
 from models.sitrep import SitrepRow, IndividualDischargePrediction, BedRow
@@ -84,7 +85,7 @@ def _merge_patients(
     ],
     background=True,
 )
-def store_ward(department: str, closed: bool):
+def store_ward(department: str, closed: bool) -> Any:
     """
     Merges patients onto beds
     """
@@ -137,7 +138,7 @@ def store_ward(department: str, closed: bool):
     State(f"{BPID}tbl-census", "data"),
     prevent_initial_call=True,
 )
-def diff_table(time, prev_data, data):
+def diff_table(time: Any, prev_data: Any, data: Any) -> Any:
 
     # TODO: Update the discharge status of the patient on the server.
     # Will need to use encounter ID or similar. Previously the discharge

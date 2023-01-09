@@ -47,10 +47,10 @@ mock_router = APIRouter(
 def get_beds(department: str, settings=Depends(get_settings)):
 
     baserow_url = settings.baserow_url
-    token = settings.baserow_read_write_token
-    beds_table_id = settings.baserow_beds_table_id
+    email = settings.baserow_email
+    password = settings.baserow_password.get_secret_value()
 
-    field_ids = get_fields(baserow_url, token, beds_table_id)
+    field_ids = get_fields(baserow_url, email, password, "hyui", "beds")
 
     department_field_id = field_ids["department"]
 
@@ -60,7 +60,7 @@ def get_beds(department: str, settings=Depends(get_settings)):
         f"filter__field_{department_field_id}__equal": department,
     }
 
-    rows = get_rows(baserow_url, token, beds_table_id, params)
+    rows = get_rows(baserow_url, email, password, "hyui", "beds", params)
     return [BedRow.parse_obj(row) for row in rows]
 
 

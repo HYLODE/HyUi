@@ -1,5 +1,10 @@
 ---
-title: "About"
+title: "Hyperlocal Demand Forecasts"
+image: resources/robot_logo.png
+image-width: 400px
+image-shape: rounded
+about:
+    template: jolla
 ---
 
-About this site
+**Hy**perlocal **De**mand **Fo**recasts

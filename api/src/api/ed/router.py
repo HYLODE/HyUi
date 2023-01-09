@@ -72,7 +72,7 @@ def _get_census(hycastle_url: str) -> pd.DataFrame:
 
 
 class Feature(BaseModel):
-    episode_slice_id: int
+    episode_slice_id: int | None
     csn: str
 
 

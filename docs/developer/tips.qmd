@@ -1,6 +1,8 @@
-Notes on setting up PyCharm for development with specific reference to working on a Mac
+---
+title: Developer tips
+---
 
-## Tips
+## Notes on setting up PyCharm for development with specific reference to working on a Mac
 
 Set up run configurations
 
