@@ -1,5 +1,28 @@
 [
   {
+    "selector": "node",
+    "style": {
+      "text-halign": "center",
+      "text-valign": "center"
+    }
+  },
+  {
+    "selector": "[entity='bed']",
+    "style": {
+      "shape": "rectangle",
+      "label": "data(bed_number)",
+      "color": "white",
+      "background-color": "blue"
+    }
+  },
+  {
+    "selector": "[entity='department']",
+    "style": {
+      "label": "data(department)"
+    }
+  },
+
+  {
     "selector": "[?occupied]",
     "style": {
       "background-color": "red"
@@ -8,8 +31,10 @@
   {
     "selector": ":selected:",
     "style": {
-      "shape": "star",
-      "background-color": "blue"
+      "background-color": "white",
+      "border-color": "green",
+      "border-width": 3,
+      "color": "black"
     }
   }
 ]

@@ -11,6 +11,7 @@ class DischargeStatus(BaseModel):
 
 
 class Bed(BaseModel):
+    location_name: str | None
     department: str | None
     room: str | None
     hl7_bed: str | None
@@ -21,8 +22,11 @@ class Bed(BaseModel):
     department_id: int | None
     room_id: int | None
     bed_id: int | None
+    bed_number: int | None
+    floor: int | None
     bed_index: int | None
     closed: bool | None
+    covid: bool | None
     xpos: int | None
     ypos: int | None
 
@@ -32,8 +36,9 @@ class Department(BaseModel):
     hl7_department: str | None
     department_id: int | None
     floor: int | None
+    floor_order: int | None
     closed_perm_01: bool | None
-    service_by_hand: str | None
+    clinical_service: str | None
     department_external_name: str | None
     department_speciality: str | None
     department_service_grouper: str | None

@@ -5,6 +5,7 @@ import dash_cytoscape as cyto
 import dash_mantine_components as dmc
 from dash import dcc, html
 
+from web.pages.home import CAMPUSES
 from web.pages.home import ids
 import web.pages.home.callbacks  # noqa
 from pathlib import Path
@@ -15,19 +16,21 @@ with open(Path(__file__).parent / "cyto_style_sheet.json") as f:
 
 dash.register_page(__name__, path="/", name="Home")
 
-debug_inspector = html.Div(
-    [dmc.Prism(language="json", id=ids.DEBUG_NODE_INSPECTOR, children="")]
-)
+DEBUG = True
+if DEBUG:
+    debug_inspector = html.Div(
+        [dmc.Prism(language="json", id=ids.DEBUG_NODE_INSPECTOR, children="")]
+    )
+else:
+    debug_inspector = html.Div()
+
 
 campus_selector = html.Div(
     [
-        dmc.MultiSelect(
-            label="Select campus",
-            placeholder="Select all you like!",
+        dmc.SegmentedControl(
             id=ids.CAMPUS_SELECTOR,
-            value=["WMS"],
-            data=["GWB", "NHNN", "UCH", "WMS"],
-            style={"width": 400, "marginBottom": 10},
+            value=[i.get("value") for i in CAMPUSES if i.get("label") == "WMS"][0],
+            data=CAMPUSES,
         ),
     ]
 )
@@ -36,8 +39,9 @@ layout_selector = html.Div(
     [
         dmc.SegmentedControl(
             id=ids.LAYOUT_SELECTOR,
-            value="grid",
+            value="preset",
             data=[
+                "preset",
                 "grid",
                 "circle",
                 "random",
@@ -48,6 +52,10 @@ layout_selector = html.Div(
 
 census_cyto = cyto.Cytoscape(
     id=ids.CYTO_MAP,
+    style={
+        "width": "80vw",
+        "height": "50vh",
+    },
     stylesheet=cyto_style_sheet,
     responsive=True,
 )
@@ -60,6 +68,7 @@ stores = html.Div(
         dcc.Store(id=ids.ROOM_SET_STORE),
         dcc.Store(id=ids.DEPT_SET_STORE),
         dcc.Store(id=ids.DEPTS_OPEN_STORE),
+        dcc.Store(id=ids.BEDS_STORE),
     ]
 )
 

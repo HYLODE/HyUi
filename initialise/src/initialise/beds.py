@@ -62,6 +62,7 @@ def _create_beds_user_table(
 
 def _add_beds_user_fields(base_url: str, auth_token: str, table_id: int) -> None:
     text_cols = [
+        "location_name",
         "department",
         "room",
         "hl7_bed",
@@ -83,6 +84,8 @@ def _add_beds_user_fields(base_url: str, auth_token: str, table_id: int) -> None
         "department_id",
         "room_id",
         "bed_id",
+        "bed_number",
+        "floor",
         "bed_index",
         "xpos",
         "ypos",

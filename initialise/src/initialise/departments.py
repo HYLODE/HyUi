@@ -24,8 +24,8 @@ def _load_department_defaults() -> pd.DataFrame:
             "department",
             "department_id",
             "floor",
+            "floor_order",
             "closed_perm_01",
-            "service_by_hand",
             "location_name",
             "department_external_name",
         ]
@@ -73,6 +73,15 @@ def _add_departments_fields(base_url: str, auth_token: str, table_id: int) -> No
         base_url,
         auth_token,
         table_id,
+        column_name="floor_order",
+        column_type="number",
+        column_details={"number_negative": True},
+    )
+
+    _add_table_field(
+        base_url,
+        auth_token,
+        table_id,
         column_name="closed_perm_01",
         column_type="boolean",
         column_details=None,
@@ -80,7 +89,7 @@ def _add_departments_fields(base_url: str, auth_token: str, table_id: int) -> No
 
     text_cols = [
         "department",
-        "service_by_hand",
+        "clinical_service",
         "location_name",
         "department_external_name",
     ]
