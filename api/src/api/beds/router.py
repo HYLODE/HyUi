@@ -9,7 +9,7 @@ from api.wards import (
     CAMPUSES,
     MISSING_DEPARTMENT_LOCATIONS,
 )
-from models.beds import Bed, Department, DischargeStatus
+from models.beds import Bed, Room, Department, DischargeStatus
 
 router = APIRouter(
     prefix="/beds",
@@ -46,6 +46,34 @@ def get_departments(settings: Settings = Depends(get_settings)) -> list[Departme
         row.pop("order")
 
     return [Department.parse_obj(row) for row in rows]
+
+
+@mock_router.get("/rooms", response_model=list[Room])
+def get_mock_rooms() -> list[Room]:
+    with open(Path(__file__).parent / "room_defaults.json", "r") as f:
+        rows = json.load(f)
+    return [Room.parse_obj(row) for row in rows]
+
+
+@router.get("/rooms", response_model=list[Room])
+def get_rooms(settings: Settings = Depends(get_settings)) -> list[Room]:
+    baserow_url = settings.baserow_url
+    email = settings.baserow_email
+    password = settings.baserow_password.get_secret_value()
+
+    params = {
+        "size": 200,  # The maximum size of a page.
+        "user_field_names": "true",
+    }
+
+    rows = get_rows(baserow_url, email, password, "hyui", "rooms", params)
+
+    # drop baserow id and order fields
+    for row in rows:
+        row.pop("id")
+        row.pop("order")
+
+    return [Room.parse_obj(row) for row in rows]
 
 
 @mock_router.get("/beds", response_model=list[Bed])

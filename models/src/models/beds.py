@@ -51,5 +51,5 @@ class Room(BaseModel):
     room: str | None
     room_id: int | None
     department: str | None
-    is_room: bool | None
+    is_sideroom: bool | None
     has_beds: bool | None
