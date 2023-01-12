@@ -18,7 +18,10 @@
   {
     "selector": "[entity='department']",
     "style": {
-      "label": "data(department)"
+      "label": "data(label)",
+      "color": "black",
+      "text-halign": "left",
+      "text-margin-x": -5
     }
   },
 

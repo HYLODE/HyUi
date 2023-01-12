@@ -6,7 +6,7 @@ import pandas as pd
 
 
 def gen_id(name: str, dunder_name: str) -> str:
-    module_name = dunder_name.split(".")[-2]
+    module_name = dunder_name.split(".")[-2].upper()
     name = name.replace("_", "-").replace(" ", "-").replace(".", "-")
     return f"{module_name}-{name}"
 

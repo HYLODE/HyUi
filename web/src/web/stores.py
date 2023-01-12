@@ -6,7 +6,7 @@ applications
 import requests
 from dash import Input, Output, callback, dcc, html
 
-from models.beds import Bed, Department
+from models.beds import Bed, Department, Room
 from web import ids
 from web.config import get_settings
 
@@ -31,6 +31,20 @@ def _store_departments(_: int) -> list[dict]:
 
 
 @callback(
+    Output(ids.ROOM_STORE, "data"),
+    Input(ids.STORE_TIMER_1H, "n_intervals"),
+    # background=True,
+)
+def _store_rooms(_: int) -> list[dict]:
+    """Store all rooms with beds"""
+    response = requests.get(
+        f"{get_settings().api_url}/beds/rooms/",
+    )
+    rooms = [Room.parse_obj(row).dict() for row in response.json()]
+    return [r for r in rooms if r.get("has_beds")]
+
+
+@callback(
     Output(ids.BEDS_STORE, "data"),
     Input(ids.STORE_TIMER_1H, "n_intervals"),
     # background=True,
@@ -45,6 +59,7 @@ def _store_beds(_: int) -> list[dict]:
 stores = html.Div(
     [
         dcc.Store(id=ids.DEPT_STORE),
+        dcc.Store(id=ids.ROOM_STORE),
         dcc.Store(id=ids.BEDS_STORE),
     ]
 )

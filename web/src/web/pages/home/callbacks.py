@@ -21,24 +21,46 @@ def _store_depts(campus: str, depts: list[dict]) -> list[dict]:
 
 
 @callback(
+    Output(ids.ROOMS_OPEN_STORE, "data"),
+    Input(ids.DEPTS_OPEN_STORE, "data"),
+    Input(store_ids.ROOM_STORE, "data"),
+)
+def _store_rooms(depts: list[dict], rooms: list[dict]) -> list[dict]:
+    """Need a list of rooms for departments in this building"""
+    these_depts = [dept.get("department") for dept in depts]
+    return [room for room in rooms if room.get("department") in these_depts]
+
+
+@callback(
     Output(ids.BEDS_STORE, "data"),
     Input(ids.CAMPUS_SELECTOR, "value"),
     Input(store_ids.DEPT_STORE, "data"),
+    Input(store_ids.ROOM_STORE, "data"),
     Input(store_ids.BEDS_STORE, "data"),
 )
-def _store_beds(campus: str, depts: list[dict], beds: list[dict]) -> list[dict]:
+def _store_beds(
+    campus: str,
+    depts: list[dict],
+    rooms: list[dict],
+    beds: list[dict],
+) -> list[dict]:
     """
     Return a list of beds for that campus
     - merge in departments to drop closed departments
     - generate the floor_index from the bed_number to permit appropriate sorting
     """
 
-    dfbeds = pd.DataFrame.from_records(beds)
     dfdepts = pd.DataFrame.from_records(depts)
     dfdepts = dfdepts[["department", "floor_order"]]
+    dfrooms = pd.DataFrame.from_records(rooms)
+    dfrooms = dfrooms[["hl7_room", "is_sideroom"]]
 
+    beds = pd.DataFrame.from_records(beds)
+    # inner join to drop rooms without beds
+    beds = beds.merge(dfrooms, on="hl7_room", how="inner")
     # inner join to drop closed_perm_01
-    beds = dfbeds.merge(dfdepts, on="department", how="inner")
+    beds = beds.merge(dfdepts, on="department", how="inner")
+
     # drop beds other than those for this campus
     mask = beds["location_name"] == campus
     beds = beds[mask]
@@ -180,16 +202,15 @@ def _layout_control(val: str) -> dict:
 @callback(
     Output(ids.CYTO_MAP, "elements"),
     Input(ids.CENSUS_STORE, "data"),
-    # Todo: remove these room and dept set_stores since now in the baserow defn
-    Input(ids.ROOM_SET_STORE, "data"),
     Input(ids.DEPTS_OPEN_STORE, "data"),
+    Input(ids.ROOMS_OPEN_STORE, "data"),
     Input(ids.BEDS_STORE, "data"),
     background=True,
 )
 def _prepare_cyto_elements(
     census: list[dict],
-    rooms: list[str],
     depts: list[dict],
+    rooms: list[dict],
     beds: list[dict],
 ) -> list[dict]:
     elements = list()
@@ -202,7 +223,7 @@ def _prepare_cyto_elements(
             bed_index=bed.get("bed_index"),
             floor=bed.get("floor"),
             entity="bed",
-            parent=bed.get("department"),
+            parent=bed.get("hl7_room"),
             bed=bed,
         )
         position = dict(
@@ -213,12 +234,13 @@ def _prepare_cyto_elements(
         )
         elements.append(dict(data=data, position=position))
 
-    for dept in depts:
+    for room in rooms:
         data = dict(
-            id=dept.get("department"),
-            label=dept.get("department"),
-            entity="department",
-            dept=dept,
+            id=room.get("hl7_room"),
+            label=room.get("room"),
+            entity="room",
+            room=room,
+            parent=room.get("department"),
         )
         elements.append(dict(data=data))
 
@@ -236,14 +258,6 @@ def _prepare_cyto_elements(
     #
     #     elements.append(dict(data=data))
     #
-    # for room in rooms:
-    #     dept = room.split("^")[0]
-    #     data = dict(
-    #         id=room,
-    #         parent=dept,
-    #         entity="room",
-    #     )
-    #     elements.append(dict(data=data))
     #
 
     return elements

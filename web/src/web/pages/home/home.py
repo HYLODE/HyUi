@@ -45,6 +45,9 @@ layout_selector = html.Div(
                 "grid",
                 "circle",
                 "random",
+                # "concentric",
+                # "breadthfirst",
+                # "cose",
             ],
         )
     ]
@@ -68,6 +71,7 @@ stores = html.Div(
         dcc.Store(id=ids.ROOM_SET_STORE),
         dcc.Store(id=ids.DEPT_SET_STORE),
         dcc.Store(id=ids.DEPTS_OPEN_STORE),
+        dcc.Store(id=ids.ROOMS_OPEN_STORE),
         dcc.Store(id=ids.BEDS_STORE),
     ]
 )
