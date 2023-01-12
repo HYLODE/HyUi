@@ -11,11 +11,13 @@ def _load_department_defaults() -> pd.DataFrame:
         value={
             "department_id": -1,
             "floor": -1,
+            "capacity": -1,
         },
         inplace=True,
     )
     df["department_id"] = df["department_id"].astype(int)
     df["floor"] = df["floor"].astype(int)
+    df["capacity"] = df["capacity"].astype(int)
     df["closed_perm_01"] = df["closed_perm_01"] == 1
 
     df = df[
@@ -28,6 +30,7 @@ def _load_department_defaults() -> pd.DataFrame:
             "closed_perm_01",
             "location_name",
             "department_external_name",
+            "capacity",
         ]
     ]
 
@@ -74,6 +77,15 @@ def _add_departments_fields(base_url: str, auth_token: str, table_id: int) -> No
         auth_token,
         table_id,
         column_name="floor_order",
+        column_type="number",
+        column_details={"number_negative": True},
+    )
+
+    _add_table_field(
+        base_url,
+        auth_token,
+        table_id,
+        column_name="capacity",
         column_type="number",
         column_details={"number_negative": True},
     )

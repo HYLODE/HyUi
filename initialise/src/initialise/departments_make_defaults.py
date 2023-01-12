@@ -32,6 +32,7 @@ departments = departments.merge(df, on="department", how="left")
 departments["closed_perm_01"] = departments["closed_perm_01"].str.contains(
     "True|1|TRUE"
 )
+departments["capacity"] = departments["capacity"].astype(pd.Int64Dtype())
 
 # departments.to_excel("department_defaults.xlsx")
 # Now hand edit the excel sheet
