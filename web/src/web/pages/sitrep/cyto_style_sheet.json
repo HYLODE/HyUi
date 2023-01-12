@@ -9,10 +9,18 @@
   {
     "selector": "[entity='bed']",
     "style": {
-      "shape": "rectangle",
+      "shape": "ellipse",
       "label": "data(bed_number)",
       "color": "white",
       "background-color": "blue"
+    }
+  },
+  {
+    "selector": "[entity='room']",
+    "style": {
+      "label": "data(label)",
+      "background-opacity": 0,
+      "border-width": 0
     }
   },
   {
