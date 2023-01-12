@@ -25,6 +25,8 @@ from .departments import (
     _create_departments_table,
     _load_department_defaults,
 )
+from .rooms import _load_room_defaults, _create_rooms_table, _add_rooms_fields
+
 from .discharge_status import (
     _add_discharge_status_fields,
     _create_discharge_status_table,
@@ -181,6 +183,23 @@ def recreate_defaults() -> None:
         df = _load_department_defaults()
 
         _add_table_row_batch(settings.public_url, auth_token, departments_table_id, df)
+
+    except BaserowException as e:
+        print(e)
+
+    try:
+        logging.info("Creating (user) rooms table")
+        beds_table_id = _create_rooms_table(
+            settings.public_url, auth_token, application_id
+        )
+        _add_rooms_fields(settings.public_url, auth_token, beds_table_id)
+        df = _load_room_defaults()
+        # need to chunk this up as the batch load is limited to 200 rows
+        while df.shape[0] > 0:
+            _add_table_row_batch(
+                settings.public_url, auth_token, beds_table_id, df[:200]
+            )
+            df = df[200:]
 
     except BaserowException as e:
         print(e)

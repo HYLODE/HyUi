@@ -44,3 +44,12 @@ class Department(BaseModel):
     department_service_grouper: str | None
     department_level_of_care_grouper: str | None
     location_name: str | None
+
+
+class Room(BaseModel):
+    hl7_room: str
+    room: str | None
+    room_id: int | None
+    department: str | None
+    is_room: bool | None
+    has_beds: bool | None

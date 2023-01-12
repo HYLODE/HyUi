@@ -1,0 +1,77 @@
+[
+  {
+    "hl7_room": "GWB L01N TR01",
+    "has_beds": true,
+    "room": "TR01 - SLEEP STUDIES"
+  },
+  {
+    "hl7_room": "GWB L01N TR02",
+    "has_beds": true,
+    "room": "TR02"
+  },
+  {
+    "hl7_room": "GWB L04E PROC RM",
+    "has_beds": false,
+    "room": "PROCEDURE ROOM"
+  },
+  {
+    "hl7_room": "C0NCCU HDU",
+    "has_beds": true,
+    "room": "HDU"
+  },
+  {
+    "hl7_room": "C0NCCU ICU",
+    "has_beds": true,
+    "room": "ICU"
+  },
+  {
+    "hl7_room": "C0NCCU WAITING",
+    "has_beds": false,
+    "room": "WAITING"
+  },
+  {
+    "hl7_room": "C1NCCU HDU1",
+    "has_beds": true,
+    "room": "HDU1"
+  },
+  {
+    "hl7_room": "C1NCCU HDU2",
+    "has_beds": true,
+    "room": "HDU2"
+  },
+  {
+    "hl7_room": "C1NCCU ICU",
+    "has_beds": true,
+    "room": "ICU"
+  },
+  {
+    "hl7_room": "C1NCCU WAITING",
+    "has_beds": false,
+    "room": "WAITING"
+  },
+  {
+    "hl7_room": "C4MLF CH01",
+    "has_beds": true,
+    "room": "CH01"
+  },
+  {
+    "hl7_room": "PATIENT LOUNGE",
+    "has_beds": false,
+    "room": "Patient Lounge"
+  },
+  {
+    "hl7_room": "T11N HR01",
+    "has_beds": true,
+    "room": "HR01"
+  },
+  {
+    "hl7_room": "T11N HR02",
+    "has_beds": true,
+    "room": "HR02"
+  },
+  {
+    "hl7_room": "T15N LOA",
+    "has_beds": false,
+    "room": "LEAVE OF ABSENCE"
+  }
+]
