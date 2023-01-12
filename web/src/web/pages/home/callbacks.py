@@ -39,26 +39,32 @@ def _store_beds(campus: str, depts: list[dict], beds: list[dict]) -> list[dict]:
 
     # inner join to drop closed_perm_01
     beds = dfbeds.merge(dfdepts, on="department", how="inner")
-
     # drop beds other than those for this campus
     mask = beds["location_name"] == campus
     beds = beds[mask]
+
     beds = beds[beds["bed_number"] != -1]
-    # TODO?: swap this to a widget to reveal closed beds
     beds = beds[~beds["closed"]]
 
-    # now generate floor_index
-    beds.sort_values(["floor", "floor_order", "department", "bed_number"], inplace=True)
-    floor_depts = beds[["floor", "floor_order", "department"]].drop_duplicates()
-    floor_depts.sort_values(["floor", "floor_order"], inplace=True)
-    floor_depts["floor_y_index"] = floor_depts.reset_index().index + 1
-    beds = beds.merge(floor_depts, how="left")
-    # create a floor x_index by sorting and ranking within floor_y_index
-    beds.sort_values(["floor_y_index", "bed_number"], inplace=True)
-    beds["floor_x_index"] = beds.groupby("floor_y_index")["bed_number"].rank(
-        method="first", na_option="keep"
-    )
-    beds.sort_values(["location_string"], inplace=True)
+    def _gen_floor_indices(df: pd.DataFrame) -> pd.DataFrame:
+        # now generate floor_y_index
+        df.sort_values(
+            ["floor", "floor_order", "department", "bed_number"], inplace=True
+        )
+        floor_depts = df[["floor", "floor_order", "department"]].drop_duplicates()
+        floor_depts.sort_values(["floor", "floor_order"], inplace=True)
+        floor_depts["floor_y_index"] = floor_depts.reset_index().index + 1
+        df = df.merge(floor_depts, how="left")
+
+        # create a floor x_index by sorting and ranking within floor_y_index
+        df.sort_values(["floor_y_index", "bed_number"], inplace=True)
+        df["floor_x_index"] = df.groupby("floor_y_index")["bed_number"].rank(
+            method="first", na_option="keep"
+        )
+        df.sort_values(["location_string"], inplace=True)
+        return df
+
+    beds = _gen_floor_indices(beds)
 
     res: list[dict] = beds.to_dict(orient="records")
     return res
@@ -140,6 +146,7 @@ def _layout_control(val: str) -> dict:
             "fit": True,
             "padding": 10,
         },
+        # you could use the grid layout with invisible beds to create maps
         "grid": {
             "name": "grid",
             "animate": True,
@@ -147,6 +154,25 @@ def _layout_control(val: str) -> dict:
             "padding": 10,
             # "cols": 5,
         },
+        # "concentric": {
+        #     "name": "concentric",
+        #     "animate": True,
+        #     "fit": True,
+        #     "padding": 10,
+        #     "concentric": "function(floor){floor}"
+        # },
+        # "breadthfirst": {
+        #     "name": "breadthfirst",
+        #     "animate": True,
+        #     "fit": True,
+        #     "padding": 10,
+        # },
+        # "cose": {
+        #     "name": "cose",
+        #     "animate": True,
+        #     "fit": True,
+        #     "padding": 10,
+        # },
     }
     return layouts.get(val, {})
 
