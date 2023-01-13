@@ -19,8 +19,7 @@
     "selector": "[entity='room']",
     "style": {
       "label": "data(label)",
-      "background-opacity": 0,
-      "border-width": 0
+      "border-width": 1
     }
   },
   {
@@ -28,6 +27,10 @@
     "style": {
       "label": "data(label)",
       "color": "black",
+      "background-opacity": 0.1,
+      "background-color": "grey",
+      "border-color": "black",
+      "border-width": 0,
       "text-halign": "left",
       "text-margin-x": -5
     }
@@ -42,9 +45,10 @@
   {
     "selector": ":selected:",
     "style": {
-      "background-color": "white",
-      "border-color": "green",
-      "border-width": 3,
+      "background-color": "red",
+      "background-opacity": 0.2,
+      "border-color": "red",
+      "border-width": 0,
       "color": "black"
     }
   }

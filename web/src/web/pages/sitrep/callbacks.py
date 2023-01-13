@@ -1,13 +1,13 @@
 import json
+import json
 import math
 import pandas as pd
 import requests
-from dash import Input, Output, callback
+from dash import Input, Output, callback, State
 
 from models.census import CensusRow
 from web.config import get_settings
-from web.pages.sitrep import ids
-from web.pages.sitrep import CAMPUSES
+from web.pages.sitrep import CAMPUSES, ids
 from web.stores import ids as store_ids
 
 
@@ -22,6 +22,14 @@ def _store_depts(campus: str, depts: list[dict]) -> list[dict]:
 
 
 @callback(
+    Output(ids.DEPTS_OPEN_STORE_NAMES, "data"),
+    Input(ids.DEPTS_OPEN_STORE, "data"),
+)
+def _dept_open_store_names(depts_open: list[dict]) -> list[str]:
+    return [i.get("department") for i in depts_open]
+
+
+@callback(
     Output(ids.ROOMS_OPEN_STORE, "data"),
     Input(ids.DEPTS_OPEN_STORE, "data"),
     Input(store_ids.ROOM_STORE, "data"),
@@ -33,8 +41,18 @@ def _store_rooms(depts: list[dict], rooms: list[dict], beds: list[dict]) -> list
     # TODO: better don't show rooms at the campus layout; the 'selector'
     #  should then respond to the level of your view (i.e. campus at ward
     #  overview, and ward at ward level with a 'back' option)
-    these_depts = [dept.get("department") for dept in depts]
-    return [room for room in rooms if room.get("department") in these_depts]
+    dfbeds = pd.DataFrame.from_records(beds)
+    dfrooms = pd.DataFrame.from_records(rooms)
+    dfdepts = pd.DataFrame.from_records(depts)
+
+    dfdepts = dfdepts[["department", "closed_perm_01"]]
+    dfrooms = dfrooms.merge(dfdepts, on="department")
+
+    room_closed_status = dfbeds.groupby("hl7_room")["closed"].all()
+    room_closed_status = pd.DataFrame(room_closed_status).reset_index()
+    dfrooms = dfrooms.merge(room_closed_status, on="hl7_room")
+
+    return dfrooms.to_dict(orient="records")
 
 
 @callback(
@@ -101,16 +119,19 @@ def _store_beds(
 @callback(
     Output(ids.CENSUS_STORE, "data"),
     Input(ids.CAMPUS_SELECTOR, "value"),
-    Input(ids.DEPTS_OPEN_STORE, "data"),
+    Input(ids.DEPTS_OPEN_STORE_NAMES, "data"),
     # background=True,
 )
-def _store_census(campus: str, depts_open: list[dict]) -> list[dict]:
+def _store_census(
+    campus: str,
+    depts_open_names: list[str],
+) -> list[dict]:
     """
     Store CensusRow as list of dictionaries after filtering out closed
     departments for that building
     Args:
         campus: one of UCH/WMS/GWB/NHNN
-        depts_open: list of departments that are open
+        depts_open_names: list of departments that are open
 
     Returns:
         Filtered list of CensusRow dictionaries
@@ -119,7 +140,6 @@ def _store_census(campus: str, depts_open: list[dict]) -> list[dict]:
     campus_short_name = [i.get("label") for i in CAMPUSES if i.get("value") == campus][
         0
     ]
-    depts_open_list = [i.get("department") for i in depts_open]
 
     response = requests.get(
         f"{get_settings().api_url}/census/campus/",
@@ -127,12 +147,12 @@ def _store_census(campus: str, depts_open: list[dict]) -> list[dict]:
     )
 
     res = [CensusRow.parse_obj(row).dict() for row in response.json()]
-    res = [row for row in res if row.get("department") in depts_open_list]
+    res = [row for row in res if row.get("department") in depts_open_names]
     return res
 
 
 @callback(
-    Output(ids.CYTO_MAP, "layout"),
+    Output(ids.CYTO_WARD_CYTO, "layout"),
     Input(ids.LAYOUT_SELECTOR, "value"),
 )
 def _layout_control(val: str) -> dict:
@@ -151,12 +171,6 @@ def _layout_control(val: str) -> dict:
             "startAngle": math.pi * 2 / 3,  # clockwise from 3 O'Clock
             "sweep": math.pi * 5 / 3,
         },
-        "random": {
-            "name": "random",
-            "animate": True,
-            "fit": True,
-            "padding": 10,
-        },
         # you could use the grid layout with invisible beds to create maps
         "grid": {
             "name": "grid",
@@ -166,27 +180,31 @@ def _layout_control(val: str) -> dict:
             # "cols": 5,
         },
     }
-    return layouts.get(val, {})
+    layout = layouts.get(val, {})
+    return layout
 
 
 @callback(
-    Output(ids.CYTO_MAP, "elements"),
-    Input(ids.CENSUS_STORE, "data"),
-    Input(ids.DEPTS_OPEN_STORE, "data"),
-    Input(ids.ROOMS_OPEN_STORE, "data"),
-    Input(ids.BEDS_STORE, "data"),
-    background=True,
+    [
+        Output(ids.DEPT_SELECTOR, "data"),
+        Output(ids.DEPT_SELECTOR, "value"),
+    ],
+    Input(ids.DEPTS_OPEN_STORE_NAMES, "data"),
+    Input(ids.CAMPUS_SELECTOR, "value"),
 )
-def _prepare_cyto_elements(
+def _dept_control(depts: list[str], campus: str) -> (list[str], str):
+    default = [i.get("default_dept") for i in CAMPUSES if i.get("value") == campus][0]
+    return depts, default
+
+
+def _make_elements(
     census: list[dict],
     depts: list[dict],
     rooms: list[dict],
     beds: list[dict],
+    selected_dept: str,
+    selected_tab: str,
 ) -> list[dict]:
-    """
-    Build the element list from pts/beds/rooms/depts for the map
-    """
-
     # Start with an empty list of elements to populate
     elements = list()
     y_index_max = max([bed.get("floor_y_index", -1) for bed in beds])
@@ -194,22 +212,33 @@ def _prepare_cyto_elements(
     census_d = {i.get("location_string"): i for i in census}
 
     # show either rooms or department as parent but not both
-    show_rooms = False
+    if selected_tab == "campus":
+        show_rooms = False
+    elif selected_tab == "ward":
+        show_rooms = True
+    else:
+        raise NotImplementedError
+
     show_depts = not show_rooms
     bed_parent = "hl7_room" if show_rooms else "department"
 
     # create beds
     for bed in beds:
+        department = bed.get("department")
+        if selected_tab != "campus" and department != selected_dept:
+            continue
         location_string = bed.get("location_string")
         data = dict(
             id=location_string,
             bed_number=bed.get("bed_number"),
             bed_index=bed.get("bed_index"),
+            department=department,
             floor=bed.get("floor"),
             entity="bed",
             parent=bed.get(bed_parent),
             bed=bed,
             census=census_d.get(location_string, {}),
+            closed=bed.get("closed"),
             occupied=census_d.get(location_string, {}).get("occupied", "False"),
         )
         position = dict(
@@ -230,12 +259,16 @@ def _prepare_cyto_elements(
 
     if show_rooms:
         for room in rooms:
+            department = room.get("department")
+            hl7_room = room.get("hl7_room")
+            if department != selected_dept or room.get("closed"):
+                continue
             data = dict(
-                id=room.get("hl7_room"),
+                id=hl7_room,
                 label=room.get("room"),
                 entity="room",
                 room=room,
-                parent=room.get("department"),
+                parent=department,
             )
             elements.append(
                 dict(
@@ -248,9 +281,11 @@ def _prepare_cyto_elements(
 
     if show_depts:
         for dept in depts:
+            dept_name = dept.get("department")
+            selected = True if dept_name == selected_dept else False
             data = dict(
-                id=dept.get("department"),
-                label=dept.get("department"),
+                id=dept_name,
+                label=dept_name,
                 entity="department",
                 dept=dept,
                 parent=dept.get("location_name"),
@@ -259,17 +294,69 @@ def _prepare_cyto_elements(
                 dict(
                     data=data,
                     grabbable=True,
-                    selectable=False,
+                    selectable=True,
                     locked=False,
+                    selected=selected,
                 )
             )
+    return elements
 
+
+@callback(
+    Output(ids.CYTO_CAMPUS_CYTO, "elements"),
+    State(ids.CENSUS_STORE, "data"),
+    State(ids.DEPTS_OPEN_STORE, "data"),
+    State(ids.ROOMS_OPEN_STORE, "data"),
+    State(ids.BEDS_STORE, "data"),
+    Input(ids.DEPT_SELECTOR, "value"),
+    Input(ids.TAB_SELECTOR, "value"),
+    # background=True,
+    # prevent_initial_call=True,
+)
+def _prepare_cyto_elements_campus(
+    census: list[dict],
+    depts: list[dict],
+    rooms: list[dict],
+    beds: list[dict],
+    selected_dept: str,
+    selected_tab: str,
+) -> (list[dict], list[dict]):
+    """
+    Build the element list from pts/beds/rooms/depts for the map
+    """
+    elements = _make_elements(census, depts, rooms, beds, selected_dept, selected_tab)
+    return elements
+
+
+@callback(
+    Output(ids.CYTO_WARD_CYTO, "elements"),
+    State(ids.CENSUS_STORE, "data"),
+    State(ids.DEPTS_OPEN_STORE, "data"),
+    State(ids.ROOMS_OPEN_STORE, "data"),
+    State(ids.BEDS_STORE, "data"),
+    Input(ids.DEPT_SELECTOR, "value"),
+    Input(ids.TAB_SELECTOR, "value"),
+    # background=True,
+    # prevent_initial_call=True,
+)
+def _prepare_cyto_elements_ward(
+    census: list[dict],
+    depts: list[dict],
+    rooms: list[dict],
+    beds: list[dict],
+    selected_dept: str,
+    selected_tab: str,
+) -> (list[dict], list[dict]):
+    """
+    Build the element list from pts/beds/rooms/depts for the map
+    """
+    elements = _make_elements(census, depts, rooms, beds, selected_dept, selected_tab)
     return elements
 
 
 @callback(
     Output(ids.DEBUG_NODE_INSPECTOR, "children"),
-    Input(ids.CYTO_MAP, "tapNode"),
+    Input(ids.CYTO_WARD, "tapNode"),
     prevent_initial_callback=True,
 )
 def tap_debug_inspector(data: dict) -> str:
