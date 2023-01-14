@@ -125,5 +125,18 @@
   { "hl7_room": "T06C BY05", "closed": true },
   { "hl7_room": "T06C BY06", "closed": true },
   { "hl7_room": "T06C BY09", "closed": true },
-  { "hl7_room": "T06C SR41", "closed": true }
+  { "hl7_room": "T06C SR41", "closed": true },
+  { "hl7_room": "T01 BY01", "closed": true },
+  { "hl7_room": "T01 BY02", "closed": true },
+  { "hl7_room": "T01 BY03", "closed": true },
+  { "hl7_room": "T01 SR01", "closed": true },
+  { "hl7_room": "T01 SR02", "closed": true },
+  { "hl7_room": "T01 SR03", "closed": true },
+  { "hl7_room": "T01 SR04", "closed": true },
+  { "hl7_room": "T01 SR14", "closed": true },
+  { "hl7_room": "T03 BY05", "closed": true },
+  { "hl7_room": "T06PACU BY07", "closed": true },
+  { "hl7_room": "T06PACU BY08", "closed": true },
+  { "hl7_room": "T06PACU BY09", "closed": true },
+  { "hl7_room": "T06PACU SR39", "closed": true }
 ]

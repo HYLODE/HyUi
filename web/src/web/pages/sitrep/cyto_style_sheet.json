@@ -21,7 +21,7 @@
       "label": "data(label)",
       "border-width": 1,
       "text-halign": "left",
-      "text-valign": "top"
+      "text-valign": "center"
     }
   },
   {
