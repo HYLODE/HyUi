@@ -50,6 +50,8 @@ dept_selector = html.Div(
             # label="Select a ward",
             placeholder="Select a ward",
             id=ids.DEPT_SELECTOR,
+            searchable=True,
+            nothingFound="No match found",
         ),
     ]
 )
