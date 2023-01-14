@@ -101,6 +101,7 @@ def _add_beds_user_fields(base_url: str, auth_token: str, table_id: int) -> None
         )
 
     _add_table_field(base_url, auth_token, table_id, "closed", "boolean", {})
+    _add_table_field(base_url, auth_token, table_id, "blocked", "boolean", {})
     _add_table_field(base_url, auth_token, table_id, "covid", "boolean", {})
 
     _add_table_field(

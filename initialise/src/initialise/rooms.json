@@ -2,76 +2,122 @@
   {
     "hl7_room": "GWB L01N TR01",
     "has_beds": true,
+    "closed": true,
     "room": "TR01 - SLEEP STUDIES"
   },
   {
     "hl7_room": "GWB L01N TR02",
     "has_beds": true,
+    "closed": true,
     "room": "TR02"
   },
   {
     "hl7_room": "GWB L04E PROC RM",
     "has_beds": false,
+    "closed": false,
     "room": "PROCEDURE ROOM"
   },
   {
     "hl7_room": "C0NCCU HDU",
     "has_beds": true,
+    "closed": true,
     "room": "HDU"
   },
   {
     "hl7_room": "C0NCCU ICU",
     "has_beds": true,
+    "closed": true,
     "room": "ICU"
   },
   {
     "hl7_room": "C0NCCU WAITING",
     "has_beds": false,
+    "closed": false,
     "room": "WAITING"
   },
   {
     "hl7_room": "C1NCCU HDU1",
     "has_beds": true,
+    "closed": true,
     "room": "HDU1"
   },
   {
     "hl7_room": "C1NCCU HDU2",
     "has_beds": true,
+    "closed": true,
     "room": "HDU2"
   },
   {
     "hl7_room": "C1NCCU ICU",
     "has_beds": true,
+    "closed": true,
     "room": "ICU"
   },
   {
     "hl7_room": "C1NCCU WAITING",
     "has_beds": false,
+    "closed": false,
     "room": "WAITING"
   },
   {
     "hl7_room": "C4MLF CH01",
     "has_beds": true,
+    "closed": true,
     "room": "CH01"
   },
   {
     "hl7_room": "PATIENT LOUNGE",
     "has_beds": false,
+    "closed": false,
     "room": "Patient Lounge"
   },
   {
     "hl7_room": "T11N HR01",
     "has_beds": true,
+    "closed": true,
     "room": "HR01"
   },
   {
     "hl7_room": "T11N HR02",
     "has_beds": true,
+    "closed": true,
     "room": "HR02"
   },
   {
     "hl7_room": "T15N LOA",
     "has_beds": false,
+    "closed": false,
     "room": "LEAVE OF ABSENCE"
-  }
+  },
+  { "hl7_room": "T14N BY04", "closed": true },
+  { "hl7_room": "T13S BY01", "closed": true },
+  { "hl7_room": "T13S BY02", "closed": true },
+  { "hl7_room": "T12S BY02", "closed": true },
+  { "hl7_room": "T12S BY03", "closed": true },
+  { "hl7_room": "T12S SR20", "closed": true },
+  { "hl7_room": "T12S SR21", "closed": true },
+  { "hl7_room": "T11S BY03", "closed": true },
+  { "hl7_room": "T11S BY04", "closed": true },
+  { "hl7_room": "T11N BY02", "closed": true },
+  { "hl7_room": "T11N BY03", "closed": true },
+  { "hl7_room": "T11N BY04", "closed": true },
+  { "hl7_room": "T09S BY13", "closed": true },
+  { "hl7_room": "T09S BY07", "closed": true },
+  { "hl7_room": "T09N BY05", "closed": true },
+  { "hl7_room": "T09N BY06", "closed": true },
+  { "hl7_room": "T08N BY05", "closed": true },
+  { "hl7_room": "T07SWH BY06", "closed": true },
+  { "hl7_room": "T07SWH BY07", "closed": true },
+  { "hl7_room": "T07SWH BY08", "closed": true },
+  { "hl7_room": "T07SWH BY09", "closed": true },
+  { "hl7_room": "T07N BY05", "closed": true },
+  { "hl7_room": "T07N BY06", "closed": true },
+  { "hl7_room": "T07N BY07", "closed": true },
+  { "hl7_room": "T07N BY08", "closed": true },
+  { "hl7_room": "T07N BY09", "closed": true },
+  { "hl7_room": "T07N BY10", "closed": true },
+  { "hl7_room": "T06C BY05", "closed": true },
+  { "hl7_room": "T06C BY06", "closed": true },
+  { "hl7_room": "T06C BY09", "closed": true },
+  { "hl7_room": "T06C SR41", "closed": true }
 ]

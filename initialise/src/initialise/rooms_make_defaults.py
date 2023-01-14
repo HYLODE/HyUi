@@ -24,7 +24,7 @@ rooms = df[
 
 # locally saved starter values
 df = pd.read_json("rooms.json")
-df = df[["hl7_room", "has_beds"]]
+df = df[["hl7_room", "has_beds", "closed"]]
 try:
     rooms = rooms.merge(df, on="hl7_room", how="left")
 except KeyError as e:
@@ -33,6 +33,7 @@ except KeyError as e:
 
 rooms["is_sideroom"] = rooms["room"].str.contains(r"SR")
 rooms["has_beds"] = rooms["has_beds"] != False  # noqa: E712
+rooms["closed"] = rooms["closed"] == True  # noqa: E712
 
 # rooms.to_excel("room_defaults.xlsx")
 # Now hand edit the Excel sheet

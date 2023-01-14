@@ -1,8 +1,8 @@
-from typing import Tuple
 import json
 import pandas as pd
 import requests
 from dash import Input, Output, callback
+from typing import Tuple
 
 from models.census import CensusRow
 from web.config import get_settings
@@ -32,57 +32,61 @@ def _dept_open_store_names(depts_open: list[dict]) -> list[str]:
     Output(ids.ROOMS_OPEN_STORE, "data"),
     Input(ids.DEPTS_OPEN_STORE, "data"),
     Input(store_ids.ROOM_STORE, "data"),
-    Input(store_ids.BEDS_STORE, "data"),
 )
-def _store_rooms(depts: list[dict], rooms: list[dict], beds: list[dict]) -> list[dict]:
-    dfbeds = pd.DataFrame.from_records(beds)
-    dfrooms = pd.DataFrame.from_records(rooms)
+def _store_rooms(
+    depts: list[dict],
+    rooms: list[dict],
+) -> list[dict]:
+    """Need a list of rooms for this building"""
     dfdepts = pd.DataFrame.from_records(depts)
-
-    dfdepts = dfdepts[["department", "closed_perm_01"]]
+    dfdepts = dfdepts[["department", "hl7_department"]]
+    dfrooms = pd.DataFrame.from_records(rooms)
+    # default inner join drops rooms not in the selected departments
     dfrooms = dfrooms.merge(dfdepts, on="department")
-
-    # identify rooms where all beds are closed
-    room_closed_status = dfbeds.groupby("hl7_room")["closed"].all()
-    room_closed_status = pd.DataFrame(room_closed_status).reset_index()
-    dfrooms = dfrooms.merge(room_closed_status, on="hl7_room")
 
     return dfrooms.to_dict(orient="records")  # type: ignore
 
 
 @callback(
     Output(ids.BEDS_STORE, "data"),
-    Input(ids.CAMPUS_SELECTOR, "value"),
-    Input(store_ids.DEPT_STORE, "data"),
-    Input(store_ids.ROOM_STORE, "data"),
+    Input(ids.DEPTS_OPEN_STORE, "data"),
+    Input(ids.ROOMS_OPEN_STORE, "data"),
     Input(store_ids.BEDS_STORE, "data"),
 )
 def _store_beds(
-    campus: str,
     depts: list[dict],
     rooms: list[dict],
     beds: list[dict],
 ) -> list[dict]:
     """
-    Return a list of beds for that campus
-    - merge in departments to drop closed departments
+    Return a list of beds using the local filtered versions of depts/rooms
     - generate the floor_index from the bed_number to permit appropriate sorting
     """
 
+    bedsdf = pd.DataFrame.from_records(beds)
     dfdepts = pd.DataFrame.from_records(depts)
-    dfdepts = dfdepts[["department", "floor_order"]]
     dfrooms = pd.DataFrame.from_records(rooms)
+
+    dfdepts = dfdepts[["department", "floor_order"]]
+
+    # drop beds where rooms are closed
+    # look for bays where all beds are closed
+    dft = bedsdf.groupby("hl7_room")["closed"].all()
+    dft = pd.DataFrame(dft).reset_index()
+    dft.rename(columns={"closed": "closed_all_beds"}, inplace=True)
+    dfrooms = dfrooms.merge(dft, on="hl7_room")
+
+    # now close a room if any of the following are true
+    dfrooms["closed"] = dfrooms["closed"] | dfrooms["closed_all_beds"]
+    dfrooms.drop(columns=["closed_all_beds"], inplace=True)
+    # drop closed rooms
+    dfrooms = dfrooms.loc[~dfrooms["closed"], :]
     dfrooms = dfrooms[["hl7_room", "is_sideroom"]]
 
-    bedsdf = pd.DataFrame.from_records(beds)
     # inner join to drop rooms without beds
     bedsdf = bedsdf.merge(dfrooms, on="hl7_room", how="inner")
     # inner join to drop closed_perm_01
     bedsdf = bedsdf.merge(dfdepts, on="department", how="inner")
-
-    # drop beds other than those for this campus
-    mask = bedsdf["location_name"] == campus
-    bedsdf = bedsdf[mask]
 
     bedsdf = bedsdf[bedsdf["bed_number"] != -1]
     bedsdf = bedsdf[~bedsdf["closed"]]
@@ -214,6 +218,7 @@ def _make_elements(
             bed=bed,
             census=census_lookup.get(location_string, {}),
             closed=bed.get("closed"),
+            blocked=bed.get("blocked"),
             occupied=census_lookup.get(location_string, {}).get("occupied", "False"),
         )
         position = dict(
@@ -234,7 +239,7 @@ def _make_elements(
         for room in rooms:
             department = room.get("department")
             hl7_room = room.get("hl7_room")
-            if department != selected_dept or room.get("closed"):
+            if department != selected_dept:
                 continue
             data = dict(
                 id=hl7_room,

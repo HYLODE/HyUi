@@ -26,6 +26,7 @@ class Bed(BaseModel):
     floor: int | None
     bed_index: int | None
     closed: bool | None
+    blocked: bool | None
     covid: bool | None
     xpos: int | None
     ypos: int | None
@@ -54,3 +55,4 @@ class Room(BaseModel):
     department: str | None
     is_sideroom: bool | None
     has_beds: bool | None
+    closed: bool | None

@@ -21,6 +21,7 @@ def _load_room_defaults() -> pd.DataFrame:
             "department",
             "has_beds",
             "is_sideroom",
+            "closed",
         ]
     ]
 
@@ -58,6 +59,15 @@ def _add_rooms_fields(base_url: str, auth_token: str, table_id: int) -> None:
         auth_token,
         table_id,
         column_name="is_sideroom",
+        column_type="boolean",
+        column_details=None,
+    )
+
+    _add_table_field(
+        base_url,
+        auth_token,
+        table_id,
+        column_name="closed",
         column_type="boolean",
         column_details=None,
     )

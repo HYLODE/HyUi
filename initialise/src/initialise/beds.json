@@ -756,36 +756,228 @@
     "ypos": "40",
     "closed": ""
   },
-{"location_string":"T01^T01 SR01^SR01-01Y","closed":"TRUE"},
-{"location_string":"T01^T01 SR02^SR02-02Y","closed":"TRUE"},
-{"location_string":"T01^T01 SR03^SR03-03Y","closed":"TRUE"},
-{"location_string":"T01^T01 SR04^SR04-04Y","closed":"TRUE"},
-{"location_string":"T01^T01 BY01^BY01-05Y","closed":"TRUE"},
-{"location_string":"T01^T01 BY01^BY01-06Y","closed":"TRUE"},
-{"location_string":"T01^T01 BY01^BY01-07Y","closed":"TRUE"},
-{"location_string":"T01^T01 BY01^BY01-08Y","closed":"TRUE"},
-{"location_string":"T01^T01 BY01^BY01-09Y","closed":"TRUE"},
-{"location_string":"T01^T01 BY02^BY02-09Y","closed":"TRUE"},
-{"location_string":"T01^T01 BY01^BY01-10Y","closed":"TRUE"},
-{"location_string":"T01^T01 BY02^BY02-10Y","closed":"TRUE"},
-{"location_string":"T01^T01 BY01^BY01-11Y","closed":"TRUE"},
-{"location_string":"T01^T01 BY02^BY02-11Y","closed":"TRUE"},
-{"location_string":"T01^T01 BY01^BY01-12Y","closed":"TRUE"},
-{"location_string":"T01^T01 BY02^BY02-12Y","closed":"TRUE"},
-{"location_string":"T01^T01 SR14^SR14-14Y","closed":"TRUE"},
-{"location_string":"T01^T01 BY03^BY03-15G","closed":"TRUE"},
-{"location_string":"T01^T01 BY03^BY03-16G","closed":"TRUE"},
-{"location_string":"T01^T01 BY03^BY03-17G","closed":"TRUE"},
-{"location_string":"T01^T01 BY03^BY03-18G","closed":"TRUE"},
-{"location_string":"T01^T01 BY03^BY03-19G","closed":"TRUE"},
-{"location_string":"T01^T01 BY03^BY02-20G","closed":"TRUE"},
-{"location_string":"T01^T01 BY03^BY02-21G","closed":"TRUE"},
-{"location_string":"T01^T01 BY03^BY02-22G","closed":"TRUE"},
-{"location_string":"T01^T01 BY03^BY02-23G","closed":"TRUE"},
-{"location_string":"T01^T01 BY03^BY02-24G","closed":"TRUE"},
-{"location_string":"T01^T01 BY03^BY02-25G","closed":"TRUE"},
-{"location_string":"T01^T01 BY03^BY02-26G","closed":"TRUE"},
-{"location_string":"T01^T01 BY03^BY02-27G","closed":"TRUE"},
-{"location_string":"T01^T01 BY03^BY02-28G","closed":"TRUE"},
-{"location_string":"T01^T01 BY03^BY02-29G","closed":"TRUE"},
-{"location_string":"T01^T01 BY03^BY02-30G","closed":"TRUE"}]
+  {
+    "location_string": "T01^T01 SR01^SR01-01Y",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T01^T01 SR02^SR02-02Y",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T01^T01 SR03^SR03-03Y",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T01^T01 SR04^SR04-04Y",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T01^T01 BY01^BY01-05Y",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T01^T01 BY01^BY01-06Y",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T01^T01 BY01^BY01-07Y",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T01^T01 BY01^BY01-08Y",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T01^T01 BY01^BY01-09Y",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T01^T01 BY02^BY02-09Y",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T01^T01 BY01^BY01-10Y",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T01^T01 BY02^BY02-10Y",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T01^T01 BY01^BY01-11Y",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T01^T01 BY02^BY02-11Y",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T01^T01 BY01^BY01-12Y",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T01^T01 BY02^BY02-12Y",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T01^T01 SR14^SR14-14Y",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T01^T01 BY03^BY03-15G",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T01^T01 BY03^BY03-16G",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T01^T01 BY03^BY03-17G",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T01^T01 BY03^BY03-18G",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T01^T01 BY03^BY03-19G",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T01^T01 BY03^BY02-20G",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T01^T01 BY03^BY02-21G",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T01^T01 BY03^BY02-22G",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T01^T01 BY03^BY02-23G",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T01^T01 BY03^BY02-24G",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T01^T01 BY03^BY02-25G",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T01^T01 BY03^BY02-26G",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T01^T01 BY03^BY02-27G",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T01^T01 BY03^BY02-28G",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T01^T01 BY03^BY02-29G",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T01^T01 BY03^BY02-30G",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T01^T01 BY06^BY03-36R",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T01^T01 BY06^BY03-37R",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T01^T01 BY06^BY03-38R",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T01^T01 BY06^BY03-39R",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T01^T01 BY06^BY03-40R",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T01^T01 BY06^BY03-42R",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T01^T01 BY06^BY03-43R",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T01^T01 BY06^BY03-44R",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T01^T01 BY06^BY03-45R",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T01^T01 BY09^BY04-50B",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T01^T01 BY09^BY04-51B",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T01^T01 BY09^BY04-52B",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T01^T01 BY09^BY04-53B",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T13S^T13S SR21^SR21-21",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "1020100164^T14NT SR21^SR01-01",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "1020100164^T14NT SR21^SR02-02",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "1020100164^T14NT SR21^SR21-21",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "1020100164^T14NT SR21^SR21-22",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T11E^T11E BY05^BY05-27",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T11E^T11E BY05^BY05-28",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T11E^T11E BY05^BY05-29",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T11E^T11E BY05^BY05-30",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "1020100172^T07SWH BY12^BY12-54",
+    "closed": "TRUE"
+  }
+]

@@ -12,14 +12,16 @@
       "shape": "ellipse",
       "label": "data(bed_number)",
       "color": "white",
-      "background-color": "blue"
+      "background-color": "green"
     }
   },
   {
     "selector": "[entity='room']",
     "style": {
       "label": "data(label)",
-      "border-width": 1
+      "border-width": 1,
+      "text-halign": "left",
+      "text-valign": "top"
     }
   },
   {
@@ -28,18 +30,31 @@
       "label": "data(label)",
       "color": "black",
       "background-opacity": 0.1,
-      "background-color": "grey",
+      "background-color": "gray",
       "border-color": "black",
       "border-width": 0,
       "text-halign": "left",
       "text-margin-x": -5
     }
   },
+  {
+    "selector": "[?closed]",
+    "style": {
+      "background-color": "white",
+      "color": "gray"
+    }
+  },
+  {
+    "selector": "[?blocked]",
+    "style": {
+      "background-color": "orange"
+    }
+  },
 
   {
     "selector": "[?occupied]",
     "style": {
-      "background-color": "red"
+      "background-color": "teal"
     }
   },
   {

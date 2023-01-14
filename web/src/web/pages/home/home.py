@@ -10,11 +10,18 @@ from pathlib import Path
 import web.pages.home.callbacks  # noqa
 from web.pages.home import CAMPUSES, ids
 from web.pages.home.widgets import page_status_controls
+from web.style import AppColors
 
 dash.register_page(__name__, path="/", name="Home")
+colors = AppColors()
 
 with open(Path(__file__).parent / "cyto_style_sheet.json") as f:
     cyto_style_sheet = json.load(f)
+    colors_dict = colors.dict()
+    for style in cyto_style_sheet:
+        for k, v in style.get("style", {}).items():
+            if "color" in k and v in colors_dict:
+                style.get("style", {}).update({k: colors_dict.get(v)})
 
 DEBUG = True
 if DEBUG:
@@ -91,7 +98,6 @@ campus_cyto = dmc.Paper(
     p="md",  # padding
     withBorder=True,
 )
-
 
 body = html.Div(
     [
