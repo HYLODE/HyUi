@@ -10,22 +10,15 @@ from pathlib import Path
 import web.pages.sitrep.callbacks  # noqa
 from web.pages.sitrep import CAMPUSES, ids
 from web.pages.sitrep.widgets import page_status_controls
-from web.style import replace_colors_in_stylesheet
+from web.style import replace_colors_in_stylesheet, AppColors
 
 dash.register_page(__name__, path="/sitrep/campus", name="Campus")
+
+colors = AppColors()
 
 with open(Path(__file__).parent / "cyto_style_sheet.json") as f:
     cyto_style_sheet = json.load(f)
     cyto_style_sheet = replace_colors_in_stylesheet(cyto_style_sheet)
-
-
-DEBUG = True
-if DEBUG:
-    debug_inspector = html.Div(
-        [dmc.Prism(language="json", id=ids.DEBUG_NODE_INSPECTOR_CAMPUS, children="")]
-    )
-else:
-    debug_inspector = html.Div()
 
 timers = html.Div([])
 stores = html.Div(
@@ -95,6 +88,26 @@ campus_cyto = dmc.Paper(
     withBorder=True,
 )
 
+debug_inspector = html.Div(
+    [dmc.Prism(language="json", id=ids.DEBUG_NODE_INSPECTOR_CAMPUS, children="")]
+)
+
+inspector = html.Div(
+    [
+        dmc.Modal(
+            title="Inspect this",
+            id=ids.INSPECTOR_CAMPUS,
+            centered=True,
+            size="60vw",
+            overflow="inside",
+            overlayColor=colors.gray,
+            transition="pop",
+            transitionDuration=300,
+            children=[debug_inspector],
+        )
+    ]
+)
+
 body = html.Div(
     [
         page_status_controls(
@@ -110,7 +123,6 @@ body = html.Div(
         dmc.Stack(
             [
                 campus_cyto,
-                debug_inspector,
             ],
             style={},
             align="flex-start",
@@ -127,5 +139,6 @@ def layout() -> dash.html.Div:
             timers,
             stores,
             body,
+            inspector,
         ]
     )

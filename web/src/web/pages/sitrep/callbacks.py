@@ -1,13 +1,16 @@
+import dash
 import json
 import pandas as pd
 import requests
-from dash import Input, Output, callback
+from dash import Input, Output, callback, State
 from typing import Tuple
 
 from models.census import CensusRow
 from web.config import get_settings
 from web.pages.sitrep import CAMPUSES, ids
 from web.stores import ids as store_ids
+
+DEBUG = True
 
 
 @callback(
@@ -338,18 +341,36 @@ def _format_tap_node_data(data: dict | None) -> str:
 
 
 @callback(
-    Output(ids.DEBUG_NODE_INSPECTOR_CAMPUS, "children"),
+    [
+        Output(ids.DEBUG_NODE_INSPECTOR_CAMPUS, "children"),
+        Output(ids.INSPECTOR_CAMPUS, "opened"),
+    ],
     Input(ids.CYTO_CAMPUS, "tapNode"),
+    State(ids.INSPECTOR_CAMPUS, "opened"),
     prevent_initial_callback=True,
 )
-def tap_debug_inspector_campus(data: dict) -> str:
-    return _format_tap_node_data(data)
+def tap_debug_inspector_campus(data: dict, opened: str) -> Tuple[str, bool]:
+    if not DEBUG:
+        return dash.no_update, False
+    if not data:
+        return _format_tap_node_data(data), False
+    else:
+        return _format_tap_node_data(data), not opened
 
 
 @callback(
-    Output(ids.DEBUG_NODE_INSPECTOR_WARD, "children"),
+    [
+        Output(ids.DEBUG_NODE_INSPECTOR_WARD, "children"),
+        Output(ids.INSPECTOR_WARD, "opened"),
+    ],
     Input(ids.CYTO_WARD, "tapNode"),
+    State(ids.INSPECTOR_WARD, "opened"),
     prevent_initial_callback=True,
 )
-def tap_debug_inspector_ward(data: dict) -> str:
-    return _format_tap_node_data(data)
+def tap_debug_inspector_ward(data: dict, opened: str) -> Tuple[str, bool]:
+    if not DEBUG:
+        return dash.no_update, False
+    if not data:
+        return _format_tap_node_data(data), False
+    else:
+        return _format_tap_node_data(data), not opened
