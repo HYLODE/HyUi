@@ -21,3 +21,17 @@ class AppColors(BaseModel):
     silver: str = "#DDDDDD"
     gray: str = "#AAAAAA"
     black: str = "#111111"
+
+
+colors = AppColors()
+
+
+def replace_colors_in_stylesheet(sheet: list[dict]) -> list[dict]:
+    """Standardise to default app colours"""
+    sheet = sheet.copy()
+    colors_dict = colors.dict()
+    for style in sheet:
+        for k, v in style.get("style", {}).items():
+            if "color" in k and v in colors_dict:
+                style.get("style", {}).update({k: colors_dict.get(v)})
+    return sheet

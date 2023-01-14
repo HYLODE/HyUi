@@ -14,6 +14,8 @@ LAYOUT_SELECTOR = gen_id("layout selector", __name__)
 
 # content
 CYTO_CAMPUS = gen_id("cyto campus", __name__)
+CYTO_WARD = gen_id("cyto ward", __name__)
 
 # other
-DEBUG_NODE_INSPECTOR = gen_id("debug inspect node", __name__)
+DEBUG_NODE_INSPECTOR_CAMPUS = gen_id("debug inspect node campus", __name__)
+DEBUG_NODE_INSPECTOR_WARD = gen_id("debug inspect node ward", __name__)

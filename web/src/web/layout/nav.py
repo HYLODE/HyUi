@@ -22,7 +22,8 @@ class _NavLink(NamedTuple):
 
 
 home = _NavLink(title="Home", path="/", icon="carbon:home")
-sitrep = _NavLink(title="SitRep", path="/sitrep", icon="carbon:location-current")
+sitrep_campus = _NavLink(title="Campus", path="/sitrep/campus", icon="carbon:hospital")
+sitrep_ward = _NavLink(title="Ward", path="/sitrep/ward", icon="carbon:hospital-bed")
 
 
 def create_side_navbar() -> dmc.Navbar:
@@ -30,7 +31,7 @@ def create_side_navbar() -> dmc.Navbar:
         fixed=True,
         id="components-navbar",
         position={"top": 70},
-        width={"base": 150},
+        width={"base": 250},
         children=[
             dmc.ScrollArea(
                 offsetScrollbars=True,
@@ -51,10 +52,28 @@ def create_side_nave_content() -> dmc.Stack:
                 label=home.title,
                 href=home.path,
             ),
+            dmc.Divider(
+                labelPosition="left",
+                label=[
+                    DashIconify(
+                        icon="carbon:location-current",
+                        width=20,
+                        style={"marginRight": 10},
+                        color=dmc.theme.DEFAULT_COLORS["indigo"][5],
+                    ),
+                    "Sitrep",
+                ],
+                my=20,
+            ),
             create_main_nav_link(
-                icon=sitrep.icon,
-                label=sitrep.title,
-                href=sitrep.path,
+                icon=sitrep_campus.icon,
+                label=sitrep_campus.title,
+                href=sitrep_campus.path,
+            ),
+            create_main_nav_link(
+                icon=sitrep_ward.icon,
+                label=sitrep_ward.title,
+                href=sitrep_ward.path,
             ),
         ],
     )
@@ -67,7 +86,7 @@ def create_main_nav_link(icon: str, label: str, href: str) -> dmc.Anchor:
         dmc.Group(
             [
                 DashIconify(
-                    icon=icon, width=23, color=dmc.theme.DEFAULT_COLORS["indigo"][5]
+                    icon=icon, width=20, color=dmc.theme.DEFAULT_COLORS["indigo"][5]
                 ),
                 dmc.Text(label, size="sm"),
             ]
@@ -83,7 +102,7 @@ def create_navbar_drawer() -> dmc.Drawer:
         overlayOpacity=0.55,
         overlayBlur=3,
         zIndex=9,
-        size=150,
+        size=250,
         children=[
             dmc.ScrollArea(
                 offsetScrollbars=True,

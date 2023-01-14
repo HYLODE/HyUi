@@ -8,7 +8,7 @@ def page_status_controls(status: list[dmc.Col], controls: list[dmc.Col]) -> dmc.
         [
             dmc.Grid(
                 [
-                    *controls,
+                    dmc.Center(style={"width": "100%"}, children=[*controls]),
                     *status,
                 ],
                 grow=False,

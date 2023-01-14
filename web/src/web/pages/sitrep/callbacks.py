@@ -6,7 +6,7 @@ from typing import Tuple
 
 from models.census import CensusRow
 from web.config import get_settings
-from web.pages.home import CAMPUSES, ids
+from web.pages.sitrep import CAMPUSES, ids
 from web.stores import ids as store_ids
 
 
@@ -43,6 +43,8 @@ def _store_rooms(
     dfrooms = pd.DataFrame.from_records(rooms)
     # default inner join drops rooms not in the selected departments
     dfrooms = dfrooms.merge(dfdepts, on="department")
+    # drop closed rooms
+    dfrooms = dfrooms.loc[~dfrooms["closed"], :]
 
     return dfrooms.to_dict(orient="records")  # type: ignore
 
@@ -304,12 +306,50 @@ def _prepare_cyto_elements_campus(
 
 
 @callback(
-    Output(ids.DEBUG_NODE_INSPECTOR, "children"),
-    Input(ids.CYTO_CAMPUS, "tapNode"),
-    prevent_initial_callback=True,
+    Output(ids.CYTO_WARD, "elements"),
+    Input(ids.CENSUS_STORE, "data"),
+    Input(ids.DEPTS_OPEN_STORE, "data"),
+    Input(ids.ROOMS_OPEN_STORE, "data"),
+    Input(ids.BEDS_STORE, "data"),
+    Input(ids.DEPT_SELECTOR, "value"),
+    prevent_initial_call=True,
 )
-def tap_debug_inspector(data: dict) -> str:
+def _prepare_cyto_elements_ward(
+    census: list[dict],
+    depts: list[dict],
+    rooms: list[dict],
+    beds: list[dict],
+    dept: str,
+) -> list[dict]:
+    """
+    Build the element list from pts/beds/rooms/depts for the map
+    """
+    elements = _make_elements(
+        census, depts, rooms, beds, selected_dept=dept, ward_only=True
+    )
+    return elements
+
+
+def _format_tap_node_data(data: dict | None) -> str:
     if data:
         # remove the style part of tapNode for readabilty
         data.pop("style", None)
     return json.dumps(data, indent=4)
+
+
+@callback(
+    Output(ids.DEBUG_NODE_INSPECTOR_CAMPUS, "children"),
+    Input(ids.CYTO_CAMPUS, "tapNode"),
+    prevent_initial_callback=True,
+)
+def tap_debug_inspector_campus(data: dict) -> str:
+    return _format_tap_node_data(data)
+
+
+@callback(
+    Output(ids.DEBUG_NODE_INSPECTOR_WARD, "children"),
+    Input(ids.CYTO_WARD, "tapNode"),
+    prevent_initial_callback=True,
+)
+def tap_debug_inspector_ward(data: dict) -> str:
+    return _format_tap_node_data(data)
