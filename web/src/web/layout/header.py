@@ -1,6 +1,9 @@
 import dash_mantine_components as dmc
 from dash import Input, Output, State, clientside_callback
 from dash_iconify import DashIconify
+from web.config import get_settings
+
+settings = get_settings()
 
 
 def create_home_link(label: str) -> dmc.Anchor:
@@ -103,7 +106,10 @@ def create_header(nav_data: list | dict) -> dmc.Header:
                                         "https://github.com/hylode/hyui",
                                     ),
                                     create_header_link(
-                                        "carbon:help", "https:hylode.org"
+                                        "carbon:help", "https://hylode.org"
+                                    ),
+                                    create_header_link(
+                                        "carbon:settings", settings.baserow_public_url
                                     ),
                                     dmc.ActionIcon(
                                         DashIconify(

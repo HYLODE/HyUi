@@ -11,7 +11,7 @@ import web.pages.home.callbacks  # noqa
 from web.pages.home import CAMPUSES, ids
 from web.pages.home.widgets import page_status_controls
 
-dash.register_page(__name__, path="/sitrep", name="Sitrep")
+dash.register_page(__name__, path="/", name="Home")
 
 with open(Path(__file__).parent / "cyto_style_sheet.json") as f:
     cyto_style_sheet = json.load(f)
@@ -64,7 +64,7 @@ campus_cyto = dmc.Paper(
                         cyto.Cytoscape(
                             id=ids.CYTO_CAMPUS,
                             style={
-                                "width": "90vw",
+                                "width": "70vw",
                                 "height": "70vh",
                                 "z-index": 999,
                             },
