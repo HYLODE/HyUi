@@ -9,6 +9,7 @@ from models.census import CensusRow
 from web.config import get_settings
 from web.pages.sitrep import CAMPUSES, ids
 from web.stores import ids as store_ids
+from web.style import colors
 
 DEBUG = True
 
@@ -374,3 +375,54 @@ def tap_debug_inspector_ward(data: dict, opened: str) -> Tuple[str, bool]:
         return _format_tap_node_data(data), False
     else:
         return _format_tap_node_data(data), not opened
+
+
+@callback(
+    Output(ids.PROGRESS_CAMPUS, "sections"),
+    Input(ids.CYTO_CAMPUS, "elements"),
+    prevent_initial_call=True,
+)
+def progress_bar_campus(elements: list[dict]) -> list[dict]:
+    beds = [
+        ele.get("data", {})
+        for ele in elements
+        if ele.get("data", {}).get("entity") == "bed"
+    ]
+
+    # TODO: replace with total capacity from department sum
+    N = len(beds)
+    occupied = len([i for i in beds if i.get("occupied")])
+    blocked = len([i for i in beds if i.get("blocked")])
+    empty = N - occupied - blocked
+    empty_p = empty / N
+
+    # Adjust colors and labels based on size
+    blocked_label = "" if blocked / N < 0.1 else "Blocked"
+    empty_label = "" if empty_p else "Empty"
+    if empty_p < 0.05:
+        empty_colour = colors.red
+    elif empty_p < 0.1:
+        empty_colour = colors.yellow
+    else:
+        empty_colour = colors.green
+
+    return [
+        dict(
+            value=occupied / N * 100,
+            color=colors.teal,
+            label="Occupied",
+            tooltip=f"{occupied} beds",
+        ),
+        dict(
+            value=blocked / N * 100,
+            color=colors.gray,
+            label=blocked_label,
+            tooltip=f"{blocked} beds",
+        ),
+        dict(
+            value=empty / N * 100,
+            color=empty_colour,
+            label=empty_label,
+            tooltip=f"{empty} beds",
+        ),
+    ]

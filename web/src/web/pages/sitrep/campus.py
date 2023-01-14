@@ -10,11 +10,10 @@ from pathlib import Path
 import web.pages.sitrep.callbacks  # noqa
 from web.pages.sitrep import CAMPUSES, ids
 from web.pages.sitrep.widgets import page_status_controls
-from web.style import replace_colors_in_stylesheet, AppColors
+from web.style import colors, replace_colors_in_stylesheet
 
 dash.register_page(__name__, path="/sitrep/campus", name="Campus")
 
-colors = AppColors()
 
 with open(Path(__file__).parent / "cyto_style_sheet.json") as f:
     cyto_style_sheet = json.load(f)
@@ -49,6 +48,31 @@ dept_selector = html.Div(
             id=ids.DEPT_SELECTOR,
         ),
     ]
+)
+campus_status = dmc.Paper(
+    [
+        dmc.Grid(
+            children=[
+                dmc.Col(
+                    [
+                        dmc.Progress(
+                            id=ids.PROGRESS_CAMPUS,
+                            size=20,
+                            radius="md",
+                            # striped=True,
+                            # style={"font-size": "10px", "font-weight": 300},
+                        )
+                    ],
+                    span=12,
+                )
+            ],
+            style={"width": "70vw"},
+        ),
+    ],
+    # shadow="lg",
+    # radius="lg",
+    p="md",  # padding
+    # withBorder=True,
 )
 
 campus_cyto = dmc.Paper(
@@ -108,6 +132,7 @@ inspector = html.Div(
     ]
 )
 
+
 body = html.Div(
     [
         page_status_controls(
@@ -122,6 +147,7 @@ body = html.Div(
         ),
         dmc.Stack(
             [
+                campus_status,
                 campus_cyto,
             ],
             style={},
