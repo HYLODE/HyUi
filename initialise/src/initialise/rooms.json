@@ -20,13 +20,13 @@
   {
     "hl7_room": "C0NCCU HDU",
     "has_beds": true,
-    "closed": true,
+    "closed": false,
     "room": "HDU"
   },
   {
     "hl7_room": "C0NCCU ICU",
     "has_beds": true,
-    "closed": true,
+    "closed": false,
     "room": "ICU"
   },
   {
@@ -38,19 +38,19 @@
   {
     "hl7_room": "C1NCCU HDU1",
     "has_beds": true,
-    "closed": true,
+    "closed": false,
     "room": "HDU1"
   },
   {
     "hl7_room": "C1NCCU HDU2",
     "has_beds": true,
-    "closed": true,
+    "closed": false,
     "room": "HDU2"
   },
   {
     "hl7_room": "C1NCCU ICU",
     "has_beds": true,
-    "closed": true,
+    "closed": false,
     "room": "ICU"
   },
   {
