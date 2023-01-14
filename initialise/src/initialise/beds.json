@@ -140,7 +140,8 @@
     "ypos": "110"
   },
   {
-    "closed": "1",
+    "closed": "0",
+    "blocked": "TRUE",
     "covid": "0",
     "location_string": "T03^T03 SR32^SR32-32",
     "xpos": "60",
@@ -978,6 +979,18 @@
   },
   {
     "location_string": "1020100172^T07SWH BY12^BY12-54",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T06C^T06C BY07^BY07-36",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T06C^T06C BY08^BY08-39",
+    "closed": "TRUE"
+  },
+  {
+    "location_string": "T06C^T06C BY08^BY08-40",
     "closed": "TRUE"
   }
 ]

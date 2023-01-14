@@ -88,7 +88,7 @@ def _merge_star_and_caboodle_beds(
     # Make key to merge and force to lower etc.
     star_locations_df["merge_key"] = star_locations_df.agg(
         lambda x: (
-            x["speciality"],
+            # x["speciality"],
             x["department"],
             x["room"],
             x["hl7_bed"].lower(),
@@ -108,7 +108,7 @@ def _merge_star_and_caboodle_beds(
     # Make key to merge and force to lower etc
     caboodle_departments_df["merge_key"] = caboodle_departments_df.agg(
         lambda x: (
-            x["department_speciality"],
+            # x["department_speciality"],
             x["department_name"],
             x["room_name"],
             x["name"].lower(),

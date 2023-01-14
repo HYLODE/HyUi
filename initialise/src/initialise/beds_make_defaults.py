@@ -13,7 +13,7 @@ bed_fields = [
     "room",
     "hl7_bed",
     "location_id",
-    "location_string",
+    "location",
     "hl7_department",
     "hl7_room",
     "department_id",
@@ -21,6 +21,7 @@ bed_fields = [
     "bed_id",
 ]
 beds = df[bed_fields]
+beds.rename(columns={"location": "location_string"}, inplace=True)
 beds[["bed_split_1", "bed_split_2"]] = beds["hl7_bed"].str.split("-", expand=True)
 
 departments = pd.read_json("department_defaults.json")
@@ -44,15 +45,18 @@ df.drop(
     inplace=True,
 )
 df["closed"] = df["closed"].str.contains("True|1|TRUE")
+df["blocked"] = df["blocked"].str.contains("True|1|TRUE")
 df["xpos"] = df["xpos"].fillna(-1).astype(int)
 df["ypos"] = df["ypos"].fillna(-1).astype(int)
 beds = beds.merge(df, on="location_string", how="left")
 beds["closed"].fillna(False, inplace=True)
+beds["blocked"].fillna(False, inplace=True)
 
 # beds.to_excel("bed_defaults.xlsx", index=False)
 # Now hand edit if you wish, read back in, and then save as json
 # beds = pd.read_excel("bed_defaults.xlsx")
 beds["xpos"] = beds["xpos"].fillna(-1).astype(int)
 beds["ypos"] = beds["ypos"].fillna(-1).astype(int)
+beds["floor"] = beds["floor"].fillna(-1).astype(int)
 beds.loc[beds["bed_number"] == -1, "closed"] = True
 beds.to_json("bed_defaults.json", orient="records")

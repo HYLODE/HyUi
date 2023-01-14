@@ -47,7 +47,7 @@
   {
     "selector": "[?blocked]",
     "style": {
-      "background-color": "orange"
+      "background-color": "gray"
     }
   },
 
@@ -60,9 +60,9 @@
   {
     "selector": ":selected:",
     "style": {
-      "background-color": "red",
-      "background-opacity": 0.2,
-      "border-color": "red",
+      "background-color": "orange",
+      "background-opacity": 1,
+      "border-color": "orange",
       "border-width": 0,
       "color": "black"
     }

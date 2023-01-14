@@ -165,9 +165,20 @@ def recreate_defaults() -> None:
     """
     settings = get_baserow_settings()
 
+    # TODO: wrap this up in a single shell script for convenience
     logging.info(
-        "Starting Baserow updates. WARNING this is destructive and "
-        "will delete the existing department table"
+        """
+        Starting Baserow updates. WARNING this is destructive and
+        will delete existing tables if replace==True
+        ==================================================
+        CHECK you have recreated the defaults as necessary
+        e.g. run
+        bed_make_defaults.py
+        rooms_make_defaults.py
+        departments_make_defaults.py
+
+        only after this will baserow be properly updated
+        """
     )
 
     auth_token = _get_admin_user_auth_token(settings)
