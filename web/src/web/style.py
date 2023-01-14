@@ -8,6 +8,7 @@ class AppColors(BaseModel):
     blue: str = "#0074D9"
     aqua: str = "#7FDBFF"
     teal: str = "#39CCCC"
+    indigo: str = "#5c7cfa"  # via dbc.theme.default_colors
     olive: str = "#3D9970"
     green: str = "#2ECC40"
     lime: str = "#01FF70"
