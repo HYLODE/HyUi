@@ -89,6 +89,7 @@ ward_list = dmc.Paper(
         striped=True,
         highlightOnHover=True,
         verticalSpacing="xxs",
+        horizontalSpacing="md",
     ),
     shadow="lg",
     radius="lg",
