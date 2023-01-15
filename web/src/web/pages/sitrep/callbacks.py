@@ -292,9 +292,9 @@ def _make_elements(
     elements = sorted(
         elements,
         key=lambda e: (
-            e.get("data").get("entity", ""),
-            e.get("data").get("department", ""),
-            e.get("data").get("bed_number", ""),
+            e.get("data").get("entity", ""),  # type: ignore
+            e.get("data").get("department", ""),  # type: ignore
+            e.get("data").get("bed_number", ""),  # type: ignore
         ),
     )
     return elements
@@ -492,12 +492,12 @@ def progress_bar_campus(elements: list[dict]) -> list[dict]:
     elif empty_p < 0.1:
         empty_colour = colors.yellow
     else:
-        empty_colour = colors.green
+        empty_colour = colors.silver
 
     return [
         dict(
             value=occupied / N * 100,
-            color=colors.teal,
+            color=colors.indigo,
             label="Occupied",
             tooltip=f"{occupied} beds",
         ),

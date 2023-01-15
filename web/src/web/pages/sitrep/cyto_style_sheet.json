@@ -11,17 +11,22 @@
     "style": {
       "shape": "ellipse",
       "label": "data(bed_number)",
-      "color": "white",
-      "background-color": "green"
+      "color": "gray",
+      "border-color": "olive",
+      "border-width": 2,
+      "background-color": "olive",
+      "background-opacity": 0
     }
   },
   {
     "selector": "[entity='room']",
     "style": {
       "label": "data(label)",
+      "color": "gray",
       "border-width": 1,
+      "background-opacity": 0,
       "text-halign": "left",
-      "text-valign": "center"
+      "text-valign": "top"
     }
   },
   {
@@ -54,7 +59,10 @@
   {
     "selector": "[?occupied]",
     "style": {
-      "background-color": "teal"
+      "background-color": "orange",
+      "border-width": 0,
+      "color": "white",
+      "background-opacity": 1
     }
   },
   {
