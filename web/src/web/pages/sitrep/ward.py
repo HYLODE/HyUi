@@ -8,7 +8,11 @@ from pathlib import Path
 
 # noqa suppresses black errors when linting since you need this import for
 # access to callbacks
-import web.pages.sitrep.callbacks  # noqa
+import web.pages.sitrep.callbacks.cytoscape  # noqa
+import web.pages.sitrep.callbacks.inspector  # noqa
+import web.pages.sitrep.callbacks.widgets  # noqa
+import web.pages.sitrep.callbacks.bedlist  # noqa
+
 from web.pages.sitrep import CAMPUSES, ids
 from web.style import colors, replace_colors_in_stylesheet
 
@@ -123,13 +127,10 @@ debug_inspector = dmc.Container(
 
 bed_inspector = html.Div(
     [
-        dmc.Accordion(
+        dmc.AccordionMultiple(
             children=[
                 dmc.AccordionItem(
-                    [
-                        dmc.AccordionControl("🛏 Bed status"),
-                        dmc.AccordionPanel(id=ids.MODAL_ACCORDION_BED),
-                    ],
+                    id=ids.MODAL_ACCORDION_BED,
                     value="bed_status",
                 ),
                 dmc.AccordionItem(
@@ -142,7 +143,10 @@ bed_inspector = html.Div(
                     ],
                     value="debug_inspector",
                 ),
-            ]
+            ],
+            chevronPosition="left",
+            loop=True,
+            variant="separated",
         )
     ]
 )

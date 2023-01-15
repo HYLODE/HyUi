@@ -7,7 +7,9 @@ from pathlib import Path
 
 # noqa suppresses black errors when linting since you need this import for
 # access to callbacks
-import web.pages.sitrep.callbacks  # noqa
+import web.pages.sitrep.callbacks.cytoscape  # noqa
+import web.pages.sitrep.callbacks.inspector  # noqa
+import web.pages.sitrep.callbacks.widgets  # noqa
 from web.pages.sitrep import CAMPUSES, ids
 from web.style import colors, replace_colors_in_stylesheet
 

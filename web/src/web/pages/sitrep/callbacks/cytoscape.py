@@ -1,19 +1,13 @@
-from typing import Any
-import dash
-import dash_mantine_components as dmc
-import json
+from datetime import datetime
 import pandas as pd
 import requests
-from dash import Input, Output, State, callback, html
-from datetime import datetime
-from types import SimpleNamespace
+from dash import Input, Output, callback
 from typing import Tuple
 
 from models.census import CensusRow
 from web.config import get_settings
 from web.pages.sitrep import CAMPUSES, ids
 from web.stores import ids as store_ids
-from web.style import colors
 
 DEBUG = True
 
@@ -348,31 +342,6 @@ def _prepare_cyto_elements_ward(
     return elements
 
 
-def _format_tap_node_data(data: dict | None) -> str:
-    if data:
-        # remove the style part of tapNode for readabilty
-        data.pop("style", None)
-    return json.dumps(data, indent=4)
-
-
-@callback(
-    [
-        Output(ids.DEBUG_NODE_INSPECTOR_CAMPUS, "children"),
-        Output(ids.INSPECTOR_CAMPUS, "opened"),
-    ],
-    Input(ids.CYTO_CAMPUS, "tapNode"),
-    State(ids.INSPECTOR_CAMPUS, "opened"),
-    prevent_initial_callback=True,
-)
-def tap_debug_inspector_campus(data: dict, opened: str) -> Tuple[str, bool]:
-    if not DEBUG:
-        return dash.no_update, False
-    if not data:
-        return _format_tap_node_data(data), False
-    else:
-        return _format_tap_node_data(data), not opened
-
-
 def format_census(census: dict) -> dict:
     """Given a census object return a suitably formatted dictionary"""
     mrn = census.get("mrn", "")
@@ -404,180 +373,3 @@ def format_census(census: dict) -> dict:
         sex=sex,
         demographic_slug=f"{firstname} {lastname} | {age}{sex} | MRN {mrn}",
     )
-
-
-def _create_accordion_item(control: Any, panel: Any) -> Any:
-    return [dmc.AccordionControl(control), dmc.AccordionPanel(panel)]
-
-
-@callback(
-    [
-        Output(ids.INSPECTOR_WARD, "opened"),
-        Output(ids.DEBUG_NODE_INSPECTOR_WARD, "children"),
-        Output(ids.INSPECTOR_WARD, "title"),
-        Output(ids.MODAL_ACCORDION_PATIENT, "children"),
-    ],
-    Input(ids.CYTO_WARD, "tapNode"),
-    State(ids.INSPECTOR_WARD, "opened"),
-    prevent_initial_callback=True,
-)
-def tap_inspector_ward(node: dict, modal_opened: str) -> Tuple[bool, str, str, str]:
-    """
-    Populate the bed inspector modal
-    Args:
-        node:
-        modal_opened:
-
-    Returns:
-        modal: open status (toggle)
-        debug_inspection: json formattd string
-        title: title of the modal built from patient data
-        patient_content: to be viewed in the modal
-
-    """
-    if not node:
-        return False, dash.no_update, "", ""
-
-    data = node.get("data", {})
-    if data.get("entity") != "bed":
-        return False, dash.no_update, "", ""
-
-    occupied = data.get("occupied")
-
-    bed = data.get("bed")
-    bed_prefix = "Sideroom" if bed.get("sideroom") else "Bed"
-
-    modal_title = f"{bed_prefix} {bed.get('bed_number')}  " f"({bed.get('department')})"
-    accordion_pt_content = _create_accordion_item("🔬 Unoccupied", "")
-
-    if occupied:
-        census = data.get("census")
-        cfmt = SimpleNamespace(**format_census(census))
-        accordion_pt_content = _create_accordion_item(
-            f"🔬 {cfmt.demographic_slug}", "🚧 Patient details under construction 🚧"
-        )
-
-    return (
-        not modal_opened,
-        _format_tap_node_data(node),
-        modal_title,
-        accordion_pt_content,
-    )
-
-
-def _progress_bar_bed_count(elements: list[dict]) -> list[dict]:
-    """Given elements from a cytoscape bed map then prepare sections for
-    progress bar"""
-    beds = [
-        ele.get("data", {})
-        for ele in elements
-        if ele.get("data", {}).get("entity") == "bed"
-    ]
-
-    # TODO: replace with total capacity from department sum
-    N = len(beds)
-    occupied = len([i for i in beds if i.get("occupied")])
-    blocked = len([i for i in beds if i.get("blocked")])
-    empty = N - occupied - blocked
-    empty_p = empty / N
-
-    # Adjust colors and labels based on size
-    blocked_label = "" if blocked / N < 0.1 else "Blocked"
-    empty_label = "" if empty_p < 0.1 else "Empty"
-    if empty_p < 0.05:
-        empty_colour = colors.red
-    elif empty_p < 0.1:
-        empty_colour = colors.yellow
-    else:
-        empty_colour = colors.silver
-
-    return [
-        dict(
-            value=occupied / N * 100,
-            color=colors.indigo,
-            label="Occupied",
-            tooltip=f"{occupied} beds",
-        ),
-        dict(
-            value=blocked / N * 100,
-            color=colors.gray,
-            label=blocked_label,
-            tooltip=f"{blocked} beds",
-        ),
-        dict(
-            value=empty / N * 100,
-            color=empty_colour,
-            label=empty_label,
-            tooltip=f"{empty} beds",
-        ),
-    ]
-
-
-@callback(
-    Output(ids.PROGRESS_CAMPUS, "sections"),
-    Input(ids.CYTO_CAMPUS, "elements"),
-    prevent_initial_call=True,
-)
-def progress_bar_campus(elements: list[dict]) -> list[dict]:
-    return _progress_bar_bed_count(elements)
-
-
-@callback(
-    Output(ids.PROGRESS_WARD, "sections"),
-    Input(ids.CYTO_WARD, "elements"),
-    prevent_initial_call=True,
-)
-def progress_bar_ward(elements: list[dict]) -> list[dict]:
-    return _progress_bar_bed_count(elements)
-
-
-@callback(Output(ids.BED_SELECTOR_WARD, "children"), Input(ids.CYTO_WARD, "elements"))
-def _prep_bed_selector(elements: list[dict]) -> list[Any]:
-    data = [
-        ele.get("data", {})
-        for ele in elements
-        if ele.get("data", {}).get("entity") == "bed"
-    ]
-
-    header = [
-        html.Thead(
-            [
-                html.Tr(
-                    [
-                        html.Th(
-                            "Bed", style={"text-align": "end", "padding-right": "10px"}
-                        ),
-                        html.Th("Patient", style={"text-align": "start"}),
-                    ]
-                )
-            ]
-        )
-    ]
-
-    rows = []
-    for dat in data:
-        occupied = dat.get("occupied")
-        full_name = ""
-        bed_number = dat.get("bed_number", "")
-        if occupied:
-            census = dat.get("census")
-            cfmt = SimpleNamespace(**format_census(census))
-            full_name = f"{cfmt.firstname} {cfmt.lastname}"
-        row = html.Tr(
-            [
-                html.Td(
-                    bed_number,
-                    style={
-                        "text-align": "end",
-                        "font-weight": "bold",
-                        "font-family": "monospace",
-                        "padding-right": "10px",
-                    },
-                ),
-                html.Td(full_name, style={"text-align": "start"}),
-            ]
-        )
-        rows.append(row)
-    body = [html.Tbody(rows)]
-
-    return header + body
