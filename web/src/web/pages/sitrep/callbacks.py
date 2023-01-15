@@ -4,7 +4,7 @@ import dash_mantine_components as dmc
 import json
 import pandas as pd
 import requests
-from dash import Input, Output, State, callback
+from dash import Input, Output, State, callback, html
 from datetime import datetime
 from types import SimpleNamespace
 from typing import Tuple
@@ -514,3 +514,32 @@ def progress_bar_campus(elements: list[dict]) -> list[dict]:
             tooltip=f"{empty} beds",
         ),
     ]
+
+
+@callback(Output(ids.BED_SELECTOR_WARD, "children"), Input(ids.CYTO_WARD, "elements"))
+def _prep_bed_selector(elements: list[dict]) -> list[Any]:
+    data = [
+        ele.get("data", {})
+        for ele in elements
+        if ele.get("data", {}).get("entity") == "bed"
+    ]
+
+    header = [
+        html.Thead(
+            [
+                html.Tr(
+                    html.Th("Bed"),
+                )
+            ]
+        )
+    ]
+
+    rows = []
+    for dat in data:
+        row = html.Tr(
+            html.Td(dat.get("bed_number", ""), style={"text-align": "end"}),
+        )
+        rows.append(row)
+    body = [html.Tbody(rows)]
+
+    return header + body

@@ -11,11 +11,10 @@ from pathlib import Path
 import web.pages.sitrep.callbacks  # noqa
 from web.pages.sitrep import CAMPUSES, ids
 from web.pages.sitrep.widgets import page_status_controls
-from web.style import AppColors, replace_colors_in_stylesheet
+from web.style import colors, replace_colors_in_stylesheet
 
 dash.register_page(__name__, path="/sitrep/ward", name="Ward")
 
-colors = AppColors()
 
 with open(Path(__file__).parent / "cyto_style_sheet.json") as f:
     cyto_style_sheet = json.load(f)
@@ -56,39 +55,41 @@ dept_selector = html.Div(
 
 ward_cyto = dmc.Paper(
     [
-        dmc.Grid(
-            children=[
-                dmc.Col(
-                    [
-                        cyto.Cytoscape(
-                            id=ids.CYTO_WARD,
-                            style={
-                                "width": "70vw",
-                                "height": "70vh",
-                                "z-index": 999,
-                            },
-                            layout={
-                                "name": "circle",
-                                "animate": True,
-                                "fit": True,
-                                "padding": 10,
-                                "startAngle": math.pi
-                                * 2
-                                / 3,  # clockwise from 3 O'Clock
-                                "sweep": math.pi * 5 / 3,
-                            },
-                            stylesheet=cyto_style_sheet,
-                            responsive=True,
-                            userPanningEnabled=True,
-                            userZoomingEnabled=True,
-                        )
-                    ],
-                    span=12,
-                )
-            ],
-            grow=True,
+        cyto.Cytoscape(
+            id=ids.CYTO_WARD,
+            style={
+                # "width": "70vw",  # do not set width; will derive from height
+                "height": "70vh",
+                "z-index": 999,
+            },
+            layout={
+                "name": "circle",
+                "animate": True,
+                "fit": True,
+                "padding": 10,
+                "startAngle": math.pi * 2 / 3,  # clockwise from 3 O'Clock
+                "sweep": math.pi * 5 / 3,
+            },
+            stylesheet=cyto_style_sheet,
+            responsive=True,
+            userPanningEnabled=True,
+            userZoomingEnabled=True,
         )
     ],
+    shadow="lg",
+    radius="lg",
+    p="md",  # padding
+    withBorder=True,
+)
+
+
+ward_list = dmc.Paper(
+    dmc.Table(
+        id=ids.BED_SELECTOR_WARD,
+        striped=True,
+        highlightOnHover=True,
+        verticalSpacing="xxs",
+    ),
     shadow="lg",
     radius="lg",
     p="md",  # padding
@@ -142,7 +143,7 @@ inspector = html.Div(
     ]
 )
 
-body = html.Div(
+body = dmc.Container(
     [
         page_status_controls(
             controls=[
@@ -151,16 +152,15 @@ body = html.Div(
             ],
             status=[],
         ),
-        dmc.Stack(
+        dmc.Grid(
             [
-                ward_cyto,
-            ],
-            style={},
-            align="flex-start",
-            justify="flex-start",
-            spacing="sm",
+                dmc.Col(ward_cyto, span=9),
+                dmc.Col(ward_list, span=3),
+            ]
         ),
-    ]
+    ],
+    style={"width": "90vw"},
+    fluid=True,
 )
 
 

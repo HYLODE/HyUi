@@ -11,6 +11,7 @@ DEPTS_OPEN_STORE_NAMES = gen_id("open depts store names", __name__)
 CAMPUS_SELECTOR = gen_id("campus selector", __name__)
 DEPT_SELECTOR = gen_id("dept selector", __name__)
 LAYOUT_SELECTOR = gen_id("layout selector", __name__)
+BED_SELECTOR_WARD = gen_id("bed selector ward", __name__)
 
 # content
 CYTO_CAMPUS = gen_id("cyto campus", __name__)

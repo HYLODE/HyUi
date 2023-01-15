@@ -14,7 +14,6 @@ from web.style import colors, replace_colors_in_stylesheet
 
 dash.register_page(__name__, path="/sitrep/campus", name="Campus")
 
-
 with open(Path(__file__).parent / "cyto_style_sheet.json") as f:
     cyto_style_sheet = json.load(f)
     cyto_style_sheet = replace_colors_in_stylesheet(cyto_style_sheet)
@@ -51,65 +50,44 @@ dept_selector = html.Div(
 )
 campus_status = dmc.Paper(
     [
-        dmc.Grid(
-            children=[
-                dmc.Col(
-                    [
-                        dmc.Progress(
-                            id=ids.PROGRESS_CAMPUS,
-                            size=20,
-                            radius="md",
-                            # striped=True,
-                            # style={"font-size": "10px", "font-weight": 300},
-                        )
-                    ],
-                    span=12,
-                )
-            ],
-            style={"width": "70vw"},
-        ),
+        dmc.Progress(
+            id=ids.PROGRESS_CAMPUS,
+            size=20,
+            radius="md",
+            # striped=True,
+            # style={"font-size": "10px", "font-weight": 300},
+        )
     ],
-    # shadow="lg",
-    # radius="lg",
     p="md",  # padding
-    # withBorder=True,
+    # style={"width": "90vw"},
 )
 
 campus_cyto = dmc.Paper(
     [
-        dmc.Grid(
-            children=[
-                dmc.Col(
-                    [
-                        cyto.Cytoscape(
-                            id=ids.CYTO_CAMPUS,
-                            style={
-                                "width": "70vw",
-                                "height": "70vh",
-                                "z-index": 999,
-                            },
-                            layout={
-                                "name": "preset",
-                                "animate": True,
-                                "fit": True,
-                                "padding": 10,
-                            },
-                            stylesheet=cyto_style_sheet,
-                            responsive=True,
-                            userPanningEnabled=True,
-                            userZoomingEnabled=True,
-                        )
-                    ],
-                    span=12,
-                )
-            ],
-            grow=True,
+        cyto.Cytoscape(
+            id=ids.CYTO_CAMPUS,
+            style={
+                # "width": "70vw",
+                "height": "70vh",
+                "z-index": 999,
+            },
+            layout={
+                "name": "preset",
+                "animate": True,
+                "fit": True,
+                "padding": 10,
+            },
+            stylesheet=cyto_style_sheet,
+            responsive=True,
+            userPanningEnabled=True,
+            userZoomingEnabled=True,
         )
     ],
     shadow="lg",
     radius="lg",
     p="md",  # padding
     withBorder=True,
+    # style={"width": "90vw"},
 )
 
 debug_inspector = html.Div(
@@ -132,8 +110,7 @@ inspector = html.Div(
     ]
 )
 
-
-body = html.Div(
+body = dmc.Container(
     [
         page_status_controls(
             controls=[
@@ -145,17 +122,11 @@ body = html.Div(
             ],
             status=[],
         ),
-        dmc.Stack(
-            [
-                campus_status,
-                campus_cyto,
-            ],
-            style={},
-            align="flex-start",
-            justify="flex-start",
-            spacing="sm",
-        ),
-    ]
+        campus_status,
+        campus_cyto,
+    ],
+    style={"width": "90vw"},
+    fluid=True,
 )
 
 
