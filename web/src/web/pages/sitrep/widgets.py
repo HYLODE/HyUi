@@ -11,8 +11,8 @@ def page_status_controls(status: list[dmc.Col], controls: list[dmc.Col]) -> dmc.
                     dmc.Center(style={"width": "100%"}, children=[*controls]),
                     *status,
                 ],
-                grow=False,
-                gutter="m",
+                # grow=False,
+                # gutter="m",
             )
         ],
         p="xs",

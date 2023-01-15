@@ -10,11 +10,9 @@ from pathlib import Path
 # access to callbacks
 import web.pages.sitrep.callbacks  # noqa
 from web.pages.sitrep import CAMPUSES, ids
-from web.pages.sitrep.widgets import page_status_controls
 from web.style import colors, replace_colors_in_stylesheet
 
 dash.register_page(__name__, path="/sitrep/ward", name="Ward")
-
 
 with open(Path(__file__).parent / "cyto_style_sheet.json") as f:
     cyto_style_sheet = json.load(f)
@@ -41,7 +39,7 @@ campus_selector = html.Div(
     ]
 )
 
-dept_selector = html.Div(
+dept_selector = dmc.Container(
     [
         dmc.Select(
             # label="Select a ward",
@@ -50,7 +48,19 @@ dept_selector = html.Div(
             searchable=True,
             nothingFound="No match found",
         ),
-    ]
+    ],
+    fluid=True,
+    p="xxs",
+)
+
+ward_status = dmc.Paper(
+    [
+        dmc.Progress(
+            id=ids.PROGRESS_WARD,
+            size=20,
+            radius="md",
+        )
+    ],
 )
 
 ward_cyto = dmc.Paper(
@@ -82,7 +92,6 @@ ward_cyto = dmc.Paper(
     withBorder=True,
 )
 
-
 ward_list = dmc.Paper(
     dmc.Table(
         id=ids.BED_SELECTOR_WARD,
@@ -97,8 +106,19 @@ ward_list = dmc.Paper(
     withBorder=True,
 )
 
-debug_inspector = html.Div(
-    [dmc.Prism(language="json", id=ids.DEBUG_NODE_INSPECTOR_WARD, children="")]
+debug_inspector = dmc.Container(
+    [
+        dmc.Spoiler(
+            children=[
+                dmc.Prism(
+                    language="json", id=ids.DEBUG_NODE_INSPECTOR_WARD, children=""
+                )
+            ],
+            showLabel="Show more ... if you really want to",
+            hideLabel="We warned you",
+            maxHeight=100,
+        )
+    ]
 )
 
 bed_inspector = html.Div(
@@ -146,17 +166,13 @@ inspector = html.Div(
 
 body = dmc.Container(
     [
-        page_status_controls(
-            controls=[
-                dmc.Col(campus_selector, span=3),
-                dmc.Col(dept_selector, span="auto"),
-            ],
-            status=[],
-        ),
         dmc.Grid(
             [
-                dmc.Col(ward_cyto, span=9),
+                dmc.Col(dept_selector, span=6),
+                dmc.Col(campus_selector, span=3, offset=3),
+                dmc.Col(ward_status, span=12),
                 dmc.Col(ward_list, span=3),
+                dmc.Col(ward_cyto, span=9),
             ]
         ),
     ],

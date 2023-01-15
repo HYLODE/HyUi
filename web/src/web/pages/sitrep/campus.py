@@ -9,7 +9,6 @@ from pathlib import Path
 # access to callbacks
 import web.pages.sitrep.callbacks  # noqa
 from web.pages.sitrep import CAMPUSES, ids
-from web.pages.sitrep.widgets import page_status_controls
 from web.style import colors, replace_colors_in_stylesheet
 
 dash.register_page(__name__, path="/sitrep/campus", name="Campus")
@@ -29,7 +28,7 @@ stores = html.Div(
     ]
 )
 
-campus_selector = html.Div(
+campus_selector = dmc.Container(
     [
         dmc.SegmentedControl(
             id=ids.CAMPUS_SELECTOR,
@@ -39,7 +38,7 @@ campus_selector = html.Div(
     ]
 )
 
-dept_selector = html.Div(
+dept_selector = dmc.Container(
     [
         dmc.Select(
             label="Select a ward",
@@ -54,12 +53,9 @@ campus_status = dmc.Paper(
             id=ids.PROGRESS_CAMPUS,
             size=20,
             radius="md",
-            # striped=True,
             # style={"font-size": "10px", "font-weight": 300},
         )
     ],
-    p="md",  # padding
-    # style={"width": "90vw"},
 )
 
 campus_cyto = dmc.Paper(
@@ -112,18 +108,13 @@ inspector = html.Div(
 
 body = dmc.Container(
     [
-        page_status_controls(
-            controls=[
-                dmc.Col(campus_selector, span=3, offset=0),
-                dmc.Col(
-                    [],
-                    span=9,
-                ),
-            ],
-            status=[],
+        dmc.Grid(
+            [
+                dmc.Col(campus_selector, offset=9, span=3),
+                dmc.Col(campus_status, span=12),
+                dmc.Col(campus_cyto, span=12),
+            ]
         ),
-        campus_status,
-        campus_cyto,
     ],
     style={"width": "90vw"},
     fluid=True,

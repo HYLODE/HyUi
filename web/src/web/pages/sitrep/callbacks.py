@@ -465,12 +465,9 @@ def tap_inspector_ward(node: dict, modal_opened: str) -> Tuple[bool, str, str, s
     )
 
 
-@callback(
-    Output(ids.PROGRESS_CAMPUS, "sections"),
-    Input(ids.CYTO_CAMPUS, "elements"),
-    prevent_initial_call=True,
-)
-def progress_bar_campus(elements: list[dict]) -> list[dict]:
+def _progress_bar_bed_count(elements: list[dict]) -> list[dict]:
+    """Given elements from a cytoscape bed map then prepare sections for
+    progress bar"""
     beds = [
         ele.get("data", {})
         for ele in elements
@@ -514,6 +511,24 @@ def progress_bar_campus(elements: list[dict]) -> list[dict]:
             tooltip=f"{empty} beds",
         ),
     ]
+
+
+@callback(
+    Output(ids.PROGRESS_CAMPUS, "sections"),
+    Input(ids.CYTO_CAMPUS, "elements"),
+    prevent_initial_call=True,
+)
+def progress_bar_campus(elements: list[dict]) -> list[dict]:
+    return _progress_bar_bed_count(elements)
+
+
+@callback(
+    Output(ids.PROGRESS_WARD, "sections"),
+    Input(ids.CYTO_WARD, "elements"),
+    prevent_initial_call=True,
+)
+def progress_bar_ward(elements: list[dict]) -> list[dict]:
+    return _progress_bar_bed_count(elements)
 
 
 @callback(Output(ids.BED_SELECTOR_WARD, "children"), Input(ids.CYTO_WARD, "elements"))
@@ -566,16 +581,3 @@ def _prep_bed_selector(elements: list[dict]) -> list[Any]:
     body = [html.Tbody(rows)]
 
     return header + body
-
-    # for dat in data:
-    #     occupied = dat.get("occupied")
-    #     # full_name = "🛏"
-    #     # if occupied:
-    #     #     census = dat.get("census")
-    #     #     cfmt = SimpleNamespace(**format_census(census))
-    #     #     full_name = f"{cfmt.firstname} {cfmt.lastname}"
-    #     row = html.Tr(
-    #         html.Td(dat.get("bed_number",""), style={"text-align": "end"}),
-    #         # html.Td(full_name, style={"text-align", "start"}),
-    #     )
-    #     rows.append(row)
