@@ -287,6 +287,16 @@ def _make_elements(
                     selected=selected,
                 )
             )
+    # Sort elements by floor/dept/bed_number: NB: make a tuple for the sort
+    # https://stackoverflow.com/a/33893264/992999
+    elements = sorted(
+        elements,
+        key=lambda e: (
+            e.get("data").get("entity", ""),
+            e.get("data").get("department", ""),
+            e.get("data").get("bed_number", ""),
+        ),
+    )
     return elements
 
 
