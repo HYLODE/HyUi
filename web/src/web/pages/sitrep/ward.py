@@ -1,8 +1,8 @@
-import math
 import dash
 import dash_cytoscape as cyto
 import dash_mantine_components as dmc
 import json
+import math
 from dash import dcc, html
 from pathlib import Path
 
@@ -11,8 +11,7 @@ from pathlib import Path
 import web.pages.sitrep.callbacks  # noqa
 from web.pages.sitrep import CAMPUSES, ids
 from web.pages.sitrep.widgets import page_status_controls
-from web.style import replace_colors_in_stylesheet, AppColors
-
+from web.style import AppColors, replace_colors_in_stylesheet
 
 dash.register_page(__name__, path="/sitrep/ward", name="Ward")
 
@@ -21,7 +20,6 @@ colors = AppColors()
 with open(Path(__file__).parent / "cyto_style_sheet.json") as f:
     cyto_style_sheet = json.load(f)
     cyto_style_sheet = replace_colors_in_stylesheet(cyto_style_sheet)
-
 
 timers = html.Div([])
 stores = html.Div(
@@ -101,18 +99,45 @@ debug_inspector = html.Div(
     [dmc.Prism(language="json", id=ids.DEBUG_NODE_INSPECTOR_WARD, children="")]
 )
 
+bed_inspector = html.Div(
+    [
+        dmc.Accordion(
+            children=[
+                dmc.AccordionItem(
+                    [
+                        dmc.AccordionControl("🛏 Bed status"),
+                        dmc.AccordionPanel(id=ids.MODAL_ACCORDION_BED),
+                    ],
+                    value="bed_status",
+                ),
+                dmc.AccordionItem(
+                    id=ids.MODAL_ACCORDION_PATIENT, value="patient_status"
+                ),
+                dmc.AccordionItem(
+                    [
+                        dmc.AccordionControl("🐛 Debugging"),
+                        dmc.AccordionPanel(debug_inspector),
+                    ],
+                    value="debug_inspector",
+                ),
+            ]
+        )
+    ]
+)
+
 inspector = html.Div(
     [
         dmc.Modal(
-            title="Inspect this",
             id=ids.INSPECTOR_WARD,
             centered=True,
+            padding="xs",
             size="60vw",
             overflow="inside",
             overlayColor=colors.gray,
+            overlayOpacity=0.5,
             transition="pop",
             transitionDuration=300,
-            children=[debug_inspector],
+            children=[bed_inspector],
         )
     ]
 )

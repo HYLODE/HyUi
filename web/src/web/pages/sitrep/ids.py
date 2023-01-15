@@ -19,6 +19,9 @@ INSPECTOR_CAMPUS = gen_id("inspector campus", __name__)
 INSPECTOR_WARD = gen_id("inspector ward", __name__)
 PROGRESS_CAMPUS = gen_id("progress ward", __name__)
 
+MODAL_ACCORDION_BED = gen_id("accordion bed", __name__)
+MODAL_ACCORDION_PATIENT = gen_id("accordion patient", __name__)
+
 # other
 DEBUG_NODE_INSPECTOR_CAMPUS = gen_id("debug inspect node campus", __name__)
 DEBUG_NODE_INSPECTOR_WARD = gen_id("debug inspect node ward", __name__)

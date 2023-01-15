@@ -1,8 +1,12 @@
+from typing import Any
 import dash
+import dash_mantine_components as dmc
 import json
 import pandas as pd
 import requests
-from dash import Input, Output, callback, State
+from dash import Input, Output, State, callback
+from datetime import datetime
+from types import SimpleNamespace
 from typing import Tuple
 
 from models.census import CensusRow
@@ -359,22 +363,96 @@ def tap_debug_inspector_campus(data: dict, opened: str) -> Tuple[str, bool]:
         return _format_tap_node_data(data), not opened
 
 
+def format_census(census: dict) -> dict:
+    """Given a census object return a suitably formatted dictionary"""
+    mrn = census.get("mrn", "")
+    encounter = str(census.get("encounter", ""))
+    lastname = census.get("lastname", "").upper()
+    firstname = census.get("firstname", "").title()
+    initials = f"{census.get('firstname', '?')[0]}" f"{census.get('lastname', '?')[0]}"
+    date_of_birth = census.get("date_of_birth", "1900-01-01")  # default dob
+    dob = datetime.fromisoformat(date_of_birth)
+    dob_fshort = datetime.strftime(dob, "%d-%m-%Y")
+    dob_flong = datetime.strftime(dob, "%d %b %Y")
+    age = int((datetime.utcnow() - dob).days / 365.25)
+    sex = census.get("sex")
+    if sex is None:
+        sex = ""
+    else:
+        sex = "M" if sex.lower() == "m" else "F"
+
+    return dict(
+        mrn=mrn,
+        encounter=encounter,
+        lastname=lastname,
+        firstname=firstname,
+        initials=initials,
+        dob=dob,
+        dob_fshort=dob_fshort,
+        dob_flong=dob_flong,
+        age=age,
+        sex=sex,
+        demographic_slug=f"{firstname} {lastname} | {age}{sex} | MRN {mrn}",
+    )
+
+
+def _create_accordion_item(control: Any, panel: Any) -> Any:
+    return [dmc.AccordionControl(control), dmc.AccordionPanel(panel)]
+
+
 @callback(
     [
-        Output(ids.DEBUG_NODE_INSPECTOR_WARD, "children"),
         Output(ids.INSPECTOR_WARD, "opened"),
+        Output(ids.DEBUG_NODE_INSPECTOR_WARD, "children"),
+        Output(ids.INSPECTOR_WARD, "title"),
+        Output(ids.MODAL_ACCORDION_PATIENT, "children"),
     ],
     Input(ids.CYTO_WARD, "tapNode"),
     State(ids.INSPECTOR_WARD, "opened"),
     prevent_initial_callback=True,
 )
-def tap_debug_inspector_ward(data: dict, opened: str) -> Tuple[str, bool]:
-    if not DEBUG:
-        return dash.no_update, False
-    if not data:
-        return _format_tap_node_data(data), False
-    else:
-        return _format_tap_node_data(data), not opened
+def tap_inspector_ward(node: dict, modal_opened: str) -> Tuple[bool, str, str, str]:
+    """
+    Populate the bed inspector modal
+    Args:
+        node:
+        modal_opened:
+
+    Returns:
+        modal: open status (toggle)
+        debug_inspection: json formattd string
+        title: title of the modal built from patient data
+        patient_content: to be viewed in the modal
+
+    """
+    if not node:
+        return False, dash.no_update, "", ""
+
+    data = node.get("data", {})
+    if data.get("entity") != "bed":
+        return False, dash.no_update, "", ""
+
+    occupied = data.get("occupied")
+
+    bed = data.get("bed")
+    bed_prefix = "Sideroom" if bed.get("sideroom") else "Bed"
+
+    modal_title = f"{bed_prefix} {bed.get('bed_number')}  " f"({bed.get('department')})"
+    accordion_pt_content = _create_accordion_item("🔬 Unoccupied", "")
+
+    if occupied:
+        census = data.get("census")
+        cfmt = SimpleNamespace(**format_census(census))
+        accordion_pt_content = _create_accordion_item(
+            f"🔬 {cfmt.demographic_slug}", "🚧 Patient details under construction 🚧"
+        )
+
+    return (
+        not modal_opened,
+        _format_tap_node_data(node),
+        modal_title,
+        accordion_pt_content,
+    )
 
 
 @callback(
@@ -398,7 +476,7 @@ def progress_bar_campus(elements: list[dict]) -> list[dict]:
 
     # Adjust colors and labels based on size
     blocked_label = "" if blocked / N < 0.1 else "Blocked"
-    empty_label = "" if empty_p else "Empty"
+    empty_label = "" if empty_p < 0.1 else "Empty"
     if empty_p < 0.05:
         empty_colour = colors.red
     elif empty_p < 0.1:
