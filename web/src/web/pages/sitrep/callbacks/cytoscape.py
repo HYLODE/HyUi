@@ -229,6 +229,8 @@ def store_discharge_status(dept: str) -> list[dict]:
     if not dept:
         return dash.no_update
     discharges = _get_discharge_updates(delta_hours=36)
+    if not discharges:
+        return dash.no_update
     df = pd.DataFrame.from_records(discharges)
     df.sort_values(["csn", "modified_at"], ascending=[True, False], inplace=True)
     df.drop_duplicates(["csn"], inplace=True)
@@ -289,7 +291,12 @@ def _make_elements(
     # TODO: rebuild discharge_statuses table with encounter as string
     # TODO: fix naming (use 'encounter' in census and 'csn' in discharges)
     # convert csn to string since that's how encounter is stored in EMAP
-    discharge_lookup = {str(i.get("csn")): i for i in discharges}
+    try:
+        discharge_lookup = {str(i.get("csn")): i for i in discharges}
+    except TypeError as e:
+        warnings.warn("Possible type error b/c no recent discharges")
+        print(e)
+        discharge_lookup = {}
 
     # create beds
     for bed in beds:
