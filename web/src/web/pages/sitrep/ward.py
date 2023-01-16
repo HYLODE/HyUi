@@ -42,6 +42,8 @@ campus_selector = html.Div(
             id=ids.CAMPUS_SELECTOR,
             value=[i.get("value") for i in CAMPUSES if i.get("label") == "UCH"][0],
             data=CAMPUSES,
+            persistence=True,
+            persistence_type="local",
         ),
     ]
 )
@@ -55,6 +57,8 @@ dept_selector = dmc.Container(
             searchable=True,
             nothingFound="No match found",
             value="UCH T03 INTENSIVE CARE",
+            persistence=True,
+            persistence_type="local",
         ),
     ],
     fluid=True,

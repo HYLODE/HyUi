@@ -36,6 +36,8 @@ campus_selector = dmc.Container(
             id=ids.CAMPUS_SELECTOR,
             value=[i.get("value") for i in CAMPUSES if i.get("label") == "UCH"][0],
             data=CAMPUSES,
+            persistence=True,
+            persistence_type="local",
         ),
     ]
 )
