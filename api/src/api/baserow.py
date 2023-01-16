@@ -1,6 +1,8 @@
 import json
 import requests
 from typing import cast, Any
+from api.utils import Timer
+from api.config import get_settings, Settings
 
 
 class BaserowException(Exception):
@@ -88,13 +90,17 @@ def get_rows(
     Baserow only returns 200 rows at the most. This function pages through an
     endpoint until all rows are returned.
     """
-    auth_token = _get_user_auth_token(baserow_url, email, password)
+    with Timer(text="get_rows.auth_token: Elapsed time: {:.4f}"):
+        # auth_token = _get_user_auth_token(baserow_url, email, password)
+        auth_token = BASEROW_AUTH_TOKEN
 
-    application_id = _get_application_id(baserow_url, auth_token, application_name)
+    with Timer(text="get_rows.application_id: Elapsed time: {:.4f}"):
+        application_id = _get_application_id(baserow_url, auth_token, application_name)
     if not application_id:
         raise BaserowException(f"no application ID for application {application_name}")
 
-    table_id = _get_table_id(baserow_url, auth_token, application_id, table_name)
+    with Timer(text="get_rows.table_id: Elapsed time: {:.4f}"):
+        table_id = _get_table_id(baserow_url, auth_token, application_id, table_name)
     if not table_id:
         raise BaserowException(
             f"no table ID for application {application_name}, table {table_name}"
@@ -108,9 +114,10 @@ def get_rows(
     while True:
 
         params["page"] = params["page"] + 1
-        response = requests.get(
-            rows_url, headers=_auth_headers(auth_token), params=params
-        )
+        with Timer(text="get_rows.requests: Elapsed time: {:.4f}"):
+            response = requests.get(
+                rows_url, headers=_auth_headers(auth_token), params=params
+            )
 
         if response.status_code != 200:
             raise BaserowException(
@@ -129,7 +136,8 @@ def get_rows(
 def get_fields(
     baserow_url: str, email: str, password: str, application_name: str, table_name: str
 ) -> dict[str, int]:
-    auth_token = _get_user_auth_token(baserow_url, email, password)
+    # auth_token = _get_user_auth_token(baserow_url, email, password)
+    auth_token = BASEROW_AUTH_TOKEN
 
     application_id = _get_application_id(baserow_url, auth_token, application_name)
     if not application_id:
@@ -161,7 +169,8 @@ def post_row(
     params: dict,
     payload: dict,
 ) -> Any:
-    auth_token = _get_user_auth_token(baserow_url, email, password)
+    # auth_token = _get_user_auth_token(baserow_url, email, password)
+    auth_token = BASEROW_AUTH_TOKEN
 
     application_id = _get_application_id(baserow_url, auth_token, application_name)
     if not application_id:
@@ -185,3 +194,14 @@ def post_row(
         )
 
     return response.json()
+
+
+def _load_user_auth_token(settings: Settings) -> str:
+    baserow_url = settings.baserow_url
+    email = settings.baserow_email
+    password = settings.baserow_password.get_secret_value()
+    return _get_user_auth_token(baserow_url, email, password)
+
+
+settings = get_settings()
+BASEROW_AUTH_TOKEN = _load_user_auth_token(settings)

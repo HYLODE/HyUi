@@ -10,6 +10,7 @@ from api.wards import (
     MISSING_DEPARTMENT_LOCATIONS,
 )
 from models.beds import Bed, Room, Department, DischargeStatus
+from api.utils import Timer
 
 router = APIRouter(
     prefix="/beds",
@@ -303,6 +304,7 @@ def post_discharge_status(
 
 
 @mock_router.get("/discharge_status/", response_model=list[DischargeStatus])
+@Timer(text="Get rows route: Elapsed time: {:.4f}")
 def get_mock_discharge_status(
     delta_hours: int = 72, settings: Settings = Depends(get_settings)
 ) -> list[DischargeStatus]:
