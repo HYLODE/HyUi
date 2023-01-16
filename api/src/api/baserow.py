@@ -64,12 +64,15 @@ def _refresh_user_auth_token(baserow_url: str) -> str:
     )
 
     if response.status_code == 200:
+        print("SUCCESS: refreshed access token")
         access_token = cast(str, response.json()["access_token"])
         global BASEROW_AUTH_TOKEN
         BASEROW_AUTH_TOKEN = access_token
     else:
         raise BaserowException(
-            f"unexpected response {response.status_code}: " f"{str(response.content)}"
+            "ERROR: unable to refresh access token"
+            f"unexpected response {response.status_code}: "
+            f"{str(response.content)}"
         )
     return access_token
 
