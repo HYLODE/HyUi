@@ -4,9 +4,6 @@ backend default {
     .host = "api";
     .port = "8000";
 }
-sub vcl_backend_response {
-    set beresp.ttl = 5m;
-}
 sub vcl_recv {
     /* other config here */
 
