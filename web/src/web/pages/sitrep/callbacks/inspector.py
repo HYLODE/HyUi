@@ -80,8 +80,10 @@ def bed_accordion_item(node: dict) -> Tuple[dmc.AccordionControl, dmc.AccordionP
         return dmc.AccordionControl(control), dmc.AccordionPanel(panel)
 
     data = node.get("data", {})
-    bed_status_control_value = data.get("discharges", {}).get("status", "").upper()
-
+    if data.get("occupied"):
+        bed_status_control_value = data.get("discharges", {}).get("status", "").upper()
+    else:
+        bed_status_control_value = ""
 
     control = dmc.Group(
         [
@@ -152,13 +154,15 @@ def patient_accordion_item(
 
     data = node.get("data", {})
     census = data.get("census", {})
-    censusf = format_census(census)
-
-    sex = census.get("sex", "")
-    if sex is None:
-        sex_icon = "carbon:person"
-    else:
-        sex_icon = "carbon:male" if sex.lower() == "m" else "carbon:female"
+    occupied = census.get("occupied", False)
+    sex_icon = "carbon:person"
+    control_text = "Unoccupied"
+    if census and occupied:
+        censusf = format_census(census)
+        sex = censusf.get("sex", "")
+        if sex:
+            sex_icon = "carbon:male" if sex.lower() == "m" else "carbon:female"
+        control_text = censusf.get("demographic_slug", "Uh-oh! No patient data?")
 
     control = dmc.Group(
         [
@@ -166,7 +170,7 @@ def patient_accordion_item(
                 icon=sex_icon,
                 width=20,
             ),
-            dmc.Text(censusf.get("demographic_slug")),
+            dmc.Text(control_text),
         ]
     )
     panel = dmc.Group()

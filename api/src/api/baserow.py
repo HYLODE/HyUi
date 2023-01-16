@@ -87,18 +87,18 @@ def _auth_headers(auth_token: str) -> dict[str, str]:
 def _get_application_id(
     baserow_url: str, auth_token: str, application_name: str
 ) -> int | None:
-    def _request():
+    def _request(auth_token: str):
         return requests.get(
             f"{baserow_url}/api/applications/",
             headers=_auth_headers(auth_token),
         )
 
-    response = _request()
+    response = _request(auth_token)
 
     if response.status_code == 401:
         warnings.warn("Authentication error: will attempt to refresh")
-        _refresh_user_auth_token(baserow_url)
-        response = _request()
+        auth_token = _refresh_user_auth_token(baserow_url)
+        response = _request(auth_token)
 
     if response.status_code != 200:
         raise BaserowException(

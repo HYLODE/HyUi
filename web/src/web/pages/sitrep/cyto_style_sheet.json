@@ -68,10 +68,12 @@
   {
     "selector": ":selected:",
     "style": {
-      "background-color": "orange",
-      "background-opacity": 1,
-      "border-color": "orange",
-      "border-width": 0,
+      "width": 36,
+      "height": 36,
+      "text-margin-y": 2,
+      "shape": "star",
+      "border-width": 1,
+      "border-color": "black",
       "color": "black"
     }
   }
