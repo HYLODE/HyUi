@@ -116,22 +116,22 @@ def store_data(days_ahead: int) -> list[type[BaseModel]]:
     return [MergedData.parse_obj(row).dict() for row in response.json()]
 
 
-# @callback(
-#     Output(filtered_data, "data"),
-#     Input(service_picker, "value"),
-#     Input(pacu_checklist, "value"),
-#     Input(request_data, "data"),
-# )
-# def filter_data(service: list[str], pacu: list[bool], data: list[dict]):
+@callback(
+     Output(filtered_data, "data"),
+     Input(service_picker, "value"),
+     Input(pacu_checklist, "value"),
+     Input(request_data, "data"),
+ )
+ def filter_data(service: list[str], pacu: list[bool], data: list[dict]):
 #     """
 #     Update data based on picker
 #     """
 
-#     # TODO: Fix this.
-#     # data = [row for row in data if row["pacu"] in pacu]
-#     # if service:
-#     #     return [row for row in data if row["primary_service"] in service]
-#     return data
+     # TODO: Fix this.
+     # data = [row for row in data if row["pacu"] in pacu]
+     # if service:
+     #     return [row for row in data if row["primary_service"] in service]
+     return data
 
 
 @callback(

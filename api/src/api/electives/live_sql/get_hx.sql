@@ -25,8 +25,8 @@ WITH surgical_pts AS (
             )
             OR wlef.[IntendedManagement] IS NULL
         )
-        AND scufx.[PlannedOperationStartInstant] >= ?
-        AND scufx.[PlannedOperationStartInstant] < ?
+        AND scufx.[PlannedOperationStartInstant] >= :start_date
+        AND scufx.[PlannedOperationStartInstant] < :end_date
 )
 SELECT DISTINCT def.[PatientDurableKey],
     surgical_pts.[SurgicalCaseKey],

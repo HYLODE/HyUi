@@ -124,8 +124,8 @@ WHERE cnf.[Type] = 'Anaesthesia Preprocedure Evaluation'
             AND dd.[DepartmentName] != 'UCH P02 ENDOSCOPY'
             AND dd.[DepartmentName] != 'UCH ANAESTHESIA DEPT'
             AND patd.[AgeInYears] >= 18
-            AND scufx.[PlannedOperationStartInstant] >= ?
-            AND scufx.[PlannedOperationStartInstant] < ?
+            AND scufx.[PlannedOperationStartInstant] >= :start_date
+            AND scufx.[PlannedOperationStartInstant] < :end_date
             AND (
                 wlef.[IntendedManagement] IN (
                     '*Unspecified',

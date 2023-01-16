@@ -14,6 +14,7 @@ from models.electives import (
     # EchoData,
     EchoWithAbnormalData,
     ObsData,
+    AxaCodes,
 )
 from api.electives.hypo_help import (
     merge_surg_preassess,
@@ -156,6 +157,7 @@ def prepare_draft(
     labs: list[type[BaseModel]],
     echo: list[type[BaseModel]],
     obs: list[type[BaseModel]],
+    axa: list[type[BaseModel]],
 ) -> pd.DataFrame:
 
     electives_df = to_data_frame(electives, SurgData)
@@ -163,21 +165,22 @@ def prepare_draft(
     labs_df = to_data_frame(labs, LabData)
     echo_df = to_data_frame(echo, EchoWithAbnormalData)
     obs_df = to_data_frame(obs, ObsData)
-    axa_codes = camel_to_snake(
-        pd.read_csv(
-            "supp_data/axa_codes.csv",
-            encoding="cp1252",
-            usecols=["SurgicalService", "Name", "axa_severity", "protocolised_adm"],
-        )
-    )
+    axa_codes = to_data_frame(axa, AxaCodes)    
+# axa_codes = camel_to_snake(
+    #    pd.read_csv(
+    #        "axa_codes.csv",
+    #        encoding="cp1252",
+    #        usecols=["SurgicalService", "Name", "axa_severity", "protocolised_adm"],
+    #    )
+    #)
 
-    print(electives_df)
+    # print(axa_codes.columns)
 
     df = (
         merge_surg_preassess(surg_data=electives_df, preassess_data=preassess_df)
         .merge(wrangle_labs(labs_df), how="left", on="patient_durable_key")
         .merge(wrangle_echo(echo_df), how="left", on="patient_durable_key")
-        .merge(j_wrangle_obs(obs_df), how="left", on="surgical_case_key")
+        .merge(j_wrangle_obs(obs_df), how="left", on=["surgical_case_key", "planned_operation_start_instant"])
         .sort_values("surgery_date", ascending=True)
         .drop_duplicates(subset="patient_durable_key", keep="first")
         .sort_index()
@@ -188,11 +191,12 @@ def prepare_draft(
             how="left",
         )
     )
+    # print(df.columns)
     # create pacu label
     df["pacu"] = False
-    df["pacu"] = np.where(
-        df["booked_destination"].astype(str).str.contains("PACU"),
-        True,
-    )
+    #df["pacu"] = np.where(
+    #    df["booked_destination"].astype(str).str.contains("PACU"),
+    #    True,
+    #)
 
     return df

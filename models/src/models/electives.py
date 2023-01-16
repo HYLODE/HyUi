@@ -94,7 +94,7 @@ class ElectiveSurgCase(BaseModel):
 
 
 class SurgData(CabData):
-    primary_mrn: int
+    primary_mrn: str
     patient_key: int
     surgical_case_uclh_key: int
     first_name: str
@@ -116,15 +116,15 @@ class SurgData(CabData):
     primary_anaesthesia_type: str | None
     reason_not_performed: str | None
     canceled: bool | None
-    planned_operation_start_instant: datetime | None
-    planned_operation_end_instant: datetime | None
+    planned_operation_start_instant: datetime #  | None
+    planned_operation_end_instant: datetime #| None
     touch_time_start_instant: datetime | None
     touch_time_end_instant: datetime | None
     touch_time_minutes: float | None
     post_operative_destination: str
     admission_service: str | None
-    elective_admission_type: str
-    intended_management: str
+    elective_admission_type: str | None
+    intended_management: str | None
     priority: str | None
     removal_reason: str | None
     status: str | None
@@ -161,7 +161,7 @@ class PreassessData(CabData):
 class LabData(CabData):
     name: str
     planned_operation_start_instant: datetime
-    value: float
+    value: float | str | None
     result_instant: datetime
 
 
@@ -197,7 +197,7 @@ class MergedData(SurgData):
     dias_bp_abnormal_count: int | None
     pulse_measured_count: int | None
     bmi_max_value: float | None
-
+    protocolised_adm : str| None
 
 class EchoData(CabData):
     imaging_key: int
@@ -218,7 +218,7 @@ class EchoWithAbnormalData(CabData):
     date_value: date
     is_abnormal: bool
     planned_operation_start_instant: datetime
-    touch_time_start_instant: datetime
+    touch_time_start_instant: datetime | None
 
 
 class ObsData(CabData):
@@ -228,3 +228,14 @@ class ObsData(CabData):
     first_documented_instant: datetime
     taken_instant: datetime
     display_name: str
+
+class AxaCodes(BaseModel):
+    surgical_service: str | None
+    name: str | None
+    axa_name: str | None
+    axa_severity: str | None
+    protocolised_adm: str | None
+
+    class Config:
+        alias_generator = _to_camel
+        allow_population_by_field_name = True

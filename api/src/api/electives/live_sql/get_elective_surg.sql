@@ -15,8 +15,8 @@ WHERE scf.[PatientDurableKey] > 0
     AND scf.[PatientDurableKey] > 1
     AND scf.[PatientDurableKey] IS NOT NULL
     AND patd.[AgeInYears] >= 18
-    AND scufx.[PlannedOperationStartInstant] >= ?
-    AND scufx.[PlannedOperationStartInstant] < ?
+    AND scufx.[PlannedOperationStartInstant] >= :start_date
+    AND scufx.[PlannedOperationStartInstant] < :end_date
     AND scufx.[CaseCancelReasonCode] != '581' -- 'Hospital Cancel - Admin Error'
     AND scf.[Classification] IN (
         'Elective',
