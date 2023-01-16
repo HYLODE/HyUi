@@ -12,6 +12,8 @@ dash.register_page(__name__, path="/", name="Home")
 timers = html.Div([])
 stores = html.Div([])
 
+_inline = {"display": "inline"}
+
 body = html.Div(
     [
         dmc.Paper(
@@ -30,9 +32,15 @@ body = html.Div(
                                 dmc.ListItem(
                                     dmc.Text(
                                         [
-                                            "🚧The application is in alpha ",
-                                            "please be careful",
-                                            "but please also let us know what you think",
+                                            "🚧The application is in ",
+                                            dmc.Text(
+                                                "alpha ",
+                                                color=colors.orange,
+                                                style=_inline,
+                                            ),
+                                            "please be careful ",
+                                            "but please also let us know what "
+                                            "you think",
                                         ]
                                     )
                                 ),
@@ -59,7 +67,7 @@ body = html.Div(
             radius="lg",
             p="md",  # padding
             withBorder=True,
-        )
+        ),
     ]
 )
 
