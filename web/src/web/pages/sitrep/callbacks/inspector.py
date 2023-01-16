@@ -79,7 +79,9 @@ def bed_accordion_item(node: dict) -> Tuple[dmc.AccordionControl, dmc.AccordionP
         control, panel = None, None
         return dmc.AccordionControl(control), dmc.AccordionPanel(panel)
 
-    # data = node.get("data", {})
+    data = node.get("data", {})
+    bed_status_control_value = data.get("discharges", {}).get("status", "").upper()
+
 
     control = dmc.Group(
         [
@@ -97,7 +99,7 @@ def bed_accordion_item(node: dict) -> Tuple[dmc.AccordionControl, dmc.AccordionP
                     id=ids.ACC_BED_STATUS_WARD,
                     data=[i.get("label") for i in DISCHARGE_DECISIONS],
                     fullWidth=True,
-                    value="",
+                    value=bed_status_control_value,
                     color="indigo",
                 ),
                 span=9,
