@@ -127,7 +127,6 @@ def _store_beds(
     Output(ids.CENSUS_STORE, "data"),
     Input(ids.CAMPUS_SELECTOR, "value"),
     Input(ids.DEPTS_OPEN_STORE_NAMES, "data"),
-    background=True,
 )
 def _store_census(
     campus: str,
