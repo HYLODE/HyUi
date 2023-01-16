@@ -64,8 +64,6 @@ def unpack_nested_baserow_dict(
     return rows
 
 
-
-
 class TimerError(Exception):
     """A custom exception used to report errors in use of Timer class"""
 
@@ -73,6 +71,7 @@ class TimerError(Exception):
 @dataclass
 class Timer(ContextDecorator):
     """Time your code using a class, context manager, or decorator"""
+
     # via https://realpython.com/python-timer/#the-python-timer-code
 
     timers: ClassVar[Dict[str, float]] = {}

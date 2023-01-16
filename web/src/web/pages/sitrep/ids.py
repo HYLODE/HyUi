@@ -1,8 +1,13 @@
 from web.utils import gen_id
 
-# stores
+# raw stores
 CENSUS_STORE = gen_id("census store", __name__)
 BEDS_STORE = gen_id("beds store", __name__)
+SITREP_STORE = gen_id("sitrep store", __name__)
+DISCHARGES_STORE = gen_id("discharges store", __name__)
+
+
+# derived stores
 DEPTS_OPEN_STORE = gen_id("open depts store", __name__)
 ROOMS_OPEN_STORE = gen_id("open rooms store", __name__)
 DEPTS_OPEN_STORE_NAMES = gen_id("open depts store names", __name__)

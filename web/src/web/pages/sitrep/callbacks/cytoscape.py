@@ -1,13 +1,17 @@
-from datetime import datetime
+import dash
 import pandas as pd
 import requests
+import warnings
 from dash import Input, Output, callback
+from datetime import datetime
 from typing import Tuple
 
 from models.census import CensusRow
+from models.sitrep import SitrepRow
 from web.config import get_settings
-from web.pages.sitrep import CAMPUSES, ids
+from web.pages.sitrep import CAMPUSES, SITREP_DEPT2WARD_MAPPING, ids
 from web.stores import ids as store_ids
+from web.utils import Timer
 
 DEBUG = True
 
@@ -155,6 +159,84 @@ def _store_census(
 
 
 @callback(
+    Output(ids.SITREP_STORE, "data"),
+    Input(ids.DEPT_SELECTOR, "value"),
+    prevent_initial_callback=True,
+    background=True,
+)
+def _store_sitrep(dept: str) -> list[dict]:
+    """
+    Use census to provide the CSNs that can be used to query additional data
+    Args:
+        dept: the department
+
+    Returns:
+        additonal patient level data
+
+    """
+    department = SITREP_DEPT2WARD_MAPPING.get(dept)
+    if not department:
+        warnings.warn(f"No sitrep data available for {department}")
+        return [{}]
+
+    # FIXME 2022-12-20 hack to keep this working whilst waiting on
+    covid_sitrep = True
+
+    if covid_sitrep:
+        warnings.warn("Working from old hycastle sitrep", category=DeprecationWarning)
+        if "mock" in str(get_settings().api_url):
+            mock = True
+            url = f"{get_settings().api_url}/sitrep/live/{department}/ui"
+        else:
+            mock = False
+            url = f"http://uclvlddpragae07:5006/live/icu/{department}/ui"
+    else:
+        url = f"{get_settings().api_url}/sitrep/live/{department}/ui"
+
+    response = requests.get(url).json()
+    try:
+        rows = response["data"] if covid_sitrep and not mock else response
+    except KeyError as e:
+        warnings.warn("No data returned for sitrep")
+        print(e)
+        return [{}]
+    return [SitrepRow.parse_obj(row).dict() for row in rows]
+
+
+@Timer(text="Discharge updates: Elapsed time: {:.3f} seconds")
+def _get_discharge_updates(delta_hours: int = 48) -> list[dict]:
+    response = requests.get(
+        f"{get_settings().api_url}/beds/discharge_status",
+        params={"delta_hours": delta_hours},
+    )
+    if response.status_code == 200:
+        return response.json()
+    else:
+        warnings.warn("No data found for discharge statues (from Baserow "
+                      "store)")
+        return [{}]
+
+
+@callback(
+    Output(ids.DISCHARGES_STORE, "data"),
+    Input(ids.DEPT_SELECTOR, "value"),
+)
+def store_discharge_status(dept: str) -> list[dict] | dash.no_update:
+    """
+    Get discharge status
+    Deduplicate to most recent only
+    Refreshes on ward update
+    """
+    if not dept:
+        return dash.no_update
+    discharges = _get_discharge_updates(delta_hours=36)
+    df = pd.DataFrame.from_records(discharges)
+    df.sort_values(["csn", "modified_at"], ascending=[True, False], inplace=True)
+    df.drop_duplicates(["csn"], inplace=True)
+    return df.to_dict(orient="records")  # type: ignore
+
+
+@callback(
     [
         Output(ids.DEPT_SELECTOR, "data"),
         Output(ids.DEPT_SELECTOR, "value"),
@@ -175,6 +257,7 @@ def _make_elements(
     depts: list[dict],
     rooms: list[dict],
     beds: list[dict],
+    discharges: list[dict],
     selected_dept: str | None,
     ward_only: bool,
 ) -> list[dict]:
@@ -186,6 +269,7 @@ def _make_elements(
         depts: list of dept objects
         rooms: list of room objects
         beds: list of bed objects (from baserow)
+        discharges: list of discharge statuses (from baserow)
         selected_dept: name of dept or None if show all
         ward_only: True if ward_only not campus; default False
 
@@ -203,6 +287,10 @@ def _make_elements(
     # define the 'height' of the map
     y_index_max = max([bed.get("floor_y_index", -1) for bed in beds])
     census_lookup = {i.get("location_string"): i for i in census}
+    # TODO: rebuild discharge_statuses table with encounter as string
+    # TODO: fix naming (use 'encounter' in census and 'csn' in discharges)
+    # convert csn to string since that's how encounter is stored in EMAP
+    discharge_lookup = {str(i.get("csn")): i for i in discharges}
 
     # create beds
     for bed in beds:
@@ -211,6 +299,11 @@ def _make_elements(
         if ward_only and department != selected_dept:
             continue
         location_string = bed.get("location_string")
+
+        occupied = census_lookup.get(location_string, {}).get("occupied", False)
+        encounter = census_lookup.get(location_string, {}).get("encounter", "")
+        discharge_status = discharge_lookup.get(encounter, {})
+
         data = dict(
             id=location_string,
             bed_number=bed.get("bed_number"),
@@ -223,7 +316,9 @@ def _make_elements(
             census=census_lookup.get(location_string, {}),
             closed=bed.get("closed"),
             blocked=bed.get("blocked"),
-            occupied=census_lookup.get(location_string, {}).get("occupied", "False"),
+            occupied=occupied,
+            encounter=encounter,
+            discharges=discharge_status,
         )
         position = dict(
             x=bed.get("floor_x_index", -1) * 40,
@@ -312,18 +407,21 @@ def _prepare_cyto_elements_campus(
     Build the element list from pts/beds/rooms/depts for the map
     """
     elements = _make_elements(
-        census, depts, rooms, beds, selected_dept=None, ward_only=False
+        census, depts, rooms, beds, discharges=[{}], selected_dept=None, ward_only=False
     )
     return elements
 
 
 @callback(
     Output(ids.CYTO_WARD, "elements"),
-    Input(ids.CENSUS_STORE, "data"),
-    Input(ids.DEPTS_OPEN_STORE, "data"),
-    Input(ids.ROOMS_OPEN_STORE, "data"),
-    Input(ids.BEDS_STORE, "data"),
-    Input(ids.DEPT_SELECTOR, "value"),
+    [
+        Input(ids.CENSUS_STORE, "data"),
+        Input(ids.DEPTS_OPEN_STORE, "data"),
+        Input(ids.ROOMS_OPEN_STORE, "data"),
+        Input(ids.BEDS_STORE, "data"),
+        Input(ids.DISCHARGES_STORE, "data"),
+        Input(ids.DEPT_SELECTOR, "value"),
+    ],
     prevent_initial_call=True,
 )
 def _prepare_cyto_elements_ward(
@@ -331,13 +429,14 @@ def _prepare_cyto_elements_ward(
     depts: list[dict],
     rooms: list[dict],
     beds: list[dict],
+    discharges: list[dict],
     dept: str,
 ) -> list[dict]:
     """
     Build the element list from pts/beds/rooms/depts for the map
     """
     elements = _make_elements(
-        census, depts, rooms, beds, selected_dept=dept, ward_only=True
+        census, depts, rooms, beds, discharges, selected_dept=dept, ward_only=True
     )
     return elements
 
@@ -348,7 +447,9 @@ def format_census(census: dict) -> dict:
     encounter = str(census.get("encounter", ""))
     lastname = census.get("lastname", "").upper()
     firstname = census.get("firstname", "").title()
-    initials = f"{census.get('firstname', '?')[0]}" f"{census.get('lastname', '?')[0]}"
+    initials = (
+        f"{census.get('firstname', '?')[0]}" f"" f"{census.get('lastname', '?')[0]}"
+    )
     date_of_birth = census.get("date_of_birth", "1900-01-01")  # default dob
     dob = datetime.fromisoformat(date_of_birth)
     dob_fshort = datetime.strftime(dob, "%d-%m-%Y")

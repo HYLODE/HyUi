@@ -4,7 +4,7 @@ from dash import Input, Output, State, callback
 from dash_iconify import DashIconify
 from typing import Any, Tuple
 
-from web.pages.sitrep import ids
+from web.pages.sitrep import DISCHARGE_DECISIONS, ids
 from web.pages.sitrep.callbacks.cytoscape import format_census
 from web.style import colors
 
@@ -33,7 +33,8 @@ def _create_accordion_item(control: Any, panel: Any) -> Any:
     State(ids.INSPECTOR_WARD_MODAL, "opened"),
     prevent_initial_callback=True,
 )
-def open_inspector_modal(node: dict, opened: bool) -> Tuple[bool, list[str], str]:
+def open_inspector_modal(node: dict, opened: bool) -> Tuple[
+    bool, list[str], str]:
     """
     Open modal
     prepare modal title
@@ -69,22 +70,12 @@ def open_inspector_modal(node: dict, opened: bool) -> Tuple[bool, list[str], str
     return not opened, ["bed"], modal_title
 
 
-decisions = [
-    dict(label="HOLD", description="Not for discharge"),
-    dict(label="REVIEW", description="Review for possible discharge later"),
-    dict(label="DISCHARGE", description="Ready for discharge now"),
-    dict(label="EXCELLENCE", description="Excellence in the End of Life " "pathway"),
-    dict(
-        label="BLOCKED", description="Block the bed (not available for " "admissions)"
-    ),
-]
-
-
 @callback(
     Output(ids.ACCORDION_ITEM_BED, "children"),
     Input(ids.CYTO_WARD, "tapNode"),
 )
-def bed_accordion_item(node: dict) -> Tuple[dmc.AccordionControl, dmc.AccordionPanel]:
+def bed_accordion_item(node: dict) -> Tuple[
+    dmc.AccordionControl, dmc.AccordionPanel]:
     """Prepare content for bed accordion item"""
     if not node:
         control, panel = None, None
@@ -106,7 +97,7 @@ def bed_accordion_item(node: dict) -> Tuple[dmc.AccordionControl, dmc.AccordionP
             dmc.Col(
                 dmc.SegmentedControl(
                     id=ids.ACC_BED_STATUS_WARD,
-                    data=[i.get("label") for i in decisions],
+                    data=[i.get("label") for i in DISCHARGE_DECISIONS],
                     fullWidth=True,
                     value="",
                     color="indigo",
@@ -138,7 +129,10 @@ def bed_accordion_item(node: dict) -> Tuple[dmc.AccordionControl, dmc.AccordionP
     Input(ids.ACC_BED_STATUS_WARD, "value"),
 )
 def update_decision_description(value: str) -> str:
-    description = [i.get("description") for i in decisions if i.get("label") == value]
+    description = [
+        i.get("description", "")
+        for i in DISCHARGE_DECISIONS if i.get("label") == value
+    ]
     if description:
         return description[0]
     else:
@@ -185,7 +179,8 @@ def patient_accordion_item(
     Output(ids.ACCORDION_ITEM_DEBUG, "children"),
     Input(ids.CYTO_WARD, "tapNode"),
 )
-def debug_accordion_item(node: dict) -> Tuple[dmc.AccordionControl, dmc.AccordionPanel]:
+def debug_accordion_item(node: dict) -> Tuple[
+    dmc.AccordionControl, dmc.AccordionPanel]:
     """Prepare content for debug accordion item"""
     title = dmc.Group(
         [
@@ -211,65 +206,3 @@ def debug_accordion_item(node: dict) -> Tuple[dmc.AccordionControl, dmc.Accordio
         )
     )
     return control, panel
-
-
-# @callback(
-#     [
-#         Output(ids.INSPECTOR_WARD, "opened"),
-#         Output(ids.DEBUG_NODE_INSPECTOR_WARD, "children"),
-#         Output(ids.INSPECTOR_WARD, "title"),
-#         Output(ids.MODAL_ACCORDION_PATIENT, "children"),
-#         Output(ids.MODAL_ACCORDION_BED, "children"),
-#     ],
-#     Input(ids.CYTO_WARD, "tapNode"),
-#     State(ids.INSPECTOR_WARD, "opened"),
-#     prevent_initial_callback=True,
-# )
-# def tap_inspector_ward(
-#     node: dict, modal_opened: str
-# ) -> Tuple[bool, str, str, str, Any]:
-#     """
-#     Populate the bed inspector modal
-#     Args:
-#         node:
-#         modal_opened:
-#
-#     Returns:
-#         modal: open status (toggle)
-#         debug_inspection: json formattd string
-#         title: title of the modal built from patient data
-#         patient_content: to be viewed in the modal
-#
-#     """
-#     if not node:
-#         return False, dash.no_update, "", "", dash.no_update
-#
-#     data = node.get("data", {})
-#     if data.get("entity") != "bed":
-#         return False, dash.no_update, "", "", dash.no_update
-#
-#     occupied = data.get("occupied")
-#
-#     bed = data.get("bed")
-#     bed_prefix = "Sideroom" if bed.get("sideroom") else "Bed"
-#
-#     modal_title = f"{bed_prefix} {bed.get('bed_number')}  " f"({bed.get(
-#     'department')})"
-#     accordion_pt_item = _create_accordion_item("🔬 Unoccupied", "")
-#     accordion_bed_item = _create_accordion_item("🛏 Bed status", "")
-#
-#     if occupied:
-#         census = data.get("census")
-#         cfmt = SimpleNamespace(**format_census(census))
-#         accordion_pt_item = _create_accordion_item(
-#             f"🔬 {cfmt.demographic_slug}", "🚧 Patient details under
-#             construction 🚧"
-#         )
-#
-#     return (
-#         not modal_opened,
-#         _format_tap_node_data(node),
-#         modal_title,
-#         accordion_pt_item,
-#         accordion_bed_item,
-#     )

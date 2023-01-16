@@ -16,3 +16,36 @@ CAMPUSES = [
     },
     {"value": "QUEEN SQUARE CAMPUS", "label": "NHNN", "default_dept": "NHNN C1 NCCU"},
 ]
+
+SITREP_DEPT2WARD_MAPPING: dict = {
+    "UCH T03 INTENSIVE CARE": "T03",
+    "UCH T06 SOUTH PACU": "T06",
+    "GWB L01 CRITICAL CARE": "GWB",
+    "WMS W01 CRITICAL CARE": "WMS",
+    "NHNN C0 NCCU": "NCCU0",
+    "NHNN C1 NCCU": "NCCU1",
+}
+
+DISCHARGE_DECISIONS = [
+    dict(label="HOLD", value="blocked", description="Not for discharge"),
+    dict(
+        label="REVIEW",
+        value="review",
+        description="Review for possible " "discharge later",
+    ),
+    dict(
+        label="DISCHARGE",
+        value="discharge",
+        description="Ready for " "discharge " "now",
+    ),
+    dict(
+        label="EXCELLENCE",
+        value="excellence",
+        description="Excellence in " "the " "End of Life " "pathway",
+    ),
+    dict(
+        label="BLOCKED",
+        value="blocked",
+        description="Block the bed (not " "available for " "admissions)",
+    ),
+]
