@@ -16,13 +16,24 @@ BED_SELECTOR_WARD = gen_id("bed selector ward", __name__)
 # content
 CYTO_CAMPUS = gen_id("cyto campus", __name__)
 CYTO_WARD = gen_id("cyto ward", __name__)
-INSPECTOR_CAMPUS = gen_id("inspector campus", __name__)
-INSPECTOR_WARD = gen_id("inspector ward", __name__)
+
 PROGRESS_CAMPUS = gen_id("progress campus", __name__)
 PROGRESS_WARD = gen_id("progress ward", __name__)
 
-MODAL_ACCORDION_BED = gen_id("accordion bed", __name__)
-MODAL_ACCORDION_PATIENT = gen_id("accordion patient", __name__)
+# inspector
+INSPECTOR_CAMPUS_MODAL = gen_id("inspector campus modal", __name__)
+INSPECTOR_WARD_MODAL = gen_id("inspector ward modal", __name__)
+
+INSPECTOR_WARD_ACCORDION = gen_id("ward accordion", __name__)
+
+ACCORDION_ITEM_BED = gen_id("accordion bed", __name__)
+ACC_BED_DECISION_TEXT = gen_id("bed decision text", __name__)
+ACC_BED_STATUS_WARD = gen_id("bed status ward", __name__)
+ACC_BED_SUBMIT_WARD = gen_id("bed submit ward", __name__)
+
+ACCORDION_ITEM_PATIENT = gen_id("accordion patient", __name__)
+ACCORDION_ITEM_DEBUG = gen_id("accordion debug", __name__)
+
 
 # other
 DEBUG_NODE_INSPECTOR_CAMPUS = gen_id("debug inspect node campus", __name__)

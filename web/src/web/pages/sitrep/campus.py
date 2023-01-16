@@ -96,7 +96,7 @@ inspector = html.Div(
     [
         dmc.Modal(
             title="Inspect this",
-            id=ids.INSPECTOR_CAMPUS,
+            id=ids.INSPECTOR_CAMPUS_MODAL,
             centered=True,
             size="60vw",
             overflow="inside",

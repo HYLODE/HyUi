@@ -6,13 +6,13 @@ import math
 from dash import dcc, html
 from pathlib import Path
 
+import web.pages.sitrep.callbacks.bedlist  # noqa
+
 # noqa suppresses black errors when linting since you need this import for
 # access to callbacks
 import web.pages.sitrep.callbacks.cytoscape  # noqa
 import web.pages.sitrep.callbacks.inspector  # noqa
 import web.pages.sitrep.callbacks.widgets  # noqa
-import web.pages.sitrep.callbacks.bedlist  # noqa
-
 from web.pages.sitrep import CAMPUSES, ids
 from web.style import colors, replace_colors_in_stylesheet
 
@@ -118,8 +118,8 @@ debug_inspector = dmc.Container(
                     language="json", id=ids.DEBUG_NODE_INSPECTOR_WARD, children=""
                 )
             ],
-            showLabel="Show more ... if you really want to",
-            hideLabel="We warned you",
+            showLabel="Show more",
+            hideLabel="Hide",
             maxHeight=100,
         )
     ]
@@ -128,21 +128,11 @@ debug_inspector = dmc.Container(
 bed_inspector = html.Div(
     [
         dmc.AccordionMultiple(
+            id=ids.INSPECTOR_WARD_ACCORDION,
             children=[
-                dmc.AccordionItem(
-                    id=ids.MODAL_ACCORDION_BED,
-                    value="bed_status",
-                ),
-                dmc.AccordionItem(
-                    id=ids.MODAL_ACCORDION_PATIENT, value="patient_status"
-                ),
-                dmc.AccordionItem(
-                    [
-                        dmc.AccordionControl("🐛 Debugging"),
-                        dmc.AccordionPanel(debug_inspector),
-                    ],
-                    value="debug_inspector",
-                ),
+                dmc.AccordionItem(id=ids.ACCORDION_ITEM_PATIENT, value="patient"),
+                dmc.AccordionItem(id=ids.ACCORDION_ITEM_BED, value="bed"),
+                dmc.AccordionItem(id=ids.ACCORDION_ITEM_DEBUG, value="debug"),
             ],
             chevronPosition="left",
             loop=True,
@@ -154,7 +144,7 @@ bed_inspector = html.Div(
 inspector = html.Div(
     [
         dmc.Modal(
-            id=ids.INSPECTOR_WARD,
+            id=ids.INSPECTOR_WARD_MODAL,
             centered=True,
             padding="xs",
             size="60vw",
