@@ -151,8 +151,8 @@ bed_inspector = html.Div(
                 dmc.AccordionItem(id=ids.ACCORDION_ITEM_DEBUG, value="debug"),
             ],
             chevronPosition="left",
-            loop=True,
             variant="separated",
+            transitionDuration=0,
         )
     ]
 )
@@ -167,8 +167,8 @@ inspector = html.Div(
             overflow="inside",
             overlayColor=colors.gray,
             overlayOpacity=0.5,
-            transition="pop",
-            transitionDuration=300,
+            transition="fade",
+            transitionDuration=0,
             children=[bed_inspector],
         )
     ]

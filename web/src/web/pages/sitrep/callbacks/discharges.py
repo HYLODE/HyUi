@@ -11,6 +11,7 @@ from web.convert import parse_to_data_frame
 
 
 def post_discharge_status(csn: int, status: str) -> Tuple[int, DischargeStatus]:
+    status = status.lower()
     response = requests.post(
         url=f"{get_settings().api_url}/beds/discharge_status",
         params={"csn": csn, "status": status},  # type: ignore

@@ -1,3 +1,5 @@
+import time
+
 import dash
 import dash_mantine_components as dmc
 import json
@@ -74,11 +76,14 @@ def open_inspector_modal(node: dict, opened: bool) -> Tuple[bool, list[str], dmc
 @callback(
     Output(ids.ACCORDION_ITEM_BED, "children"),
     Input(ids.CYTO_WARD, "tapNode"),
+    Input(ids.INSPECTOR_WARD_MODAL, "opened"),
     prevent_initial_call=True,
 )
-def bed_accordion_item(node: dict) -> Tuple[dmc.AccordionControl, dmc.AccordionPanel]:
+def bed_accordion_item(
+    node: dict, modal_open: bool
+) -> Tuple[dmc.AccordionControl, dmc.AccordionPanel]:
     """Prepare content for bed accordion item"""
-    if not node:
+    if not node or not modal_open:
         control, panel = None, None
         return dmc.AccordionControl(control), dmc.AccordionPanel(panel)
 
@@ -221,12 +226,14 @@ def submit_discharge_status(
 @callback(
     Output(ids.ACCORDION_ITEM_PATIENT, "children"),
     Input(ids.CYTO_WARD, "tapNode"),
+    Input(ids.INSPECTOR_WARD_MODAL, "opened"),
+    prevent_initial_call=True,
 )
 def patient_accordion_item(
-    node: dict,
+    node: dict, modal_open: bool
 ) -> Tuple[dmc.AccordionControl, dmc.AccordionPanel]:
-    """Prepare content for patient accordion item"""
-    if not node:
+    """Prepare content for bed accordion item"""
+    if not node or not modal_open:
         control, panel = None, None
         return dmc.AccordionControl(control), dmc.AccordionPanel(panel)
 
@@ -282,7 +289,7 @@ def debug_accordion_item(node: dict) -> Tuple[dmc.AccordionControl, dmc.Accordio
             ],
             showLabel="Show more",
             hideLabel="Hide",
-            maxHeight=100,
+            maxHeight=200,
         )
     )
     return control, panel

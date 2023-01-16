@@ -234,12 +234,15 @@ def store_discharge_status(dept: str) -> list[dict]:
     if not dept:
         return dash.no_update
     discharges = _get_discharge_updates(delta_hours=36)
-    print(discharges)
     if not discharges or not len(discharges):
         return dash.no_update
     df = pd.DataFrame.from_records(discharges)
-    df.sort_values(["csn", "modified_at"], ascending=[True, False], inplace=True)
-    df.drop_duplicates(["csn"], inplace=True)
+    try:
+        df.sort_values(["csn", "modified_at"], ascending=[True, False], inplace=True)
+        df.drop_duplicates(["csn"], inplace=True)
+    except KeyError as e:
+        print(e)
+        warnings.warn("Unable to sort: is the dataframe empty?")
     return df.to_dict(orient="records")  # type: ignore
 
 
@@ -356,6 +359,7 @@ def _make_elements(
                 id=hl7_room,
                 label=room.get("room"),
                 entity="room",
+                sideroom=room.get("is_sideroom"),
                 room=room,
                 parent=department,
             )
