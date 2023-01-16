@@ -1,8 +1,10 @@
 import json
 import requests
-from typing import cast, Any
+import warnings
+from typing import Any, Tuple, cast
+
+from api.config import Settings, get_settings
 from api.utils import Timer
-from api.config import get_settings, Settings
 
 
 class BaserowException(Exception):
@@ -14,19 +16,62 @@ class BaserowException(Exception):
         return self.message
 
 
-def _get_user_auth_token(baserow_url: str, email: str, password: str) -> str:
+def _get_user_auth_token(
+    baserow_url: str, email: str, password: str
+) -> Tuple[str, str]:
     response = requests.post(
         f"{baserow_url}/api/user/token-auth/",
         headers={"Content-Type": "application/json"},
         data=json.dumps({"email": email, "password": password}),
     )
+    # access tokens valid for 10m
+    # refresh tokens valid for 168h
+    warnings.warn("Authenticating via username/password")
 
-    if response.status_code != 200:
+    if response.status_code == 200:
+        access_token = cast(str, response.json()["access_token"])
+        refresh_token = cast(str, response.json()["refresh_token"])
+    else:
         raise BaserowException(
-            f"unexpected response {response.status_code}: {str(response.content)}"
+            f"unexpected response {response.status_code}: " f"{str(response.content)}"
         )
 
-    return cast(str, response.json()["token"])
+    # see https://api.baserow.io/api/redoc/#tag/User/operation/token_auth
+    # Response sample
+    # {
+    #   "user": {
+    #     "first_name": "string",
+    #     "username": "user@example.com",
+    #     "language": "string"
+    #   },
+    #   "token": "string",
+    #   "access_token": "string",
+    #   "refresh_token": "string"
+    # }
+    # Note that in the above access_token == token
+    return access_token, refresh_token
+
+
+def _refresh_user_auth_token(baserow_url: str) -> str:
+    # access tokens valid for 10m
+    # refresh tokens valid for 168h
+    warnings.warn("Refreshing user authentication")
+    refresh_token = BASEROW_REFRESH_TOKEN  # from the outer scope
+    response = requests.post(
+        f"{baserow_url}/api/user/token-refresh/",
+        headers={"Content-Type": "application/json"},
+        data=json.dumps({"refresh_token": refresh_token}),
+    )
+
+    if response.status_code == 200:
+        access_token = cast(str, response.json()["access_token"])
+        global BASEROW_AUTH_TOKEN
+        BASEROW_AUTH_TOKEN = access_token
+    else:
+        raise BaserowException(
+            f"unexpected response {response.status_code}: " f"{str(response.content)}"
+        )
+    return access_token
 
 
 def _auth_headers(auth_token: str) -> dict[str, str]:
@@ -39,14 +84,22 @@ def _auth_headers(auth_token: str) -> dict[str, str]:
 def _get_application_id(
     baserow_url: str, auth_token: str, application_name: str
 ) -> int | None:
-    response = requests.get(
-        f"{baserow_url}/api/applications/",
-        headers=_auth_headers(auth_token),
-    )
+    def _request():
+        return requests.get(
+            f"{baserow_url}/api/applications/",
+            headers=_auth_headers(auth_token),
+        )
+
+    response = _request()
+
+    if response.status_code == 401:
+        warnings.warn("Authentication error: will attempt to refresh")
+        _refresh_user_auth_token(baserow_url)
+        response = _request()
 
     if response.status_code != 200:
         raise BaserowException(
-            f"unexpected response {response.status_code}: {str(response.content)}"
+            f"unexpected response {response.status_code}: " f"{str(response.content)}"
         )
 
     return next(
@@ -69,7 +122,7 @@ def _get_table_id(
 
     if response.status_code != 200:
         raise BaserowException(
-            f"unexpected response {response.status_code}: {str(response.content)}"
+            f"unexpected response {response.status_code}: " f"{str(response.content)}"
         )
 
     return next(
@@ -103,7 +156,7 @@ def get_rows(
         table_id = _get_table_id(baserow_url, auth_token, application_id, table_name)
     if not table_id:
         raise BaserowException(
-            f"no table ID for application {application_name}, table {table_name}"
+            f"no table ID for application {application_name}, table " f"{table_name}"
         )
 
     rows_url = f"{baserow_url}/api/database/rows/table/{table_id}/"
@@ -121,7 +174,8 @@ def get_rows(
 
         if response.status_code != 200:
             raise BaserowException(
-                f"unexpected response {response.status_code}: {str(response.content)}"
+                f"unexpected response {response.status_code}: "
+                f"{str(response.content)}"
             )
 
         data = response.json()
@@ -146,7 +200,7 @@ def get_fields(
     table_id = _get_table_id(baserow_url, auth_token, application_id, table_name)
     if not table_id:
         raise BaserowException(
-            f"no table ID for application {application_name}, table {table_name}"
+            f"no table ID for application {application_name}, table " f"{table_name}"
         )
 
     url = f"{baserow_url}/api/database/fields/table/{table_id}/"
@@ -154,7 +208,7 @@ def get_fields(
 
     if response.status_code != 200:
         raise BaserowException(
-            f"unexpected response {response.status_code}: {str(response.content)}"
+            f"unexpected response {response.status_code}: " f"{str(response.content)}"
         )
 
     return {row["name"]: row["id"] for row in response.json()}
@@ -179,7 +233,7 @@ def post_row(
     table_id = _get_table_id(baserow_url, auth_token, application_id, table_name)
     if not table_id:
         raise BaserowException(
-            f"no table ID for application {application_name}, table {table_name}"
+            f"no table ID for application {application_name}, table " f"{table_name}"
         )
 
     url = f"{baserow_url}/api/database/rows/table/{table_id}/"
@@ -190,13 +244,15 @@ def post_row(
 
     if response.status_code != 200:
         raise BaserowException(
-            f"unexpected response {response.status_code}: " f"{str(response.content)}"
+            f"unexpected response {response.status_code}: "
+            f""
+            f"{str(response.content)}"
         )
 
     return response.json()
 
 
-def _load_user_auth_token(settings: Settings) -> str:
+def _load_user_auth_token(settings: Settings) -> Tuple[str, str]:
     baserow_url = settings.baserow_url
     email = settings.baserow_email
     password = settings.baserow_password.get_secret_value()
@@ -204,4 +260,4 @@ def _load_user_auth_token(settings: Settings) -> str:
 
 
 settings = get_settings()
-BASEROW_AUTH_TOKEN = _load_user_auth_token(settings)
+BASEROW_AUTH_TOKEN, BASEROW_REFRESH_TOKEN = _load_user_auth_token(settings)

@@ -54,6 +54,7 @@ dept_selector = dmc.Container(
             id=ids.DEPT_SELECTOR,
             searchable=True,
             nothingFound="No match found",
+            value="UCH T03 INTENSIVE CARE",
         ),
     ],
     fluid=True,
