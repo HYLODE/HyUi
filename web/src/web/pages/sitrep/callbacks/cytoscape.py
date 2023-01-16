@@ -212,8 +212,7 @@ def _get_discharge_updates(delta_hours: int = 48) -> list[dict]:
     if response.status_code == 200:
         return response.json()
     else:
-        warnings.warn("No data found for discharge statues (from Baserow "
-                      "store)")
+        warnings.warn("No data found for discharge statues (from Baserow " "store)")
         return [{}]
 
 
@@ -221,7 +220,7 @@ def _get_discharge_updates(delta_hours: int = 48) -> list[dict]:
     Output(ids.DISCHARGES_STORE, "data"),
     Input(ids.DEPT_SELECTOR, "value"),
 )
-def store_discharge_status(dept: str) -> list[dict] | dash.no_update:
+def store_discharge_status(dept: str) -> list[dict]:
     """
     Get discharge status
     Deduplicate to most recent only

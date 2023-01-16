@@ -33,8 +33,7 @@ def _create_accordion_item(control: Any, panel: Any) -> Any:
     State(ids.INSPECTOR_WARD_MODAL, "opened"),
     prevent_initial_callback=True,
 )
-def open_inspector_modal(node: dict, opened: bool) -> Tuple[
-    bool, list[str], str]:
+def open_inspector_modal(node: dict, opened: bool) -> Tuple[bool, list[str], str]:
     """
     Open modal
     prepare modal title
@@ -74,8 +73,7 @@ def open_inspector_modal(node: dict, opened: bool) -> Tuple[
     Output(ids.ACCORDION_ITEM_BED, "children"),
     Input(ids.CYTO_WARD, "tapNode"),
 )
-def bed_accordion_item(node: dict) -> Tuple[
-    dmc.AccordionControl, dmc.AccordionPanel]:
+def bed_accordion_item(node: dict) -> Tuple[dmc.AccordionControl, dmc.AccordionPanel]:
     """Prepare content for bed accordion item"""
     if not node:
         control, panel = None, None
@@ -130,8 +128,7 @@ def bed_accordion_item(node: dict) -> Tuple[
 )
 def update_decision_description(value: str) -> str:
     description = [
-        i.get("description", "")
-        for i in DISCHARGE_DECISIONS if i.get("label") == value
+        i.get("description", "") for i in DISCHARGE_DECISIONS if i.get("label") == value
     ]
     if description:
         return description[0]
@@ -179,8 +176,7 @@ def patient_accordion_item(
     Output(ids.ACCORDION_ITEM_DEBUG, "children"),
     Input(ids.CYTO_WARD, "tapNode"),
 )
-def debug_accordion_item(node: dict) -> Tuple[
-    dmc.AccordionControl, dmc.AccordionPanel]:
+def debug_accordion_item(node: dict) -> Tuple[dmc.AccordionControl, dmc.AccordionPanel]:
     """Prepare content for debug accordion item"""
     title = dmc.Group(
         [
