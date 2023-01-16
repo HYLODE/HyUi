@@ -99,6 +99,12 @@ def _get_application_id(
         warnings.warn("Authentication error: will attempt to refresh")
         auth_token = _refresh_user_auth_token(baserow_url)
         response = _request(auth_token)
+        if response.status_code != 200:
+            warnings.warn("ERROR Failed trying to refresh access token")
+            raise BaserowException(
+                f"unexpected response {response.status_code}: "
+                f"{str(response.content)}"
+            )
 
     if response.status_code != 200:
         raise BaserowException(
@@ -118,10 +124,24 @@ def _get_application_id(
 def _get_table_id(
     baserow_url: str, auth_token: str, application_id: int, table_name: str
 ) -> int | None:
-    response = requests.get(
-        f"{baserow_url}/api/database/tables/database/{application_id}/",
-        headers=_auth_headers(auth_token),
-    )
+    def _request(auth_token: str):
+        return requests.get(
+            f"{baserow_url}/api/database/tables/database/{application_id}/",
+            headers=_auth_headers(auth_token),
+        )
+
+    response = _request(auth_token)
+
+    if response.status_code == 401:
+        warnings.warn("Authentication error: will attempt to refresh")
+        auth_token = _refresh_user_auth_token(baserow_url)
+        response = _request(auth_token)
+        if response.status_code != 200:
+            warnings.warn("ERROR Failed trying to refresh access token")
+            raise BaserowException(
+                f"unexpected response {response.status_code}: "
+                f"{str(response.content)}"
+            )
 
     if response.status_code != 200:
         raise BaserowException(
@@ -146,17 +166,13 @@ def get_rows(
     Baserow only returns 200 rows at the most. This function pages through an
     endpoint until all rows are returned.
     """
-    with Timer(text="get_rows.auth_token: Elapsed time: {:.4f}"):
-        # auth_token = _get_user_auth_token(baserow_url, email, password)
-        auth_token = BASEROW_AUTH_TOKEN
+    auth_token = BASEROW_AUTH_TOKEN
 
-    with Timer(text="get_rows.application_id: Elapsed time: {:.4f}"):
-        application_id = _get_application_id(baserow_url, auth_token, application_name)
+    application_id = _get_application_id(baserow_url, auth_token, application_name)
     if not application_id:
         raise BaserowException(f"no application ID for application {application_name}")
 
-    with Timer(text="get_rows.table_id: Elapsed time: {:.4f}"):
-        table_id = _get_table_id(baserow_url, auth_token, application_id, table_name)
+    table_id = _get_table_id(baserow_url, auth_token, application_id, table_name)
     if not table_id:
         raise BaserowException(
             f"no table ID for application {application_name}, table " f"{table_name}"
