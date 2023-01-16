@@ -2,6 +2,13 @@ import numpy as np
 import pandas as pd
 from pydantic import BaseModel
 
+import pickle 
+from pathlib import Path
+from imblearn.pipeline import Pipeline
+from sklearn.model_selection import RandomizedSearchCV, StratifiedKFold
+from sklearn.linear_model import BayesianRidge
+from sklearn.ensemble import RandomForestClassifier
+from category_encoders import TargetEncoder
 from api.convert import to_data_frame
 
 from models.electives import (
@@ -194,9 +201,22 @@ def prepare_draft(
     # print(df.columns)
     # create pacu label
     df["pacu"] = False
-    #df["pacu"] = np.where(
-    #    df["booked_destination"].astype(str).str.contains("PACU"),
-    #    True,
-    #)
+    df["pacu"] = np.where(
+        df["booked_destination"].astype(str).str.contains("PACU"),
+        True,
+        df["pacu"]
+    )
+    df["pacu"]=np.where(
+        df["pacdest"].astype(str).str.contains("PACU"),
+        True,
+        df["pacu"]
+    )
+
+    deployed = pickle.load(open((Path(__file__).parent / 'deploy/RFR_jan1601.sav'), 'rb'))
+    model = deployed.best_estimator_    
+    cols = model[1].feature_names_in_
+    preds = model.predict_proba(df[cols])[:,1]
+    df["icu_prob"]=preds 
+
 
     return df

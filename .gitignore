@@ -927,3 +927,6 @@ src/api/perrt/admission_probability/generated_data
 
 # pete odor's PACU dashboard
 web/src/web/assets/pacu_dashboard.html
+
+# temporary Model storage
+api/src/api/electives/deploy/*

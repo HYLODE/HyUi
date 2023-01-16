@@ -113,7 +113,7 @@ class SurgData(CabData):
     classification: str | None
     surgery_patient_class: str
     admission_patient_class: str
-    primary_anaesthesia_type: str | None
+    primary_anesthesia_type: str | None
     reason_not_performed: str | None
     canceled: bool | None
     planned_operation_start_instant: datetime #  | None
@@ -198,6 +198,7 @@ class MergedData(SurgData):
     pulse_measured_count: int | None
     bmi_max_value: float | None
     protocolised_adm : str| None
+    icu_prob: float 
 
 class EchoData(CabData):
     imaging_key: int

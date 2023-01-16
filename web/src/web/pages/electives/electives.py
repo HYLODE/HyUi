@@ -215,7 +215,7 @@ def gen_table_consults(data: list[dict]) -> dbc.Container:
                 # {"id": "asa", "name": "asa"},
                 #          {"id": "c_line", "name": "Central line consent"},
                 {"id": "resp", "name": "num_resp_conditions"},
-                {"id": "simple_score", "name": "ICU_probability"},
+                {"id":"icu_prob", "name": "ICU_probability"},
             ],
             data=dfo.to_dict("records"),
             style_table={"width": "100%", "minWidth": "100%", "maxWidth": "100%"},
