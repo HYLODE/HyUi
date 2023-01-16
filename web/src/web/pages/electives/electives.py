@@ -122,7 +122,7 @@ def store_data(days_ahead: int) -> list[type[BaseModel]]:
      Input(pacu_checklist, "value"),
      Input(request_data, "data"),
  )
- def filter_data(service: list[str], pacu: list[bool], data: list[dict]):
+def filter_data(service: list[str], pacu: list[bool], data: list[dict]):
 #     """
 #     Update data based on picker
 #     """
