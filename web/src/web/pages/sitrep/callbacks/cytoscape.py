@@ -229,7 +229,7 @@ def store_discharge_status(dept: str) -> list[dict]:
     if not dept:
         return dash.no_update
     discharges = _get_discharge_updates(delta_hours=36)
-    if not discharges:
+    if not discharges or not len(discharges):
         return dash.no_update
     df = pd.DataFrame.from_records(discharges)
     df.sort_values(["csn", "modified_at"], ascending=[True, False], inplace=True)
