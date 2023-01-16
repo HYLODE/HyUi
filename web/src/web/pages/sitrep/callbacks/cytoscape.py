@@ -2,7 +2,7 @@ import dash
 import pandas as pd
 import requests
 import warnings
-from dash import Input, Output, callback
+from dash import Input, Output, callback, State, callback_context
 from datetime import datetime
 from typing import Tuple
 
@@ -234,6 +234,7 @@ def store_discharge_status(dept: str) -> list[dict]:
     if not dept:
         return dash.no_update
     discharges = _get_discharge_updates(delta_hours=36)
+    print(discharges)
     if not discharges or not len(discharges):
         return dash.no_update
     df = pd.DataFrame.from_records(discharges)
@@ -313,7 +314,7 @@ def _make_elements(
 
         occupied = census_lookup.get(location_string, {}).get("occupied", False)
         encounter = census_lookup.get(location_string, {}).get("encounter", "")
-        discharge_status = discharge_lookup.get(encounter, {})
+        discharge_status = discharge_lookup.get(encounter, {}).get("status", "")
 
         data = dict(
             id=location_string,
@@ -329,7 +330,7 @@ def _make_elements(
             blocked=bed.get("blocked"),
             occupied=occupied,
             encounter=encounter,
-            discharges=discharge_status,
+            dc_status=discharge_status,
         )
         position = dict(
             x=bed.get("floor_x_index", -1) * 40,
@@ -426,29 +427,45 @@ def _prepare_cyto_elements_campus(
 @callback(
     Output(ids.CYTO_WARD, "elements"),
     [
+        State(ids.CYTO_WARD, "elements"),
         Input(ids.CENSUS_STORE, "data"),
         Input(ids.DEPTS_OPEN_STORE, "data"),
         Input(ids.ROOMS_OPEN_STORE, "data"),
         Input(ids.BEDS_STORE, "data"),
         Input(ids.DISCHARGES_STORE, "data"),
         Input(ids.DEPT_SELECTOR, "value"),
+        Input(ids.ACC_BED_SUBMIT_STORE, "data"),
     ],
     prevent_initial_call=True,
 )
 def _prepare_cyto_elements_ward(
+    elements: list[dict],
     census: list[dict],
     depts: list[dict],
     rooms: list[dict],
     beds: list[dict],
     discharges: list[dict],
     dept: str,
+    bed_submit_store: dict,
 ) -> list[dict]:
     """
     Build the element list from pts/beds/rooms/depts for the map
     """
-    elements = _make_elements(
-        census, depts, rooms, beds, discharges, selected_dept=dept, ward_only=True
-    )
+    if callback_context.triggered_id != ids.ACC_BED_SUBMIT_STORE:
+        elements = _make_elements(
+            census, depts, rooms, beds, discharges, selected_dept=dept, ward_only=True
+        )
+    elif callback_context.triggered_id == ids.ACC_BED_SUBMIT_STORE:
+        node_id = bed_submit_store.get("id")
+        for ele in elements:
+            if ele.get("data", {}).get("id") != node_id:
+                continue
+            data = ele.get("data")
+            data.update(dc_status=bed_submit_store.get("status"))
+            break
+    else:
+        return dash.no_update
+
     return elements
 
 

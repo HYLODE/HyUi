@@ -3,18 +3,19 @@ Module to manage the CRUD of discharge status
 """
 import requests
 from pydantic import BaseModel
+from typing import Tuple
 
 from models.beds import DischargeStatus
 from web.config import get_settings
 from web.convert import parse_to_data_frame
 
 
-def _post_discharge_status(csn: int, status: str) -> DischargeStatus:
+def post_discharge_status(csn: int, status: str) -> Tuple[int, DischargeStatus]:
     response = requests.post(
         url=f"{get_settings().api_url}/beds/discharge_status",
         params={"csn": csn, "status": status},  # type: ignore
     )
-    return DischargeStatus.parse_obj(response.json())
+    return response.status_code, DischargeStatus.parse_obj(response.json())
 
 
 def _most_recent_row_only(

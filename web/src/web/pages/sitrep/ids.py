@@ -35,6 +35,8 @@ ACCORDION_ITEM_BED = gen_id("accordion bed", __name__)
 ACC_BED_DECISION_TEXT = gen_id("bed decision text", __name__)
 ACC_BED_STATUS_WARD = gen_id("bed status ward", __name__)
 ACC_BED_SUBMIT_WARD = gen_id("bed submit ward", __name__)
+ACC_BED_SUBMIT_WARD_NOTIFY = gen_id("bed submit ward notify", __name__)
+ACC_BED_SUBMIT_STORE = gen_id("bed submit ward store", __name__)
 
 ACCORDION_ITEM_PATIENT = gen_id("accordion patient", __name__)
 ACCORDION_ITEM_DEBUG = gen_id("accordion debug", __name__)

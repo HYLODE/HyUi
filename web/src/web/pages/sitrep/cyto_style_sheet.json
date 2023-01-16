@@ -55,7 +55,6 @@
       "background-color": "gray"
     }
   },
-
   {
     "selector": "[?occupied]",
     "style": {
@@ -65,6 +64,16 @@
       "background-opacity": 1
     }
   },
+  {
+    "selector": "[dc_status='discharge']",
+    "style": {
+      "background-color": "green",
+      "border-color": "green",
+      "border-width": 2,
+      "shape": "tag"
+    }
+  },
+
   {
     "selector": ":selected:",
     "style": {

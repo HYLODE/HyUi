@@ -23,6 +23,7 @@ with open(Path(__file__).parent / "cyto_style_sheet.json") as f:
     cyto_style_sheet = json.load(f)
     cyto_style_sheet = replace_colors_in_stylesheet(cyto_style_sheet)
 
+
 timers = html.Div([])
 stores = html.Div(
     [
@@ -33,8 +34,15 @@ stores = html.Div(
         dcc.Store(id=ids.DEPTS_OPEN_STORE_NAMES),
         dcc.Store(id=ids.SITREP_STORE),
         dcc.Store(id=ids.DISCHARGES_STORE),
+        dcc.Store(id=ids.ACC_BED_SUBMIT_STORE),
     ]
 )
+notifications = html.Div(
+    [
+        html.Div(id=ids.ACC_BED_SUBMIT_WARD_NOTIFY),
+    ]
+)
+
 
 campus_selector = html.Div(
     [
@@ -188,6 +196,7 @@ def layout() -> dash.html.Div:
         children=[
             timers,
             stores,
+            notifications,
             body,
             inspector,
         ]

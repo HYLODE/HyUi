@@ -1,11 +1,13 @@
+import dash
 import dash_mantine_components as dmc
 import json
-from dash import Input, Output, State, callback
+from dash import Input, Output, State, callback, callback_context
 from dash_iconify import DashIconify
 from typing import Any, Tuple
 
 from web.pages.sitrep import DISCHARGE_DECISIONS, ids
 from web.pages.sitrep.callbacks.cytoscape import format_census
+from web.pages.sitrep.callbacks.discharges import post_discharge_status
 from web.style import colors
 
 DEBUG = True
@@ -33,18 +35,18 @@ def _create_accordion_item(control: Any, panel: Any) -> Any:
     State(ids.INSPECTOR_WARD_MODAL, "opened"),
     prevent_initial_callback=True,
 )
-def open_inspector_modal(node: dict, opened: bool) -> Tuple[bool, list[str], str]:
+def open_inspector_modal(node: dict, opened: bool) -> Tuple[bool, list[str], dmc.Group]:
     """
     Open modal
     prepare modal title
     define which accordion item is open
     """
     if not node:
-        return False, ["bed"], ""
+        return False, ["bed"], dmc.Group()
 
     data = node.get("data", {})
     if data.get("entity") != "bed":
-        return False, ["bed"], ""
+        return False, ["bed"], dmc.Group()
 
     bed = data.get("bed")
     bed_color = colors.orange if data.get("occupied") else colors.gray
@@ -72,6 +74,7 @@ def open_inspector_modal(node: dict, opened: bool) -> Tuple[bool, list[str], str
 @callback(
     Output(ids.ACCORDION_ITEM_BED, "children"),
     Input(ids.CYTO_WARD, "tapNode"),
+    prevent_initial_call=True,
 )
 def bed_accordion_item(node: dict) -> Tuple[dmc.AccordionControl, dmc.AccordionPanel]:
     """Prepare content for bed accordion item"""
@@ -80,10 +83,10 @@ def bed_accordion_item(node: dict) -> Tuple[dmc.AccordionControl, dmc.AccordionP
         return dmc.AccordionControl(control), dmc.AccordionPanel(panel)
 
     data = node.get("data", {})
-    if data.get("occupied"):
-        bed_status_control_value = data.get("discharges", {}).get("status", "").upper()
-    else:
-        bed_status_control_value = ""
+    bed_status_control_value = data.get("dc_status", "").upper()
+
+    # BUG?: SegmentedControl does not reset to original colors after first draw
+    color = "indigo" if bed_status_control_value else "gray"
 
     control = dmc.Group(
         [
@@ -102,7 +105,8 @@ def bed_accordion_item(node: dict) -> Tuple[dmc.AccordionControl, dmc.AccordionP
                     data=[i.get("label") for i in DISCHARGE_DECISIONS],
                     fullWidth=True,
                     value=bed_status_control_value,
-                    color="indigo",
+                    color=color,
+                    persistence=False,
                 ),
                 span=9,
             ),
@@ -138,6 +142,80 @@ def update_decision_description(value: str) -> str:
         return description[0]
     else:
         return "Choose one"
+
+
+@callback(
+    [
+        Output(ids.ACC_BED_SUBMIT_WARD_NOTIFY, "children"),
+        Output(ids.ACC_BED_SUBMIT_WARD, "disabled"),
+        Output(ids.ACC_BED_SUBMIT_STORE, "data"),
+    ],
+    Input(ids.ACC_BED_SUBMIT_WARD, "n_clicks"),
+    Input(ids.ACC_BED_STATUS_WARD, "value"),
+    State(ids.ACC_BED_SUBMIT_WARD, "disabled"),
+    State(ids.CYTO_WARD, "tapNode"),
+    prevent_initial_call=True,
+)
+def submit_discharge_status(
+    _: int,
+    value: str,
+    disabled: bool,
+    node: dict,
+) -> Tuple[dmc.Notification, bool, dict]:
+    """Handle the submission of new info"""
+
+    msg = ""
+    data = node.get("data", {})
+    status = value.lower()
+    response_status = -1
+    response_dict = {}
+
+    if callback_context.triggered_id == ids.ACC_BED_STATUS_WARD:
+        bed_status_control_value = data.get("dc_status", "").upper()
+        disabled = True if bed_status_control_value == status else False
+        show = False
+    elif callback_context.triggered_id == ids.ACC_BED_SUBMIT_WARD:
+        if status != "blocked":
+            encounter = int(data.get("encounter", -1))
+            response_status, response_json = post_discharge_status(
+                csn=encounter, status=value
+            )
+            response_dict = response_json.dict()
+            if response_status == 200:
+                msg = "Updated discharge status: OK"
+                disabled = True
+            else:
+                msg = "Uh-oh: Unable to save discharge status - try again?"
+                disabled = False
+
+        show = True
+    else:
+        disabled = False
+        show = False
+
+    if show:
+        show = "show" if show else "hide"
+
+        bed_submit_dict = dict(
+            msg=msg,
+            status=status.lower(),
+            id=data.get("id"),
+            response_json=response_dict,
+            response_status=response_status,
+        )
+
+        notificaton = dmc.Notification(
+            title="Saving discharge status",
+            id="_submit_discharge_status_notification_NOT_IN_USE",
+            action=show,
+            message=msg,
+            icon=DashIconify(icon="ic:round-celebration"),
+        )
+
+        return notificaton, disabled, bed_submit_dict
+
+    else:
+        return dash.no_update, disabled, dash.no_update
 
 
 @callback(
