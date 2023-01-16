@@ -23,7 +23,13 @@ DEBUG = True
 )
 def _store_depts(campus: str, depts: list[dict]) -> list[dict]:
     """Need a list of departments for this building"""
-    return [dept for dept in depts if dept.get("location_name") == campus]
+    try:
+        these_depts = [dept for dept in depts if dept.get("location_name") == campus]
+    except TypeError as e:
+        print(e)
+        warnings.warn(f"No departments found at {campus} campus")
+        these_depts = []
+    return these_depts
 
 
 @callback(
@@ -143,9 +149,9 @@ def _store_census(
         Filtered list of CensusRow dictionaries
 
     """
-    campus_short_name = [i.get("label") for i in CAMPUSES if i.get("value") == campus][
-        0
-    ]
+    campus_short_name = next(
+        i.get("label") for i in CAMPUSES if i.get("value") == campus
+    )
 
     response = requests.get(
         f"{get_settings().api_url}/census/campus/",
@@ -453,7 +459,7 @@ def format_census(census: dict) -> dict:
     lastname = census.get("lastname", "").upper()
     firstname = census.get("firstname", "").title()
     initials = (
-        f"{census.get('firstname', '?')[0]}" f"" f"{census.get('lastname', '?')[0]}"
+        f"{census.get('firstname', '?')[0]}" f"" f"" f"{census.get('lastname', '?')[0]}"
     )
     date_of_birth = census.get("date_of_birth", "1900-01-01")  # default dob
     dob = datetime.fromisoformat(date_of_birth)
