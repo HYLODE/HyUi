@@ -22,9 +22,13 @@ services:
         <<: *build-args-common
     environment:
       <<: *proxy-common
-    env_file: .env
+    env_file:
+      - .env
+      - .env.baserow
     ports:
       - ${API_PORT}:8000
+    depends_on:
+      - baserow  # b/c initiate baserow provides auth token etc.
     networks:
       - hyui
 
