@@ -1,10 +1,16 @@
-import json
 import requests
 import warnings
 from typing import Any, Tuple, cast
+from fastapi import Depends
 
 from api.config import Settings, get_settings
 from api.utils import Timer
+
+# TODO: use database not user tokens for read/write actions
+# will need to be regenerated each time the application runs
+# https://api.baserow.io/api/redoc/#tag/Database-tokens/operation/create_database_token
+
+settings = get_settings()
 
 
 class BaserowException(Exception):
@@ -16,142 +22,26 @@ class BaserowException(Exception):
         return self.message
 
 
-def _get_user_auth_token(
-    baserow_url: str, email: str, password: str
-) -> Tuple[str, str]:
-    response = requests.post(
-        f"{baserow_url}/api/user/token-auth/",
-        headers={"Content-Type": "application/json"},
-        data=json.dumps({"email": email, "password": password}),
-    )
-    # access tokens valid for 10m
-    # refresh tokens valid for 168h
-    warnings.warn("Authenticating via username/password")
-
-    if response.status_code == 200:
-        access_token = cast(str, response.json()["access_token"])
-        refresh_token = cast(str, response.json()["refresh_token"])
-    else:
-        raise BaserowException(
-            f"unexpected response {response.status_code}: " f"{str(response.content)}"
-        )
-
-    # see https://api.baserow.io/api/redoc/#tag/User/operation/token_auth
-    # Response sample
-    # {
-    #   "user": {
-    #     "first_name": "string",
-    #     "username": "user@example.com",
-    #     "language": "string"
-    #   },
-    #   "token": "string",
-    #   "access_token": "string",
-    #   "refresh_token": "string"
-    # }
-    # Note that in the above access_token == token
-    return access_token, refresh_token
-
-
-def _refresh_user_auth_token(baserow_url: str) -> str:
-    # access tokens valid for 10m
-    # refresh tokens valid for 168h
-    warnings.warn("Refreshing user authentication")
-    refresh_token = BASEROW_REFRESH_TOKEN  # from the outer scope
-    response = requests.post(
-        f"{baserow_url}/api/user/token-refresh/",
-        headers={"Content-Type": "application/json"},
-        data=json.dumps({"refresh_token": refresh_token}),
-    )
-
-    if response.status_code == 200:
-        print("SUCCESS: refreshed access token")
-        access_token = cast(str, response.json()["access_token"])
-        global BASEROW_AUTH_TOKEN
-        BASEROW_AUTH_TOKEN = access_token
-    else:
-        raise BaserowException(
-            "ERROR: unable to refresh access token"
-            f"unexpected response {response.status_code}: "
-            f"{str(response.content)}"
-        )
-    return access_token
-
-
-def _auth_headers(auth_token: str) -> dict[str, str]:
+def _simple_auth_headers(simple_auth_token: str) -> dict[str, str]:
     return {
         "Content-Type": "application/json",
-        "Authorization": f"JWT {auth_token}",
+        "Authorization": f"Token {simple_auth_token}",
     }
 
 
-def _get_application_id(
-    baserow_url: str, auth_token: str, application_name: str
-) -> int | None:
-    def _request(auth_token: str):
-        return requests.get(
-            f"{baserow_url}/api/applications/",
-            headers=_auth_headers(auth_token),
-        )
-
-    response = _request(auth_token)
-
-    if response.status_code == 401:
-        warnings.warn("Authentication error: will attempt to refresh")
-        auth_token = _refresh_user_auth_token(baserow_url)
-        response = _request(auth_token)
-        if response.status_code != 200:
-            warnings.warn("ERROR Failed trying to refresh access token")
-            raise BaserowException(
-                f"unexpected response {response.status_code}: "
-                f"{str(response.content)}"
-            )
-
-    if response.status_code != 200:
-        raise BaserowException(
-            f"unexpected response {response.status_code}: " f"{str(response.content)}"
-        )
-
-    return next(
-        (
-            cast(int, row["id"])
-            for row in response.json()
-            if row["name"] == application_name
-        ),
-        None,
-    )
+def _get_application_id(settings: Settings = Depends(get_settings)) -> int:
+    return settings.baserow_application_id
 
 
 def _get_table_id(
-    baserow_url: str, auth_token: str, application_id: int, table_name: str
+    settings: Settings,
+    table_name: str,
 ) -> int | None:
-    def _request(auth_token: str):
-        return requests.get(
-            f"{baserow_url}/api/database/tables/database/{application_id}/",
-            headers=_auth_headers(auth_token),
-        )
+    table_id = settings.dict().get(f"baserow_table_{table_name}")
+    return table_id
 
-    response = _request(auth_token)
 
-    if response.status_code == 401:
-        warnings.warn("Authentication error: will attempt to refresh")
-        auth_token = _refresh_user_auth_token(baserow_url)
-        response = _request(auth_token)
-        if response.status_code != 200:
-            warnings.warn("ERROR Failed trying to refresh access token")
-            raise BaserowException(
-                f"unexpected response {response.status_code}: "
-                f"{str(response.content)}"
-            )
-
-    if response.status_code != 200:
-        raise BaserowException(
-            f"unexpected response {response.status_code}: " f"{str(response.content)}"
-        )
-
-    return next(
-        (cast(int, row["id"]) for row in response.json() if row["name"] == table_name),
-        None,
-    )
+_get_table_id(settings, "beds")
 
 
 def get_rows(
@@ -188,7 +78,7 @@ def get_rows(
         params["page"] = params["page"] + 1
         with Timer(text="get_rows.requests: Elapsed time: {:.4f}"):
             response = requests.get(
-                rows_url, headers=_auth_headers(auth_token), params=params
+                rows_url, headers=_jwt_auth_headers(auth_token), params=params
             )
 
         if response.status_code != 200:
@@ -223,7 +113,7 @@ def get_fields(
         )
 
     url = f"{baserow_url}/api/database/fields/table/{table_id}/"
-    response = requests.get(url, headers=_auth_headers(auth_token))
+    response = requests.get(url, headers=_jwt_auth_headers(auth_token))
 
     if response.status_code != 200:
         raise BaserowException(
@@ -258,7 +148,7 @@ def post_row(
     url = f"{baserow_url}/api/database/rows/table/{table_id}/"
 
     response = requests.post(
-        url, headers=_auth_headers(auth_token), params=params, json=payload
+        url, headers=_jwt_auth_headers(auth_token), params=params, json=payload
     )
 
     if response.status_code != 200:
