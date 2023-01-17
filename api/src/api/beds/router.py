@@ -4,13 +4,13 @@ from fastapi import APIRouter, Depends, Query
 from pathlib import Path
 
 from api.baserow import get_fields, get_rows, post_row
-from api.config import Settings, get_settings
+from api.config import BaserowSettings, Settings, get_settings, get_settings_baserow
+from api.utils import Timer
 from api.wards import (
     CAMPUSES,
     MISSING_DEPARTMENT_LOCATIONS,
 )
-from models.beds import Bed, Room, Department, DischargeStatus
-from api.utils import Timer
+from models.beds import Bed, Department, DischargeStatus, Room
 
 router = APIRouter(
     prefix="/beds",
@@ -29,17 +29,16 @@ def get_mock_departments() -> list[Department]:
 
 
 @router.get("/departments", response_model=list[Department])
-def get_departments(settings: Settings = Depends(get_settings)) -> list[Department]:
-    baserow_url = settings.baserow_url
-    email = settings.baserow_email
-    password = settings.baserow_password.get_secret_value()
-
+def get_departments(
+    settings_baserow: BaserowSettings = Depends(get_settings_baserow),
+    settings: Settings = Depends(get_settings),
+) -> list[Department]:
     params = {
         "size": 200,  # The maximum size of a page.
         "user_field_names": "true",
     }
 
-    rows = get_rows(baserow_url, email, password, "hyui", "departments", params)
+    rows = get_rows(settings_baserow, settings, "departments", params)
 
     # drop baserow id and order fields
     for row in rows:
@@ -57,17 +56,16 @@ def get_mock_rooms() -> list[Room]:
 
 
 @router.get("/rooms", response_model=list[Room])
-def get_rooms(settings: Settings = Depends(get_settings)) -> list[Room]:
-    baserow_url = settings.baserow_url
-    email = settings.baserow_email
-    password = settings.baserow_password.get_secret_value()
-
+def get_rooms(
+    settings_baserow: BaserowSettings = Depends(get_settings_baserow),
+    settings: Settings = Depends(get_settings),
+) -> list[Room]:
     params = {
         "size": 200,  # The maximum size of a page.
         "user_field_names": "true",
     }
 
-    rows = get_rows(baserow_url, email, password, "hyui", "rooms", params)
+    rows = get_rows(settings_baserow, settings, "rooms", params)
 
     # drop baserow id and order fields
     for row in rows:
@@ -97,13 +95,10 @@ def get_mock_beds(
 def get_beds(
     departments: list[str] = Query(default=[]),
     locations: list[str] = Query(default=[]),
+    settings_baserow: BaserowSettings = Depends(get_settings_baserow),
     settings: Settings = Depends(get_settings),
 ) -> list[Bed]:
-    baserow_url = settings.baserow_url
-    email = settings.baserow_email
-    password = settings.baserow_password.get_secret_value()
-
-    field_ids = get_fields(baserow_url, email, password, "hyui", "beds")
+    field_ids = get_fields(settings_baserow, settings, "beds")
     params = {
         "size": 200,  # The maximum size of a page.
         "user_field_names": "true",
@@ -114,18 +109,18 @@ def get_beds(
         for department in departments:
             department_field_id = field_ids["department"]
             params[f"filter__field_{department_field_id}__equal"] = department
-            rows.extend(get_rows(baserow_url, email, password, "hyui", "beds", params))
+            rows.extend(get_rows(settings_baserow, settings, "beds", params))
             params.pop(f"filter__field_{department_field_id}__equal")
 
         for location in locations:
             location_string_field_id = field_ids["location_string"]
             params[f"filter__field_{location_string_field_id}__equal"] = location
-            rows.extend(get_rows(baserow_url, email, password, "hyui", "beds", params))
+            rows.extend(get_rows(settings_baserow, settings, "beds", params))
             params.pop(f"filter__field_{location_string_field_id}__equal")
 
     else:
         # get everything
-        rows = get_rows(baserow_url, email, password, "hyui", "beds", params)
+        rows = get_rows(settings_baserow, settings, "beds", params)
 
     # drop baserow id and order fields
     for row in rows:
@@ -165,12 +160,9 @@ def get_mock_campus(
 @router.get("/campus", response_model=list[Bed])
 def get_campus(
     campuses: list[str] = Query(default=[]),
+    settings_baserow: BaserowSettings = Depends(get_settings_baserow),
     settings: Settings = Depends(get_settings),
 ) -> list[Bed]:
-    baserow_url = settings.baserow_url
-    email = settings.baserow_email
-    password = settings.baserow_password.get_secret_value()
-
     departments: list = []
     for campus in campuses:
         departments.extend(CAMPUSES.get(campus, []))
@@ -180,7 +172,7 @@ def get_campus(
         if missing_locations := MISSING_DEPARTMENT_LOCATIONS.get(department):
             locations.extend(missing_locations)
 
-    field_ids = get_fields(baserow_url, email, password, "hyui", "beds")
+    field_ids = get_fields(settings_baserow, settings, "beds")
     params = {
         "size": 200,  # The maximum size of a page.
         "user_field_names": "true",
@@ -191,18 +183,18 @@ def get_campus(
         for department in departments:
             department_field_id = field_ids["department"]
             params[f"filter__field_{department_field_id}__equal"] = department
-            rows.extend(get_rows(baserow_url, email, password, "hyui", "beds", params))
+            rows.extend(get_rows(settings_baserow, settings, "beds", params))
             params.pop(f"filter__field_{department_field_id}__equal")
 
         for location in locations:
             location_string_field_id = field_ids["location_string"]
             params[f"filter__field_{location_string_field_id}__equal"] = location
-            rows.extend(get_rows(baserow_url, email, password, "hyui", "beds", params))
+            rows.extend(get_rows(settings_baserow, settings, "beds", params))
             params.pop(f"filter__field_{location_string_field_id}__equal")
 
     else:
         # get everything
-        rows = get_rows(baserow_url, email, password, "hyui", "beds", params)
+        rows = get_rows(settings_baserow, settings, "beds", params)
 
     # drop baserow id and order fields
     for row in rows:
@@ -221,12 +213,11 @@ def get_mock_closed_beds() -> list[Bed]:
 
 
 @router.get("/closed/", response_model=list[Bed])
-def get_closed_beds(settings: Settings = Depends(get_settings)) -> list[Bed]:
-    baserow_url = settings.baserow_url
-    email = settings.baserow_email
-    password = settings.baserow_password.get_secret_value()
-
-    field_ids = get_fields(baserow_url, email, password, "hyui", "beds")
+def get_closed_beds(
+    settings_baserow: BaserowSettings = Depends(get_settings_baserow),
+    settings: Settings = Depends(get_settings),
+) -> list[Bed]:
+    field_ids = get_fields(settings_baserow, settings, "beds")
 
     closed_field_id = field_ids["closed"]
 
@@ -236,18 +227,18 @@ def get_closed_beds(settings: Settings = Depends(get_settings)) -> list[Bed]:
         f"filter__field_{closed_field_id}__boolean": True,
     }
 
-    rows = get_rows(baserow_url, email, password, "hyui", "beds", params)
+    rows = get_rows(settings_baserow, settings, "beds", params)
     return [Bed.parse_obj(row) for row in rows]
 
 
 @mock_router.post("/discharge_status/", response_model=DischargeStatus)
 def post_mock_discharge_status(
-    csn: int, status: str, settings: Settings = Depends(get_settings)
+    csn: int,
+    status: str,
+    settings_baserow: BaserowSettings = Depends(get_settings_baserow),
+    settings: Settings = Depends(get_settings),
 ) -> DischargeStatus:
     # this function depends on having a local instance of baserow running
-    baserow_url = settings.baserow_url
-    email = settings.baserow_email
-    password = settings.baserow_password.get_secret_value()
 
     params = {"user_field_names": True}
 
@@ -261,10 +252,8 @@ def post_mock_discharge_status(
     }
 
     result = post_row(
-        baserow_url,
-        email,
-        password,
-        "hyui",
+        settings_baserow,
+        settings,
         "discharge_statuses",
         params=params,
         payload=payload,
@@ -275,12 +264,11 @@ def post_mock_discharge_status(
 
 @router.post("/discharge_status/", response_model=DischargeStatus)
 def post_discharge_status(
-    csn: int, status: str, settings: Settings = Depends(get_settings)
+    csn: int,
+    status: str,
+    settings_baserow: BaserowSettings = Depends(get_settings_baserow),
+    settings: Settings = Depends(get_settings),
 ) -> DischargeStatus:
-    baserow_url = settings.baserow_url
-    email = settings.baserow_email
-    password = settings.baserow_password.get_secret_value()
-
     params = {"user_field_names": True}
 
     payload = {
@@ -290,10 +278,8 @@ def post_discharge_status(
     }
 
     result = post_row(
-        baserow_url,
-        email,
-        password,
-        "hyui",
+        settings_baserow,
+        settings,
         "discharge_statuses",
         params=params,
         payload=payload,
@@ -306,14 +292,13 @@ def post_discharge_status(
 @mock_router.get("/discharge_status/", response_model=list[DischargeStatus])
 @Timer(text="Get rows route: Elapsed time: {:.4f}")
 def get_mock_discharge_status(
-    delta_hours: int = 72, settings: Settings = Depends(get_settings)
+    delta_hours: int = 72,
+    settings_baserow: BaserowSettings = Depends(get_settings_baserow),
+    settings: Settings = Depends(get_settings),
 ) -> list[DischargeStatus]:
-    baserow_url = settings.baserow_url
-    email = settings.baserow_email
-    password = settings.baserow_password.get_secret_value()
     _table = "discharge_statuses"
 
-    field_ids = get_fields(baserow_url, email, password, "hyui", _table)
+    field_ids = get_fields(settings_baserow, settings, _table)
 
     modified_at_field_id = field_ids["modified_at"]
     horizon = (datetime.utcnow() - timedelta(hours=float(delta_hours))).isoformat()
@@ -325,20 +310,19 @@ def get_mock_discharge_status(
         f"filter__field_{modified_at_field_id}__date_after": horizon,
     }
 
-    rows = get_rows(baserow_url, email, password, "hyui", _table, params)
+    rows = get_rows(settings_baserow, settings, _table, params)
     return [DischargeStatus.parse_obj(row) for row in rows]
 
 
 @router.get("/discharge_status/", response_model=list[DischargeStatus])
 def get_discharge_status(
-    delta_hours: int = 72, settings: Settings = Depends(get_settings)
+    delta_hours: int = 72,
+    settings_baserow: BaserowSettings = Depends(get_settings_baserow),
+    settings: Settings = Depends(get_settings),
 ) -> list[DischargeStatus]:
-    baserow_url = settings.baserow_url
-    email = settings.baserow_email
-    password = settings.baserow_password.get_secret_value()
     _table = "discharge_statuses"
 
-    field_ids = get_fields(baserow_url, email, password, "hyui", _table)
+    field_ids = get_fields(settings_baserow, settings, _table)
 
     modified_at_field_id = field_ids["modified_at"]
     horizon = (datetime.utcnow() - timedelta(hours=float(delta_hours))).isoformat()
@@ -350,5 +334,5 @@ def get_discharge_status(
         f"filter__field_{modified_at_field_id}__date_after": horizon,
     }
 
-    rows = get_rows(baserow_url, email, password, "hyui", _table, params)
+    rows = get_rows(settings_baserow, settings, _table, params)
     return [DischargeStatus.parse_obj(row) for row in rows]

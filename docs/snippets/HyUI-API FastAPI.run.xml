@@ -22,6 +22,7 @@
       <ENTRIES>
         <ENTRY IS_ENABLED="true" PARSER="runconfig" IS_EXECUTABLE="false" />
         <ENTRY IS_ENABLED="true" PARSER="env" IS_EXECUTABLE="false" PATH=".env" />
+        <ENTRY IS_ENABLED="true" PARSER="env" IS_EXECUTABLE="false" PATH=".env.baserow" />
       </ENTRIES>
     </EXTENSION>
     <option name="SCRIPT_NAME" value="uvicorn" />
