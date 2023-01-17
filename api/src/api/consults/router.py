@@ -12,7 +12,7 @@ router = APIRouter(
 
 
 @router.get("/", response_model=list[Consults])
-def get_consults(session: Session = Depends(get_star_session)):
+def get_consults(session: Session = Depends(get_star_session)) -> list[Consults]:
     """
     Returns Consults data class populated by query-live/mock
     query preparation depends on the environment so will return

@@ -6,7 +6,7 @@ from pydantic import parse_obj_as
 import pandas as pd
 import pickle
 from pathlib import Path
-
+from typing import Any
 from models.perrt import AdmissionPrediction, PerrtRaw, PerrtRead
 from api.db import prepare_query, get_star_session
 
@@ -22,7 +22,7 @@ def read_perrt_table(
     session: Session = Depends(get_star_session),
     offset: int = 0,
     limit: int = Query(default=100, lte=100),
-):
+) -> list[PerrtRaw]:
     """
     Returns PerrtTable data class populated by query-live/mock
 
@@ -38,7 +38,7 @@ def read_perrt_table(
 
 
 @router.get("/", response_model=list[PerrtRead])
-def read_perrt(session: Session = Depends(get_star_session)):
+def read_perrt(session: Session = Depends(get_star_session)) -> Any:
     """
     Returns PerrtRead data class post wrangling
 
@@ -66,7 +66,7 @@ def read_perrt(session: Session = Depends(get_star_session)):
 @router.post("/admission_predictions", response_model=list[AdmissionPrediction])
 def get_predictions(
     hospital_visit_ids: list[str] = Body(),
-):
+) -> list[AdmissionPrediction]:
 
     predictions_filepath = Path(
         f"{Path(__file__).parent}/admission_probability/"

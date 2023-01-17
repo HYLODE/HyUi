@@ -44,7 +44,9 @@ mock_router = APIRouter(
 
 
 @router.get("/beds/", response_model=list[BedRow])
-def get_beds(department: str, settings=Depends(get_settings)):
+def get_beds(
+    department: str, settings: Depends = Depends(get_settings)
+) -> list[BedRow]:
 
     baserow_url = settings.baserow_url
     email = settings.baserow_email
@@ -114,7 +116,9 @@ def get_mock_live_ui(ward: str) -> list[SitrepRow]:
 
 
 @router.get("/live/{ward}/ui/", response_model=list[SitrepRow])
-def get_live_ui(ward: str, settings=Depends(get_settings)) -> list[SitrepRow]:
+def get_live_ui(
+    ward: str, settings: Depends = Depends(get_settings)
+) -> list[SitrepRow]:
     response = requests.get(f"{settings.hycastle_url}/live/icu/{ward}/ui")
     rows = response.json()["data"]
     return [SitrepRow.parse_obj(row) for row in rows]
@@ -122,8 +126,8 @@ def get_live_ui(ward: str, settings=Depends(get_settings)) -> list[SitrepRow]:
 
 @router.patch("/beds")
 def update_bed_row(
-    table_id: int, row_id: int, data: dict, settings=Depends(get_settings)
-):
+    table_id: int, row_id: int, data: dict, settings: Depends = Depends(get_settings)
+) -> None:
     url = f"{settings.baserow_url}/api/database/rows/table/{table_id}/"
 
     # TODO: Need to get working.
@@ -142,7 +146,7 @@ def update_bed_row(
     response_model=list[IndividualDischargePrediction],
 )
 def get_individual_discharge_predictions(
-    ward: str, settings=Depends(get_settings)
+    ward: str, settings: Depends = Depends(get_settings)
 ) -> list[IndividualDischargePrediction]:
     response = requests.get(
         f"{settings.hymind_url}/predictions/icu/discharge", params={"ward": ward}

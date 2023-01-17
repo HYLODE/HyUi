@@ -2,7 +2,7 @@
 Entry point and main file for the FastAPI backend
 """
 
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, Depends
 from fastapi.responses import ORJSONResponse
 
 from api.census.router import router as census_router, mock_router as mock_census_router
@@ -33,10 +33,15 @@ from api.demo.router import (
     mock_router as mock_demo_router,
 )
 
+from api.dependencies import add_cache_control_header
 
-app = FastAPI(default_response_class=ORJSONResponse)
+app = FastAPI(
+    default_response_class=ORJSONResponse,
+    dependencies=[Depends(add_cache_control_header)],
+)
+
 mock_router = APIRouter(
-    prefix="/mock",
+    prefix="/mock", dependencies=[Depends(add_cache_control_header)]
 )
 
 app.include_router(demo_router)
@@ -68,6 +73,18 @@ app.include_router(hymind_router)
 
 # Finally include the mock router.
 app.include_router(mock_router)
+
+#
+# @app.middleware("http")
+# async def add_cache_control_header(request: Request, call_next):
+#    print(f"Attempting to make a {request.method} request!")
+#    response = await call_next(request)
+#    if request.method.upper() == "GET":
+#        print(f"Will be hitting the cache...")
+#        response.headers["Cache-control"]= "public, max-age=30"
+#    else:
+#        print("Not a GET - Skipping the cache!")
+#    return response
 
 
 @app.get("/ping")

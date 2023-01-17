@@ -12,7 +12,7 @@ router = APIRouter(
 
 
 @router.get("/", response_model=list[RosRead])
-def read_ros(session: Session = Depends(get_star_session)):
+def read_ros(session: Session = Depends(get_star_session)) -> list[RosRead]:
     """
     Returns Ros data
     """

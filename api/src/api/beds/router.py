@@ -51,7 +51,7 @@ def get_mock_closed_beds() -> list[Bed]:
 
 
 @router.get("/beds/closed/", response_model=list[Bed])
-def get_closed_beds(settings=Depends(get_settings)) -> list[Bed]:
+def get_closed_beds(settings: Depends = Depends(get_settings)) -> list[Bed]:
     baserow_url = settings.baserow_url
     email = settings.baserow_email
     password = settings.baserow_password.get_secret_value()
