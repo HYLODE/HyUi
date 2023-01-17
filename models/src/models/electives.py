@@ -207,7 +207,7 @@ class EchoData(CabData):
 class EchoWithAbnormalData(CabData):
     imaging_key: int
     narrative: str
-    finalizing_date_key: date
+    finalizing_date_key: int
     date_value: date
     is_abnormal: bool
     planned_operation_start_instant: datetime

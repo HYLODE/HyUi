@@ -18,7 +18,6 @@ from models.electives import (
     PreassessData,
     MergedData,
     LabData,
-    EchoData,
     EchoWithAbnormalData,
     AxaCodes,
     ObsData,
@@ -159,9 +158,9 @@ def get_caboodle_labs(
     return _parse_query("live_sql/get_labs.sql", session, LabData, params)
 
 
-@mock_router.get("/echo/", response_model=list[EchoData])
-def get_mock_echo() -> list[type[EchoData]]:
-    return _get_mock_sql_rows("echo", EchoData)
+@mock_router.get("/echo/", response_model=list[EchoWithAbnormalData])
+def get_mock_echo() -> list[type[EchoWithAbnormalData]]:
+    return _get_mock_sql_rows("echo", EchoWithAbnormalData)
 
 
 @router.get("/echo/", response_model=list[EchoWithAbnormalData])
