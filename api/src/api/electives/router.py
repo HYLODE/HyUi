@@ -12,10 +12,8 @@ from sqlmodel import Session
 from api.db import get_caboodle_session, get_clarity_session
 from api.electives.wrangle import prepare_draft  # , prepare_electives
 from models.electives import (
-    CaboodleCaseBooking,
     CaboodlePreassessment,
     ClarityPostopDestination,
-    # ElectiveSurgCase,
     SurgData,
     PreassessData,
     MergedData,
@@ -75,8 +73,12 @@ def _parse_query(
         "%Y-%m-%d"
     )
 
-    df = pd.read_sql(query, session.connection(), params={'start_date':start_date, 'end_date':end_date})
-    
+    df = pd.read_sql(
+        query,
+        session.connection(),
+        params={"start_date": start_date, "end_date": end_date},
+    )
+
     return [model.parse_obj(row) for row in df.to_dict(orient="records")]
 
 
@@ -121,9 +123,9 @@ def get_clarity_pod(
     Return clarity post op destination
     """
     params = {"days_ahead": days_ahead}
-    # _parse_query("live_pod.sql", session, ClarityPostopDestination, params)
-    
-    return pd.read_sql(query, session.connection(), params=params)
+
+    return _parse_query("live_pod.sql", session, ClarityPostopDestination, params)
+
 
 @mock_router.get("/preassessment/", response_model=list[PreassessData])
 def get_mock_caboodle_preassess() -> list[type[PreassessData]]:
@@ -188,15 +190,19 @@ def get_caboodle_obs(
     params = {"days_ahead": days_ahead}
     return _parse_query("live_sql/get_obs.sql", session, ObsData, params)
 
+
 @router.get("/axa/", response_model=list[AxaCodes])
 def get_axa_codes() -> list[AxaCodes]:
-    model=AxaCodes
-    df = pd.read_csv((Path(__file__).parent / "supp_data/axa_codes.csv"))# , encoding="cp1252")
+    model = AxaCodes
+    df = pd.read_csv(
+        (Path(__file__).parent / "supp_data/axa_codes.csv")
+    )  # , encoding="cp1252")
     return [model.parse_obj(row) for row in df.to_dict(orient="records")]
+
 
 @router.get("/", response_model=list[MergedData])
 def get_electives(
-     s_caboodle: Session = Depends(get_caboodle_session),
+    s_caboodle: Session = Depends(get_caboodle_session),
     #  s_clarity: Session = Depends(get_clarity_session),
     days_ahead: int = 3,
 ) -> list[MergedData]:
@@ -225,7 +231,8 @@ def get_mock_electives(
     labs = _get_mock_sql_rows("labs", LabData)
     echo = _get_mock_sql_rows("echo", EchoWithAbnormalData)
     obs = _get_mock_sql_rows("obs", ObsData)
+    axa = get_axa_codes()
 
-    df = prepare_draft(case, preassess, labs, echo, obs)
+    df = prepare_draft(case, preassess, labs, echo, obs, axa)
     df = df.replace({np.nan: None})
     return [MergedData.parse_obj(row) for row in df.to_dict(orient="records")]

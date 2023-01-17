@@ -58,7 +58,10 @@ WHERE def.[DiagnosisKey] > 0
         OR ddim.[DateValue] < CONVERT(date, surgical_pts.[TouchTimeStartInstant])
     )
     AND (
-        ddim2.[DateValue] > CONVERT(date, surgical_pts.[PlannedOperationStartInstant])
+        ddim2.[DateValue] > CONVERT(
+            date,
+            surgical_pts.[PlannedOperationStartInstant]
+        )
         OR ddim2.[DateValue] > CONVERT(date, surgical_pts.[TouchTimeStartInstant])
         OR ddim2.[DateValue] IS NULL
     )

@@ -1,12 +1,3 @@
-"""
-Results from Electives Query
-eg.
-
-The developer should specify the data models here
-and follow the **same** naming convention such that
-the module.classname can be reliably used for access
-"""
-
 from datetime import datetime, date, time
 
 from pydantic import BaseModel
@@ -116,8 +107,8 @@ class SurgData(CabData):
     primary_anesthesia_type: str | None
     reason_not_performed: str | None
     canceled: bool | None
-    planned_operation_start_instant: datetime #  | None
-    planned_operation_end_instant: datetime #| None
+    planned_operation_start_instant: datetime
+    planned_operation_end_instant: datetime
     touch_time_start_instant: datetime | None
     touch_time_end_instant: datetime | None
     touch_time_minutes: float | None
@@ -197,8 +188,9 @@ class MergedData(SurgData):
     dias_bp_abnormal_count: int | None
     pulse_measured_count: int | None
     bmi_max_value: float | None
-    protocolised_adm : str| None
-    icu_prob: float 
+    protocolised_adm: str | None
+    icu_prob: float
+
 
 class EchoData(CabData):
     imaging_key: int
@@ -229,6 +221,7 @@ class ObsData(CabData):
     first_documented_instant: datetime
     taken_instant: datetime
     display_name: str
+
 
 class AxaCodes(BaseModel):
     surgical_service: str | None

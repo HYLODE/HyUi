@@ -2,13 +2,14 @@ import numpy as np
 import pandas as pd
 from pydantic import BaseModel
 
-import pickle 
+import pickle
 from pathlib import Path
-from imblearn.pipeline import Pipeline
-from sklearn.model_selection import RandomizedSearchCV, StratifiedKFold
-from sklearn.linear_model import BayesianRidge
-from sklearn.ensemble import RandomForestClassifier
-from category_encoders import TargetEncoder
+
+# from imblearn.pipeline import Pipeline
+# from sklearn.model_selection import RandomizedSearchCV, StratifiedKFold
+# from sklearn.linear_model import BayesianRidge
+# from sklearn.ensemble import RandomForestClassifier
+# from category_encoders import TargetEncoder
 from api.convert import to_data_frame
 
 from models.electives import (
@@ -31,7 +32,7 @@ from api.electives.hypo_help import (
     j_wrangle_obs,
     wrangle_echo,
     fill_na,
-    camel_to_snake,
+    # camel_to_snake,
 )
 
 
@@ -172,14 +173,14 @@ def prepare_draft(
     labs_df = to_data_frame(labs, LabData)
     echo_df = to_data_frame(echo, EchoWithAbnormalData)
     obs_df = to_data_frame(obs, ObsData)
-    axa_codes = to_data_frame(axa, AxaCodes)    
-# axa_codes = camel_to_snake(
+    axa_codes = to_data_frame(axa, AxaCodes)
+    # axa_codes = camel_to_snake(
     #    pd.read_csv(
     #        "axa_codes.csv",
     #        encoding="cp1252",
     #        usecols=["SurgicalService", "Name", "axa_severity", "protocolised_adm"],
     #    )
-    #)
+    # )
 
     # print(axa_codes.columns)
 
@@ -187,7 +188,11 @@ def prepare_draft(
         merge_surg_preassess(surg_data=electives_df, preassess_data=preassess_df)
         .merge(wrangle_labs(labs_df), how="left", on="patient_durable_key")
         .merge(wrangle_echo(echo_df), how="left", on="patient_durable_key")
-        .merge(j_wrangle_obs(obs_df), how="left", on=["surgical_case_key", "planned_operation_start_instant"])
+        .merge(
+            j_wrangle_obs(obs_df),
+            how="left",
+            on=["surgical_case_key", "planned_operation_start_instant"],
+        )
         .sort_values("surgery_date", ascending=True)
         .drop_duplicates(subset="patient_durable_key", keep="first")
         .sort_index()
@@ -202,21 +207,18 @@ def prepare_draft(
     # create pacu label
     df["pacu"] = False
     df["pacu"] = np.where(
-        df["booked_destination"].astype(str).str.contains("PACU"),
-        True,
-        df["pacu"]
+        df["booked_destination"].astype(str).str.contains("PACU"), True, df["pacu"]
     )
-    df["pacu"]=np.where(
-        df["pacdest"].astype(str).str.contains("PACU"),
-        True,
-        df["pacu"]
+    df["pacu"] = np.where(
+        df["pacdest"].astype(str).str.contains("PACU"), True, df["pacu"]
     )
 
-    deployed = pickle.load(open((Path(__file__).parent / 'deploy/RFR_jan1601.sav'), 'rb'))
-    model = deployed.best_estimator_    
+    deployed = pickle.load(
+        open((Path(__file__).parent / "deploy/RFR_jan1601.sav"), "rb")
+    )
+    model = deployed.best_estimator_
     cols = model[1].feature_names_in_
-    preds = model.predict_proba(df[cols])[:,1]
-    df["icu_prob"]=preds 
-
+    preds = model.predict_proba(df[cols])[:, 1]
+    df["icu_prob"] = preds
 
     return df
