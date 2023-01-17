@@ -1008,5 +1008,9 @@
   {
     "location_string": "T06H^T06H BY04^BY04-25",
     "closed": "TRUE"
+  },
+  {
+    "location_string": "T16N^T16N SR01^SR01-01",
+    "closed": "TRUE"
   }
 ]
