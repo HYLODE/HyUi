@@ -160,7 +160,7 @@ def get_caboodle_labs(
 
 @mock_router.get("/echo/", response_model=list[EchoWithAbnormalData])
 def get_mock_echo() -> list[type[EchoWithAbnormalData]]:
-    return _get_mock_sql_rows("echo", EchoWithAbnormalData)
+    return _get_mock_sql_rows("echo_2", EchoWithAbnormalData)
 
 
 @router.get("/echo/", response_model=list[EchoWithAbnormalData])
