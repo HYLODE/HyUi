@@ -2,8 +2,8 @@ import numpy as np
 import pandas as pd
 from pydantic import BaseModel
 
-import pickle
-from pathlib import Path
+# import pickle
+# from pathlib import Path
 
 # from imblearn.pipeline import Pipeline
 # from sklearn.model_selection import RandomizedSearchCV, StratifiedKFold
@@ -213,12 +213,13 @@ def prepare_draft(
         df["pacdest"].astype(str).str.contains("PACU"), True, df["pacu"]
     )
 
-    deployed = pickle.load(
-        open((Path(__file__).parent / "deploy/RFR_jan1601.sav"), "rb")
-    )
-    model = deployed.best_estimator_
-    cols = model[1].feature_names_in_
-    preds = model.predict_proba(df[cols])[:, 1]
-    df["icu_prob"] = preds
+    # deployed = pickle.load(
+    #     open((Path(__file__).parent / "deploy/RFR_jan1601.sav"), "rb")
+    # )
+    # model = deployed.best_estimator_
+    # cols = model[1].feature_names_in_
+    # preds = model.predict_proba(df[cols])[:, 1]
+    # df["icu_prob"] = preds
+    df["icu_prob"] = 0
 
     return df

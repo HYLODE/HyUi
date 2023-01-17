@@ -228,7 +228,7 @@ def get_mock_electives(
     case = _get_mock_sql_rows("surg", SurgData)
     preassess = _get_mock_sql_rows("preassess", PreassessData)
     labs = _get_mock_sql_rows("labs", LabData)
-    echo = _get_mock_sql_rows("echo", EchoWithAbnormalData)
+    echo = _get_mock_sql_rows("echo_2", EchoWithAbnormalData)
     obs = _get_mock_sql_rows("obs", ObsData)
     axa = get_axa_codes()
 
