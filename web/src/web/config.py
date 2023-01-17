@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     development_port: str = "8201"
 
     api_url: AnyHttpUrl
+    baserow_public_url: AnyHttpUrl
 
     class Config:
         # The prefix below scopes the .env variables.

@@ -1,0 +1,176 @@
+{
+	"table": "vitals",
+	"rows":
+	[
+		{
+			"visit_observation_id": 679777370,
+			"hospital_visit_id": 699999996,
+			"observation_datetime": "2022-12-05 10:52:00+00",
+			"id_in_application": "5",
+			"value_as_real": null,
+			"value_as_text": "119/71",
+			"unit": null,
+			"encounter": 1040463999
+		},
+		{
+			"visit_observation_id": 679777372,
+			"hospital_visit_id": 699999996,
+			"observation_datetime": "2022-12-05 10:52:00+00",
+			"id_in_application": "6",
+			"value_as_real": 97.2,
+			"value_as_text": null,
+			"unit": null,
+			"encounter": 1040463999
+		},
+		{
+			"visit_observation_id": 679777374,
+			"hospital_visit_id": 699999996,
+			"observation_datetime": "2022-12-05 10:52:00+00",
+			"id_in_application": "8",
+			"value_as_real": 107,
+			"value_as_text": null,
+			"unit": null,
+			"encounter": 1040463999
+		},
+		{
+			"visit_observation_id": 679777376,
+			"hospital_visit_id": 699999996,
+			"observation_datetime": "2022-12-05 10:52:00+00",
+			"id_in_application": "9",
+			"value_as_real": 21,
+			"value_as_text": null,
+			"unit": null,
+			"encounter": 1040463999
+		},
+		{
+			"visit_observation_id": 679777378,
+			"hospital_visit_id": 699999996,
+			"observation_datetime": "2022-12-05 10:52:00+00",
+			"id_in_application": "10",
+			"value_as_real": 93,
+			"value_as_text": null,
+			"unit": "%",
+			"encounter": 1040463999
+		},
+		{
+			"visit_observation_id": 679777380,
+			"hospital_visit_id": 699999996,
+			"observation_datetime": "2022-12-05 10:52:00+00",
+			"id_in_application": "6466",
+			"value_as_real": null,
+			"value_as_text": "A",
+			"unit": null,
+			"encounter": 1040463999
+		},
+		{
+			"visit_observation_id": 679777382,
+			"hospital_visit_id": 699999996,
+			"observation_datetime": "2022-12-05 10:52:00+00",
+			"id_in_application": "28315",
+			"value_as_real": null,
+			"value_as_text": "5",
+			"unit": null,
+			"encounter": 1040463999
+		},
+		{
+			"visit_observation_id": 679777386,
+			"hospital_visit_id": 699999996,
+			"observation_datetime": "2022-12-05 10:52:00+00",
+			"id_in_application": "3040109304",
+			"value_as_real": null,
+			"value_as_text": "Room air",
+			"unit": null,
+			"encounter": 1040463999
+		},
+		{
+			"visit_observation_id": 679779226,
+			"hospital_visit_id": 674628501,
+			"observation_datetime": "2022-12-05 10:54:00+00",
+			"id_in_application": "5",
+			"value_as_real": null,
+			"value_as_text": "129/90",
+			"unit": null,
+			"encounter": 1039738111
+		},
+		{
+			"visit_observation_id": 679779228,
+			"hospital_visit_id": 674628501,
+			"observation_datetime": "2022-12-05 10:54:00+00",
+			"id_in_application": "6",
+			"value_as_real": 99,
+			"value_as_text": null,
+			"unit": null,
+			"encounter": 1039738111
+		},
+		{
+			"visit_observation_id": 679779230,
+			"hospital_visit_id": 674628501,
+			"observation_datetime": "2022-12-05 10:54:00+00",
+			"id_in_application": "8",
+			"value_as_real": 97,
+			"value_as_text": null,
+			"unit": null,
+			"encounter": 1039738111
+		},
+		{
+			"visit_observation_id": 679779232,
+			"hospital_visit_id": 674628501,
+			"observation_datetime": "2022-12-05 10:54:00+00",
+			"id_in_application": "9",
+			"value_as_real": 17,
+			"value_as_text": null,
+			"unit": null,
+			"encounter": 1039738111
+		},
+		{
+			"visit_observation_id": 679779234,
+			"hospital_visit_id": 674628501,
+			"observation_datetime": "2022-12-05 10:54:00+00",
+			"id_in_application": "10",
+			"value_as_real": 96,
+			"value_as_text": null,
+			"unit": "%",
+			"encounter": 1039738111
+		},
+		{
+			"visit_observation_id": 679779236,
+			"hospital_visit_id": 674628501,
+			"observation_datetime": "2022-12-05 10:54:00+00",
+			"id_in_application": "6466",
+			"value_as_real": null,
+			"value_as_text": "A",
+			"unit": null,
+			"encounter": 1039738111
+		},
+		{
+			"visit_observation_id": 679779238,
+			"hospital_visit_id": 674628501,
+			"observation_datetime": "2022-12-05 10:54:00+00",
+			"id_in_application": "28315",
+			"value_as_real": null,
+			"value_as_text": "1",
+			"unit": null,
+			"encounter": 1021440882
+		},
+		{
+			"visit_observation_id": 679779240,
+			"hospital_visit_id": 674628501,
+			"observation_datetime": "2022-12-05 10:54:00+00",
+			"id_in_application": "3040109304",
+			"value_as_real": null,
+			"value_as_text": "Room air",
+			"unit": null,
+			"encounter": 1039738111
+		},
+		{
+			"visit_observation_id": 679779241,
+			"hospital_visit_id": 674628501,
+			"observation_datetime": "2022-12-05 10:54:00+00",
+			"id_in_application": "28316",
+			"value_as_real": null,
+			"value_as_text": "4",
+			"unit": null,
+			"encounter": 1039738111
+		}
+	]
+}

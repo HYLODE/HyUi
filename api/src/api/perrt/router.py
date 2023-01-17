@@ -1,87 +1,182 @@
-from collections import namedtuple
+"""
+Serve the PERRT endpoints
+- raw data in long form from EMAP visit observation table
+- wrangled data at the route
+"""
 
-from fastapi import APIRouter, Depends, Query, Body
-from sqlmodel import Session
-from pydantic import parse_obj_as
-import pandas as pd
-import pickle
+import datetime as dt
 from pathlib import Path
 
-from models.perrt import AdmissionPrediction, PerrtRaw, PerrtRead
-from api.db import prepare_query, get_star_session
+from fastapi import APIRouter, Depends, Query
+from sqlmodel import Session
 
+from api.convert import parse_to_data_frame, to_data_frame
+from api.db import get_star_session
+from api.mock import _get_json_rows, _parse_query
 from api.perrt.wrangle import wrangle
+from models.perrt import EmapConsults, EmapCpr, EmapVitalsLong, EmapVitalsWide
 
-router = APIRouter(
-    prefix="/perrt",
-)
+router = APIRouter(prefix="/perrt")
+mock_router = APIRouter(prefix="/perrt")
+_this_file = Path(__file__)
 
 
-@router.get("/raw", response_model=list[PerrtRaw])
-def read_perrt_table(
+@router.get("/cpr", response_model=list[EmapCpr])
+def get_emap_cpr(
     session: Session = Depends(get_star_session),
-    offset: int = 0,
-    limit: int = Query(default=100, lte=100),
+    encounter_ids: list[str] = Query(default=[]),
 ):
     """
-    Returns PerrtTable data class populated by query-live/mock
-
-    Query preparation depends on the environment via arg get_emap_session so
-    will return mock data in dev and live (from the API itself)
+    Return advance decisions about CPR
+    :type session: Session object from sqlmodel
     """
-    q = prepare_query("perrt", "FIXME")
-    results = session.exec(q)  # type: ignore
-    Record = namedtuple("Record", results.keys())  # type: ignore
-    records = [Record(*r) for r in results.fetchall()]
-    records = records[offset:limit]
-    return records
+    params = {"encounter_ids": encounter_ids}
+    res = _parse_query(_this_file, "live_cpr.sql", session, EmapCpr, params)
+    return res
 
 
-@router.get("/", response_model=list[PerrtRead])
-def read_perrt(session: Session = Depends(get_star_session)):
+@mock_router.get("/cpr", response_model=list[EmapCpr])
+def get_mock_emap_cpr():
     """
-    Returns PerrtRead data class post wrangling
-
-    :param      session:  EMAP database connection
-    :type       session:  Session
+    Return mock consults to PERRT or ICU
+    :return:
     """
-    # Run the 'raw query'
-    q = prepare_query("perrt", "FIXME")
-    results = session.exec(q)  # type: ignore
-    # Validate the raw query using the SQLModel (Pydantic model)
-    rec = [parse_obj_as(PerrtRaw, r) for r in results.fetchall()]
-    # now you want to hand this pandas without losing the typing
-    dfr = pd.DataFrame.from_records([dict(r) for r in rec])
-    # now wrangle
-    dfw = wrangle(dfr)
-    mask1 = dfw["news_scale_1_max"] > 0
-    mask2 = dfw["news_scale_2_max"] > 0
-    dfw = dfw[mask1 | mask2]
-    # now return as a list of dictionaries
-    recw = dfw.to_dict(orient="records")
-    # recw = recw[:10]
-    return recw
+    rows = _get_json_rows(_this_file, "mock_cpr.json")
+    return rows
 
 
-@router.post("/admission_predictions", response_model=list[AdmissionPrediction])
-def get_predictions(
-    hospital_visit_ids: list[str] = Body(),
+@router.get("/consults", response_model=list[EmapConsults])
+def get_emap_perrt_consults(
+    session: Session = Depends(get_star_session),
+    encounter_ids: list[str] = Query(default=[]),
+    horizon_dt: dt.datetime = dt.datetime.now() - dt.timedelta(days=7),
 ):
+    """
+    Return consults to PERRT or ICU
+    :type session: Session object from sqlmodel
+    :type horizon_dt: datetime remember to diff this from 'now'
+    """
+    params = {"encounter_ids": encounter_ids, "horizon_dt": horizon_dt}
+    res = _parse_query(_this_file, "live_consults.sql", session, EmapConsults, params)
+    return res
 
-    predictions_filepath = Path(
-        f"{Path(__file__).parent}/admission_probability/"
-        + "generated_data/id_to_admission_prediction.pkl"
-    )
 
-    predictions_map = {}
+@mock_router.get("/consults", response_model=list[EmapConsults])
+def get_mock_emap_perrt_consults():
+    """
+    Return mock consults to PERRT or ICU
+    :return:
+    """
+    rows = _get_json_rows(_this_file, "mock_consults.json")
+    return rows
 
-    if predictions_filepath.is_file():
-        predictions_map = pickle.load(open(predictions_filepath, "rb"))
 
-    return [
-        {
-            "hospital_visit_id": key,
-            "admission_probability": predictions_map.get(key, None),
-        }
-        for key in hospital_visit_ids
-    ]
+@router.get("/vitals/long", response_model=list[EmapVitalsLong])
+def get_emap_vitals_long(
+    session: Session = Depends(get_star_session),
+    encounter_ids: list[str] = Query(default=[]),
+    horizon_dt: dt.datetime = dt.datetime.now() - dt.timedelta(hours=6),
+):
+    """
+    Return vital signs
+    :type session: Session object from sqlmodel
+    :type horizon_dt: datetime remember to diff this from 'now'
+    """
+    params = {"encounter_ids": encounter_ids, "horizon_dt": horizon_dt}
+    res = _parse_query(_this_file, "live_vitals.sql", session, EmapVitalsLong, params)
+    return res
+
+
+@mock_router.get("/vitals/long", response_model=list[EmapVitalsLong])
+def get_mock_emap_vitals_long():
+    """
+    returns mock of emap query for vital signs
+    :return:
+    """
+    rows = _get_json_rows(_this_file, "mock_vitals.json")
+    return rows
+
+
+# TODO: 2022-12-06 rather than prepare the vitals and the patients together;
+#  leave that to the front end which can use census itself and instead you
+#  will need a query for perrt consults and a wrangle to return one row per
+#  encounter for the vitals
+@router.get("/vitals/wide", response_model=list[EmapVitalsWide])
+def get_emap_vitals_wide(
+    session: Session = Depends(get_star_session),
+    encounter_ids: list[str] = Query(default=[]),
+    horizon_dt: dt.datetime = dt.datetime.now() - dt.timedelta(hours=6),
+):
+    """
+    Return vital signs as a wide table after wrangling
+    :type horizon_dt: datetime remember to diff this from 'now'
+    """
+    params = {"encounter_ids": encounter_ids, "horizon_dt": horizon_dt}
+    rows = _parse_query(_this_file, "live_vitals.sql", session, EmapVitalsLong, params)
+    df = to_data_frame(rows, EmapVitalsLong)
+    df_wide = wrangle(df)
+
+    return [EmapVitalsWide.parse_obj(row) for row in df_wide.to_dict(orient="records")]
+
+
+@mock_router.get("/vitals/wide")
+def get_mock_emap_vitals_wide():
+    """
+    returns mock of emap query after wrangling
+    :return:
+    """
+    rows = _get_json_rows(_this_file, "mock_vitals.json")
+    df = parse_to_data_frame(rows, EmapVitalsLong)
+    df_wide = wrangle(df)
+
+    return [EmapVitalsWide.parse_obj(row) for row in df_wide.to_dict(orient="records")]
+
+
+# @router.get("/", response_model=list[PerrtRead])
+# def read_perrt(session: Session = Depends(get_star_session)):
+#     """
+#     Returns PerrtRead data class post wrangling
+#
+#     :param      session:  EMAP database connection
+#     :type       session:  Session
+#     """
+#     # Run the 'raw query'
+#     q = prepare_query("perrt", "FIXME")
+#     results = session.exec(q)  # type: ignore
+#     # Validate the raw query using the SQLModel (Pydantic model)
+#     rec = [parse_obj_as(PerrtRaw, r) for r in results.fetchall()]
+#     # now you want to hand this pandas without losing the typing
+#     dfr = pd.DataFrame.from_records([dict(r) for r in rec])
+#     # now wrangle
+#     dfw = wrangle(dfr)
+#     mask1 = dfw["news_scale_1_max"] > 0
+#     mask2 = dfw["news_scale_2_max"] > 0
+#     dfw = dfw[mask1 | mask2]
+#     # now return as a list of dictionaries
+#     recw = dfw.to_dict(orient="records")
+#     # recw = recw[:10]
+#     return recw
+#
+#
+# @router.post("/admission_predictions", response_model=list[
+# AdmissionPrediction])
+# def get_predictions(
+#         hospital_visit_ids: list[str] = Body(),
+# ):
+#     predictions_filepath = Path(
+#         f"{Path(__file__).parent}/admission_probability/"
+#         + "generated_data/id_to_admission_prediction.pkl"
+#     )
+#
+#     predictions_map = {}
+#
+#     if predictions_filepath.is_file():
+#         predictions_map = pickle.load(open(predictions_filepath, "rb"))
+#
+#     return [
+#         {
+#             "hospital_visit_id": key,
+#             "admission_probability": predictions_map.get(key, None),
+#         }
+#         for key in hospital_visit_ids
+#     ]

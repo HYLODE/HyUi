@@ -80,9 +80,29 @@ NHNN = (
     # default value = nhnn[0]
     "NHNN C0 NCCU",
     "NHNN C1 NCCU",
+    "NHNN C1 SURGICAL ITU",
+    "NHNN C2 VICTOR HORSLEY",
+    "NHNN C3 BERNARD SUNLEY",
+    "NHNN C3 DAVID FERRIER",
+    "NHNN C4 BLOOMSBURY WRD",
+    "NHNN C4 MOLLY LANE FOX",
+    "NHNN Q1 LADY ANNE",
+    "NHNN Q3 REHABILITATION",
+    "NHNN Q4 JOHN YOUNG WRD",
+    "NHNN Q5 H JACKSON WARD",
+    "NHNN Q6 MAIDA VALE WRD",
+    "NHNN Q7 TELEMETRY UNIT",
 )
 
 ALL = TOWER + GWB + WMS + NHNN
+
+CAMPUSES = {
+    "UCH": TOWER,
+    "WMS": WMS,
+    "GWB": GWB,
+    "NHNN": NHNN,
+}
+
 
 # Departments that have locations (beds) which incorrectly don't show up in
 # Epic as part of that department.

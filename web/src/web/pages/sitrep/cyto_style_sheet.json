@@ -1,0 +1,87 @@
+[
+  {
+    "selector": "node",
+    "style": {
+      "text-halign": "center",
+      "text-valign": "center"
+    }
+  },
+  {
+    "selector": "[entity='department']",
+    "style": {
+      "label": "data(label)",
+      "color": "black",
+      "background-opacity": 0.1,
+      "background-color": "gray",
+      "border-color": "black",
+      "border-width": 0,
+      "text-halign": "left",
+      "text-margin-x": -5
+    }
+  },
+  {
+    "selector": "[entity='bed']",
+    "style": {
+      "shape": "ellipse",
+      "label": "data(bed_number)",
+      "color": "gray",
+      "border-color": "olive",
+      "border-width": 2,
+      "background-color": "olive",
+      "background-opacity": 0
+    }
+  },
+  {
+    "selector": "[entity='room']",
+    "style": {
+      "color": "gray",
+      "label": "data(label)",
+      "border-width": 1,
+      "background-opacity": 0,
+      "text-halign": "left"
+    }
+  },
+  {
+    "selector": "[?closed]",
+    "style": {
+      "background-color": "white",
+      "color": "gray"
+    }
+  },
+  {
+    "selector": "[?blocked]",
+    "style": {
+      "background-color": "gray"
+    }
+  },
+  {
+    "selector": "[?occupied]",
+    "style": {
+      "background-color": "orange",
+      "border-width": 0,
+      "color": "white",
+      "background-opacity": 1
+    }
+  },
+  {
+    "selector": "[dc_status='discharge'][?occupied]",
+    "style": {
+      "shape": "tag",
+      "background-color": "olive",
+      "text-margin-x": -2
+    }
+  },
+
+  {
+    "selector": ":selected:",
+    "style": {
+      "width": 36,
+      "height": 36,
+      "text-margin-y": 2,
+      "shape": "star",
+      "border-width": 1,
+      "border-color": "black",
+      "color": "black"
+    }
+  }
+]

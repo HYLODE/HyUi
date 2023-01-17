@@ -2,7 +2,7 @@
 Entry point and main file for the FastAPI backend
 """
 
-from fastapi import FastAPI, APIRouter
+from fastapi import APIRouter, FastAPI
 from fastapi.responses import ORJSONResponse
 
 from api.census.router import router as census_router, mock_router as mock_census_router
@@ -21,18 +21,14 @@ from api.beds.router import (
     mock_router as mock_beds_router,
 )
 from api.consults.router import router as consults_router
-from api.perrt.router import router as perrt_router
-from api.ros.router import router as ros_router
-from api.hymind.router import router as hymind_router
+from api.demo.router import mock_router as mock_demo_router, router as demo_router
 from api.hospital.router import (
-    router as hospital_router,
     mock_router as mock_hospital_router,
+    router as hospital_router,
 )
-from api.demo.router import (
-    router as demo_router,
-    mock_router as mock_demo_router,
-)
-
+from api.hymind.router import router as hymind_router
+from api.perrt.router import mock_router as mock_perrt_router, router as perrt_router
+from api.ros.router import router as ros_router
 
 app = FastAPI(default_response_class=ORJSONResponse)
 mock_router = APIRouter(
@@ -54,6 +50,9 @@ mock_router.include_router(mock_sitrep_router)
 app.include_router(electives_router)
 mock_router.include_router(mock_electives_router)
 
+app.include_router(perrt_router)
+mock_router.include_router(mock_perrt_router)
+
 app.include_router(ed_router)
 mock_router.include_router(mock_ed_router)
 
@@ -62,7 +61,6 @@ mock_router.include_router(mock_beds_router)
 
 app.include_router(consults_router)
 
-app.include_router(perrt_router)
 app.include_router(ros_router)
 app.include_router(hymind_router)
 

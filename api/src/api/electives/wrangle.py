@@ -1,16 +1,7 @@
 import numpy as np
 import pandas as pd
-from pydantic import BaseModel
-
-# import pickle
-# from pathlib import Path
-
-# from imblearn.pipeline import Pipeline
-# from sklearn.model_selection import RandomizedSearchCV, StratifiedKFold
-# from sklearn.linear_model import BayesianRidge
-# from sklearn.ensemble import RandomForestClassifier
-# from category_encoders import TargetEncoder
 from api.convert import to_data_frame
+from pydantic import BaseModel
 
 from models.electives import (
     CaboodleCaseBooking,
@@ -129,7 +120,6 @@ def prepare_electives(
     :returns:   merged dataframe
     """
     electives_df = to_data_frame(electives, CaboodleCaseBooking)
-    # electives_df = parse_to_data_frame(electives, SurgData)
     preassess_df = to_data_frame(preassess, CaboodlePreassessment)
     pod_df = to_data_frame(pod, ClarityPostopDestination)
 

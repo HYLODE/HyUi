@@ -1,7 +1,6 @@
 import json
 from pathlib import Path
 from typing import cast
-
 import numpy as np
 import pandas as pd
 from fastapi import APIRouter, Depends
@@ -54,7 +53,7 @@ def _get_mock_sql_rows(table: str, model: type[BaseModel]) -> list[type[BaseMode
 
 
 def _parse_query(
-    query_file: str, session: Session, model: BaseModel, params: dict
+    query_file: str, session: Session, model: BaseModel, params: dict = {}
 ) -> list[BaseModel]:
     """
     generic function that reads a text query from a file, handles parameters
@@ -150,7 +149,7 @@ def get_mock_labs() -> list[type[LabData]]:
 @router.get("/labs/", response_model=list[LabData])
 def get_caboodle_labs(
     session: Session = Depends(get_caboodle_session), days_ahead: int = 1
-) -> list[CaboodlePreassessment]:
+) -> list[LabData]:
     """
     Return caboodle preassessment data
     """
@@ -182,7 +181,7 @@ def get_mock_obs() -> list[type[ObsData]]:
 @router.get("/obs/", response_model=list[ObsData])
 def get_caboodle_obs(
     session: Session = Depends(get_caboodle_session), days_ahead: int = 1
-) -> list[CaboodlePreassessment]:
+) -> list[ObsData]:
     """
     Return caboodle preassessment data
     """

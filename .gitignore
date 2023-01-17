@@ -930,3 +930,6 @@ web/src/web/assets/pacu_dashboard.html
 
 # temporary Model storage
 api/src/api/electives/deploy/*
+
+# local jupyter lab for exploratory work
+jupyter/

@@ -1,0 +1,36 @@
+{
+	"table": "PerrtConsults",
+	"rows":
+	[
+		{
+			"consultation_request_id": 659770584,
+			"scheduled_datetime": "2022-11-08 23:21:00+00",
+			"status_change_datetime": "2022-11-08 23:22:19+00",
+			"hospital_visit_id": 699999996,
+			"encounter": "1333333999",
+			"code": "CON134",
+			"name": "Inpatient consult to PERRT",
+			"con_i": 1
+		},
+		{
+			"consultation_request_id": 659878840,
+			"scheduled_datetime": "2022-11-09 02:41:00+00",
+			"status_change_datetime": "2022-11-09 02:40:52+00",
+			"hospital_visit_id": 1039855261,
+			"encounter": "1024505696",
+			"code": "CON134",
+			"name": "Inpatient consult to PERRT",
+			"con_i": 1
+		},
+		{
+			"consultation_request_id": 660019048,
+			"scheduled_datetime": "2022-11-09 09:34:00+00",
+			"status_change_datetime": "2022-11-09 09:34:37+00",
+			"hospital_visit_id": 611111113,
+			"encounter": "1222222229",
+			"code": "CON134",
+			"name": "Inpatient consult to PERRT",
+			"con_i": 1
+		}
+	]
+}

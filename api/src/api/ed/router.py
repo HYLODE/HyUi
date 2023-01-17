@@ -5,8 +5,9 @@ import pandas as pd
 import requests
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
+from sqlalchemy.orm import Session
 
-from api.config import get_settings
+from api.config import get_settings, Settings
 from api.convert import parse_to_data_frame, to_data_frame
 from api.db import get_star_session
 from api.movement import next_locations, NextLocation
@@ -22,7 +23,7 @@ mock_router = APIRouter(
 
 
 @mock_router.get("/individual/", response_model=list[EmergencyDepartmentPatient])
-def get_mock_individual_admission_rows():
+def get_mock_individual_admission_rows() -> list[EmergencyDepartmentPatient]:
     return [
         EmergencyDepartmentPatient(
             arrival_datetime=datetime(2022, 10, 12, 13, 14),
@@ -103,8 +104,9 @@ def _set_next_location_text(row: pd.Series) -> str | None:
 
 @router.get("/individual/", response_model=list[EmergencyDepartmentPatient])
 def get_individual_admission_rows(
-    settings=Depends(get_settings), star_session=Depends(get_star_session)
-):
+    settings: Settings = Depends(get_settings),
+    star_session: Session = Depends(get_star_session),
+) -> list[EmergencyDepartmentPatient]:
     census_df = _get_census(settings.hycastle_url)
     features_df = _get_features(settings.hycastle_url)
     predictions_df = _get_individual_predictions(settings.hymind_url)
@@ -129,7 +131,7 @@ def get_individual_admission_rows(
 
 
 @mock_router.get("/aggregate/", response_model=list[AggregateAdmissionRow])
-def get_mock_aggregate_admission_rows():
+def get_mock_aggregate_admission_rows() -> list[AggregateAdmissionRow]:
     return [
         AggregateAdmissionRow(
             speciality="medical",
@@ -170,14 +172,16 @@ def adjust_for_model_specific_times(t: datetime) -> datetime:
 
 
 @router.get("/aggregate/", response_model=list[AggregateAdmissionRow])
-def get_aggregate_admission_rows(settings=Depends(get_settings)):
+def get_aggregate_admission_rows(
+    settings: Settings = Depends(get_settings),
+) -> list[AggregateAdmissionRow]:
     horizon_dt = datetime.now()
 
     response = requests.get(
         f"{settings.towermail_url}/aggregations/",
         params={
             "horizon_dt": adjust_for_model_specific_times(horizon_dt),
-        },
+        },  # type: ignore
     )
 
     # Use dict({"speciality":row[0]}, **row[1]) to turn

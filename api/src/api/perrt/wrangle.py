@@ -13,39 +13,19 @@ import pandas as pd
 _model_cols = (
     "visit_observation_id",
     "hospital_visit_id",
-    "date_of_birth",
-    "lastname",
-    "firstname",
-    "mrn",
-    "ob_tail_i",
+    "encounter",
     "observation_datetime",
     "id_in_application",
     "value_as_real",
     "value_as_text",
     "unit",
-    "sex",
-    "bed_admit_dt",
-    "dept_name",
-    "room_name",
-    "bed_hl7",
-    "perrt_consult_datetime",
-    "Perrt_id",
 )
 
 # columns that change per patient not per observation
 # used to define an index when wrangling
-_cols_per_mrn = (
-    "date_of_birth",
+_cols_per_csn = (
     "hospital_visit_id",
-    "lastname",
-    "firstname",
-    "mrn",
-    "sex",
-    "bed_admit_dt",
-    "dept_name",
-    "room_name",
-    "bed_hl7",
-    "perrt_consult_datetime",
+    "encounter",
 )
 
 _obs_types = {
@@ -121,18 +101,18 @@ def _news_as_int(df, news_labels: list[str] = ["NEWS_scale_1", "NEWS_scale_2"]):
     return df
 
 
-def _long_to_wide(df, cols_per_mrn: tuple = _cols_per_mrn) -> pd.DataFrame:
+def _long_to_wide(df, cols_per_csn: tuple = _cols_per_csn) -> pd.DataFrame:
     """
     converts SQL query data (post-wrangling) into wide data for Dash
     :param      df:            { parameter_description }
     :type       df:            { type_description }
-    :param      cols_per_mrn:  The cols per mrn
-    :type       cols_per_mrn:  list
+    :param      cols_per_csn:  The cols per mrn
+    :type       cols_per_csn:  list
     """
 
     # import pdb; pdb.set_trace()
     dft = (
-        df.groupby(["id_in_application", *cols_per_mrn], dropna=False)
+        df.groupby(["id_in_application", *cols_per_csn], dropna=False)
         .agg(
             max=("value", "max"),
             min=("value", "min"),
@@ -140,17 +120,22 @@ def _long_to_wide(df, cols_per_mrn: tuple = _cols_per_mrn) -> pd.DataFrame:
         .reset_index()
     )
     dft = dft.pivot(
-        index=cols_per_mrn,
+        index=cols_per_csn,
         columns=["id_in_application"],
     )
     # rename the cols (b/c multi-index)
     dft.columns = [f"{col[1]}_{col[0]}".lower() for col in dft.columns.tolist()]
     dft.reset_index(inplace=True)
-    dft.sort_values(
-        ["news_scale_1_max", "news_scale_2_max"],
-        ascending=False,
-        inplace=True,
-    )
+
+    # sort by news score if poss
+    try:
+        dft.sort_values(
+            ["news_scale_1_max", "news_scale_2_max"],
+            ascending=False,
+            inplace=True,
+        )
+    except:
+        pass
     # IMPORTANT data model has now changed
     return dft
 

@@ -1,111 +1,71 @@
-from datetime import date, datetime
+"""
+data model for live PERRT query
+"""
+from datetime import datetime
 from typing import Optional
 
-import arrow
-import pandas as pd
-from pydantic import validator, BaseModel
+from pydantic import BaseModel
 
 
-# define the data model that you're expecting from your query
-class PerrtRaw(BaseModel):
+def _to_camel(member: str) -> str:
+    return "".join(word.capitalize() for word in member.split("_"))
+
+
+class EmapCpr(BaseModel):
     """
-    Raw data
-    Perrt class to hold data returned from the Perrt query
-    the SQL query that runs against EMAP etc
-    One row per visit observation (hence _long_)
+    Advance Decisions and CPR
     """
 
-    # patient level fields
-    mrn: str
-    lastname: str
-    firstname: str
-    sex: str
-    date_of_birth: date
-    bed_admit_dt: datetime
-    dept_name: str
-    room_name: str
-    bed_hl7: str
-    perrt_consult_datetime: object
-    # observation level fields
+    advance_decision_id: int
+    requested_datetime: datetime
+    status_change_datetime: datetime
+    care_code: str
+    name: str
+    cancelled: bool
+    closed_due_to_discharge: bool
+    hospital_visit_id: int
+    encounter: str
+
+
+class EmapConsults(BaseModel):
+    """
+    Consults and Consult type
+    """
+
+    consultation_request_id: int
+    scheduled_datetime: datetime
+    status_change_datetime: datetime
+    hospital_visit_id: int
+    encounter: str
+    code: str
+    name: Optional[str]
+
+
+class EmapVitalsLong(BaseModel):
+    """
+    vital signs extracted from the visit observation table
+    use hospital_visit_id as the key to link against beds
+    """
+
     visit_observation_id: int
-    hospital_visit_id: str
-    ob_tail_i: Optional[int]
+    hospital_visit_id: int
+    encounter: str
     observation_datetime: datetime
-    id_in_application: int
+    id_in_application: str
     value_as_real: Optional[float]
     value_as_text: Optional[str]
     unit: Optional[str]
 
-    # TODO: how to share functions between classes?
-    @validator("perrt_consult_datetime")
-    def replace_NaT_with_None(cls, v):
-        """
-        SQLAlchemy chokes when converting pd.NaT It seems to convert to a float
-        which is incompatible with the int type used for datetimes so here we
-        simple convert NaT to None
 
-        NB: pd.NaT is stored as -9223372036854775808 (int64 type)
-        ```
-        dfTest = pd.DataFrame(
-            [-9223372036854775808, 1655651820000000000]
-            ,columns=['ts'])
-
-        dfTest.apply(pd.to_datetime)
-        ```
-        """
-        return v if v is not pd.NaT else None
-
-    @validator("date_of_birth", pre=True)
-    def convert_datetime_to_date(cls, v):
-        if isinstance(v, str):
-            try:
-                return arrow.get(v).date()
-            except Exception as e:
-                print("Unable to convert dob to date")
-                print(e)
-        elif isinstance(v, pd.Timestamp):
-            try:
-                return v.date()
-            except Exception as e:
-                print("Unable to convert pandas Timestamp to date")
-                print(e)
-        return v
-
-
-class PerrtMock(PerrtRaw):
+class EmapVitalsWide(BaseModel):
     """
-    The table version of the pydantic class
-    Used for creating tables via SQLModel for mocking
-    """
-
-    # only set schema if in postgres
-
-    # TODO: Figure out how to fix this.
-    # if "postgres" in settings.STAR_URL:
-    #     __table_args__ = {"schema": settings.DB_POSTGRES_SCHEMA}
-    Perrt_id: int | None  # Optional[int] = Field(default=None, primary_key=True)
-
-
-# define the data model that you're expecting from your query
-class PerrtBase(BaseModel):
-    """
-    Wrangled data
-    Perrt class to hold data returned from the Perrt query
-    the SQL query or the API
+    vital signs wrangled to one row per encounter by summarising over the
+    window period
     """
 
     # patient level fields
-    mrn: str
     hospital_visit_id: str
-    lastname: str
-    firstname: str
-    sex: str
-    date_of_birth: date
-    bed_admit_dt: datetime
-    dept_name: str
-    room_name: str
-    bed_hl7: str
-    perrt_consult_datetime: object
+    encounter: str
     # observation level fields collapsed to per patient
     air_or_o2_max: Optional[float]
     air_or_o2_min: Optional[float]
@@ -126,48 +86,7 @@ class PerrtBase(BaseModel):
     temp_max: Optional[float]
     temp_min: Optional[float]
 
-    @validator("perrt_consult_datetime")
-    def replace_NaT_with_None(cls, v):
-        """
-        SQLAlchemy chokes when converting pd.NaT It seems to convert to a float
-        which is incompatible with the int type used for datetimes so here we
-        simple convert NaT to None
 
-        NB: pd.NaT is stored as -9223372036854775808 (int64 type)
-        ```
-        dfTest = pd.DataFrame(
-            [-9223372036854775808, 1655651820000000000],
-            columns=['ts'])
-        dfTest.apply(pd.to_datetime)
-        ```
-        """
-        return v if v is not pd.NaT else None
-
-    @validator("date_of_birth", pre=True)
-    def convert_datetime_to_date(cls, v):
-        if isinstance(v, str):
-            try:
-                return arrow.get(v).date()
-            except Exception as e:
-                print("Unable to convert dob to date")
-                print(e)
-        elif isinstance(v, pd.Timestamp):
-            try:
-                return v.date()
-            except Exception as e:
-                print("Unable to convert pandas Timestamp to date")
-                print(e)
-        return v
-
-
-class PerrtRead(PerrtBase):
-    """
-    Read version that includes the key column
-    """
-
-    Perrt_id: Optional[int]
-
-
-class AdmissionPrediction(BaseModel):
-    hospital_visit_id: str
-    admission_probability: Optional[float]
+# class AdmissionPrediction(BaseModel):
+#     hospital_visit_id: str
+#     admission_probability: Optional[float]
