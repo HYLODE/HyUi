@@ -3,6 +3,7 @@ module level config
 """
 
 DEPARTMENTS = (
+    "UCH SDEC",  #
     "UCH T01 ACUTE MEDICAL",  # 86
     "UCH T01 ENHANCED CARE",  # 20
     "UCH T03 INTENSIVE CARE",  # 37
