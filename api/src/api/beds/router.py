@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Response
 
 from api.baserow import get_fields, get_rows
 from api.config import get_settings, Settings
@@ -14,7 +14,7 @@ mock_router = APIRouter(
 
 
 @mock_router.get("/", response_model=list[Bed])
-def get_mock_beds(department: str) -> list[Bed]:
+def get_mock_beds(department: str, response: Response) -> list[Bed]:
     return [
         Bed(location_string="LOC1", room="ROOM1", closed=False, covid=True),
         Bed(location_string="LOC1", room="ROOM1", closed=True, covid=False),

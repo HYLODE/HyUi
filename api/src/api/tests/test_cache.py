@@ -14,3 +14,11 @@ def test_mock_beds_skip_cache() -> None:
     response = client.get("/mock/beds/closed/", headers=skip_cache_headers)
     print(f"{response.headers=}")
     assert response.headers["Cache-control"] == "no-cache"
+
+
+def test_mock_beds_alter_ttl() -> None:
+    max_ttl = "max-age=10"
+    skip_cache_headers = {"x-cache-control": max_ttl}
+    response = client.get("/mock/beds/closed/", headers=skip_cache_headers)
+    print(f"{response.headers=}")
+    assert response.headers["Cache-control"] == max_ttl

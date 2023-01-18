@@ -18,12 +18,17 @@ Cache configuration is set in `cache/default.vcl` and contains very minimal addi
 
 The first request made to an uncached API endpoint will not see any speed up - subsequent requests within the time to live (TTL) of an object will use the cached object and will see a speedier response.
 
-Additional configuration is provided for endpoints that absolutely must return live data from the API. Add `X-Varnish-Nuke:1` to the **request** header will clear the cache for the current endpoint and force a live query of the API.
+Additional configuration is provided for endpoints that absolutely must return live data from the API. In this case, there are two options for skipping the cache.
 
-By relying on the setting of cached object TTL via request/response headers and the skipping/clearing of the cache with an additional header, the hope is that developers should not need to interact with `default.vcl`.
+1. adding `X-Varnish-Nuke:1` to the **request** header will clear the cache for the current endpoint and force a live query of the API
+2. Adding `x-cache-control:no-cache` to the request header will instruct Varnish to skip the cache for the requested endpoint
+
+By relying on the setting of cached object TTL via response headers and the skipping (or clearing of) the cache with an additional header, the hope is that developers should not need to interact with `default.vcl` and all changes can be made via [web standards](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control).
 
 #### Altering the lifetime of cached objects
-In the absence of an explicit setting, Varnish defaults to a 2 minute TTL for cached objects. This default is overriden in this case and is set to 5 minutes (300 seconds) via response headers in `api/src/api/dependencies.py`. This is then added as a dependency in `api/src/api/main.py` to the `app` and `mock_router` `FastAPI` instances.
+In the absence of an explicit setting, Varnish defaults to a 2 minute TTL for cached objects. This default is overriden in this case and is set to 5 minutes (300 seconds) via response headers via middleware in `api/src/api/main.py`. This is added as a decorator to the `app` and `mock_router` `FastAPI` instances.
+
+TTLs for individual endpoints can be altered by adding `x-cache-control: max-age=<ttl>`, where `<ttl>` represents the desired TTL in seconds.
 
 ## Run the Docker Compose services
 

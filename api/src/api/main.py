@@ -76,8 +76,12 @@ app.include_router(mock_router)
 @app.middleware("http")
 async def add_cache_control_header(request: Request, call_next: Any) -> Response:
     response = await call_next(request)
-    response.headers["Cache-control"] = "public, max-age=300"
+    print(request.body)
+    if "x-cache-control" not in request.headers:
+        response.headers["Cache-control"] = "public, max-age=300"
     # Can't for some reason parse out request headers...
+    else:
+        response.headers["Cache-control"] = request.headers["x-cache-control"]
     try:
         if request.headers["X-Varnish-Nuke"] == "1":
             response.headers["Cache-control"] = "no-cache"
