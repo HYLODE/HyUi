@@ -134,6 +134,7 @@ ENV/
 env.bak/
 venv.bak/
 pythonenv*
+.env.baserow
 
 # Spyder project settings
 .spyderproject
@@ -924,9 +925,5 @@ docs/_linkcheck/
 # ignore generated data
 src/api/perrt/admission_probability/generated_data
 
-
-# pete odor's PACU dashboard
-web/src/web/assets/pacu_dashboard.html
-
-# temporary Model storage
-api/src/api/electives/deploy/*
+# local jupyter lab for exploratory work
+jupyter/
