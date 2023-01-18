@@ -2,8 +2,9 @@
 Entry point and main file for the FastAPI backend
 """
 
-from fastapi import FastAPI, APIRouter, Depends
+from fastapi import FastAPI, APIRouter, Request, Response
 from fastapi.responses import ORJSONResponse
+from typing import Any
 
 from api.census.router import router as census_router, mock_router as mock_census_router
 from api.sitrep.router import router as sitrep_router, mock_router as mock_sitrep_router
@@ -33,15 +34,12 @@ from api.demo.router import (
     mock_router as mock_demo_router,
 )
 
-from api.dependencies import add_cache_control_header
-
 app = FastAPI(
     default_response_class=ORJSONResponse,
-    dependencies=[Depends(add_cache_control_header)],
 )
 
 mock_router = APIRouter(
-    prefix="/mock", dependencies=[Depends(add_cache_control_header)]
+    prefix="/mock",
 )
 
 app.include_router(demo_router)
@@ -73,6 +71,20 @@ app.include_router(hymind_router)
 
 # Finally include the mock router.
 app.include_router(mock_router)
+
+
+@app.middleware("http")
+async def add_cache_control_header(request: Request, call_next: Any) -> Response:
+    response = await call_next(request)
+    response.headers["Cache-control"] = "public, max-age=300"
+    # Can't for some reason parse out request headers...
+    try:
+        if request.headers["X-Varnish-Nuke"] == "1":
+            response.headers["Cache-control"] = "no-cache"
+    except KeyError:
+        # mostly expected behaviour - requests won't have cache control headers
+        pass
+    return response
 
 
 @app.get("/ping")
