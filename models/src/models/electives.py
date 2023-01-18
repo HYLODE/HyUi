@@ -88,6 +88,7 @@ class SurgData(CabData):
     primary_mrn: str
     patient_key: int
     surgical_case_uclh_key: int
+    surgical_case_epic_id: int
     first_name: str
     last_name: str
     birth_date: date
