@@ -156,6 +156,7 @@ def prepare_draft(
     echo: list[type[BaseModel]],
     obs: list[type[BaseModel]],
     axa: list[type[BaseModel]],
+    pod: list[type[BaseModel]],
 ) -> pd.DataFrame:
 
     electives_df = to_data_frame(electives, SurgData)
@@ -164,6 +165,7 @@ def prepare_draft(
     echo_df = to_data_frame(echo, EchoWithAbnormalData)
     obs_df = to_data_frame(obs, ObsData)
     axa_codes = to_data_frame(axa, AxaCodes)
+    pod_df = to_data_frame(pod, ClarityPostopDestination)
     # axa_codes = camel_to_snake(
     #    pd.read_csv(
     #        "axa_codes.csv",
@@ -176,6 +178,7 @@ def prepare_draft(
 
     df = (
         merge_surg_preassess(surg_data=electives_df, preassess_data=preassess_df)
+        .merge(pod_df, left_on="surgical_case_epic_id", right_on="or_case_id")
         .merge(wrangle_labs(labs_df), how="left", on="patient_durable_key")
         .merge(wrangle_echo(echo_df), how="left", on="patient_durable_key")
         .merge(
@@ -197,7 +200,8 @@ def prepare_draft(
     # create pacu label
     df["pacu"] = np.where(
         df["booked_destination"].astype(str).str.contains("PACU")
-        | df["pacdest"].astype(str).str.contains("PACU"),
+        | df["pacdest"].astype(str).str.contains("PACU")
+        | df["pod_orc"].astype(str).str.contains("PACU"),
         True,
         False,
     )

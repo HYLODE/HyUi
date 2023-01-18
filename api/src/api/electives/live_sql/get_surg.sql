@@ -78,27 +78,25 @@ FROM [CABOODLE_REPORT].[dbo].[SurgicalCaseFact] scf
 			) ac
 		WHERE ac.ranked_order = 1
 	) cbd on cbd.[PatientDurableKey] = scf.PatientDurableKey
-WHERE scf.[PatientDurableKey] > 0
-	AND scf.[PatientDurableKey] > 1
-	AND scf.[PatientDurableKey] IS NOT NULL
-	AND scf.[PrimaryService] != 'Obstetrics'
-	AND scf.[PrimaryService] != 'Neurosurgery'
-	AND scf.[PrimaryService] != 'Paediatric Dental'
-	AND dd.[DepartmentName] != 'NHNN THEATRE SUITE'
-	AND dd.[DepartmentName] != 'RNTNE THEATRE SUITE'
-	AND dd.[DepartmentName] != 'EGA E02 LABOUR WARD'
-	AND dd.[DepartmentName] != 'MCC H-1 THEATRE SUITE' -- AND dd.[DepartmentName] != 'UCH P02 ENDOSCOPY'
-	AND dd.[DepartmentName] != 'UCH ANAESTHESIA DEPT'
+WHERE scf.[PatientDurableKey] > 1
+	AND scf.[PatientDurableKey] IS NOT NULL -- AND scf.[PrimaryService] != 'Obstetrics'
+	-- AND scf.[PrimaryService] != 'Neurosurgery'
+	-- AND scf.[PrimaryService] != 'Paediatric Dental'
+	-- AND dd.[DepartmentName] != 'NHNN THEATRE SUITE'
+	-- AND dd.[DepartmentName] != 'RNTNE THEATRE SUITE'
+	-- AND dd.[DepartmentName] != 'EGA E02 LABOUR WARD'
+	-- AND dd.[DepartmentName] != 'MCC H-1 THEATRE SUITE' -- AND dd.[DepartmentName] != 'UCH P02 ENDOSCOPY'
+	-- AND dd.[DepartmentName] != 'UCH ANAESTHESIA DEPT'
+	-- AND (
+	-- 	wlef.[IntendedManagement] IN (
+	-- 		'*Unspecified',
+	-- 		'Inpatient',
+	-- 		'Inpatient Series',
+	-- 		'Night Admit Series'
+	-- 	)
+	-- 	OR wlef.[IntendedManagement] IS NULL
+	-- )
 	AND patd.[AgeInYears] >= 18
 	AND scufx.[PlannedOperationStartInstant] >= :start_date
 	AND scufx.[PlannedOperationStartInstant] < :end_date
-	AND (
-		wlef.[IntendedManagement] IN (
-			'*Unspecified',
-			'Inpatient',
-			'Inpatient Series',
-			'Night Admit Series'
-		)
-		OR wlef.[IntendedManagement] IS NULL
-	)
 	AND scufx.[CaseCancelReasonCode] != '581'

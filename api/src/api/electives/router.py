@@ -117,12 +117,10 @@ def get_mock_clarity_pod() -> list[dict]:
 def get_clarity_pod(
     session: Session = Depends(get_clarity_session), days_ahead: int = 1
 ) -> list[ClarityPostopDestination]:
-    """
-    Return clarity post op destination
-    """
     params = {"days_ahead": days_ahead}
-
-    return _parse_query("live_pod.sql", session, ClarityPostopDestination, params)
+    return _parse_query(
+        "live_sql/get_pod.sql", session, ClarityPostopDestination, params
+    )
 
 
 @mock_router.get("/preassessment/", response_model=list[PreassessData])
@@ -201,7 +199,7 @@ def get_axa_codes() -> list[AxaCodes]:
 @router.get("/", response_model=list[MergedData])
 def get_electives(
     s_caboodle: Session = Depends(get_caboodle_session),
-    #  s_clarity: Session = Depends(get_clarity_session),
+    s_clarity: Session = Depends(get_clarity_session),
     days_ahead: int = 3,
 ) -> list[MergedData]:
 
@@ -210,11 +208,21 @@ def get_electives(
     labs = get_caboodle_labs(session=s_caboodle, days_ahead=days_ahead)
     echo = get_caboodle_echo(session=s_caboodle, days_ahead=days_ahead)
     obs = get_caboodle_obs(session=s_caboodle, days_ahead=days_ahead)
+
+    pod = get_clarity_pod(session=s_clarity, days_ahead=days_ahead)
     axa = get_axa_codes()
 
     # pod = _parse_query("live_pod.sql", s_clarity, ClarityPostopDestination, params)
 
-    df = prepare_draft(case, preassess, labs, echo, obs, axa)
+    df = prepare_draft(
+        electives=case,
+        preassess=preassess,
+        labs=labs,
+        echo=echo,
+        obs=obs,
+        axa=axa,
+        pod=pod,
+    )
     df = df.replace({np.nan: None})
     return [MergedData.parse_obj(row) for row in df.to_dict(orient="records")]
 
@@ -230,7 +238,16 @@ def get_mock_electives(
     echo = _get_mock_sql_rows("echo_2", EchoWithAbnormalData)
     obs = _get_mock_sql_rows("obs", ObsData)
     axa = get_axa_codes()
+    pod = _get_mock_sql_rows("pod", ClarityPostopDestination)
 
-    df = prepare_draft(case, preassess, labs, echo, obs, axa)
+    df = prepare_draft(
+        electives=case,
+        preassess=preassess,
+        labs=labs,
+        echo=echo,
+        obs=obs,
+        axa=axa,
+        pod=pod,
+    )
     df = df.replace({np.nan: None})
     return [MergedData.parse_obj(row) for row in df.to_dict(orient="records")]

@@ -8,8 +8,5 @@ SELECT pod.NAME AS PodOrc,
     c.SURGERY_DATE AS SurgeryDateClarity
 FROM OR_CASE c
     INNER JOIN ZC_OR_POSTOP_DEST pod ON pod.POSTOP_DEST = c.POSTOP_DEST_C
-WHERE c.SURGERY_DATE >= GETDATE()
-    AND c.SURGERY_DATE <= CONVERT(
-        DATE,
-        DATEADD(DAY, :days_ahead, CURRENT_TIMESTAMP)
-    )
+WHERE c.SURGERY_DATE >= :start_date
+    AND c.SURGERY_DATE < :end_date

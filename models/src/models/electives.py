@@ -196,6 +196,7 @@ class MergedData(CabData):
     bmi_max_value: float | None
     protocolised_adm: str | None
     post_operative_destination: str
+    pod_orc: str | None
     pacdest: str | None
     booked_destination: str | None
     pacu: int | None
