@@ -195,12 +195,11 @@ def prepare_draft(
     )
     # print(df.columns)
     # create pacu label
-    df["pacu"] = False
     df["pacu"] = np.where(
-        df["booked_destination"].astype(str).str.contains("PACU"), True, df["pacu"]
-    )
-    df["pacu"] = np.where(
-        df["pacdest"].astype(str).str.contains("PACU"), True, df["pacu"]
+        df["booked_destination"].astype(str).str.contains("PACU")
+        | df["pacdest"].astype(str).str.contains("PACU"),
+        True,
+        False,
     )
 
     # deployed = pickle.load(

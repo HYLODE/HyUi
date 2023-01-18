@@ -156,40 +156,49 @@ class LabData(CabData):
     result_instant: datetime
 
 
-class MergedData(SurgData):
-    #  cardio: int | None ## TODO: FIX cardio does not appear. wrangle. preassess error.
+class MergedData(CabData):
+    primary_mrn: str
+    surgical_case_uclh_key: str
+    first_name: str
+    last_name: str
+    birth_date: date
+    age_in_years: int
+    sex: str
+    surgery_date: date
+    cancel_date: date | None
+    primary_service: str
+    classification: str | None
+    admission_patient_class: str
+    primary_anesthesia_type: str | None
+    canceled: bool | None
+    planned_operation_start_instant: datetime
+    planned_operation_end_instant: datetime
+    intended_management: str | None
+    urgency: str | None
+    priority: str | None
+    patient_friendly_name: str | None
+    department_name: str | None
+    preassess_date: date | None
+    cardio: int | None  # TODO: FIX cardio does not appear. wrangle. preassess error.
     resp: int | None
-    airway: int | None
-    infectious: int | None
-    endo: int | None
-    neuro: int | None
-    haem: int | None
-    renal: int | None
-    gastro: int | None
     cpet: int | None
     mets: int | None
     anaesthetic_alert: int | None
+    asa_rating_code: str | None
     asa: int | None
     c_line: int | None
     a_line: int | None
-    expected_stay: str | None
-    urgency: str | None
-    pacdest: str | None
     prioritisation: str | None
-    preassess_date: date | None
-    na_abnormal_count: float | None
     crp_abnormal_count: float | None
     inr_last_value: float | None
-    na_max_value: float | None
-    simple_score: float | None
-    echo_performed: bool | None
-    echo_abnormal: bool | None
-    sys_bp_abnormal_count: int | None
-    dias_bp_abnormal_count: int | None
-    pulse_measured_count: int | None
+    num_echo: int | None
+    abnormal_echo: int | None
     bmi_max_value: float | None
     protocolised_adm: str | None
-    icu_prob: float
+    post_operative_destination: str
+    pacdest: str | None
+    booked_destination: str | None
+    pacu: int | None
 
 
 class EchoData(CabData):
