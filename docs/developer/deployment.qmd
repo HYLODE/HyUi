@@ -14,18 +14,19 @@ We use [Varnish](https://varnish-cache.org) as a HTTP cache to speed up some of 
 The cache is brought up with other services and is represented in `compose.yml`, which uses `docker/cache/Dockerfile`.
 The only change required to utilise caching is within the base `.env` file. The `WEB_API_URL` environment variable should be set to `http://cache:8000`, or `http://cache:8000/mock` for local development.
 
-Cache configuration is set in `cache/default.vcl` and contains some additional configuration with respect to a basic varnish configuration. The time to live (TTL) setting (representing the lifetime of an object in the cache) defaults to 2 minutes, but is increased in HyUI to **5 minutes** in the configuration file with
+Cache configuration is set in `cache/default.vcl` and contains very minimal additions with respect to a basic varnish configuration.
 
-```
-sub vcl_backend_response {
-    set beresp.ttl = 5m;
-}
-```
-The first request made to an uncached API endpoint will not see any speed up - subsequent requests within the TTL will use the cached object and will see a speedier response.
+The first request made to an uncached API endpoint will not see any speed up - subsequent requests within the time to live (TTL) of an object will use the cached object and will see a speedier response.
 
-Additional configuration is provided for endpoints that absolutely must return live data from the API. In this case, adding `X-Varnish-Nuke:1` to the request header will force the cache to query the live value.
+Additional configuration is provided for endpoints that absolutely must return live data from the API. In this case, there are two options for skipping the cache.
 
-By relying on the default behaviour of Varnish to cache all and optionally skip the cache with an additional header, the hope is that any changes to `default.vcl` should be minimal.
+1. adding `X-Varnish-Nuke:1` to the **request** header will clear the cache for the current endpoint and force a live query of the API
+2. Adding `Cache-control:no-cache` to the request header will instruct Varnish to skip the cache for the requested endpoint
+
+By relying on the setting of cached object TTL via response headers and the skipping (or clearing of) the cache with an additional header, the hope is that developers should not need to interact with `default.vcl` and all changes can be made via [web standards](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control).
+
+#### Altering the lifetime of cached objects
+In the absence of an explicit setting, Varnish defaults to a 2 minute TTL for cached objects. This default is overriden in this case and is set to 5 minutes (300 seconds) via response headers in `api/src/api/dependencies.py`. This is then added as a dependency in `api/src/api/main.py` to the `app` and `mock_router` `FastAPI` instances.
 
 ## Run the Docker Compose services
 
