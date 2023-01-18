@@ -74,18 +74,6 @@ app.include_router(hymind_router)
 # Finally include the mock router.
 app.include_router(mock_router)
 
-#
-# @app.middleware("http")
-# async def add_cache_control_header(request: Request, call_next):
-#    print(f"Attempting to make a {request.method} request!")
-#    response = await call_next(request)
-#    if request.method.upper() == "GET":
-#        print(f"Will be hitting the cache...")
-#        response.headers["Cache-control"]= "public, max-age=30"
-#    else:
-#        print("Not a GET - Skipping the cache!")
-#    return response
-
 
 @app.get("/ping")
 async def pong() -> dict[str, str]:
