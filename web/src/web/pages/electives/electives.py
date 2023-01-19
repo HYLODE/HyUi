@@ -1,13 +1,21 @@
 import dash
 import dash_mantine_components as dmc
-from dash import html
+import json
+import warnings
+from dash import dash_table as dtable, html
+from pathlib import Path
 
-# noqa suppresses black errors when linting since you need this import for
-# access to callbacks
-import web.pages.electives.callbacks
-from web.style import colors
+import web.pages.electives.callbacks  # noqa
+from web.pages.electives import CAMPUSES, ids
+from web.style import replace_colors_in_stylesheet
+
+warnings.warn("\nINFO: Confirm that you have imported all the callbacks")
 
 dash.register_page(__name__, path="/surgery/electives", name="Electives")
+
+with open(Path(__file__).parent / "table_style_sheet.json") as f:
+    table_style_sheet = json.load(f)
+    table_style_sheet = replace_colors_in_stylesheet(table_style_sheet)
 
 timers = html.Div([])
 stores = html.Div(
@@ -21,6 +29,48 @@ notifications = html.Div(
     ]
 )
 
+campus_selector = html.Div(
+    [
+        dmc.SegmentedControl(
+            id=ids.CAMPUS_SELECTOR,
+            value=[i.get("value") for i in CAMPUSES if i.get("label") == "UCH"][0],
+            data=CAMPUSES,
+            persistence=True,
+            persistence_type="local",
+        ),
+    ]
+)
+
+electives_list = dmc.Paper(
+    dtable.DataTable(
+        id=ids.ELECTIVES_TABLE,
+        columns=[
+            {"id": "surgery_date", "name": "Date"},
+            {"id": "pacu", "name": "pacu"},
+            {"id": "primary_service", "name": "Specialty"},
+            {"id": "patient_friendly_name", "name": "Operation"},
+            {"id": "name", "name": "Full Name"},
+            {"id": "primary_mrn", "name": "MRN"},
+        ],
+        data=[],
+        style_table={"width": "100%", "minWidth": "100%", "maxWidth": "100%"},
+        style_as_list_view=True,  # remove col lines
+        style_cell={
+            "fontSize": 12,
+            "padding": "1px",
+        },
+        style_cell_conditional=table_style_sheet,
+        style_data={"color": "black", "backgroundColor": "white"},
+        # striped rows
+        markdown_options={"html": True},
+        persistence=True,
+        persisted_props=["data"],
+    ),
+    shadow="lg",
+    radius="lg",
+    p="md",  # padding
+    withBorder=True,
+)
 
 debug_inspector = dmc.Container(
     [
@@ -37,7 +87,6 @@ debug_inspector = dmc.Container(
         )
     ]
 )
-
 
 inspector = html.Div(
     [
@@ -60,7 +109,8 @@ body = dmc.Container(
     [
         dmc.Grid(
             [
-                # dmc.Col(dept_selector, span=6),
+                dmc.Col(campus_selector, offset=9, span=3),
+                dmc.Col(electives_list, span=12),
             ]
         ),
     ],
