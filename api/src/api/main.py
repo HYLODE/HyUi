@@ -79,7 +79,6 @@ async def add_cache_control_header(request: Request, call_next: Any) -> Response
     print(request.body)
     if "x-cache-control" not in request.headers:
         response.headers["Cache-control"] = "public, max-age=300"
-    # Can't for some reason parse out request headers...
     else:
         response.headers["Cache-control"] = request.headers["x-cache-control"]
     try:
