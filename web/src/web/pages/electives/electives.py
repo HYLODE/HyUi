@@ -65,6 +65,8 @@ electives_list = dmc.Paper(
         markdown_options={"html": True},
         persistence=True,
         persisted_props=["data"],
+        sort_action="native",
+        filter_action="native",
     ),
     shadow="lg",
     radius="lg",
