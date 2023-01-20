@@ -10,7 +10,7 @@ from sqlmodel import Session
 
 from api.config import Settings, get_settings
 
-from api.baserow import get_fields, get_rows
+from api.baserow import BaserowAuthenticator
 
 # TODO: Give sitrep its own CensusRow model so we do not have interdependencies.
 from models.census import CensusRow
@@ -48,11 +48,12 @@ def get_beds(
     department: str, settings: Settings = Depends(get_settings)
 ) -> list[BedRow]:
 
-    baserow_url = settings.baserow_url
-    email = settings.baserow_email
-    password = settings.baserow_password.get_secret_value()
-
-    field_ids = get_fields(baserow_url, email, password, "hyui", "beds")
+    baserow_auth = BaserowAuthenticator(
+        settings.baserow_url,
+        settings.baserow_email,
+        settings.baserow_password.get_secret_value(),
+    )
+    field_ids = baserow_auth.get_fields("hyui", "beds")
 
     department_field_id = field_ids["department"]
 
@@ -62,7 +63,7 @@ def get_beds(
         f"filter__field_{department_field_id}__equal": department,
     }
 
-    rows = get_rows(baserow_url, email, password, "hyui", "beds", params)
+    rows = baserow_auth.get_rows("hyui", "beds", params)
     return [BedRow.parse_obj(row) for row in rows]
 
 
