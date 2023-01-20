@@ -3,13 +3,13 @@ from pathlib import Path
 from urllib.parse import urlencode
 
 import requests
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Response
 from fastapi.responses import RedirectResponse
 from sqlalchemy import create_engine
 from sqlmodel import Session
 
 from api.config import get_settings
-
+from api.dependencies import add_cache_control_header
 from api.baserow import get_fields, get_rows
 
 # TODO: Give sitrep its own CensusRow model so we do not have interdependencies.
@@ -34,12 +34,10 @@ CORE_FIELDS = [
     "location_string",
 ]
 
-router = APIRouter(
-    prefix="/sitrep",
-)
+router = APIRouter(prefix="/sitrep", dependencies=[Depends(add_cache_control_header)])
 
 mock_router = APIRouter(
-    prefix="/sitrep",
+    prefix="/sitrep", dependencies=[Depends(add_cache_control_header)]
 )
 
 
@@ -151,6 +149,7 @@ def get_individual_discharge_predictions(
     response = requests.get(
         f"{settings.hymind_url}/predictions/icu/discharge", params={"ward": ward}
     )
+    response.headers["Cache-Control"] = "no-cache"
     rows = response.json()["data"]
     return [IndividualDischargePrediction.parse_obj(row) for row in rows]
 
@@ -160,6 +159,7 @@ def get_individual_discharge_predictions(
     response_model=list[IndividualDischargePrediction],
 )
 def get_mock_individual_discharge_predictions(
-    ward: str,
+    ward: str, response: Response
 ) -> list[IndividualDischargePrediction]:
+    response.headers["Cache-Control"] = "no-cache"
     return [IndividualDischargePrediction(episode_slice_id=1, prediction_as_real=0.4)]

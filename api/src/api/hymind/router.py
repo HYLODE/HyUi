@@ -2,8 +2,9 @@ from pathlib import Path
 
 import pandas as pd
 from fastapi import APIRouter, Depends
-
+from typing import Any
 from api.config import get_settings
+from api.dependencies import add_cache_control_header
 from models.hymind import EmElTapPostBody, IcuDischarge, EmTap, ElTap
 from api.validate import pydantic_dataframe
 
@@ -17,9 +18,7 @@ MOCK_TAP_ELECTIVE_DATA = (
     Path(__file__).resolve().parent / "data" / "tap_elective_tower.json"
 )
 
-router = APIRouter(
-    prefix="/hymind",
-)
+router = APIRouter(prefix="/hymind", dependencies=[Depends(add_cache_control_header)])
 
 
 # def read_query(file_live: str, table_mock: str):
@@ -41,7 +40,7 @@ router = APIRouter(
 
 
 @router.get("/icu/discharge")
-def read_icu_discharge(ward: str, settings=Depends(get_settings)):
+def read_icu_discharge(ward: str, settings: Depends = Depends(get_settings)) -> Any:
     """ """
     if settings.env == "dev":
 
@@ -68,7 +67,9 @@ def read_icu_discharge(ward: str, settings=Depends(get_settings)):
 # List[Model]} which I cannot encode
 # @router.post("/icu/tap/emergency", response_model=EmTap)  # type: ignore
 @router.post("/icu/tap/emergency")
-def read_tap_emergency(data: EmElTapPostBody, settings=Depends(get_settings)):
+def read_tap_emergency(
+    data: EmElTapPostBody, settings: Depends = Depends(get_settings)
+) -> pd.DataFrame | str:
     """ """
     if settings.env == "dev":
 
@@ -88,7 +89,9 @@ def read_tap_emergency(data: EmElTapPostBody, settings=Depends(get_settings)):
 
 
 @router.get("/icu/tap/electives")
-def read_tap_electives(data: EmElTapPostBody, settings=Depends(get_settings)):
+def read_tap_electives(
+    data: EmElTapPostBody, settings: Depends = Depends(get_settings)
+) -> pd.DataFrame | str:
     if settings.env == "dev":
 
         # import ipdb; ipdb.set_trace()

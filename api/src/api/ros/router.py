@@ -4,11 +4,10 @@ from fastapi import APIRouter, Depends
 from sqlmodel import Session
 
 from models.ros import RosRead
+from api.dependencies import add_cache_control_header
 from api.db import prepare_query, get_star_session
 
-router = APIRouter(
-    prefix="/ros",
-)
+router = APIRouter(prefix="/ros", dependencies=[Depends(add_cache_control_header)])
 
 
 @router.get("/", response_model=list[RosRead])

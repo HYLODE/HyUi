@@ -1,15 +1,14 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
 from api import wards
+from api.dependencies import add_cache_control_header
 
 from models.hospital import BuildingDepartments
 
-router = APIRouter(
-    prefix="/hospital",
-)
+router = APIRouter(prefix="/hospital", dependencies=[Depends(add_cache_control_header)])
 
 mock_router = APIRouter(
-    prefix="/hospital",
+    prefix="/hospital", dependencies=[Depends(add_cache_control_header)]
 )
 
 

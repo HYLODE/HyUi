@@ -1,20 +1,20 @@
-from fastapi import APIRouter, Depends, Response
+from fastapi import APIRouter, Depends
 
 from api.baserow import get_fields, get_rows
 from api.config import get_settings, Settings
+from api.dependencies import add_cache_control_header
 from models.beds import Bed
 
-router = APIRouter(
-    prefix="/beds",
-)
+
+router = APIRouter(prefix="/beds", dependencies=[Depends(add_cache_control_header)])
 
 mock_router = APIRouter(
-    prefix="/beds",
+    prefix="/beds", dependencies=[Depends(add_cache_control_header)]
 )
 
 
 @mock_router.get("/", response_model=list[Bed])
-def get_mock_beds(department: str, response: Response) -> list[Bed]:
+def get_mock_beds(department: str) -> list[Bed]:
     return [
         Bed(location_string="LOC1", room="ROOM1", closed=False, covid=True),
         Bed(location_string="LOC1", room="ROOM1", closed=True, covid=False),
