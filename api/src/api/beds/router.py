@@ -251,31 +251,17 @@ def get_closed_beds(settings: Settings = Depends(get_settings)) -> list[Bed]:
 def post_mock_discharge_status(
     csn: int, status: str, settings: Settings = Depends(get_settings)
 ) -> DischargeStatus:
-    # this function depends on having a local instance of baserow running
-    baserow_auth = BaserowAuthenticator(
-        settings.baserow_url,
-        settings.baserow_email,
-        settings.baserow_password.get_secret_value(),
-    )
-    params = {"user_field_names": True}
 
     csn = 123 if not csn else csn
     status = "ready" if not status else status
 
-    payload = {
-        "csn": csn,
-        "status": status,
-        "modified_at": datetime.utcnow().isoformat(),
-    }
-
-    result = baserow_auth.post_row(
-        "hyui",
-        "discharge_statuses",
-        params=params,
-        payload=payload,
+    return DischargeStatus(
+        id=1,
+        order=1,
+        csn=csn,
+        modified_at=datetime.fromisoformat("2023-01-21t23:55:41"),
+        status=status,
     )
-    output = DischargeStatus.parse_obj(result)  # type: DischargeStatus
-    return output
 
 
 @router.post("/discharge_status/", response_model=DischargeStatus)
