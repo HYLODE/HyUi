@@ -70,3 +70,33 @@ To be used when updating an existing instance of baserow adjustments to default 
 ```sh
 docker compose --project-name [project name] down
 ```
+
+
+## Debugging after deployment in the live environment
+
+Since we don't have root access, then the deployment happens via docker. This means that the debugging must also happen inside a live docker container. The following seems to work.
+
+Ensure that your docker-compose file includes these options for the image that you wish to debug.
+
+If this is your docker-compose config for the **api** service:
+```yaml
+
+  api:
+    build:
+      context: ./src
+      dockerfile: Dockerfile.api
+...
+```
+then add these lines
+```yaml
+    stdin_open: true
+    tty: true
+```
+
+1. Run `docker-compose up -d --build` as usual.
+2. Find the ID of the approprite container via `docker container ps | grep hyui` (e.g. abc123)
+3. Use that ID to run `docker attach abc123`. Don't be put off if nothing seems to happen.
+4. Whenever the python debugger is triggered (e.g. via a breakpoint `import pdb; pdb.set_trace()`) the container will return control to the terminal above.
+5. To exit without killing the container then use `CONTROL-P, CONTROL-Q` instead of `CONTROL-C`
+
+All this via https://blog.lucasferreira.org/howto/2017/06/03/running-pdb-with-docker-and-gunicorn.html with tips for the Python Debugger via https://realpython.com/python-debugging-pdb/.

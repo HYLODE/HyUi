@@ -21,6 +21,7 @@ DEBUG = True
     Input(ids.CAMPUS_SELECTOR, "value"),
     Input(store_ids.DEPT_STORE, "data"),
 )
+@Timer(text="Sitrep department updates: Elapsed time: {:.3f} seconds")
 def _store_depts(campus: str, depts: list[dict]) -> list[dict]:
     """Need a list of departments for this building"""
     try:
@@ -67,6 +68,7 @@ def _store_rooms(
     Input(ids.ROOMS_OPEN_STORE, "data"),
     Input(store_ids.BEDS_STORE, "data"),
 )
+@Timer(text="Sitrep bed updates: Elapsed time: {:.3f} seconds")
 def _store_beds(
     depts: list[dict],
     rooms: list[dict],
@@ -134,6 +136,7 @@ def _store_beds(
     Input(ids.CAMPUS_SELECTOR, "value"),
     Input(ids.DEPTS_OPEN_STORE_NAMES, "data"),
 )
+@Timer(text="Sitrep census updates: Elapsed time: {:.3f} seconds")
 def _store_census(
     campus: str,
     depts_open_names: list[str],
@@ -169,6 +172,7 @@ def _store_census(
     prevent_initial_callback=True,
     background=True,
 )
+@Timer(text="Sitrep sitrep updates: Elapsed time: {:.3f} seconds")
 def _store_sitrep(dept: str) -> list[dict]:
     """
     Use census to provide the CSNs that can be used to query additional data
@@ -224,6 +228,7 @@ def _get_discharge_updates(delta_hours: int = 48) -> list[dict]:
     Output(ids.DISCHARGES_STORE, "data"),
     Input(ids.DEPT_SELECTOR, "value"),
 )
+@Timer(text="Sitrep store discharge updates: Elapsed time: {:.3f} seconds")
 def store_discharge_status(dept: str) -> list[dict]:
     """
     Get discharge status
@@ -261,7 +266,8 @@ def _dept_select_control(depts: list[str], campus: str) -> Tuple[list[str], str]
     return depts, default
 
 
-def _make_elements(  # noqa: C901
+@Timer(text="Sitrep _make_elements: Elapsed time: {:.3f} " "seconds")
+def _make_elements(
     census: list[dict],
     depts: list[dict],
     rooms: list[dict],

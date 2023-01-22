@@ -20,6 +20,8 @@ services:
       dockerfile: docker/api/Dockerfile
       args:
         <<: *build-args-common
+    stdin_open: true
+    tty: true
     environment:
       <<: *proxy-common
     env_file: .env
@@ -27,12 +29,16 @@ services:
       - ${API_PORT}:8000
     networks:
       - hyui
+    depends_on:
+      - baserow
 
   web:
     build:
       dockerfile: docker/web/Dockerfile
       args:
         <<: *build-args-common
+    stdin_open: true
+    tty: true
     environment:
       <<: *proxy-common
     env_file: .env
