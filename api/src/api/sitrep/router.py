@@ -10,7 +10,7 @@ from sqlmodel import Session
 
 from api.config import Settings, get_settings
 
-from api.baserow import BaserowAuthenticator
+from api.baserow import BaserowDB, get_baserow_db
 
 # TODO: Give sitrep its own CensusRow model so we do not have interdependencies.
 from models.census import CensusRow
@@ -40,15 +40,11 @@ mock_router = APIRouter(prefix="/sitrep")
 
 @router.get("/beds/", response_model=list[BedRow])
 def get_beds(
-    department: str, settings: Settings = Depends(get_settings)
+    department: str,
+    baserow: BaserowDB = Depends(get_baserow_db),
 ) -> list[BedRow]:
 
-    baserow_auth = BaserowAuthenticator(
-        settings.baserow_url,
-        settings.baserow_email,
-        settings.baserow_password.get_secret_value(),
-    )
-    field_ids = baserow_auth.get_fields("hyui", "beds")
+    field_ids = baserow.get_fields("beds")
 
     department_field_id = field_ids["department"]
 
@@ -58,7 +54,7 @@ def get_beds(
         f"filter__field_{department_field_id}__equal": department,
     }
 
-    rows = baserow_auth.get_rows("hyui", "beds", params)
+    rows = baserow.get_rows("beds", params)
     return [BedRow.parse_obj(row) for row in rows]
 
 

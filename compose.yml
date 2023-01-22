@@ -27,6 +27,8 @@ services:
       - ${API_PORT}:8000
     networks:
       - hyui
+    depends_on:
+      - baserow
 
   web:
     build:
