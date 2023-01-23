@@ -211,11 +211,11 @@ def _store_sitrep(dept: str) -> list[dict]:
 @Timer(text="Discharge updates: Elapsed time: {:.3f} seconds")
 def _get_discharge_updates(delta_hours: int = 48) -> list[dict]:
     response = requests.get(
-        f"{get_settings().api_url}/beds/discharge_status",
+        f"{get_settings().api_url}/baserow/discharge_status",
         params={"delta_hours": delta_hours},
     )
     if response.status_code == 200:
-        return response.json()
+        return response.json()  # type: ignore
     else:
         warnings.warn("No data found for discharge statues (from Baserow " "store)")
         return [{}]
@@ -232,10 +232,10 @@ def store_discharge_status(dept: str) -> list[dict]:
     Refreshes on ward update
     """
     if not dept:
-        return dash.no_update
+        return dash.no_update  # type: ignore
     discharges = _get_discharge_updates(delta_hours=36)
     if not discharges or not len(discharges):
-        return dash.no_update
+        return dash.no_update  # type: ignore
     df = pd.DataFrame.from_records(discharges)
     try:
         df.sort_values(["csn", "modified_at"], ascending=[True, False], inplace=True)
@@ -262,7 +262,7 @@ def _dept_select_control(depts: list[str], campus: str) -> Tuple[list[str], str]
     return depts, default
 
 
-def _make_elements(
+def _make_elements(  # noqa: C901
     census: list[dict],
     depts: list[dict],
     rooms: list[dict],
@@ -401,7 +401,7 @@ def _make_elements(
             e.get("data").get("department", ""),  # type: ignore
             e.get("data").get("bed_number", ""),  # type: ignore
         ),
-    )
+    )  # type: ignore
     return elements
 
 
@@ -464,13 +464,13 @@ def _prepare_cyto_elements_ward(
         for ele in elements:
             if ele.get("data", {}).get("id") != node_id:
                 continue
-            data = ele.get("data")
-            data.update(dc_status=bed_submit_store.get("status"))
+            data = ele.get("data")  # type: ignore
+            data.update(dc_status=bed_submit_store.get("status"))  # type: ignore
             break
     else:
-        return dash.no_update
+        return dash.no_update  # type: ignore
 
-    return elements
+    return elements  # type: ignore
 
 
 def format_census(census: dict) -> dict:

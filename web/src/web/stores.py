@@ -24,7 +24,7 @@ from web.config import get_settings
 def _store_departments(_: int) -> list[dict]:
     """Store all open departments"""
     response = requests.get(
-        f"{get_settings().api_url}/beds/departments/",
+        f"{get_settings().api_url}/baserow/departments/",
     )
     depts = [Department.parse_obj(row).dict() for row in response.json()]
     return [d for d in depts if not d.get("closed_perm_01")]
@@ -38,7 +38,7 @@ def _store_departments(_: int) -> list[dict]:
 def _store_rooms(_: int) -> list[dict]:
     """Store all rooms with beds"""
     response = requests.get(
-        f"{get_settings().api_url}/beds/rooms/",
+        f"{get_settings().api_url}/baserow/rooms/",
     )
     rooms = [Room.parse_obj(row).dict() for row in response.json()]
     return [r for r in rooms if r.get("has_beds")]
@@ -51,7 +51,7 @@ def _store_rooms(_: int) -> list[dict]:
 )
 def _store_beds(_: int) -> list[dict]:
     response = requests.get(
-        f"{get_settings().api_url}/beds/beds/",
+        f"{get_settings().api_url}/baserow/beds/",
     )
     return [Bed.parse_obj(row).dict() for row in response.json()]
 
