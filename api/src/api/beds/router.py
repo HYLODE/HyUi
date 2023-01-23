@@ -13,11 +13,11 @@ from models.beds import Bed, Room, Department, DischargeStatus
 from api.utils import Timer
 
 router = APIRouter(
-    prefix="/beds",
+    prefix="/baserow",
 )
 
 mock_router = APIRouter(
-    prefix="/beds",
+    prefix="/baserow",
 )
 
 

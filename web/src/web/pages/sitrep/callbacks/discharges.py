@@ -13,7 +13,7 @@ from web.convert import parse_to_data_frame
 def post_discharge_status(csn: int, status: str) -> Tuple[int, DischargeStatus]:
     status = status.lower()
     response = requests.post(
-        url=f"{get_settings().api_url}/beds/discharge_status",
+        url=f"{get_settings().api_url}/baserow/discharge_status",
         params={"csn": csn, "status": status},  # type: ignore
     )
     return response.status_code, DischargeStatus.parse_obj(response.json())
@@ -26,4 +26,4 @@ def _most_recent_row_only(
     # remove duplicates here
     df = df.sort_values(timestamp_col, ascending=False)
     df = df.groupby(groupby_col).head(1)
-    return df.to_dict(orient="records")
+    return df.to_dict(orient="records")  # type: ignore

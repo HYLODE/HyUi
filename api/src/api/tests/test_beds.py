@@ -7,7 +7,7 @@ client = TestClient(app)
 
 
 def test_get_mock_beds_closed() -> None:
-    response = client.get("/mock/beds/closed/")
+    response = client.get("/mock/baserow/closed/")
     assert response.status_code == 200
 
     closed_beds_rows = [Bed.parse_obj(row) for row in response.json()]
@@ -16,7 +16,7 @@ def test_get_mock_beds_closed() -> None:
 
 def test_get_mock_beds() -> None:
     response = client.get(
-        url="/mock/beds/beds/", params={"department": "UCH T03 INTENSIVE CARE"}
+        url="/mock/baserow/beds/", params={"department": "UCH T03 INTENSIVE CARE"}
     )
     assert response.status_code == 200
     beds = [Bed.parse_obj(row) for row in response.json()]

@@ -7,7 +7,7 @@ from web.convert import to_data_frame
 
 
 # def _get_closed_beds() -> list[Bed]:
-#     response = requests.get(f"{get_settings().api_url}/beds/closed/")
+#     response = requests.get(f"{get_settings().api_url}/baserow/closed/")
 #     return [Bed.parse_obj(row) for row in response.json()]
 
 
