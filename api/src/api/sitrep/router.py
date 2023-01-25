@@ -140,27 +140,3 @@ def update_bed_row(
         },
         json=data,
     )
-
-
-@router.get(
-    "/predictions/discharge/individual/{ward}/",
-    response_model=list[IndividualDischargePrediction],
-)
-def get_individual_discharge_predictions(
-    ward: str, settings: Settings = Depends(get_settings)
-) -> list[IndividualDischargePrediction]:
-    response = requests.get(
-        f"{settings.hymind_url}/predictions/icu/discharge", params={"ward": ward}
-    )
-    rows = response.json()["data"]
-    return [IndividualDischargePrediction.parse_obj(row) for row in rows]
-
-
-@mock_router.get(
-    "/predictions/discharge/individual/{ward}/",
-    response_model=list[IndividualDischargePrediction],
-)
-def get_mock_individual_discharge_predictions(
-    ward: str,
-) -> list[IndividualDischargePrediction]:
-    return [IndividualDischargePrediction(episode_slice_id=1, prediction_as_real=0.4)]

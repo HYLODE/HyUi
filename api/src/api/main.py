@@ -26,7 +26,10 @@ from api.hospital.router import (
     mock_router as mock_hospital_router,
     router as hospital_router,
 )
-from api.hymind.router import router as hymind_router
+from api.hymind.router import (
+    router as hymind_router,
+    mock_router as mock_hymind_router,
+)
 from api.perrt.router import mock_router as mock_perrt_router, router as perrt_router
 from api.ros.router import router as ros_router
 
@@ -63,6 +66,7 @@ app.include_router(consults_router)
 
 app.include_router(ros_router)
 app.include_router(hymind_router)
+mock_router.include_router(mock_hymind_router)
 
 # Finally include the mock router.
 app.include_router(mock_router)

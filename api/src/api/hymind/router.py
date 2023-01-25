@@ -1,11 +1,15 @@
+import logging
+
+import datetime
+import pandas as pd
+import pytz
+import requests
+from fastapi import APIRouter, Depends, Query
 from pathlib import Path
 
-import pandas as pd
-from fastapi import APIRouter, Depends
-
-from api.config import get_settings
-from models.hymind import EmElTapPostBody, IcuDischarge, EmTap, ElTap
+from api.config import Settings, get_settings
 from api.validate import pydantic_dataframe
+from models.hymind import ElTap, EmElTapPostBody, EmTap, IcuDischarge
 
 MOCK_ICU_DISCHARGE_DATA = (
     Path(__file__).resolve().parent / "data" / "mock_icu_discharge.json"
@@ -21,52 +25,11 @@ router = APIRouter(
     prefix="/hymind",
 )
 
-
-# def read_query(file_live: str, table_mock: str):
-#     """
-#     generates a query based on the environment
-#
-#     :param      file_live:   The file live
-#                              e.g. live_case.sql
-#     :param      table_mock:  The table mock
-#                              e.g. electivesmock
-#     returns a string containing a SQL query
-#     """
-#     if settings.ENV == "dev":
-#         query = f"SELECT * FROM {table_mock}"
-#     else:
-#         sql_file = Path(__file__).resolve().parent / file_live
-#         query = Path(sql_file).read_text()
-#     return query
+mock_router = APIRouter(
+    prefix="/hymind",
+)
 
 
-@router.get("/icu/discharge")
-def read_icu_discharge(ward: str, settings=Depends(get_settings)):
-    """ """
-    if settings.env == "dev":
-
-        # import ipdb; ipdb.set_trace()
-        _ = pd.read_json(MOCK_ICU_DISCHARGE_DATA)
-        df = pd.DataFrame.from_records(_["data"])
-        df = pydantic_dataframe(df, IcuDischarge)
-    else:
-        return (
-            "API not designed to work in live environment. You should call "
-            "http://uclvlddpragae08:5907/predictions/icu/discharge?ward=T03 "
-            "or similar instead"
-        )
-    records = df.to_dict(orient="records")
-    response = dict(data=records)  # to match API
-    # deliberately not using response model in the decorator definition b/c we
-    # do the validating in the function and the model is nested as {data:
-    # List[Model]} which I cannot encode
-    return response
-
-
-# deliberately not using response model in the decorator definition b/c we
-# do the validating in the function and the model is nested as {data:
-# List[Model]} which I cannot encode
-# @router.post("/icu/tap/emergency", response_model=EmTap)  # type: ignore
 @router.post("/icu/tap/emergency")
 def read_tap_emergency(data: EmElTapPostBody, settings=Depends(get_settings)):
     """ """
@@ -104,3 +67,37 @@ def read_tap_electives(data: EmElTapPostBody, settings=Depends(get_settings)):
     records = df.to_dict(orient="records")
     response = dict(data=records)  # to match API structure {"data": List[Dict]}
     return response
+
+
+@router.get(
+    "/discharge/individual/{ward}/",
+    response_model=list[IcuDischarge],
+)
+def get_individual_discharge_predictions(
+    ward: str = Query(default=""), settings: Settings = Depends(get_settings)
+) -> list[IcuDischarge]:
+    response = requests.get(
+        f"{settings.hymind_url}/predictions/icu/discharge", params={"ward": ward}
+    )
+    rows = response.json()["data"]
+    return [IcuDischarge.parse_obj(row) for row in rows]
+
+
+@mock_router.get(
+    "/discharge/individual/{ward}/",
+    response_model=list[IcuDischarge],
+)
+def get_mock_individual_discharge_predictions(
+    ward: str = Query(default=""),
+) -> list[IcuDischarge]:
+    logging.info(f"Mock predictions for {ward}")
+    return [
+        IcuDischarge(
+            prediction_id=421859,
+            episode_slice_id=539532,
+            model_name="bournville_rf",
+            model_version=3,
+            prediction_as_real=0.6994126228548821,
+            predict_dt=datetime.datetime(2023, 1, 25, 22, 16, 24, 00, tzinfo=pytz.UTC),
+        )
+    ]

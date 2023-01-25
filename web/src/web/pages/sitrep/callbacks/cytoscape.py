@@ -184,27 +184,26 @@ def _store_sitrep(dept: str) -> list[dict]:
         warnings.warn(f"No sitrep data available for {department}")
         return [{}]
 
-    # FIXME 2022-12-20 hack to keep this working whilst waiting on
-    covid_sitrep = True
-
-    if covid_sitrep:
-        warnings.warn("Working from old hycastle sitrep", category=DeprecationWarning)
-        if "mock" in str(get_settings().api_url):
-            mock = True
-            url = f"{get_settings().api_url}/sitrep/live/{department}/ui"
-        else:
-            mock = False
-            url = f"http://uclvlddpragae07:5006/live/icu/{department}/ui"
-    else:
-        url = f"{get_settings().api_url}/sitrep/live/{department}/ui"
-
+    url = f"{get_settings().api_url}/sitrep/live/{department}/ui"
     response = requests.get(url).json()
     try:
-        rows = response["data"] if covid_sitrep and not mock else response
-    except KeyError as e:
-        warnings.warn("No data returned for sitrep")
-        print(e)
-        return [{}]
+        # assumes http://uclvlddpragae08:5201
+        assert type(response) is list
+        rows = response
+    except AssertionError:
+        warnings.warn(
+            f"Sitrep endpoint at {url} did not return list - "
+            f"Retry list is keyed under 'data'"
+        )
+        # see https://github.com/HYLODE/HyUi/issues/179
+        # where we switch to using http://172.16.149.202:5001/
+        try:
+            rows = response["data"]
+        except KeyError as e:
+            warnings.warn("No data returned for sitrep")
+            print(repr(e))
+            return [{}]
+
     return [SitrepRow.parse_obj(row).dict() for row in rows]
 
 
