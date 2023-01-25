@@ -24,11 +24,3 @@ def departments_by_building(building: str) -> list[str]:
             departments.extend(bd.departments)
             break
     return departments
-
-
-def get_bed_list(department: str) -> list[CensusBed]:
-    """Returns bed not patient level data from BaseRow for that department"""
-    response = requests.get(
-        f"{get_settings().api_url}/census/beds/", params={"department": department}
-    )
-    return [CensusBed.parse_obj(row) for row in response.json()]

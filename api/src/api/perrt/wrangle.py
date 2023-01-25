@@ -8,6 +8,7 @@ Use `_` prefix to indicate private methods
 
 import numpy as np
 import pandas as pd
+import warnings
 
 # use tuples (immutable) to store these data to avoid unintentional copies
 _model_cols = (
@@ -134,8 +135,10 @@ def _long_to_wide(df, cols_per_csn: tuple = _cols_per_csn) -> pd.DataFrame:
             ascending=False,
             inplace=True,
         )
-    except:
-        pass
+    except KeyError as e:
+        warnings.warn("Unable to sort NEWS values: possibly missing "
+                      "news_scale_1_max or news_scale_2_max")
+        print(repr(e))
     # IMPORTANT data model has now changed
     return dft
 
