@@ -1,10 +1,10 @@
 from pathlib import Path
 import pandas as pd
-from .baserow import _add_table_field, _create_table
+from initialise.baserow import _add_table_field, _create_table
 
 
-def _load_room_defaults() -> pd.DataFrame:
-    df = pd.read_json(Path(__file__).parent / "room_defaults.json")
+def _load_room_defaults(json_file_path: Path) -> pd.DataFrame:
+    df = pd.read_json(json_file_path)
     df.fillna(
         value={
             "room_id": -1,

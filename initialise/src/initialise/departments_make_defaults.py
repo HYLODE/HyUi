@@ -27,7 +27,7 @@ departments.sort_values("department", inplace=True)
 departments.set_index("department", inplace=True)
 
 # locally saved starter values
-df = pd.read_json("departments.json")
+df = pd.read_json("json/departments.json")
 departments = departments.merge(df, on="department", how="left")
 departments["closed_perm_01"] = departments["closed_perm_01"].str.contains(
     "True|1|TRUE"
@@ -40,4 +40,4 @@ departments["capacity"] = departments["capacity"].astype(pd.Int64Dtype())
 # departments = pd.read_excel("department_defaults.xlsx")
 # quality control and save
 
-departments.to_json("department_defaults.json", orient="records")
+departments.to_json("json/department_defaults.json", orient="records")

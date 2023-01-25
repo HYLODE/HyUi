@@ -24,7 +24,7 @@ beds = df[bed_fields]
 beds.rename(columns={"location": "location_string"}, inplace=True)
 beds[["bed_split_1", "bed_split_2"]] = beds["hl7_bed"].str.split("-", expand=True)
 
-departments = pd.read_json("department_defaults.json")
+departments = pd.read_json("json/department_defaults.json")
 floors = departments.loc[:, ["department", "floor", "location_name"]]
 beds = beds.merge(floors, how="left", on="department")
 beds["bed_number"] = beds.loc[:, "bed_split_2"].str.extract(r"(\d+)")
@@ -35,7 +35,7 @@ beds.sort_values(
 )
 beds["bed_number"] = beds["bed_number"].fillna(-1).astype(int)
 beds.drop(columns=["bed_split_1", "bed_split_2"], inplace=True)
-df = pd.read_json("beds.json")
+df = pd.read_json("json/beds.json")
 df.drop(
     columns=[
         "department",
@@ -59,4 +59,4 @@ beds["xpos"] = beds["xpos"].fillna(-1).astype(int)
 beds["ypos"] = beds["ypos"].fillna(-1).astype(int)
 beds["floor"] = beds["floor"].fillna(-1).astype(int)
 beds.loc[beds["bed_number"] == -1, "closed"] = True
-beds.to_json("bed_defaults.json", orient="records")
+beds.to_json("json/bed_defaults.json", orient="records")

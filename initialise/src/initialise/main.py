@@ -1,8 +1,8 @@
 import argparse
 import logging
 import warnings
-
-from .baserow import (
+from pathlib import Path
+from initialise.baserow import (
     BaserowException,
     _add_misc_fields,
     _add_table_row_batch,
@@ -12,22 +12,22 @@ from .baserow import (
     _get_admin_user_auth_token,
     _get_group_id,
 )
-from .beds import (
+from initialise.beds import (
     _add_beds_user_fields,
     _create_bed_bones_table,
     _create_beds_user_table,
     _load_beds_user_defaults,
 )
-from .beds_build import _fetch_beds
-from .config import get_baserow_settings
-from .departments import (
+from initialise.beds_build import _fetch_beds
+from initialise.config import get_baserow_settings
+from initialise.departments import (
     _add_departments_fields,
     _create_departments_table,
     _load_department_defaults,
 )
-from .rooms import _load_room_defaults, _create_rooms_table, _add_rooms_fields
+from initialise.rooms import _load_room_defaults, _create_rooms_table, _add_rooms_fields
 
-from .discharge_status import (
+from initialise.discharge_status import (
     _add_discharge_status_fields,
     _create_discharge_status_table,
 )
@@ -191,7 +191,9 @@ def recreate_defaults() -> None:
             settings.public_url, auth_token, application_id
         )
         _add_departments_fields(settings.public_url, auth_token, departments_table_id)
-        df = _load_department_defaults()
+        df = _load_department_defaults(
+            Path(__file__).parent / "json/department_defaults.json"
+        )
 
         _add_table_row_batch(settings.public_url, auth_token, departments_table_id, df)
 
@@ -204,7 +206,7 @@ def recreate_defaults() -> None:
             settings.public_url, auth_token, application_id
         )
         _add_rooms_fields(settings.public_url, auth_token, beds_table_id)
-        df = _load_room_defaults()
+        df = _load_room_defaults(Path(__file__).parent / "json/room_defaults.json")
         # need to chunk this up as the batch load is limited to 200 rows
         while df.shape[0] > 0:
             _add_table_row_batch(
@@ -221,7 +223,7 @@ def recreate_defaults() -> None:
             settings.public_url, auth_token, application_id
         )
         _add_beds_user_fields(settings.public_url, auth_token, beds_table_id)
-        df = _load_beds_user_defaults()
+        df = _load_beds_user_defaults(Path(__file__).parent / "json/bed_defaults.json")
         # need to chunk this up as the batch load is limited to 200 rows
         while df.shape[0] > 0:
             _add_table_row_batch(

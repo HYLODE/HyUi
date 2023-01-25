@@ -10,7 +10,7 @@ from typing import Any, cast
 import pandas as pd
 import requests
 
-from .config import BaserowSettings
+from initialise.config import BaserowSettings
 
 
 class BaserowException(Exception):
@@ -171,7 +171,7 @@ def _create_application(base_url: str, auth_token: str, group_id: int) -> int:
     return cast(int, response.json()["id"])
 
 
-def _create_table(
+def _create_table(  # noqa
     base_url: str,
     auth_token: str,
     application_id: int,

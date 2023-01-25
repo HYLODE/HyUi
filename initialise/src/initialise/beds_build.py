@@ -3,8 +3,8 @@ Read and merge bed level data from Epic and EMAP
 """
 import pandas as pd
 
-from . import DEPARTMENTS, VIRTUAL_BEDS, VIRTUAL_ROOMS
-from .db import caboodle_engine, star_engine
+from initialise import DEPARTMENTS, VIRTUAL_BEDS, VIRTUAL_ROOMS
+from initialise.db import caboodle_engine, star_engine
 
 
 def _star_locations() -> pd.DataFrame:

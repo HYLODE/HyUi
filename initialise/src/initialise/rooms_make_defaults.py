@@ -23,7 +23,7 @@ rooms = df[
 ].drop_duplicates()
 
 # locally saved starter values
-df = pd.read_json("rooms.json")
+df = pd.read_json("json/rooms.json")
 df = df[["hl7_room", "has_beds", "closed"]]
 try:
     rooms = rooms.merge(df, on="hl7_room", how="left")
@@ -41,4 +41,4 @@ rooms["closed"] = rooms["closed"] == True  # noqa: E712
 # rooms = pd.read_excel("room_defaults.xlsx")
 # quality control and save
 
-rooms.to_json("room_defaults.json", orient="records")
+rooms.to_json("json/room_defaults.json", orient="records")
