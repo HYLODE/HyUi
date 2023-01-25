@@ -146,7 +146,6 @@ def get_individual_discharge_predictions(
     response = requests.get(
         f"{settings.hymind_url}/predictions/icu/discharge", params={"ward": ward}
     )
-    response.headers["Cache-Control"] = "no-cache"
     rows = response.json()["data"]
     return [IndividualDischargePrediction.parse_obj(row) for row in rows]
 
@@ -158,5 +157,4 @@ def get_individual_discharge_predictions(
 def get_mock_individual_discharge_predictions(
     ward: str, response: Response
 ) -> list[IndividualDischargePrediction]:
-    response.headers["Cache-Control"] = "no-cache"
     return [IndividualDischargePrediction(episode_slice_id=1, prediction_as_real=0.4)]
