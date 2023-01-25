@@ -29,8 +29,7 @@ def get_mock_departments() -> list[Department]:
 
 
 @router.get("/departments", response_model=list[Department])
-def get_departments(settings: Settings = Depends(get_settings)) -> list[
-    Department]:
+def get_departments(settings: Settings = Depends(get_settings)) -> list[Department]:
     baserow_auth = BaserowAuthenticator(
         settings.baserow_url,
         settings.baserow_email,
@@ -123,8 +122,7 @@ def get_beds(
 
         for location in locations:
             location_string_field_id = field_ids["location_string"]
-            params[
-                f"filter__field_{location_string_field_id}__equal"] = location
+            params[f"filter__field_{location_string_field_id}__equal"] = location
             rows.extend(baserow_auth.get_rows("hyui", "beds", params))
             params.pop(f"filter__field_{location_string_field_id}__equal")
 
@@ -202,8 +200,7 @@ def get_campus(
 
         for location in locations:
             location_string_field_id = field_ids["location_string"]
-            params[
-                f"filter__field_{location_string_field_id}__equal"] = location
+            params[f"filter__field_{location_string_field_id}__equal"] = location
             rows.extend(baserow_auth.get_rows("hyui", "beds", params))
             params.pop(f"filter__field_{location_string_field_id}__equal")
 
@@ -222,10 +219,8 @@ def get_campus(
 @mock_router.get("/closed/", response_model=list[Bed])
 def get_mock_closed_beds() -> list[Bed]:
     return [
-        Bed(location_string="LOC1", closed=True, covid=True, xpos=100,
-            ypos=100),
-        Bed(location_string="LOC1", closed=True, covid=False, xpos=100,
-            ypos=100),
+        Bed(location_string="LOC1", closed=True, covid=True, xpos=100, ypos=100),
+        Bed(location_string="LOC1", closed=True, covid=False, xpos=100, ypos=100),
     ]
 
 
@@ -297,8 +292,7 @@ def post_discharge_status(
 @mock_router.get("/discharge_status/", response_model=list[DischargeStatus])
 @Timer(text="Get rows route: Elapsed time: {:.4f}")
 def get_mock_discharge_status(
-    delta_hours: int = 72,  # noqa
-    settings: Settings = Depends(get_settings)  # noqa
+    delta_hours: int = 72, settings: Settings = Depends(get_settings)  # noqa  # noqa
 ) -> list[DischargeStatus]:
     rows = [
         DischargeStatus(
@@ -333,8 +327,7 @@ def get_discharge_status(
     field_ids = baserow_auth.get_fields("hyui", _table)
 
     modified_at_field_id = field_ids["modified_at"]
-    horizon = (datetime.utcnow() - timedelta(
-        hours=float(delta_hours))).isoformat()
+    horizon = (datetime.utcnow() - timedelta(hours=float(delta_hours))).isoformat()
 
     params = {
         "size": 200,
