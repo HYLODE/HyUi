@@ -82,4 +82,4 @@ def test_load_beds_user_missing(sample_bed_json: dict[str, Path]) -> None:
     assert df.loc[0, "bed_index"] == -1
     assert df.loc[0, "xpos"] == -1
     assert df.loc[0, "ypos"] == -1
-    assert df.loc[0, "closed"] is False
+    assert not df.loc[0, "closed"]
