@@ -2,15 +2,12 @@ from fastapi import APIRouter, Depends
 
 from api.baserow import get_fields, get_rows
 from api.config import get_settings, Settings
-from api.dependencies import add_cache_control_header
 from models.beds import Bed
 
 
-router = APIRouter(prefix="/beds", dependencies=[Depends(add_cache_control_header)])
+router = APIRouter(prefix="/beds")
 
-mock_router = APIRouter(
-    prefix="/beds", dependencies=[Depends(add_cache_control_header)]
-)
+mock_router = APIRouter(prefix="/beds")
 
 
 @mock_router.get("/", response_model=list[Bed])

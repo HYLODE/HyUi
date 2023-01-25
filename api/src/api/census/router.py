@@ -12,14 +12,11 @@ from models.census import CensusDepartment, CensusRow
 from api.db import get_star_session
 
 from api.census.wrangle import aggregate_by_department
-from api.dependencies import add_cache_control_header
 from api import wards
 
-router = APIRouter(prefix="/census", dependencies=[Depends(add_cache_control_header)])
+router = APIRouter(prefix="/census")
 
-mock_router = APIRouter(
-    prefix="/census", dependencies=[Depends(add_cache_control_header)]
-)
+mock_router = APIRouter(prefix="/census")
 
 
 def _fetch_census(

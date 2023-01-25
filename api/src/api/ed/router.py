@@ -8,14 +8,13 @@ from pydantic import BaseModel, Field
 
 from api.config import get_settings
 from api.convert import parse_to_data_frame, to_data_frame
-from api.dependencies import add_cache_control_header
 from api.db import get_star_session
 from api.movement import next_locations, NextLocation
 from models.ed import EmergencyDepartmentPatient, AggregateAdmissionRow
 
-router = APIRouter(prefix="/ed", dependencies=[Depends(add_cache_control_header)])
+router = APIRouter(prefix="/ed")
 
-mock_router = APIRouter(prefix="/ed", dependencies=[Depends(add_cache_control_header)])
+mock_router = APIRouter(prefix="/ed")
 
 
 @mock_router.get("/individual/", response_model=list[EmergencyDepartmentPatient])

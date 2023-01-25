@@ -8,12 +8,11 @@ import pickle
 from pathlib import Path
 from typing import Any
 from models.perrt import AdmissionPrediction, PerrtRaw, PerrtRead
-from api.dependencies import add_cache_control_header
 from api.db import prepare_query, get_star_session
 
 from api.perrt.wrangle import wrangle
 
-router = APIRouter(prefix="/perrt", dependencies=[Depends(add_cache_control_header)])
+router = APIRouter(prefix="/perrt")
 
 
 @router.get("/raw", response_model=list[PerrtRaw])

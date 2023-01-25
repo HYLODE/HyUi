@@ -9,7 +9,6 @@ from pydantic import BaseModel
 from sqlalchemy import text
 from sqlmodel import Session
 
-from api.dependencies import add_cache_control_header
 from api.db import get_caboodle_session, get_clarity_session
 from api.electives.wrangle import prepare_electives
 from models.electives import (
@@ -19,13 +18,9 @@ from models.electives import (
     ElectiveSurgCase,
 )
 
-router = APIRouter(
-    prefix="/electives", dependencies=[Depends(add_cache_control_header)]
-)
+router = APIRouter(prefix="/electives")
 
-mock_router = APIRouter(
-    prefix="/electives", dependencies=[Depends(add_cache_control_header)]
-)
+mock_router = APIRouter(prefix="/electives")
 
 
 def _get_json_rows(filename: str) -> Any:

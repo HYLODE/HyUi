@@ -7,14 +7,11 @@ from sqlmodel import Session
 from sqlalchemy import text
 
 from api.db import get_clarity_session
-from api.dependencies import add_cache_control_header
 from models.demo import ClarityOrCase
 
-router = APIRouter(prefix="/demo", dependencies=[Depends(add_cache_control_header)])
+router = APIRouter(prefix="/demo")
 
-mock_router = APIRouter(
-    prefix="/demo", dependencies=[Depends(add_cache_control_header)]
-)
+mock_router = APIRouter(prefix="/demo")
 
 
 @mock_router.get("/", response_model=list[ClarityOrCase])

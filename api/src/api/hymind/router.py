@@ -4,7 +4,6 @@ import pandas as pd
 from fastapi import APIRouter, Depends
 from typing import Any
 from api.config import get_settings
-from api.dependencies import add_cache_control_header
 from models.hymind import EmElTapPostBody, IcuDischarge, EmTap, ElTap
 from api.validate import pydantic_dataframe
 
@@ -18,7 +17,7 @@ MOCK_TAP_ELECTIVE_DATA = (
     Path(__file__).resolve().parent / "data" / "tap_elective_tower.json"
 )
 
-router = APIRouter(prefix="/hymind", dependencies=[Depends(add_cache_control_header)])
+router = APIRouter(prefix="/hymind")
 
 
 # def read_query(file_live: str, table_mock: str):

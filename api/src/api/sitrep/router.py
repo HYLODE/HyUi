@@ -9,7 +9,6 @@ from sqlalchemy import create_engine
 from sqlmodel import Session
 
 from api.config import get_settings
-from api.dependencies import add_cache_control_header
 from api.baserow import get_fields, get_rows
 
 # TODO: Give sitrep its own CensusRow model so we do not have interdependencies.
@@ -34,11 +33,9 @@ CORE_FIELDS = [
     "location_string",
 ]
 
-router = APIRouter(prefix="/sitrep", dependencies=[Depends(add_cache_control_header)])
+router = APIRouter(prefix="/sitrep")
 
-mock_router = APIRouter(
-    prefix="/sitrep", dependencies=[Depends(add_cache_control_header)]
-)
+mock_router = APIRouter(prefix="/sitrep")
 
 
 @router.get("/beds/", response_model=list[BedRow])

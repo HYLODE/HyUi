@@ -5,10 +5,9 @@ from sqlmodel import Session
 
 from models.consults import Consults
 from api.db import prepare_query, get_star_session
-from api.dependencies import add_cache_control_header
 
 
-router = APIRouter(prefix="/consults", dependencies=[Depends(add_cache_control_header)])
+router = APIRouter(prefix="/consults")
 
 
 @router.get("/", response_model=list[Consults])
