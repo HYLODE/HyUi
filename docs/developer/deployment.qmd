@@ -1,15 +1,42 @@
 # Deployment
 
 
-### Setup environment
+## Setup environment
 
 - Clone the repository on an NHS server `git clone https://github.com/HYLODE/HyUi.git`.
 - Configure your `.env` variables using `.env.example` as a template.
 - Configure `docker/initialise/.env` variables using `docker/initialise/.env.example.`
 
-### Run the Docker Compose services
+### Using the http cache
 
-In the `code` directory:
+We use [Varnish](https://varnish-cache.org) as a HTTP cache to speed up some of the slower API calls made by the front end. The default behaviour we follow is to skip the cache and manually identify endpoints which would benefit from caching.
+
+The cache is brought up with other services and is represented in `compose.yml`, which uses `docker/cache/Dockerfile`.
+The only change required to utilise caching is within the base `.env` file. The `WEB_API_URL` environment variable should be set to `http://cache:8000` for deployment on the hospital network or `http://cache:8000/mock` for local development with `docker compose`.
+
+Cache configuration is set in `cache/default.vcl` and contains very minimal additions with respect to a basic varnish configuration.
+
+Endpoints can be added to the cache by altering the `Cache-Control` response header. An example is provided in `api/src/api/beds/router.py` under `mock/beds/`, where the cache lifetime is set to 300 seconds with `response.headers["Cache-Control"] = "public, max-age=300"`.
+
+The first request made to an uncached API endpoint will not see any speed up - subsequent requests within the time to live (TTL) of an object will use the cached object and will see a speedier response.
+
+Additional configuration is provided for endpoints that absolutely must return live data from the API. In this case, there are two options for skipping the cache.
+
+1. adding `X-Varnish-Nuke:1` to the **request** header will clear the cache for the current endpoint and force a live query of the API
+2. Adding `Cache-Control: no-cache` to the request header will instruct Varnish to skip the cache for the requested endpoint
+
+By relying on the setting of cached object TTL via response headers and the skipping (or clearing of) the cache with an additional header, the hope is that developers should not need to interact with `default.vcl` and all changes can be made via [web standards](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control).
+
+The `web` service in `compose.yml` contains a `healthcheck` element that runs the `docker/web/refresh_cache.sh` script at a regular specified time interval. Via this script, endpoints can be called via `curl` with the `X-Varnish-Nuke:1` header to force regular updating of the cached endpoint. This is particularly useful for slow-to-load endpoints that should be available on demand to users.
+
+#### Altering the lifetime of cached objects
+By default, endpoints are not cached. This is enforced with response headers set via middleware in `api/src/api/main.py` added as a decorator to the `app` and `mock_router` `FastAPI` instances.. This default is overriden for specified endpoints by altering the response headers as described previously.
+
+TTLs for individual endpoints can be altered by adding `Cache-Control: max-age=<ttl>`, where `<ttl>` represents the desired TTL in seconds.
+
+## Run the Docker Compose services
+
+In the base directory (containing `compose.yml`)
 
 ```sh
 docker compose --project-name [project name] up --build
@@ -17,7 +44,7 @@ docker compose --project-name [project name] up --build
 
 Ensure that you use a unique name for your `[project name]`. The production service should be named `hyui-prod`.
 
-### Initialise services
+## Initialise services
 
 This should be done the first time you stand up the services. It populates the Baserow database with the tables and static data required to run the rest of the HyUi services.
 
@@ -25,7 +52,7 @@ This should be done the first time you stand up the services. It populates the B
 ./bin/initialise.sh --operation baserow
 ```
 
-### Stop And Remove Docker Containers
+## Stop And Remove Docker Containers
 
 ```sh
 docker compose --project-name [project name] down

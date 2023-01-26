@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Any
 
 import numpy as np
 import pandas as pd
@@ -18,14 +18,12 @@ from models.electives import (
     ElectiveSurgCase,
 )
 
-router = APIRouter(
-    prefix="/electives",
-)
+router = APIRouter(prefix="/electives")
 
 mock_router = APIRouter(prefix="/electives")
 
 
-def _get_json_rows(filename: str):
+def _get_json_rows(filename: str) -> Any:
     """
     Return mock data from adjacent mock.json file
     Assumes that data in nested object 'rows'
@@ -37,7 +35,7 @@ def _get_json_rows(filename: str):
 
 
 def _parse_query(
-        query_file: str, session: Session, model: BaseModel, params: Dict = {}
+    query_file: str, session: Session, model: BaseModel, params: Dict = {}
 ) -> List[BaseModel]:
     """
     generic function that reads a text query from a file, handles parameters
@@ -55,8 +53,8 @@ def _parse_query(
 
 @router.get("/case_booking", response_model=list[CaboodleCaseBooking])
 def get_caboodle_cases(
-        session: Session = Depends(get_caboodle_session), days_ahead: int = 1
-):
+    session: Session = Depends(get_caboodle_session), days_ahead: int = 1
+) -> list[CaboodleCaseBooking]:
     """
     Return caboodle case booking data
     """
@@ -66,19 +64,19 @@ def get_caboodle_cases(
 
 
 @mock_router.get("/case_booking", response_model=list[CaboodleCaseBooking])
-def get_mock_caboodle_cases():
+def get_mock_caboodle_cases() -> list[CaboodleCaseBooking]:
     """
     returns mock of caboodle query for elective cases
     :return:
     """
-    rows = _get_json_rows("mock_case.json")
+    rows = _get_json_rows("mock_case.json")  # type: list[CaboodleCaseBooking]
     return rows
 
 
 @router.get("/postop_destination", response_model=list[ClarityPostopDestination])
 def get_clarity_pod(
-        session: Session = Depends(get_clarity_session), days_ahead: int = 1
-):
+    session: Session = Depends(get_clarity_session), days_ahead: int = 1
+) -> list[ClarityPostopDestination]:
     """
     Return clarity post op destination
     """
@@ -88,18 +86,18 @@ def get_clarity_pod(
 
 
 @mock_router.get("/postop_destination", response_model=list[ClarityPostopDestination])
-def get_mock_clarity_pod():
+def get_mock_clarity_pod() -> list[ClarityPostopDestination]:
     """
     returns mock of caboodle query for preassessment
     """
-    rows = _get_json_rows("mock_pod.json")
+    rows = _get_json_rows("mock_pod.json")  # type: list[ClarityPostopDestination]
     return rows
 
 
 @router.get("/preassessment", response_model=list[CaboodlePreassessment])
 def get_caboodle_preassess(
-        session: Session = Depends(get_caboodle_session), days_ahead: int = 1
-):
+    session: Session = Depends(get_caboodle_session), days_ahead: int = 1
+) -> list[CaboodlePreassessment]:
     """
     Return caboodle preassessment data
     """
@@ -109,19 +107,19 @@ def get_caboodle_preassess(
 
 
 @mock_router.get("/preassessment", response_model=list[CaboodlePreassessment])
-def get_mock_caboodle_preassess():
+def get_mock_caboodle_preassess() -> list[CaboodlePreassessment]:
     """
     returns mock of caboodle query for preassessment
     :return:
     """
-    rows = _get_json_rows("mock_preassess.json")
+    rows = _get_json_rows("mock_preassess.json")  # type: list[CaboodlePreassessment]
     return rows
 
 
 @mock_router.get("/", response_model=list[ElectiveSurgCase])
 def get_mock_electives(
-        days_ahead: int = 3,
-):
+    days_ahead: int = 3,
+) -> list[ElectiveSurgCase]:
     """
     Returns Electives data class populated by query-live/mock
     Includes
@@ -139,16 +137,18 @@ def get_mock_electives(
 
 @router.get("/", response_model=list[ElectiveSurgCase])
 def get_electives(
-        s_caboodle: Session = Depends(get_caboodle_session),
-        s_clarity: Session = Depends(get_clarity_session),
-        days_ahead: int = 3,
-):
+    s_caboodle: Session = Depends(get_caboodle_session),
+    s_clarity: Session = Depends(get_clarity_session),
+    days_ahead: int = 3,
+) -> list[ElectiveSurgCase]:
     """
     Returns elective surgical cases by wrangling together the three components
     """
     params = {"days_ahead": days_ahead}
     _case = _parse_query("live_case.sql", s_caboodle, CaboodleCaseBooking, params)
-    _preassess = _parse_query("live_preassess.sql", s_caboodle, CaboodlePreassessment, params)
+    _preassess = _parse_query(
+        "live_preassess.sql", s_caboodle, CaboodlePreassessment, params
+    )
     _pod = _parse_query("live_pod.sql", s_clarity, ClarityPostopDestination, params)
 
     df = prepare_electives(_case, _pod, _preassess)

@@ -3,13 +3,12 @@ from pathlib import Path
 from urllib.parse import urlencode
 
 import requests
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Response
 from fastapi.responses import RedirectResponse
 from sqlalchemy import create_engine
 from sqlmodel import Session
 
 from api.config import get_settings
-
 from api.baserow import get_fields, get_rows
 
 # TODO: Give sitrep its own CensusRow model so we do not have interdependencies.
@@ -34,17 +33,15 @@ CORE_FIELDS = [
     "location_string",
 ]
 
-router = APIRouter(
-    prefix="/sitrep",
-)
+router = APIRouter(prefix="/sitrep")
 
-mock_router = APIRouter(
-    prefix="/sitrep",
-)
+mock_router = APIRouter(prefix="/sitrep")
 
 
 @router.get("/beds/", response_model=list[BedRow])
-def get_beds(department: str, settings=Depends(get_settings)):
+def get_beds(
+    department: str, settings: Depends = Depends(get_settings)
+) -> list[BedRow]:
 
     baserow_url = settings.baserow_url
     email = settings.baserow_email
@@ -114,7 +111,9 @@ def get_mock_live_ui(ward: str) -> list[SitrepRow]:
 
 
 @router.get("/live/{ward}/ui/", response_model=list[SitrepRow])
-def get_live_ui(ward: str, settings=Depends(get_settings)) -> list[SitrepRow]:
+def get_live_ui(
+    ward: str, settings: Depends = Depends(get_settings)
+) -> list[SitrepRow]:
     response = requests.get(f"{settings.hycastle_url}/live/icu/{ward}/ui")
     rows = response.json()["data"]
     return [SitrepRow.parse_obj(row) for row in rows]
@@ -122,8 +121,8 @@ def get_live_ui(ward: str, settings=Depends(get_settings)) -> list[SitrepRow]:
 
 @router.patch("/beds")
 def update_bed_row(
-    table_id: int, row_id: int, data: dict, settings=Depends(get_settings)
-):
+    table_id: int, row_id: int, data: dict, settings: Depends = Depends(get_settings)
+) -> None:
     url = f"{settings.baserow_url}/api/database/rows/table/{table_id}/"
 
     # TODO: Need to get working.
@@ -142,7 +141,7 @@ def update_bed_row(
     response_model=list[IndividualDischargePrediction],
 )
 def get_individual_discharge_predictions(
-    ward: str, settings=Depends(get_settings)
+    ward: str, settings: Depends = Depends(get_settings)
 ) -> list[IndividualDischargePrediction]:
     response = requests.get(
         f"{settings.hymind_url}/predictions/icu/discharge", params={"ward": ward}
@@ -156,6 +155,6 @@ def get_individual_discharge_predictions(
     response_model=list[IndividualDischargePrediction],
 )
 def get_mock_individual_discharge_predictions(
-    ward: str,
+    ward: str, response: Response
 ) -> list[IndividualDischargePrediction]:
     return [IndividualDischargePrediction(episode_slice_id=1, prediction_as_real=0.4)]

@@ -4,13 +4,9 @@ from api import wards
 
 from models.hospital import BuildingDepartments
 
-router = APIRouter(
-    prefix="/hospital",
-)
+router = APIRouter(prefix="/hospital")
 
-mock_router = APIRouter(
-    prefix="/hospital",
-)
+mock_router = APIRouter(prefix="/hospital")
 
 
 def _building_departments() -> list[BuildingDepartments]:

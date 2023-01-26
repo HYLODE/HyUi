@@ -14,13 +14,9 @@ from api.db import get_star_session
 from api.census.wrangle import aggregate_by_department
 from api import wards
 
-router = APIRouter(
-    prefix="/census",
-)
+router = APIRouter(prefix="/census")
 
-mock_router = APIRouter(
-    prefix="/census",
-)
+mock_router = APIRouter(prefix="/census")
 
 
 def _fetch_census(
