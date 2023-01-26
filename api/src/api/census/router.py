@@ -113,7 +113,7 @@ def get_census(
     return _fetch_census(session, query, departments, locations)
 
 
-@mock_router.get("/campus", response_model=list[CensusRow])
+@mock_router.get("/campus/", response_model=list[CensusRow])
 def get_mock_census_by_campus(
     campuses: list[str] = Query(default=[]),
 ) -> list[CensusRow]:
@@ -125,7 +125,7 @@ def get_mock_census_by_campus(
     return _fetch_mock_census(departments, locations)
 
 
-@router.get("/campus", response_model=list[CensusRow])
+@router.get("/campus/", response_model=list[CensusRow])
 def get_census_by_campus(
     session: Session = Depends(get_star_session),
     campuses: list[str] = Query(default=[]),
