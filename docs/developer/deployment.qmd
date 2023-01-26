@@ -16,7 +16,7 @@ The only change required to utilise caching is within the base `.env` file. The 
 
 Cache configuration is set in `cache/default.vcl` and contains very minimal additions with respect to a basic varnish configuration.
 
-Endpoints can be added to the cache by altering the `Cache-Control` response header. An example is provided in `api/src/api/beds/router.py` under `mock/beds/`, where the cache lifetime is set to 300 seconds with `response.headers["Cache-Control"] = "public, max-age=300"`.
+Endpoints can be added to the cache by altering the `Cache-Control` response header. An example is provided in `api/src/api/beds/router.py` under `/mock/baserow/beds/`, where the cache lifetime is set to 300 seconds with `response.headers["Cache-Control"] = "public, max-age=300"`.
 
 The first request made to an uncached API endpoint will not see any speed up - subsequent requests within the time to live (TTL) of an object will use the cached object and will see a speedier response.
 
