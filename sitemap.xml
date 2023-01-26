@@ -1,83 +1,83 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://github.com/HYLODE/HyUi/user/user.html</loc>
-    <lastmod>2023-01-05T21:02:05.098Z</lastmod>
-  </url>
-  <url>
     <loc>https://github.com/HYLODE/HyUi/developer/deployment.html</loc>
-    <lastmod>2023-01-05T21:02:05.990Z</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/HYLODE/HyUi/developer/demo.html</loc>
-    <lastmod>2023-01-05T21:02:06.362Z</lastmod>
+    <lastmod>2023-01-26T11:33:18.864Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/HYLODE/HyUi/developer/documentation.html</loc>
-    <lastmod>2023-01-05T21:02:06.910Z</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/HYLODE/HyUi/developer/tips.html</loc>
-    <lastmod>2023-01-05T21:02:07.218Z</lastmod>
+    <lastmod>2023-01-26T11:33:19.724Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/HYLODE/HyUi/developer/setup.html</loc>
-    <lastmod>2023-01-05T21:02:07.866Z</lastmod>
+    <lastmod>2023-01-26T11:33:20.304Z</lastmod>
   </url>
   <url>
-    <loc>https://github.com/HYLODE/HyUi/about.html</loc>
-    <lastmod>2023-01-05T21:02:08.154Z</lastmod>
+    <loc>https://github.com/HYLODE/HyUi/developer/tips.html</loc>
+    <lastmod>2023-01-26T11:33:20.600Z</lastmod>
   </url>
   <url>
-    <loc>https://github.com/HYLODE/HyUi/vignettes/beds_v3NHNN.html</loc>
-    <lastmod>2023-01-05T21:02:08.550Z</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/HYLODE/HyUi/vignettes/beds_v3UCLH.html</loc>
-    <lastmod>2023-01-05T21:02:08.954Z</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/HYLODE/HyUi/vignettes/vignettes.html</loc>
-    <lastmod>2023-01-05T21:02:09.314Z</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/HYLODE/HyUi/vignettes/icu-tap-elective-predictions.html</loc>
-    <lastmod>2023-01-05T21:02:09.762Z</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/HYLODE/HyUi/vignettes/icu-tap-aggregate-probs.html</loc>
-    <lastmod>2023-01-05T21:02:10.094Z</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/HYLODE/HyUi/vignettes/icu-tap-emergency-predictions.html</loc>
-    <lastmod>2023-01-05T21:02:10.534Z</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/HYLODE/HyUi/vignettes/wrangle_beds.html</loc>
-    <lastmod>2023-01-05T21:02:10.894Z</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/HYLODE/HyUi/contributor_guide/pre_commit_hooks.html</loc>
-    <lastmod>2023-01-05T21:02:11.534Z</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/HYLODE/HyUi/contributor_guide/updating_gitignore.html</loc>
-    <lastmod>2023-01-05T21:02:11.838Z</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/HYLODE/HyUi/contributor_guide/CODE_OF_CONDUCT.html</loc>
-    <lastmod>2023-01-05T21:02:12.182Z</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/HYLODE/HyUi/contributor_guide/CONTRIBUTING.html</loc>
-    <lastmod>2023-01-05T21:02:12.786Z</lastmod>
+    <loc>https://github.com/HYLODE/HyUi/developer/demo.html</loc>
+    <lastmod>2023-01-26T11:33:20.920Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/HYLODE/HyUi/index.html</loc>
-    <lastmod>2023-01-05T21:02:13.090Z</lastmod>
+    <lastmod>2023-01-26T11:33:21.204Z</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/HYLODE/HyUi/user/user.html</loc>
+    <lastmod>2023-01-26T11:33:21.520Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/HYLODE/HyUi/notes/provisioning.html</loc>
-    <lastmod>2023-01-05T21:02:13.446Z</lastmod>
+    <lastmod>2023-01-26T11:33:21.832Z</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/HYLODE/HyUi/contributor_guide/CONTRIBUTING.html</loc>
+    <lastmod>2023-01-26T11:33:22.412Z</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/HYLODE/HyUi/contributor_guide/pre_commit_hooks.html</loc>
+    <lastmod>2023-01-26T11:33:23.033Z</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/HYLODE/HyUi/contributor_guide/updating_gitignore.html</loc>
+    <lastmod>2023-01-26T11:33:23.313Z</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/HYLODE/HyUi/contributor_guide/CODE_OF_CONDUCT.html</loc>
+    <lastmod>2023-01-26T11:33:23.641Z</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/HYLODE/HyUi/about.html</loc>
+    <lastmod>2023-01-26T11:33:23.949Z</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/HYLODE/HyUi/vignettes/wrangle_beds.html</loc>
+    <lastmod>2023-01-26T11:33:24.320Z</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/HYLODE/HyUi/vignettes/icu-tap-elective-predictions.html</loc>
+    <lastmod>2023-01-26T11:33:24.744Z</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/HYLODE/HyUi/vignettes/icu-tap-emergency-predictions.html</loc>
+    <lastmod>2023-01-26T11:33:25.148Z</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/HYLODE/HyUi/vignettes/vignettes.html</loc>
+    <lastmod>2023-01-26T11:33:25.496Z</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/HYLODE/HyUi/vignettes/beds_v3NHNN.html</loc>
+    <lastmod>2023-01-26T11:33:25.880Z</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/HYLODE/HyUi/vignettes/beds_v3UCLH.html</loc>
+    <lastmod>2023-01-26T11:33:26.260Z</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/HYLODE/HyUi/vignettes/icu-tap-aggregate-probs.html</loc>
+    <lastmod>2023-01-26T11:33:26.576Z</lastmod>
   </url>
 </urlset>

@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.280">
+<meta name="generator" content="quarto-1.2.313">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -258,7 +258,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <ul>
   <li><a href="#deployment" id="toc-deployment" class="nav-link active" data-scroll-target="#deployment">Deployment</a>
   <ul class="collapse">
-  <li><a href="#setup-environment" id="toc-setup-environment" class="nav-link" data-scroll-target="#setup-environment">Setup environment</a></li>
+  <li><a href="#setup-environment" id="toc-setup-environment" class="nav-link" data-scroll-target="#setup-environment">Setup environment</a>
+  <ul class="collapse">
+  <li><a href="#using-the-http-cache" id="toc-using-the-http-cache" class="nav-link" data-scroll-target="#using-the-http-cache">Using the http cache</a></li>
+  </ul></li>
   <li><a href="#run-the-docker-compose-services" id="toc-run-the-docker-compose-services" class="nav-link" data-scroll-target="#run-the-docker-compose-services">Run the Docker Compose services</a></li>
   <li><a href="#initialise-services" id="toc-initialise-services" class="nav-link" data-scroll-target="#initialise-services">Initialise services</a></li>
   <li><a href="#stop-and-remove-docker-containers" id="toc-stop-and-remove-docker-containers" class="nav-link" data-scroll-target="#stop-and-remove-docker-containers">Stop And Remove Docker Containers</a></li>
@@ -273,27 +276,47 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <section id="deployment" class="level1">
 <h1>Deployment</h1>
-<section id="setup-environment" class="level3">
-<h3 class="anchored" data-anchor-id="setup-environment">Setup environment</h3>
+<section id="setup-environment" class="level2">
+<h2 class="anchored" data-anchor-id="setup-environment">Setup environment</h2>
 <ul>
 <li>Clone the repository on an NHS server <code>git clone https://github.com/HYLODE/HyUi.git</code>.</li>
 <li>Configure your <code>.env</code> variables using <code>.env.example</code> as a template.</li>
 <li>Configure <code>docker/initialise/.env</code> variables using <code>docker/initialise/.env.example.</code></li>
 </ul>
+<section id="using-the-http-cache" class="level3">
+<h3 class="anchored" data-anchor-id="using-the-http-cache">Using the http cache</h3>
+<p>We use <a href="https://varnish-cache.org">Varnish</a> as a HTTP cache to speed up some of the slower API calls made by the front end. The default behaviour we follow is to skip the cache and manually identify endpoints which would benefit from caching.</p>
+<p>The cache is brought up with other services and is represented in <code>compose.yml</code>, which uses <code>docker/cache/Dockerfile</code>. The only change required to utilise caching is within the base <code>.env</code> file. The <code>WEB_API_URL</code> environment variable should be set to <code>http://cache:8000</code> for deployment on the hospital network or <code>http://cache:8000/mock</code> for local development with <code>docker compose</code>.</p>
+<p>Cache configuration is set in <code>cache/default.vcl</code> and contains very minimal additions with respect to a basic varnish configuration.</p>
+<p>Endpoints can be added to the cache by altering the <code>Cache-Control</code> response header. An example is provided in <code>api/src/api/beds/router.py</code> under <code>mock/beds/</code>, where the cache lifetime is set to 300 seconds with <code>response.headers["Cache-Control"] = "public, max-age=300"</code>.</p>
+<p>The first request made to an uncached API endpoint will not see any speed up - subsequent requests within the time to live (TTL) of an object will use the cached object and will see a speedier response.</p>
+<p>Additional configuration is provided for endpoints that absolutely must return live data from the API. In this case, there are two options for skipping the cache.</p>
+<ol type="1">
+<li>adding <code>X-Varnish-Nuke:1</code> to the <strong>request</strong> header will clear the cache for the current endpoint and force a live query of the API</li>
+<li>Adding <code>Cache-Control: no-cache</code> to the request header will instruct Varnish to skip the cache for the requested endpoint</li>
+</ol>
+<p>By relying on the setting of cached object TTL via response headers and the skipping (or clearing of) the cache with an additional header, the hope is that developers should not need to interact with <code>default.vcl</code> and all changes can be made via <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control">web standards</a>.</p>
+<p>The <code>web</code> service in <code>compose.yml</code> contains a <code>healthcheck</code> element that runs the <code>docker/web/refresh_cache.sh</code> script at a regular specified time interval. Via this script, endpoints can be called via <code>curl</code> with the <code>X-Varnish-Nuke:1</code> header to force regular updating of the cached endpoint. This is particularly useful for slow-to-load endpoints that should be available on demand to users.</p>
+<section id="altering-the-lifetime-of-cached-objects" class="level4">
+<h4 class="anchored" data-anchor-id="altering-the-lifetime-of-cached-objects">Altering the lifetime of cached objects</h4>
+<p>By default, endpoints are not cached. This is enforced with response headers set via middleware in <code>api/src/api/main.py</code> added as a decorator to the <code>app</code> and <code>mock_router</code> <code>FastAPI</code> instances.. This default is overriden for specified endpoints by altering the response headers as described previously.</p>
+<p>TTLs for individual endpoints can be altered by adding <code>Cache-Control: max-age=&lt;ttl&gt;</code>, where <code>&lt;ttl&gt;</code> represents the desired TTL in seconds.</p>
 </section>
-<section id="run-the-docker-compose-services" class="level3">
-<h3 class="anchored" data-anchor-id="run-the-docker-compose-services">Run the Docker Compose services</h3>
-<p>In the <code>code</code> directory:</p>
+</section>
+</section>
+<section id="run-the-docker-compose-services" class="level2">
+<h2 class="anchored" data-anchor-id="run-the-docker-compose-services">Run the Docker Compose services</h2>
+<p>In the base directory (containing <code>compose.yml</code>)</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> compose <span class="at">--project-name</span> [project name] up <span class="at">--build</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Ensure that you use a unique name for your <code>[project name]</code>. The production service should be named <code>hyui-prod</code>.</p>
 </section>
-<section id="initialise-services" class="level3">
-<h3 class="anchored" data-anchor-id="initialise-services">Initialise services</h3>
+<section id="initialise-services" class="level2">
+<h2 class="anchored" data-anchor-id="initialise-services">Initialise services</h2>
 <p>This should be done the first time you stand up the services. It populates the Baserow database with the tables and static data required to run the rest of the HyUi services.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./bin/initialise.sh</span> <span class="at">--operation</span> baserow</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="stop-and-remove-docker-containers" class="level3">
-<h3 class="anchored" data-anchor-id="stop-and-remove-docker-containers">Stop And Remove Docker Containers</h3>
+<section id="stop-and-remove-docker-containers" class="level2">
+<h2 class="anchored" data-anchor-id="stop-and-remove-docker-containers">Stop And Remove Docker Containers</h2>
 <div class="sourceCode" id="cb3"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> compose <span class="at">--project-name</span> [project name] down</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 

@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.280">
+<meta name="generator" content="quarto-1.2.313">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -301,9 +301,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>The root directory contains all the libraries that are used to power the HyUi dashboards.</p>
 <ul>
 <li><code>api</code>: This is a FastAPI app that does all the data wrangling and accessing of external sources such as to databases and web services. For each route there should be an equivalent mock route that allows this app to serve mock data when run in development. For example, if there is a <code>/census/</code> endpoint then there should be a corresponding <code>/mock/census</code> endpoint that only serves mock data.</li>
-<li><code>web</code>: This is contains the Plotly Dash web server code. It should <em>only</em> communicate with the <code>api</code> service. This allows the <code>api</code> service to provide mock data seamlessly when developing without needing to spin up other services to help development.</li>
+<li><code>web</code>: This contains the Plotly Dash web server code. It should <em>only</em> communicate with the <code>api</code> service. This allows the <code>api</code> service to provide mock data seamlessly when developing without needing to spin up other services to help development.</li>
 <li><code>models</code>: This contains all the Pydantic models that are used to share data between the <code>api</code> and <code>web</code>.</li>
 <li><code>initialise</code>: This sets-up the BaseRow instance that is used for configuration by the user.</li>
+<li><code>cache</code>: This contains the HTTP cache service that serves cached objects from <code>api</code> to <code>web</code> with a 5 minute expiry. See <a href="../developer/deployment.html">the deployment docs</a> for more information.</li>
 </ul>
 <section id="architecture-ideals" class="level3">
 <h3 class="anchored" data-anchor-id="architecture-ideals">Architecture Ideals</h3>
