@@ -2,8 +2,9 @@
 Entry point and main file for the FastAPI backend
 """
 
-from fastapi import APIRouter, FastAPI
+from fastapi import FastAPI, APIRouter, Request, Response
 from fastapi.responses import ORJSONResponse
+from typing import Any
 
 from api.census.router import router as census_router, mock_router as mock_census_router
 from api.sitrep.router import router as sitrep_router, mock_router as mock_sitrep_router
@@ -33,7 +34,10 @@ from api.hymind.router import (
 from api.perrt.router import mock_router as mock_perrt_router, router as perrt_router
 from api.ros.router import router as ros_router
 
-app = FastAPI(default_response_class=ORJSONResponse)
+app = FastAPI(
+    default_response_class=ORJSONResponse,
+)
+
 mock_router = APIRouter(
     prefix="/mock",
 )
@@ -70,6 +74,14 @@ mock_router.include_router(mock_hymind_router)
 
 # Finally include the mock router.
 app.include_router(mock_router)
+
+
+@app.middleware("http")
+async def add_cache_control_header(request: Request, call_next: Any) -> Response:
+    response = await call_next(request)
+    if "Cache-Control" not in response.headers:
+        response.headers["Cache-control"] = "no-cache"
+    return response
 
 
 @app.get("/ping")

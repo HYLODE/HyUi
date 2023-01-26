@@ -15,13 +15,9 @@ from api.wards import (
 )
 from models.census import CensusDepartment, CensusRow
 
-router = APIRouter(
-    prefix="/census",
-)
+router = APIRouter(prefix="/census")
 
-mock_router = APIRouter(
-    prefix="/census",
-)
+mock_router = APIRouter(prefix="/census")
 
 
 def _fetch_census(

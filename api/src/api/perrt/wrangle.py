@@ -42,14 +42,16 @@ _obs_types = {
 }
 
 
-def _fahrenheit_to_celsius(df, temperature_label: str = "Temp"):
+def _fahrenheit_to_celsius(
+    df: pd.DataFrame, temperature_label: str = "Temp"
+) -> pd.DataFrame:
     df["value"] = df["value"].mask(
         df["id_in_application"] == temperature_label, (df["value_as_real"] - 32) * 5 / 9
     )
     return df
 
 
-def _air_or_o2_as_int(df):
+def _air_or_o2_as_int(df: pd.DataFrame) -> pd.DataFrame:
     """Convert NEWS air/o2 label to integer"""
     conditions = [
         (df["id_in_application"] == "air_or_o2") & (df["value_as_text"] == "Room air"),
@@ -64,7 +66,7 @@ def _air_or_o2_as_int(df):
     return df
 
 
-def _avpu_as_int(df):
+def _avpu_as_int(df: pd.DataFrame) -> pd.DataFrame:
     conditions = [
         (df["id_in_application"] == "AVPU") & (df["value_as_text"] == "A"),
         (df["id_in_application"] == "AVPU") & (df["value_as_text"] == "C"),
@@ -83,7 +85,7 @@ def _avpu_as_int(df):
     return df
 
 
-def _bp_as_int(df, bp_label: str = "BP"):
+def _bp_as_int(df: pd.DataFrame, bp_label: str = "BP") -> pd.DataFrame:
     mask = df["id_in_application"] == bp_label
     df["tmp"] = pd.to_numeric(
         df[mask]["value_as_text"].str.split("/").str[0], errors="coerce"
@@ -93,7 +95,9 @@ def _bp_as_int(df, bp_label: str = "BP"):
     return df
 
 
-def _news_as_int(df, news_labels: list[str] = ["NEWS_scale_1", "NEWS_scale_2"]):
+def _news_as_int(
+    df: pd.DataFrame, news_labels: list[str] = ["NEWS_scale_1", "NEWS_scale_2"]
+) -> pd.DataFrame:
     for label in news_labels:
         mask = df["id_in_application"] == label
         df["tmp"] = pd.to_numeric(df[mask]["value_as_text"], errors="coerce")
@@ -102,7 +106,9 @@ def _news_as_int(df, news_labels: list[str] = ["NEWS_scale_1", "NEWS_scale_2"]):
     return df
 
 
-def _long_to_wide(df, cols_per_csn: tuple = _cols_per_csn) -> pd.DataFrame:
+def _long_to_wide(
+    df: pd.DataFrame, cols_per_csn: tuple = _cols_per_csn
+) -> pd.DataFrame:
     """
     converts SQL query data (post-wrangling) into wide data for Dash
     :param      df:            { parameter_description }

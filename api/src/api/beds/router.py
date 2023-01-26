@@ -1,6 +1,6 @@
 import json
 from datetime import datetime, timedelta
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Response
 from pathlib import Path
 
 from api.baserow import BaserowAuthenticator
@@ -81,9 +81,11 @@ def get_rooms(settings: Settings = Depends(get_settings)) -> list[Room]:
 
 @mock_router.get("/beds", response_model=list[Bed])
 def get_mock_beds(
+    response: Response,
     departments: list[str] = Query(default=[]),
     locations: list[str] = Query(default=[]),
 ) -> list[Bed]:
+    response.headers["Cache-Control"] = "public, max-age=300"
     with open(Path(__file__).parent / "bed_defaults.json", "r") as f:
         rows = json.load(f)
 

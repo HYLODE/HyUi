@@ -41,6 +41,13 @@ services:
     depends_on:
       - baserow
       - api
+      - cache
+    healthcheck:
+      test: ["CMD", "./refresh_cache.sh"]
+      interval: 5m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
     networks:
       - hyui
 
@@ -53,11 +60,10 @@ services:
       <<: *proxy-common
     env_file: .env
     ports:
-      - "${CACHE_PORT}:6081"
+      - "${CACHE_PORT}:8000"
     command: "-p default_keep=300"
     depends_on:
       - api
-      - web
     networks:
       - hyui
 

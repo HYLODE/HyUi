@@ -25,23 +25,25 @@ _this_file = Path(__file__)
 def get_emap_cpr(
     session: Session = Depends(get_star_session),
     encounter_ids: list[str] = Query(default=[]),
-):
+) -> list[EmapCpr]:
     """
     Return advance decisions about CPR
     :type session: Session object from sqlmodel
     """
     params = {"encounter_ids": encounter_ids}
-    res = _parse_query(_this_file, "live_cpr.sql", session, EmapCpr, params)
+    res = _parse_query(
+        _this_file, "live_cpr.sql", session, EmapCpr, params
+    )  # type: list[EmapCpr]
     return res
 
 
 @mock_router.get("/cpr", response_model=list[EmapCpr])
-def get_mock_emap_cpr():
+def get_mock_emap_cpr() -> list[EmapCpr]:
     """
     Return mock consults to PERRT or ICU
     :return:
     """
-    rows = _get_json_rows(_this_file, "mock_cpr.json")
+    rows = _get_json_rows(_this_file, "mock_cpr.json")  # type: list[EmapCpr]
     return rows
 
 
@@ -50,7 +52,7 @@ def get_emap_perrt_consults(
     session: Session = Depends(get_star_session),
     encounter_ids: list[str] = Query(default=[]),
     horizon_dt: dt.datetime = dt.datetime.now() - dt.timedelta(days=7),
-):
+) -> list[EmapConsults]:
     """
     Return consults to PERRT or ICU
     :type session: Session object from sqlmodel
@@ -62,12 +64,12 @@ def get_emap_perrt_consults(
 
 
 @mock_router.get("/consults", response_model=list[EmapConsults])
-def get_mock_emap_perrt_consults():
+def get_mock_emap_perrt_consults() -> list[EmapConsults]:
     """
     Return mock consults to PERRT or ICU
     :return:
     """
-    rows = _get_json_rows(_this_file, "mock_consults.json")
+    rows = _get_json_rows(_this_file, "mock_consults.json")  # type: list[EmapConsults]
     return rows
 
 
@@ -76,7 +78,7 @@ def get_emap_vitals_long(
     session: Session = Depends(get_star_session),
     encounter_ids: list[str] = Query(default=[]),
     horizon_dt: dt.datetime = dt.datetime.now() - dt.timedelta(hours=6),
-):
+) -> list[EmapVitalsLong]:
     """
     Return vital signs
     :type session: Session object from sqlmodel
@@ -88,12 +90,12 @@ def get_emap_vitals_long(
 
 
 @mock_router.get("/vitals/long", response_model=list[EmapVitalsLong])
-def get_mock_emap_vitals_long():
+def get_mock_emap_vitals_long() -> list[EmapVitalsLong]:
     """
     returns mock of emap query for vital signs
     :return:
     """
-    rows = _get_json_rows(_this_file, "mock_vitals.json")
+    rows = _get_json_rows(_this_file, "mock_vitals.json")  # type: list[EmapVitalsLong]
     return rows
 
 
@@ -106,7 +108,7 @@ def get_emap_vitals_wide(
     session: Session = Depends(get_star_session),
     encounter_ids: list[str] = Query(default=[]),
     horizon_dt: dt.datetime = dt.datetime.now() - dt.timedelta(hours=6),
-):
+) -> list[EmapVitalsWide]:
     """
     Return vital signs as a wide table after wrangling
     :type horizon_dt: datetime remember to diff this from 'now'
@@ -120,7 +122,7 @@ def get_emap_vitals_wide(
 
 
 @mock_router.get("/vitals/wide")
-def get_mock_emap_vitals_wide():
+def get_mock_emap_vitals_wide() -> list[EmapVitalsWide]:
     """
     returns mock of emap query after wrangling
     :return:
@@ -130,5 +132,3 @@ def get_mock_emap_vitals_wide():
     df_wide = wrangle(df)
 
     return [EmapVitalsWide.parse_obj(row) for row in df_wide.to_dict(orient="records")]
-
-

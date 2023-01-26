@@ -2,7 +2,7 @@ import logging
 
 import datetime
 import pandas as pd
-import pytz
+import pytz  # type: ignore
 import requests
 from fastapi import APIRouter, Depends, Query
 from pathlib import Path
@@ -21,9 +21,7 @@ MOCK_TAP_ELECTIVE_DATA = (
     Path(__file__).resolve().parent / "data" / "tap_elective_tower.json"
 )
 
-router = APIRouter(
-    prefix="/hymind",
-)
+router = APIRouter(prefix="/hymind")
 
 mock_router = APIRouter(
     prefix="/hymind",
@@ -31,7 +29,9 @@ mock_router = APIRouter(
 
 
 @router.post("/icu/tap/emergency")
-def read_tap_emergency(data: EmElTapPostBody, settings=Depends(get_settings)):
+def read_tap_emergency(
+    data: EmElTapPostBody, settings: Depends = Depends(get_settings)
+) -> pd.DataFrame | str:
     """ """
     if settings.env == "dev":
 
@@ -51,7 +51,9 @@ def read_tap_emergency(data: EmElTapPostBody, settings=Depends(get_settings)):
 
 
 @router.get("/icu/tap/electives")
-def read_tap_electives(data: EmElTapPostBody, settings=Depends(get_settings)):
+def read_tap_electives(
+    data: EmElTapPostBody, settings: Depends = Depends(get_settings)
+) -> pd.DataFrame | str:
     if settings.env == "dev":
 
         # import ipdb; ipdb.set_trace()

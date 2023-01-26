@@ -18,9 +18,7 @@ from models.electives import (
     ElectiveSurgCase,
 )
 
-router = APIRouter(
-    prefix="/electives",
-)
+router = APIRouter(prefix="/electives")
 
 mock_router = APIRouter(prefix="/electives")
 
@@ -66,12 +64,12 @@ def get_caboodle_cases(
 
 
 @mock_router.get("/case_booking", response_model=list[CaboodleCaseBooking])
-def get_mock_caboodle_cases() -> Any:
+def get_mock_caboodle_cases() -> list[CaboodleCaseBooking]:
     """
     returns mock of caboodle query for elective cases
     :return:
     """
-    rows = _get_json_rows("mock_case.json")
+    rows = _get_json_rows("mock_case.json")  # type: list[CaboodleCaseBooking]
     return rows
 
 
@@ -88,11 +86,11 @@ def get_clarity_pod(
 
 
 @mock_router.get("/postop_destination", response_model=list[ClarityPostopDestination])
-def get_mock_clarity_pod() -> Any:
+def get_mock_clarity_pod() -> list[ClarityPostopDestination]:
     """
     returns mock of caboodle query for preassessment
     """
-    rows = _get_json_rows("mock_pod.json")
+    rows = _get_json_rows("mock_pod.json")  # type: list[ClarityPostopDestination]
     return rows
 
 
@@ -109,12 +107,12 @@ def get_caboodle_preassess(
 
 
 @mock_router.get("/preassessment", response_model=list[CaboodlePreassessment])
-def get_mock_caboodle_preassess() -> Any:
+def get_mock_caboodle_preassess() -> list[CaboodlePreassessment]:
     """
     returns mock of caboodle query for preassessment
     :return:
     """
-    rows = _get_json_rows("mock_preassess.json")
+    rows = _get_json_rows("mock_preassess.json")  # type: list[CaboodlePreassessment]
     return rows
 
 

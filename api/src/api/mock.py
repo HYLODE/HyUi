@@ -2,7 +2,7 @@
 utils for working with the mock json data
 """
 import json
-from typing import Dict, List
+from typing import Any
 
 import pandas as pd
 from pydantic import BaseModel
@@ -10,7 +10,7 @@ from sqlalchemy import text
 from sqlmodel import Session
 
 
-def _get_json_rows(this_file, filename: str):
+def _get_json_rows(this_file: Any, filename: str) -> Any:
     """
     Return mock data from adjacent mock.json file
     Assumes that data in nested object 'rows'
@@ -22,12 +22,12 @@ def _get_json_rows(this_file, filename: str):
 
 
 def _parse_query(
-    this_file,
+    this_file: Any,
     query_file: str,
     session: Session,
     model: type[BaseModel],
-    params: Dict = {},
-) -> List[BaseModel]:
+    params: dict = {},
+) -> list[BaseModel]:
     """
     generic function that reads a text query from a file, handles parameters
     within the query and then returns after parsing through a pydantic model

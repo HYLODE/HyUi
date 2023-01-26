@@ -13,13 +13,9 @@ from api.db import get_star_session
 from api.movement import next_locations, NextLocation
 from models.ed import EmergencyDepartmentPatient, AggregateAdmissionRow
 
-router = APIRouter(
-    prefix="/ed",
-)
+router = APIRouter(prefix="/ed")
 
-mock_router = APIRouter(
-    prefix="/ed",
-)
+mock_router = APIRouter(prefix="/ed")
 
 
 @mock_router.get("/individual/", response_model=list[EmergencyDepartmentPatient])

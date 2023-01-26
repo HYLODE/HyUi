@@ -16,7 +16,6 @@ from api.baserow import BaserowAuthenticator
 from models.census import CensusRow
 from models.sitrep import (
     SitrepRow,
-    IndividualDischargePrediction,
     BedRow,
 )
 
@@ -34,13 +33,9 @@ CORE_FIELDS = [
     "location_string",
 ]
 
-router = APIRouter(
-    prefix="/sitrep",
-)
+router = APIRouter(prefix="/sitrep")
 
-mock_router = APIRouter(
-    prefix="/sitrep",
-)
+mock_router = APIRouter(prefix="/sitrep")
 
 
 @router.get("/beds/", response_model=list[BedRow])
