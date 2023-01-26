@@ -55,6 +55,16 @@ You may also want to register the license for the self hosted version. To do thi
 ./bin/initialise.sh --operation baserow
 ```
 
+### Recreating defaults in baserow
+To be used when updating an existing instance of baserow adjustments to default tables
+
+- loads fresh versions of the default tables including
+    - departments
+
+```sh
+./bin/initialise.sh --operation recreate_defaults
+```
+
 ## Stop And Remove Docker Containers
 
 ```sh
