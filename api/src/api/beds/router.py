@@ -98,11 +98,14 @@ def get_mock_beds(
 
 
 @router.get("/beds", response_model=list[Bed])
+@Timer(text="Get baserow/beds route: Elapsed time: {:.4f}")
 def get_beds(
+    response: Response,
     departments: list[str] = Query(default=[]),
     locations: list[str] = Query(default=[]),
     settings: Settings = Depends(get_settings),
 ) -> list[Bed]:
+    response.headers["Cache-Control"] = "public, max-age=300"
     baserow_auth = BaserowAuthenticator(
         settings.baserow_url,
         settings.baserow_email,
@@ -168,10 +171,13 @@ def get_mock_campus(
 
 
 @router.get("/campus", response_model=list[Bed])
+@Timer(text="Get baserow/campus route: Elapsed time: {:.4f}")
 def get_campus(
+    response: Response,
     campuses: list[str] = Query(default=[]),
     settings: Settings = Depends(get_settings),
 ) -> list[Bed]:
+    response.headers["Cache-Control"] = "public, max-age=300"
     baserow_auth = BaserowAuthenticator(
         settings.baserow_url,
         settings.baserow_email,

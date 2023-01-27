@@ -3,7 +3,7 @@ from typing import cast
 
 import pandas as pd
 import requests
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Response
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
@@ -100,9 +100,13 @@ def _set_next_location_text(row: pd.Series) -> str | None:
 
 @router.get("/individual/", response_model=list[EmergencyDepartmentPatient])
 def get_individual_admission_rows(
+    response: Response,
     settings: Settings = Depends(get_settings),
     star_session: Session = Depends(get_star_session),
 ) -> list[EmergencyDepartmentPatient]:
+
+    response.headers["Cache-Control"] = "public, max-age=300"
+
     census_df = _get_census(settings.hycastle_url)
     features_df = _get_features(settings.hycastle_url)
     predictions_df = _get_individual_predictions(settings.hymind_url)
@@ -169,8 +173,11 @@ def adjust_for_model_specific_times(t: datetime) -> datetime:
 
 @router.get("/aggregate/", response_model=list[AggregateAdmissionRow])
 def get_aggregate_admission_rows(
+    response: Response,
     settings: Settings = Depends(get_settings),
 ) -> list[AggregateAdmissionRow]:
+    response.headers["Cache-Control"] = "public, max-age=300"
+
     horizon_dt = datetime.now()
 
     response = requests.get(
