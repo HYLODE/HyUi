@@ -32,6 +32,20 @@ def _simple_auth_headers(token: str) -> dict[str, str]:
 
 @Timer(text="Getting admin auth token: Elapsed time {:0.4f} seconds")
 def _get_user_auth_token(settings: Settings) -> dict[str, str]:
+    """
+
+    Uses username/password authentication to get a user access token that
+    give admin privileges; permits a 1 minute pause if fails on first attempt;
+    this is necessary when the API is started at the same time
+    as the baserow application service
+
+    Args:
+        settings: read from the .env file; specifically needs a
+            valid baserow username (email address) and password
+
+    Returns:
+        {access_token, refresh_token)
+    """
     logging.warning("Authenticating as admin via username/password")
     msg = """
     This typically happens on docker compose up.
@@ -70,14 +84,12 @@ def _get_user_auth_token(settings: Settings) -> dict[str, str]:
         else:
             break
 
+    # noinspection PyUnboundLocalVariable
     if response.status_code == 200:
         access_token = cast(str, response.json()["access_token"])
         refresh_token = cast(str, response.json()["refresh_token"])
     else:
         logging.error("Failed to authenticate as admin")
-        import pdb
-
-        pdb.set_trace()
         raise BaserowException(
             f"unexpected response {response.status_code}: "
             f""
@@ -109,6 +121,42 @@ def _refresh_user_auth_token(settings: Settings) -> str:
             f"{str(response.content)}"
         )
     return access_token
+
+
+def _get_database_token(settings: Settings, auth_token: str, group_id: int) -> str:
+    response = requests.get(
+        url=f"{settings.baserow_url}/api/database/tokens/",
+        headers=_admin_auth_headers(auth_token),
+    )
+    if response.status_code != 200:
+        raise BaserowException(
+            f"Error {response.status_code}: unable to " f"list database " f"tokens"
+        )
+    token_list = [token for token in response.json() if token.get("group") == group_id]
+    tokens = iter(token_list)
+
+    try:
+        token = next(tokens).get("key", "")
+        logging.info("Using existing database read/write token")
+        warnings.warn("Assumes that all tokens are equal with full " "permissions ")
+    except StopIteration:
+        logging.info("Generating database read/write token")
+        response = requests.post(
+            url=f"{settings.baserow_url}/api/database/tokens/",
+            headers=_admin_auth_headers(auth_token),
+            json=dict(
+                name=settings.baserow_username,
+                group=group_id,
+            ),
+        )
+
+        if response.status_code == 200:
+            token = response.json().get("key", "")
+        else:
+            raise BaserowException(
+                f"Error {response.status_code}: unable to " f"generate database token"
+            )
+    return token  # type: ignore
 
 
 def _get_group_id(settings: Settings, auth_token: str) -> int:
@@ -172,7 +220,10 @@ def _get_table_ids(settings: Settings, auth_token: str, application_id: int) -> 
     """Return a dictionary of table names and ids"""
 
     url = (
-        f"{settings.baserow_url}/api/database/tables/database/" f"" f"{application_id}/"
+        f"{settings.baserow_url}/api/database/tables/database/"
+        f""
+        f""
+        f"{application_id}/"
     )
 
     def _request(url: str, auth_token: str) -> requests.Response:
@@ -215,76 +266,21 @@ class BaserowException(Exception):
 
 
 class BaserowDB:
-    @staticmethod
-    def _get_database_token(settings: Settings, auth_token: str, group_id: int) -> str:
-
-        response = requests.get(
-            url=f"{settings.baserow_url}/api/database/tokens/",
-            headers=_admin_auth_headers(auth_token),
-        )
-        if response.status_code != 200:
-            raise BaserowException(
-                f"Error {response.status_code}: unable to " f"list database " f"tokens"
-            )
-        token_list = [
-            token for token in response.json() if token.get("group") == group_id
-        ]
-        tokens = iter(token_list)
-
-        try:
-            token = next(tokens).get("key", "")
-            logging.info("Using existing database read/write token")
-            warnings.warn("Assumes that all tokens are equal with full " "permissions ")
-        except StopIteration:
-            logging.info("Generating database read/write token")
-            response = requests.post(
-                url=f"{settings.baserow_url}/api/database/tokens/",
-                headers=_admin_auth_headers(auth_token),
-                json=dict(
-                    name=settings.baserow_username,
-                    group=group_id,
-                ),
-            )
-
-            if response.status_code == 200:
-                token = response.json().get("key", "")
-            else:
-                raise BaserowException(
-                    f"Error {response.status_code}: unable to "
-                    f"generate database token"
-                )
-        return token  # type: ignore
-
-    logging.warning("Initiating class methods for BaserowDB")
-    settings = get_settings()
-    logging.warning("Generating admin token")
-    admin_token = _get_user_auth_token(settings)["access_token"]
-    logging.warning("Getting database token")
-    group_id = _get_group_id(settings, admin_token)
-    database_token = _get_database_token(
-        settings,
-        admin_token,
-        group_id,
-    )
-    application_id = _get_application_id(
-        settings,
-        admin_token,
-    )
-    tables_dict = _get_table_ids(settings, admin_token, application_id)
-    logging.info(str(tables_dict))
-
     # Redefine all the function names here else not availalbe at class scope
     # for the instance of the class
     _admin_auth_headers = _admin_auth_headers
     _simple_auth_headers = _simple_auth_headers
-    _get_user_auth_token = _get_user_auth_token
-    _refresh_user_auth_token = _refresh_user_auth_token
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        settings: Settings,
+        database_token: str,
+        tables_dict: dict,
+    ) -> None:
 
-        self.baserow_url = BaserowDB.settings.baserow_url
-        self.database_token = BaserowDB.database_token
-        self.tables_dict = BaserowDB.tables_dict
+        self.baserow_url = settings.baserow_url
+        self.database_token = database_token
+        self.tables_dict = tables_dict
 
     def get_rows(
         self,
@@ -366,6 +362,29 @@ class BaserowDB:
         return response.json()
 
 
+logging.warning("Baserow module initiation")
+logging.warning("=========================")
+settings = get_settings()
+
+logging.warning("Generating admin token")
+admin_token = _get_user_auth_token(settings)["access_token"]
+
+logging.warning("Getting database token")
+group_id = _get_group_id(settings, admin_token)
+database_token = _get_database_token(settings, admin_token, group_id)
+
+logging.warning("Getting application ID")
+application_id = _get_application_id(settings, admin_token)
+
+logging.warning("Getting tables dictionary")
+tables_dict = _get_table_ids(settings, admin_token, application_id)
+logging.info(str(tables_dict))
+
+
 @lru_cache()
 def get_baserow_db() -> BaserowDB:
-    return BaserowDB()
+    return BaserowDB(
+        settings=settings,
+        database_token=database_token,
+        tables_dict=tables_dict,
+    )

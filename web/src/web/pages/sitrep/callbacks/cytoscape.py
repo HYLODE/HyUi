@@ -167,7 +167,6 @@ def _store_census(
     Output(ids.SITREP_STORE, "data"),
     Input(ids.DEPT_SELECTOR, "value"),
     prevent_initial_callback=True,
-    background=True,
 )
 def _store_sitrep(dept: str) -> list[dict]:
     """

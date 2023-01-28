@@ -100,7 +100,7 @@ def get_beds(
 ) -> list[Bed]:
     response.headers["Cache-Control"] = "public, max-age=300"
 
-    field_ids = baserow_auth.get_fields("hyui", "beds")
+    field_ids = baserow.get_fields("beds")
     params = {
         "size": 200,  # The maximum size of a page.
         "user_field_names": "true",

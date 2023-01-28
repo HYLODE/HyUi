@@ -19,7 +19,6 @@ from web.config import get_settings
 @callback(
     Output(ids.DEPT_STORE, "data"),
     Input(ids.STORE_TIMER_1H, "n_intervals"),
-    background=True,
 )
 def _store_departments(_: int) -> list[dict]:
     """Store all open departments"""
@@ -33,7 +32,6 @@ def _store_departments(_: int) -> list[dict]:
 @callback(
     Output(ids.ROOM_STORE, "data"),
     Input(ids.STORE_TIMER_1H, "n_intervals"),
-    background=True,
 )
 def _store_rooms(_: int) -> list[dict]:
     """Store all rooms with beds"""
@@ -47,7 +45,6 @@ def _store_rooms(_: int) -> list[dict]:
 @callback(
     Output(ids.BEDS_STORE, "data"),
     Input(ids.STORE_TIMER_1H, "n_intervals"),
-    background=True,
 )
 def _store_beds(_: int) -> list[dict]:
     response = requests.get(
