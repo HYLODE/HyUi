@@ -263,7 +263,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <li><a href="#using-the-http-cache" id="toc-using-the-http-cache" class="nav-link" data-scroll-target="#using-the-http-cache">Using the http cache</a></li>
   </ul></li>
   <li><a href="#run-the-docker-compose-services" id="toc-run-the-docker-compose-services" class="nav-link" data-scroll-target="#run-the-docker-compose-services">Run the Docker Compose services</a></li>
-  <li><a href="#initialise-services" id="toc-initialise-services" class="nav-link" data-scroll-target="#initialise-services">Initialise services</a></li>
+  <li><a href="#initialise-services" id="toc-initialise-services" class="nav-link" data-scroll-target="#initialise-services">Initialise services</a>
+  <ul class="collapse">
+  <li><a href="#recreating-defaults-in-baserow" id="toc-recreating-defaults-in-baserow" class="nav-link" data-scroll-target="#recreating-defaults-in-baserow">Recreating defaults in baserow</a></li>
+  </ul></li>
   <li><a href="#stop-and-remove-docker-containers" id="toc-stop-and-remove-docker-containers" class="nav-link" data-scroll-target="#stop-and-remove-docker-containers">Stop And Remove Docker Containers</a></li>
   </ul></li>
   </ul>
@@ -288,7 +291,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>We use <a href="https://varnish-cache.org">Varnish</a> as a HTTP cache to speed up some of the slower API calls made by the front end. The default behaviour we follow is to skip the cache and manually identify endpoints which would benefit from caching.</p>
 <p>The cache is brought up with other services and is represented in <code>compose.yml</code>, which uses <code>docker/cache/Dockerfile</code>. The only change required to utilise caching is within the base <code>.env</code> file. The <code>WEB_API_URL</code> environment variable should be set to <code>http://cache:8000</code> for deployment on the hospital network or <code>http://cache:8000/mock</code> for local development with <code>docker compose</code>.</p>
 <p>Cache configuration is set in <code>cache/default.vcl</code> and contains very minimal additions with respect to a basic varnish configuration.</p>
-<p>Endpoints can be added to the cache by altering the <code>Cache-Control</code> response header. An example is provided in <code>api/src/api/beds/router.py</code> under <code>mock/beds/</code>, where the cache lifetime is set to 300 seconds with <code>response.headers["Cache-Control"] = "public, max-age=300"</code>.</p>
+<p>Endpoints can be added to the cache by altering the <code>Cache-Control</code> response header. An example is provided in <code>api/src/api/beds/router.py</code> under <code>/mock/baserow/beds/</code>, where the cache lifetime is set to 300 seconds with <code>response.headers["Cache-Control"] = "public, max-age=300"</code>.</p>
 <p>The first request made to an uncached API endpoint will not see any speed up - subsequent requests within the time to live (TTL) of an object will use the cached object and will see a speedier response.</p>
 <p>Additional configuration is provided for endpoints that absolutely must return live data from the API. In this case, there are two options for skipping the cache.</p>
 <ol type="1">
@@ -312,12 +315,24 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </section>
 <section id="initialise-services" class="level2">
 <h2 class="anchored" data-anchor-id="initialise-services">Initialise services</h2>
-<p>This should be done the first time you stand up the services. It populates the Baserow database with the tables and static data required to run the rest of the HyUi services.</p>
+<p>This should be done the first time you stand up the services. It populates the Baserow database with the tables and static data required to run the rest of the HyUi services. You will also need to do this when you update your configuration (loading) data for Baserow. That is, you should consider Baserow as a temporary scratch pad, and mapping changes etc. will live in code (see <code>initialise/src/initialise/bed_defaults.json</code>). Before you ‘redeploy’, you must manually delete the tables from Baserow.</p>
+<p>You may also want to register the license for the self hosted version. To do this, check that the ‘instance id’ available on the admin pages is copied from the self-hosted version to the web / hosted version; then regenerate the license key on the hosted version; then copy that license key back to the self-hosted; then add the user to the ‘seat’ created by that registered version. This enables ‘export to JSON’ functionality etc.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./bin/initialise.sh</span> <span class="at">--operation</span> baserow</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="recreating-defaults-in-baserow" class="level3">
+<h3 class="anchored" data-anchor-id="recreating-defaults-in-baserow">Recreating defaults in baserow</h3>
+<p>To be used when updating an existing instance of baserow adjustments to default tables</p>
+<ul>
+<li>loads fresh versions of the default tables including
+<ul>
+<li>departments</li>
+</ul></li>
+</ul>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./bin/initialise.sh</span> <span class="at">--operation</span> recreate_defaults</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
 </section>
 <section id="stop-and-remove-docker-containers" class="level2">
 <h2 class="anchored" data-anchor-id="stop-and-remove-docker-containers">Stop And Remove Docker Containers</h2>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> compose <span class="at">--project-name</span> [project name] down</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> compose <span class="at">--project-name</span> [project name] down</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 
 </section>
