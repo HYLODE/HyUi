@@ -38,6 +38,7 @@ website:
           - developer/demo.qmd
           - developer/deployment.qmd
           - developer/documentation.qmd
+          - developer/ide_setup.qmd
       - section: "Vignettes"
         contents:
           - vignettes/vignettes.qmd

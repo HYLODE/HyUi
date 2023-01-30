@@ -1,5 +1,5 @@
 ---
-title: Developer tips
+title: IDE set-up
 ---
 
 ## Notes on setting up PyCharm for development with specific reference to working on a Mac
