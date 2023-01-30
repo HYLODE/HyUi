@@ -66,7 +66,7 @@ One small problem with sharing a VS Code configuration is that it seems to requi
 
 And my sidebar in VS Code (with the `web` labelled as 'HyUI Plotly Dash')
 
-![](../resources/vscode-workspace-sidebar.png)
+![](../resources/vscode-workspace-sidebar.png){width=50%}
 
 5. Then prepare nested `.vscode/settings.json` and `.vscode/launch.json` files etc (also visible in the screenshot above). For example, for the `web` module, you need to specify the interpreter, and a debug configuration (in `launch.json`)
 
