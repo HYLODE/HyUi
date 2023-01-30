@@ -1,0 +1,116 @@
+---
+title: IDE set-up
+---
+
+## Notes on setting up PyCharm for development with specific reference to working on a Mac
+
+Set up run configurations
+
+- https://www.jetbrains.com/help/pycharm/run-debug-configuration.html
+- install the **EnvFile** plug-in so that the environment file can be read by your run configuration (see https://stackoverflow.com/a/42708476/992999)
+- set `OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES` as an environment variable in your run configuration to avoid [errors](https://stackoverflow.com/a/52230415/992999) on recent _macos_ installs
+
+Example configurations here
+- [FastAPI](../snippets/HyUI-API%20FastAPI.run.xml)
+- [Plotly Dash](../snippets/HyUI-Web%20Plotly%20Dash.run.xml)
+
+
+## Notes on setting up VSCode for development
+
+Because there are separate Python packages with separate interpreters you will need a ['multiroot' workspace](https://code.visualstudio.com/docs/editor/multi-root-workspaces). I found this [note](https://stackoverflow.com/questions/56080307/different-python-version-environment-per-directory-in-vscode) from StackOverFlow helpful.
+
+One small problem with sharing a VS Code configuration is that it seems to require absolute paths from the `settings.json` and `launch.json` files. With that caveat in mind, then here are some examples below.
+
+1. Git clone the project as per usual
+2. Open the project in VSCode and save as a workspace
+3. Edit the root (HyUI) `.vscode/settings.json` file to exclude the folders holding the nested packages
+
+```json
+{
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "**/Thumbs.db": true,
+        // exclude nested modules/packages below
+        "api": true,
+        "web": true,
+        "initialise": true,
+        "jupyter": true,
+    }
+}
+```
+
+4. Add these folders back in via **Workspaces >> Add folder to workspace ...** command (nested under the File menu). In my case, this means that my 'workspace' file, now looks like this (where I have used the `name` property to help me visually navigate my workspace).
+
+```json
+{
+	"folders": [
+		{
+			"path": ".",
+			"name": "HyUi Project"
+		},
+		{
+			"path": "api",
+			"name": "HyUi FastAPI"
+		},
+		{
+			"path": "web",
+			"name": "HyUi Plotly Dash"
+		}
+	]
+}
+```
+
+And my sidebar in VS Code (with the `web` labelled as 'HyUI Plotly Dash')
+
+![](../resources/vscode-workspace-sidebar.png){width=50%}
+
+5. Then prepare nested `.vscode/settings.json` and `.vscode/launch.json` files etc (also visible in the screenshot above). For example, for the `web` module, you need to specify the interpreter, and a debug configuration (in `launch.json`)
+
+Beware the absolute paths below ☹. You will need to change these unless your name is also 'steve'.
+
+`settings.json`
+
+```json
+{
+    "python.defaultInterpreterPath": "${userHome}/.pyenv/hyui-web/bin/python3",
+    "python.envFile": "${workspaceFolder}/.env",
+    "python.testing.pytestArgs": [
+        "src/web/"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true
+}
+```
+
+`launch.json`
+
+```json
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "HyUi: Plotly Dash",
+            "type": "python",
+            "request": "launch",
+            "module": "web.app",
+            "args": [],
+            "jinja": true,
+            "justMyCode": true,
+            "python": "/users/steve/.pyenv/versions/hyui-web/bin/python3",
+            "cwd": "${workspaceFolder}/src",
+            "envFile": "${workspaceFolder}/../.env",
+            "env": {
+                "OBJC_DISABLE_INITIALIZE_FORK_SAFETY": "YES",
+                "PYTHONUNBUFFERED": "1",
+        }
+        }
+    ]
+}
+```
