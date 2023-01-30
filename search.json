@@ -1,5 +1,19 @@
 [
   {
+    "objectID": "developer/ide_setup.html",
+    "href": "developer/ide_setup.html",
+    "title": "IDE set-up",
+    "section": "",
+    "text": "Set up run configurations\n\nhttps://www.jetbrains.com/help/pycharm/run-debug-configuration.html\ninstall the EnvFile plug-in so that the environment file can be read by your run configuration (see https://stackoverflow.com/a/42708476/992999)\nset OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES as an environment variable in your run configuration to avoid errors on recent macos installs\n\nExample configurations here - FastAPI - Plotly Dash"
+  },
+  {
+    "objectID": "developer/ide_setup.html#notes-on-setting-up-vscode-for-development",
+    "href": "developer/ide_setup.html#notes-on-setting-up-vscode-for-development",
+    "title": "IDE set-up",
+    "section": "Notes on setting up VSCode for development",
+    "text": "Notes on setting up VSCode for development\nBecause there are separate Python packages with separate interpreters you will need a ‘multiroot’ workspace. I found this note from StackOverFlow helpful.\nOne small problem with sharing a VS Code configuration is that it seems to require absolute paths from the settings.json and launch.json files. With that caveat in mind, then here are some examples below.\n\nGit clone the project as per usual\nOpen the project in VSCode and save as a workspace\nEdit the root (HyUI) .vscode/settings.json file to exclude the folders holding the nested packages\n\n{\n    \"files.exclude\": {\n        \"**/.git\": true,\n        \"**/.svn\": true,\n        \"**/.hg\": true,\n        \"**/CVS\": true,\n        \"**/.DS_Store\": true,\n        \"**/Thumbs.db\": true,\n        // exclude nested modules/packages below\n        \"api\": true,\n        \"web\": true,\n        \"initialise\": true,\n        \"jupyter\": true,\n    }\n}\n\nAdd these folders back in via Workspaces >> Add folder to workspace … command (nested under the File menu). In my case, this means that my ‘workspace’ file, now looks like this (where I have used the name property to help me visually navigate my workspace).\n\n{\n    \"folders\": [\n        {\n            \"path\": \".\",\n            \"name\": \"HyUi Project\"\n        },\n        {\n            \"path\": \"api\",\n            \"name\": \"HyUi FastAPI\"\n        },\n        {\n            \"path\": \"web\",\n            \"name\": \"HyUi Plotly Dash\"\n        }\n    ]\n}\nAnd my sidebar in VS Code (with the web labelled as ‘HyUI Plotly Dash’)\n\n\nThen prepare nested .vscode/settings.json and .vscode/launch.json files etc (also visible in the screenshot above). For example, for the web module, you need to specify the interpreter, and a debug configuration (in launch.json)\n\nBeware the absolute paths below ☹. You will need to change these unless your name is also ‘steve’.\nsettings.json\n{\n    \"python.defaultInterpreterPath\": \"${userHome}/.pyenv/hyui-web/bin/python3\",\n    \"python.envFile\": \"${workspaceFolder}/.env\",\n    \"python.testing.pytestArgs\": [\n        \"src/web/\"\n    ],\n    \"python.testing.unittestEnabled\": false,\n    \"python.testing.pytestEnabled\": true\n}\nlaunch.json\n{\n    // Use IntelliSense to learn about possible attributes.\n    // Hover to view descriptions of existing attributes.\n    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387\n    \"version\": \"0.2.0\",\n    \"configurations\": [\n        {\n            \"name\": \"HyUi: Plotly Dash\",\n            \"type\": \"python\",\n            \"request\": \"launch\",\n            \"module\": \"web.app\",\n            \"args\": [],\n            \"jinja\": true,\n            \"justMyCode\": true,\n            \"python\": \"/users/steve/.pyenv/versions/hyui-web/bin/python3\",\n            \"cwd\": \"${workspaceFolder}/src\",\n            \"envFile\": \"${workspaceFolder}/../.env\",\n            \"env\": {\n                \"OBJC_DISABLE_INITIALIZE_FORK_SAFETY\": \"YES\",\n                \"PYTHONUNBUFFERED\": \"1\",\n        }\n        }\n    ]\n}"
+  },
+  {
     "objectID": "developer/deployment.html",
     "href": "developer/deployment.html",
     "title": "HYLODE",
@@ -33,13 +47,6 @@
     "title": "Setting up development for HyUi",
     "section": "Initialisation",
     "text": "Initialisation\nCurrently only Baserow needs to be initialised by creating an admin user and setting up the tables required for the rest of the app to function correct. The initialise python package contains the code that does all this.\npyenv virtualenv 3.11.0 hyui-initialise\npyenv activate hyui-initialise\n\npip install -e \"initialise\"\n\npython -m initialise.main --operation baserow\nYou can do this on your local machine but you need to install (with docker). See the docs. If you do this then don’t forget to adjust the BASEROW_PUBLIC_URL to point to your local dev version (e.g. http://localhost:80)"
-  },
-  {
-    "objectID": "developer/tips.html",
-    "href": "developer/tips.html",
-    "title": "Developer tips",
-    "section": "",
-    "text": "Set up run configurations\n\nhttps://www.jetbrains.com/help/pycharm/run-debug-configuration.html\ninstall the EnvFile plug-in so that the environment file can be read by your run configuration (see https://stackoverflow.com/a/42708476/992999)\nset OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES as an environment variable in your run configuration to avoid errors on recent macos installs\n\nExample configurations here - FastAPI - Plotly Dash"
   },
   {
     "objectID": "developer/demo.html",
