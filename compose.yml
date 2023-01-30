@@ -39,6 +39,7 @@ services:
     ports:
       - ${WEB_PORT}:8000
     depends_on:
+      - baserow
       - api
       - cache
     healthcheck:

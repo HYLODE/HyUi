@@ -1,0 +1,28 @@
+{
+	"table": "AdvancedDecision",
+	"rows":
+	[
+		{
+			"advance_decision_id": 178744730,
+			"requested_datetime": "2021-04-01 06:49:00+01",
+			"status_change_datetime": "2021-04-01 17:08:18+01",
+			"care_code": "COD2",
+			"name": "DNACPR",
+			"cancelled": "false",
+			"closed_due_to_discharge": "true",
+			"hospital_visit_id": 699999996,
+			"encounter": "1333333999"
+		},
+		{
+			"advance_decision_id": 178769726,
+			"requested_datetime": "2021-04-01 10:54:00+01",
+			"status_change_datetime": "2021-04-01 21:44:22+01",
+			"care_code": "COD4",
+			"name": "FULL ACTIVE TREATMENT",
+			"cancelled": "false",
+			"closed_due_to_discharge": "true",
+			"hospital_visit_id": 188888884,
+			"encounter": "1078170769"
+		}
+	]
+}

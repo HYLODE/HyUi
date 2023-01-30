@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Dict, List, Any
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -35,8 +35,8 @@ def _get_json_rows(filename: str) -> Any:
 
 
 def _parse_query(
-    query_file: str, session: Session, model: BaseModel, params: Dict = {}
-) -> List[BaseModel]:
+    query_file: str, session: Session, model: BaseModel, params: dict = {}
+) -> list[BaseModel]:
     """
     generic function that reads a text query from a file, handles parameters
     within the query and then returns after parsing through a pydantic model

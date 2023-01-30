@@ -17,5 +17,5 @@ def read_ros(session: Session = Depends(get_star_session)) -> list[RosRead]:
     q = prepare_query("ros", "FIXME")
     results = session.exec(q)  # type: ignore
     Record = namedtuple("Record", results.keys())  # type: ignore
-    records = [Record(*r) for r in results.fetchall()]
+    records = [Record(*r) for r in results.fetchall()]  # type: ignore
     return records

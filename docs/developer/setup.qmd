@@ -135,5 +135,9 @@ pyenv activate hyui-initialise
 
 pip install -e "initialise"
 
-python -m initialise.main
+python -m initialise.main --operation baserow
 ```
+
+You can do this on your local machine but you need to install (with docker).
+See the [docs](https://baserow.io/docs/installation%2Finstall-with-docker).
+If you do this then don't forget to adjust the `BASEROW_PUBLIC_URL` to point to your local dev version (e.g. `http://localhost:80`)

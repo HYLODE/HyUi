@@ -19,4 +19,4 @@ docker build -t "hyui-initialise" -f "${PROJECT_DIR}/docker/initialise/Dockerfil
 # machine. We only use the first part of the domain name below.
 HOSTNAME="$(hostname)"
 
-docker run --rm --env NO_PROXY="${HOSTNAME%%.*}" --env-file "${PROJECT_DIR}/docker/initialise/.env" hyui-initialise $@
+docker run --rm --env NO_PROXY="${HOSTNAME%%.*}" --env-file "${PROJECT_DIR}/.env" hyui-initialise $@

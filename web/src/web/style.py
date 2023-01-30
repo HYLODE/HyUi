@@ -8,6 +8,7 @@ class AppColors(BaseModel):
     blue: str = "#0074D9"
     aqua: str = "#7FDBFF"
     teal: str = "#39CCCC"
+    indigo: str = "#5c7cfa"  # via dbc.theme.default_colors
     olive: str = "#3D9970"
     green: str = "#2ECC40"
     lime: str = "#01FF70"
@@ -21,3 +22,17 @@ class AppColors(BaseModel):
     silver: str = "#DDDDDD"
     gray: str = "#AAAAAA"
     black: str = "#111111"
+
+
+colors = AppColors()
+
+
+def replace_colors_in_stylesheet(sheet: list[dict]) -> list[dict]:
+    """Standardise to default app colours"""
+    sheet = sheet.copy()
+    colors_dict = colors.dict()
+    for style in sheet:
+        for k, v in style.get("style", {}).items():
+            if "color" in k and v in colors_dict:
+                style.get("style", {}).update({k: colors_dict.get(v)})
+    return sheet

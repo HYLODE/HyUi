@@ -39,4 +39,4 @@ COPY --chown=hyui:root ./web/src/web /app/web
 COPY --chown=hyui:root ./docker/web/refresh_cache.sh /app
 RUN chmod +x /app/refresh_cache.sh
 
-ENTRYPOINT ["gunicorn", "--bind", "0.0.0.0", "web.main:server"]
+ENTRYPOINT ["gunicorn", "--bind", "0.0.0.0", "web.app:server"]

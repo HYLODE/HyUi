@@ -1,0 +1,63 @@
+{
+	"table": "perrt",
+	"rows":
+	[
+		{
+			"visit_observation_id": 688888886,
+			"hospital_visit_id": 677777773,
+			"observation_datetime": "2022-12-05 21:51:00+00",
+			"id_in_application": "5",
+			"value_as_real": null,
+			"value_as_text": "162/79",
+			"unit": null,
+			"mrn": "47777778",
+			"lastname": "HERCULES",
+			"firstname": "MISSUS",
+			"sex": "F",
+			"date_of_birth": "1979-03-11",
+			"bed_admit_dt": "2022-11-19 13:30:00+00",
+			"dept_name": "UCH T09 SOUTH (T09S)",
+			"room_name": "BY13",
+			"bed_hl7": "BY13-63",
+			"perrt_consult_datetime": null
+		},
+		{
+			"visit_observation_id": 680288308,
+			"hospital_visit_id": 677777773,
+			"observation_datetime": "2022-12-05 21:51:00+00",
+			"id_in_application": "6",
+			"value_as_real": 98.1,
+			"value_as_text": null,
+			"unit": null,
+			"mrn": "47777778",
+			"lastname": "HERCULES",
+			"firstname": "MISSUS",
+			"sex": "F",
+			"date_of_birth": "1979-03-11",
+			"bed_admit_dt": "2022-11-19 13:30:00+00",
+			"dept_name": "UCH T09 SOUTH (T09S)",
+			"room_name": "BY13",
+			"bed_hl7": "BY13-63",
+			"perrt_consult_datetime": null
+		},
+		{
+			"visit_observation_id": 680288310,
+			"hospital_visit_id": 677777773,
+			"observation_datetime": "2022-12-05 21:51:00+00",
+			"id_in_application": "8",
+			"value_as_real": 89,
+			"value_as_text": null,
+			"unit": null,
+			"mrn": "47777778",
+			"lastname": "HERCULES",
+			"firstname": "MISSUS",
+			"sex": "F",
+			"date_of_birth": "1979-03-11",
+			"bed_admit_dt": "2022-11-19 13:30:00+00",
+			"dept_name": "UCH T09 SOUTH (T09S)",
+			"room_name": "BY13",
+			"bed_hl7": "BY13-63",
+			"perrt_consult_datetime": null
+		}
+	]
+}

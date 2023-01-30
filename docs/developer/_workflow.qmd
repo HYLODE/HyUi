@@ -63,7 +63,7 @@ class ModuleNames(str, Enum):
     """
 
     consults = "consults"
-    sitrep = "sitrep"
+    sitrep = "sitlist"
     mymodule = "mymodule"
 ```
 

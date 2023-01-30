@@ -5,7 +5,7 @@ client = TestClient(app)
 
 
 def test_mock_beds_cached() -> None:
-    response = client.get("/mock/beds/?department=T03")
+    response = client.get("/mock/baserow/beds/?department=T03")
     assert response.headers["Cache-Control"] == "public, max-age=300"
 
 
