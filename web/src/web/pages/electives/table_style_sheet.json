@@ -22,7 +22,7 @@
       "column_id": "primary_service"
     },
     "textAlign": "left",
-    "width": "20vw"
+    "width": "15vw"
   },
   {
     "if": {
