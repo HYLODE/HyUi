@@ -13,9 +13,9 @@ from pydantic import BaseModel
 from api.convert import to_data_frame
 
 from models.electives import (
-    CaboodleCaseBooking,
+    #  CaboodleCaseBooking,
     ClarityPostopDestination,
-    CaboodlePreassessment,
+    #  CaboodlePreassessment,
     SurgData,
     PreassessData,
     LabData,
@@ -31,7 +31,7 @@ from api.electives.hypo_help import (
     #  j_wrangle_echo,
     j_wrangle_obs,
     wrangle_echo,
-    fill_na,
+    # fill_na,
     # camel_to_snake,
 )
 
@@ -114,51 +114,6 @@ def process_join_preassess_data(
     return electives_df
 
 
-def prepare_electives(
-    electives: list[type[BaseModel]],
-    pod: list[type[BaseModel]],
-    preassess: list[type[BaseModel]],
-) -> pd.DataFrame:
-    """
-    Prepare elective case list
-
-    :param      electives:  list of dicts with surgical cases
-    :param      pod:    list of dicts with postop destination
-    :param      preassess:    list of dicts with preassessment info
-
-    :returns:   merged dataframe
-    """
-    electives_df = to_data_frame(electives, CaboodleCaseBooking)
-    # electives_df = parse_to_data_frame(electives, SurgData)
-    preassess_df = to_data_frame(preassess, CaboodlePreassessment)
-    pod_df = to_data_frame(pod, ClarityPostopDestination)
-
-    # join caboodle case booking to preassess case
-    dfca = process_join_preassess_data(electives_df, preassess_df)
-
-    # join on post op destinations from clarity
-    df = dfca.merge(
-        pod_df,
-        left_on="surgical_case_epic_id",
-        right_on="or_case_id",
-        how="left",
-    )
-
-    # create pacu label
-    df["pacu"] = False
-    df["pacu"] = np.where(
-        df["pod_orc"].astype(str).str.contains("PACU"), True, df["pacu"]
-    )
-    df["pacu"] = np.where(
-        df["pod_preassessment"].astype(str).str.contains("PACU"), True, df["pacu"]
-    )
-
-    # drop cancellations
-    df = df[~(df["canceled"] == 1)]
-
-    return df
-
-
 def prepare_draft(
     electives: list[type[BaseModel]],
     preassess: list[type[BaseModel]],
@@ -199,13 +154,14 @@ def prepare_draft(
         .sort_values("surgery_date", ascending=True)
         .drop_duplicates(subset="patient_durable_key", keep="first")
         .sort_index()
-        .pipe(fill_na)
+        # .pipe(fill_na)
         .merge(
             axa_codes[["surgical_service", "name", "axa_severity", "protocolised_adm"]],
             on=["surgical_service", "name"],
             how="left",
         )
     )
+
     # print(df.columns)
     # create pacu label
     df["pacu"] = np.where(

@@ -41,23 +41,26 @@ campus_selector = html.Div(
     ]
 )
 
+
 electives_list = dmc.Paper(
     dtable.DataTable(
         id=ids.ELECTIVES_TABLE,
         columns=[
-            {"id": "surgery_date", "name": "Date"},
-            {"id": "pacu", "name": "pacu"},
-            {"id": "primary_service", "name": "Specialty"},
-            {"id": "patient_friendly_name", "name": "Operation"},
-            {"id": "name", "name": "Full Name"},
+            {"id": "surgery_date", "name": "date"},
             {"id": "primary_mrn", "name": "MRN"},
+            {"id": "patient_friendly_name", "name": "operation"},
+            {"id": "first_name", "name": "first_name"},
+            {"id": "last_name", "name": "last_name"},
+            {"id": "sex", "name": "sex"},
+            {"id": "pacu", "name": "pacu"},
+            {"id": "abnormal_echo", "name": "abnormal_echo"},
         ],
         data=[],
         style_table={"width": "100%", "minWidth": "100%", "maxWidth": "100%"},
         style_as_list_view=True,  # remove col lines
         style_cell={
             "fontSize": 12,
-            "padding": "1px",
+            "padding": "15px",
         },
         style_cell_conditional=table_style_sheet,
         style_data={"color": "black", "backgroundColor": "white"},
