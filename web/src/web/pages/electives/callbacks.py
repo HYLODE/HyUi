@@ -31,8 +31,7 @@ def _store_electives(campus: str, electives: list[dict], date: str) -> list[dict
     ]
 
     # then filter by date selected
-    print(date)
-    # elective_table = [row for row in campus_electives if date == row["surgery_date"]]
+    elective_table = [row for row in campus_electives if date == row["surgery_date"]]
 
-    # print(elective_table)
-    return campus_electives
+    print(elective_table)
+    return elective_table

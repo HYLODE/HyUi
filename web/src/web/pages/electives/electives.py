@@ -140,7 +140,6 @@ body = dmc.Container(
                                 value=(date.today() + timedelta(days=2)),
                             ),
                         ],
-                        id="date_selected",
                         grow=True,
                     ),
                     dmc.TabsPanel(electives_list, value=date.today()),
@@ -151,6 +150,7 @@ body = dmc.Container(
                         electives_list, value=(date.today() + timedelta(days=2))
                     ),
                 ],
+                id="date_selected",
                 orientation="horizontal",
                 value=date.today(),
             ),
