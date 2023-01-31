@@ -218,6 +218,30 @@ def wrangle_preassess(df: pd.DataFrame) -> pd.DataFrame:
     note_nums["a_line"] = note_nums["a_line"].astype(bool).astype(int)
     note_nums["c_line"] = note_nums["a_line"].astype(bool).astype(int)
 
+    note_nums = note_nums[
+        [
+            "patient_durable_key",
+            "creation_instant",
+            "author_type",
+            "cardio",
+            "resp",
+            "airway",
+            "infectious",
+            "endo",
+            "neuro",
+            "haem",
+            "renal",
+            "gastro",
+            "CPET",
+            "mets",
+            "anaesthetic_alert",
+            "asa",
+            "a_line",
+            "c_line",
+            "expected_stay",
+        ]
+    ]
+
     note_strings = (
         df.groupby(["patient_durable_key", "creation_instant", "author_type"])
         .first()[["urgency", "pacdest", "prioritisation"]]

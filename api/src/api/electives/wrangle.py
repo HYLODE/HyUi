@@ -31,7 +31,7 @@ from api.electives.hypo_help import (
     #  j_wrangle_echo,
     j_wrangle_obs,
     wrangle_echo,
-    # fill_na,
+    fill_na,
     # camel_to_snake,
 )
 
@@ -177,7 +177,9 @@ def prepare_draft(
     )
     model = deployed.best_estimator_
     cols = model[1].feature_names_in_
-    preds = model.predict_proba(df[cols])[:, 1]
+
+    df_to_predict = fill_na(df)
+    preds = model.predict_proba(df_to_predict[cols])[:, 1]
     df["icu_prob"] = preds
 
     return df
