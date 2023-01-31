@@ -82,7 +82,6 @@ electives_list = dmc.Paper(
         filter_action="native",
     ),
     shadow="lg",
-    radius="lg",
     p="md",  # padding
     withBorder=True,
 )
@@ -128,24 +127,32 @@ body = dmc.Container(
                 [
                     dmc.TabsList(
                         [
-                            dmc.Tab(date.today().strftime("%A %B %d"), value="today"),
+                            dmc.Tab(
+                                date.today().strftime("%A %B %d"),
+                                value=date.today(),
+                            ),
                             dmc.Tab(
                                 (date.today() + timedelta(days=1)).strftime("%A %B %d"),
-                                value="tomorrow",
+                                value=(date.today() + timedelta(days=1)),
                             ),
                             dmc.Tab(
                                 (date.today() + timedelta(days=2)).strftime("%A %B %d"),
-                                value="day_after_tomorrow",
+                                value=(date.today() + timedelta(days=2)),
                             ),
                         ],
+                        id="date_selected",
                         grow=True,
                     ),
-                    dmc.TabsPanel(electives_list, value="today"),
-                    dmc.TabsPanel(electives_list, value="tomorrow"),
-                    dmc.TabsPanel(electives_list, value="day_after_tomorrow"),
+                    dmc.TabsPanel(electives_list, value=date.today()),
+                    dmc.TabsPanel(
+                        electives_list, value=(date.today() + timedelta(days=1))
+                    ),
+                    dmc.TabsPanel(
+                        electives_list, value=(date.today() + timedelta(days=2))
+                    ),
                 ],
                 orientation="horizontal",
-                value="todaytab",
+                value=date.today(),
             ),
         ]
     ),
