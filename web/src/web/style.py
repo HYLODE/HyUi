@@ -10,6 +10,7 @@ class AppColors(BaseModel):
     teal: str = "#39CCCC"
     indigo: str = "#5c7cfa"  # via dbc.theme.default_colors
     olive: str = "#3D9970"
+    olive50: str = "#3D997080"  # last 2 digits 80 approx 50% alpha
     green: str = "#2ECC40"
     lime: str = "#01FF70"
     yellow: str = "#FFDC00"
