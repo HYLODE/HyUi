@@ -4,6 +4,8 @@ import json
 import warnings
 from dash import dash_table as dtable, html
 from pathlib import Path
+from datetime import date, timedelta
+
 
 import web.pages.electives.callbacks  # noqa
 from web.pages.electives import CAMPUSES, ids
@@ -46,7 +48,6 @@ electives_list = dmc.Paper(
     dtable.DataTable(
         id=ids.ELECTIVES_TABLE,
         columns=[
-            {"id": "surgery_date", "name": "Date"},
             {"id": "pacu", "name": "PACU"},
             {"id": "room_name", "name": "Room"},
             {"id": "primary_service", "name": "Specialty"},
@@ -120,15 +121,35 @@ inspector = html.Div(
 )
 
 body = dmc.Container(
-    [
-        dmc.Grid(
-            [
-                dmc.Col(campus_selector, offset=9, span=3),
-                dmc.Col(electives_list, span=12),
-            ]
-        ),
-    ],
-    style={"width": "90vw"},
+    dmc.Grid(
+        [
+            dmc.Col(campus_selector, offset=9, span=3),
+            dmc.Tabs(
+                [
+                    dmc.TabsList(
+                        [
+                            dmc.Tab(date.today().strftime("%A %B %d"), value="today"),
+                            dmc.Tab(
+                                (date.today() + timedelta(days=1)).strftime("%A %B %d"),
+                                value="tomorrow",
+                            ),
+                            dmc.Tab(
+                                (date.today() + timedelta(days=2)).strftime("%A %B %d"),
+                                value="day_after_tomorrow",
+                            ),
+                        ],
+                        grow=True,
+                    ),
+                    dmc.TabsPanel(electives_list, value="today"),
+                    dmc.TabsPanel(electives_list, value="tomorrow"),
+                    dmc.TabsPanel(electives_list, value="day_after_tomorrow"),
+                ],
+                orientation="horizontal",
+                value="todaytab",
+            ),
+        ]
+    ),
+    style={"width": "100vw"},
     fluid=True,
 )
 
