@@ -53,10 +53,8 @@ electives_list = dmc.Paper(
             {"id": "primary_service", "name": "Specialty"},
             {"id": "patient_friendly_name", "name": "Operation"},
             {"id": "primary_mrn", "name": "MRN"},
-            {"id": "first_name", "name": "First Name"},
-            {"id": "last_name", "name": "Last Name"},
-            {"id": "age_in_years", "name": "Age"},
-            {"id": "sex", "name": "Sex"},
+            {"id": "full_name", "name": "Full Name"},
+            {"id": "age_sex", "name": "Age / Sex"},
             #            {"id": "abnormal_echo", "name": "abnormal_echo"},
             # {
             #     "id": "icu_prob",
@@ -65,7 +63,7 @@ electives_list = dmc.Paper(
             #     "format": {"specifier": ".1f"},
             # },
         ],
-        data=[],
+        # data=[],
         # style_table={"width": "50%", "minWidth": "50%", "maxWidth": "100%"},
         style_as_list_view=True,  # remove col lines
         style_cell={
