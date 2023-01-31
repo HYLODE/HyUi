@@ -201,6 +201,8 @@ class MergedData(CabData):
     pacdest: str | None
     booked_destination: str | None
     pacu: int | None
+    icu_prob: float | None
+    room_name: str | None
 
 
 class EchoData(CabData):
