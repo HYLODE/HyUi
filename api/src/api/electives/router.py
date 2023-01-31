@@ -226,7 +226,7 @@ def get_electives(
         obs=obs,
         axa=axa,
         pod=pod,
-        to_predict=True,
+        to_predict=False,
     )
     df = df.replace({np.nan: None})
     return [MergedData.parse_obj(row) for row in df.to_dict(orient="records")]

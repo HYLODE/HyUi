@@ -122,7 +122,7 @@ def prepare_draft(
     obs: list[type[BaseModel]],
     axa: list[type[BaseModel]],
     pod: list[type[BaseModel]],
-    to_predict: bool = True,
+    to_predict: bool = False,
 ) -> pd.DataFrame:
 
     electives_df = to_data_frame(electives, SurgData)
