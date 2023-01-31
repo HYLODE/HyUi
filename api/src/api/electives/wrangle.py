@@ -122,6 +122,7 @@ def prepare_draft(
     obs: list[type[BaseModel]],
     axa: list[type[BaseModel]],
     pod: list[type[BaseModel]],
+    to_predict: bool = True,
 ) -> pd.DataFrame:
 
     electives_df = to_data_frame(electives, SurgData)
@@ -172,14 +173,15 @@ def prepare_draft(
         False,
     )
 
-    deployed = pickle.load(
-        open((Path(__file__).parent / "deploy/RFR_jan1601.sav"), "rb")
-    )
-    model = deployed.best_estimator_
-    cols = model[1].feature_names_in_
-
-    df_to_predict = fill_na(df)
-    preds = model.predict_proba(df_to_predict[cols])[:, 1]
-    df["icu_prob"] = preds
-
+    if to_predict:
+        deployed = pickle.load(
+            open((Path(__file__).parent / "deploy/RFR_jan1601.sav"), "rb")
+        )
+        model = deployed.best_estimator_
+        cols = model[1].feature_names_in_
+        df_to_predict = fill_na(df)
+        preds = model.predict_proba(df_to_predict[cols])[:, 1]
+        df["icu_prob"] = preds
+    else:
+        df["icu_prob"] = 0
     return df
