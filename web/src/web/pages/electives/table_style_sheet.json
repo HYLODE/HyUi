@@ -13,7 +13,7 @@
     "fontWeight": "bold",
     "textAlign": "left",
     "width": "5vw",
-    "minWidth": "5vw",
+    "minWidth": "2vw",
     "maxWidth": "5vw",
     "whitespace": "normal"
   },
@@ -39,11 +39,10 @@
   },
   {
     "if": {
-      "column_id": "name"
+      "column_id": "icu_prob"
     },
-    "textAlign": "left",
-    "font-family": "sans-serif",
-    "fontWeight": "bold",
-    "width": "20vw"
+    "textAlign": "centre",
+    "fontWeight": "italics",
+    "width": "2vw"
   }
 ]
