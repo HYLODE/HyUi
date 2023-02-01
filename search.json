@@ -49,6 +49,13 @@
     "text": "Initialisation\nCurrently only Baserow needs to be initialised by creating an admin user and setting up the tables required for the rest of the app to function correct. The initialise python package contains the code that does all this.\npyenv virtualenv 3.11.0 hyui-initialise\npyenv activate hyui-initialise\n\npip install -e \"initialise\"\n\npython -m initialise.main --operation baserow\nYou can do this on your local machine but you need to install (with docker). See the docs. If you do this then don’t forget to adjust the BASEROW_PUBLIC_URL to point to your local dev version (e.g. http://localhost:80)"
   },
   {
+    "objectID": "developer/infrastructure.html",
+    "href": "developer/infrastructure.html",
+    "title": "HYLODE Infrastructure",
+    "section": "",
+    "text": "Our infrastructure is managed under the HySys repository which contains a series of readme files. Setup and deployment of the various services is described here\n\nHyCastle - the keeper\nHyCommand - the controller\nHyFlow - the fetcher\nHyGear - the transformer\nHyMind - the laboratory\nHyViz - the monitor"
+  },
+  {
     "objectID": "developer/demo.html",
     "href": "developer/demo.html",
     "title": "Backend to frontend demonstration vignette",
