@@ -38,7 +38,4 @@ def _store_electives(campus: str, electives: list[dict], date: str) -> list[dict
         row["full_name"] = row["first_name"] + " " + row["last_name"]
         row["age_sex"] = str(row["age_in_years"]) + row["sex"][:1]
 
-    print(campus)
-    print(date)
-    print(electives)
     return electives

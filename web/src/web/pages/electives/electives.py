@@ -148,7 +148,7 @@ body = dmc.Container(
         dmc.Grid(
             [
                 dmc.Col(campus_selector, offset=0, span=3),
-                dmc.Col(date_selector, offset=0, span=9),
+                dmc.Col(date_selector, offset=3, span=6),
                 dmc.Col(electives_list, span=12),
             ]
         ),
