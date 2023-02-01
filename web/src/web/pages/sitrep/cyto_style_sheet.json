@@ -57,7 +57,7 @@
   {
     "selector": "[?occupied]",
     "style": {
-      "background-color": "orange",
+      "background-color": "indigo",
       "border-width": 0,
       "color": "white",
       "background-opacity": 1

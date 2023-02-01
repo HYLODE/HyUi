@@ -4,7 +4,7 @@ import datetime
 import pandas as pd
 import pytz  # type: ignore
 import requests
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Response
 from pathlib import Path
 
 from api.config import Settings, get_settings
@@ -76,8 +76,11 @@ def read_tap_electives(
     response_model=list[IcuDischarge],
 )
 def get_individual_discharge_predictions(
-    ward: str = Query(default=""), settings: Settings = Depends(get_settings)
+    response: Response,
+    ward: str = Query(default=""),
+    settings: Settings = Depends(get_settings),
 ) -> list[IcuDischarge]:
+    response.headers["Cache-Control"] = "public, max-age=300"
     response = requests.get(
         f"{settings.hymind_url}/predictions/icu/discharge", params={"ward": ward}
     )

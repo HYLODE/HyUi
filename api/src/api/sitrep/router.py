@@ -3,7 +3,7 @@ from pathlib import Path
 from urllib.parse import urlencode
 
 import requests
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Response
 from fastapi.responses import RedirectResponse
 from sqlalchemy import create_engine
 from sqlmodel import Session
@@ -113,8 +113,9 @@ def get_mock_live_ui(ward: str) -> list[SitrepRow]:
 
 @router.get("/live/{ward}/ui/", response_model=list[SitrepRow])
 def get_live_ui(
-    ward: str, settings: Settings = Depends(get_settings)
+    response: Response, ward: str, settings: Settings = Depends(get_settings)
 ) -> list[SitrepRow]:
+    response.headers["Cache-Control"] = "public, max-age=300"
     response = requests.get(f"{settings.hycastle_url}/live/icu/{ward}/ui")
     rows = response.json()["data"]
     return [SitrepRow.parse_obj(row) for row in rows]
