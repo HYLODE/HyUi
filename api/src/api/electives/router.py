@@ -4,7 +4,7 @@ from typing import cast
 
 import numpy as np
 import pandas as pd
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Response
 from pydantic import BaseModel
 from sqlalchemy import text, create_engine
 from sqlmodel import Session
@@ -200,10 +200,12 @@ def get_axa_codes() -> list[AxaCodes]:
 
 @router.get("/", response_model=list[MergedData])
 def get_electives(
+    response: Response,
     s_caboodle: Session = Depends(get_caboodle_session),
     s_clarity: Session = Depends(get_clarity_session),
     days_ahead: int = 3,
 ) -> list[MergedData]:
+    response.headers["Cache-Control"] = "public, max-age=7200"
 
     case = get_caboodle_cases(session=s_caboodle, days_ahead=days_ahead)
     preassess = get_caboodle_preassess(session=s_caboodle, days_ahead=days_ahead)
@@ -224,6 +226,7 @@ def get_electives(
         obs=obs,
         axa=axa,
         pod=pod,
+        to_predict=False,
     )
     df = df.replace({np.nan: None})
     return [MergedData.parse_obj(row) for row in df.to_dict(orient="records")]
@@ -233,7 +236,6 @@ def get_electives(
 def get_mock_electives(
     #   days_ahead: int = 100,
 ) -> list[MergedData]:
-
     case = _get_mock_sql_rows("surg", SurgData)
     preassess = _get_mock_sql_rows("preassess", PreassessData)
     labs = _get_mock_sql_rows("labs", LabData)
@@ -250,6 +252,7 @@ def get_mock_electives(
         obs=obs,
         axa=axa,
         pod=pod,
+        to_predict=False,
     )
     df = df.replace({np.nan: None})
     return [MergedData.parse_obj(row) for row in df.to_dict(orient="records")]
