@@ -90,7 +90,7 @@ electives_list = dmc.Paper(
             # },
         ],
         # data=[],
-        # style_table={"width": "50%", "minWidth": "50%", "maxWidth": "100%"},
+        style_table={"overflowX": "scroll"},
         style_as_list_view=True,  # remove col lines
         style_cell={
             "fontSize": 11,
