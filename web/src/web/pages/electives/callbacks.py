@@ -26,14 +26,19 @@ def _store_electives(campus: str, electives: list[dict], date: str) -> list[dict
         "QUEEN SQUARE CAMPUS": "NHNN",
     }
 
-    elective_table = [
-        row
-        for row in electives
-        if campus_dict[campus] in row["department_name"] and date == row["surgery_date"]
-    ]
+    if campus != []:
+        electives = [
+            row for row in electives if campus_dict[campus] in row["department_name"]
+        ]
 
-    for row in elective_table:
+    if date is not None:
+        electives = [row for row in electives if row["surgery_date"] == date]
+
+    for row in electives:
         row["full_name"] = row["first_name"] + " " + row["last_name"]
         row["age_sex"] = str(row["age_in_years"]) + row["sex"][:1]
 
-    return elective_table
+    print(campus)
+    print(date)
+    print(electives)
+    return electives

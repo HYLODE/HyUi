@@ -43,6 +43,32 @@ campus_selector = html.Div(
     ]
 )
 
+date_selector = html.Div(
+    [
+        dmc.SegmentedControl(
+            id="date_selected",
+            value=date.today(),
+            data=[
+                {
+                    "value": date.today(),
+                    "label": date.today().strftime("%A %d"),
+                },
+                {
+                    "value": (date.today() + timedelta(days=1)),
+                    "label": (date.today() + timedelta(days=1)).strftime("%A %d"),
+                },
+                {
+                    "value": (date.today() + timedelta(days=2)),
+                    "label": (date.today() + timedelta(days=2)).strftime("%A %d"),
+                },
+            ],
+            fullWidth=True,
+            persistence=True,
+            persistence_type="local",
+        ),
+    ]
+)
+
 
 electives_list = dmc.Paper(
     dtable.DataTable(
@@ -118,44 +144,18 @@ inspector = html.Div(
 )
 
 body = dmc.Container(
-    dmc.Grid(
-        [
-            dmc.Col(campus_selector, offset=9, span=3),
-            dmc.Tabs(
-                [
-                    dmc.TabsList(
-                        [
-                            dmc.Tab(
-                                date.today().strftime("%A %B %d"),
-                                value=date.today(),
-                            ),
-                            dmc.Tab(
-                                (date.today() + timedelta(days=1)).strftime("%A %B %d"),
-                                value=(date.today() + timedelta(days=1)),
-                            ),
-                            dmc.Tab(
-                                (date.today() + timedelta(days=2)).strftime("%A %B %d"),
-                                value=(date.today() + timedelta(days=2)),
-                            ),
-                        ],
-                        grow=True,
-                    ),
-                    dmc.TabsPanel(electives_list, value=date.today()),
-                    dmc.TabsPanel(
-                        electives_list, value=(date.today() + timedelta(days=1))
-                    ),
-                    dmc.TabsPanel(
-                        electives_list, value=(date.today() + timedelta(days=2))
-                    ),
-                ],
-                id="date_selected",
-                orientation="horizontal",
-                value=date.today(),
-            ),
-        ]
-    ),
-    style={"width": "100vw"},
+    [
+        dmc.Grid(
+            [
+                dmc.Col(campus_selector, offset=0, span=3),
+                dmc.Col(date_selector, offset=0, span=9),
+                dmc.Col(electives_list, span=12),
+            ]
+        ),
+    ],
+    style={"width": "90vw"},
     fluid=True,
+    id="date_selected",
 )
 
 
