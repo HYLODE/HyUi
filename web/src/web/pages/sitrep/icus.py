@@ -14,10 +14,10 @@ import web.pages.sitrep.callbacks.cytoscape  # noqa
 import web.pages.sitrep.callbacks.inspector  # noqa
 import web.pages.sitrep.callbacks.widgets  # noqa
 import web.pages.sitrep.callbacks.discharges  # noqa
-from web.pages.sitrep import CAMPUSES, ids
+from web.pages.sitrep import ids, SITREP_DEPT2WARD_MAPPING
 from web.style import colors, replace_colors_in_stylesheet
 
-dash.register_page(__name__, path="/sitrep/ward", name="Ward")
+dash.register_page(__name__, path="/sitrep/icus", name="Critical Care")
 
 with open(Path(__file__).parent / "cyto_style_sheet.json") as f:
     cyto_style_sheet = json.load(f)
@@ -25,8 +25,10 @@ with open(Path(__file__).parent / "cyto_style_sheet.json") as f:
 
 
 timers = html.Div([])
+
 stores = html.Div(
     [
+        html.Data(id=ids.DEPT_GROUPER, value="ALL_ICUS", hidden=True),
         dcc.Store(id=ids.CENSUS_STORE),
         dcc.Store(id=ids.DEPTS_OPEN_STORE),
         dcc.Store(id=ids.ROOMS_OPEN_STORE),
@@ -37,34 +39,22 @@ stores = html.Div(
         dcc.Store(id=ids.ACC_BED_SUBMIT_STORE),
     ]
 )
+
 notifications = html.Div(
     [
         html.Div(id=ids.ACC_BED_SUBMIT_WARD_NOTIFY),
     ]
 )
 
-
-campus_selector = html.Div(
-    [
-        dmc.SegmentedControl(
-            id=ids.DEPT_GROUPER,
-            value=[i.get("value") for i in CAMPUSES if i.get("label") == "UCH"][0],
-            data=CAMPUSES,
-            persistence=True,
-            persistence_type="local",
-        ),
-    ]
-)
-
 dept_selector = dmc.Container(
     [
-        dmc.Select(
-            # label="Select a ward",
-            placeholder="Select a ward",
+        dmc.SegmentedControl(
             id=ids.DEPT_SELECTOR,
-            searchable=True,
-            nothingFound="No match found",
             value="UCH T03 INTENSIVE CARE",
+            data=[
+                {"value": k, "label": v}
+                for k, v in list(SITREP_DEPT2WARD_MAPPING.items())
+            ],
             persistence=True,
             persistence_type="local",
         ),
@@ -179,7 +169,7 @@ body = dmc.Container(
         dmc.Grid(
             [
                 dmc.Col(dept_selector, span=6),
-                dmc.Col(campus_selector, span=3, offset=3),
+                dmc.Col([], span=3, offset=3),
                 dmc.Col(ward_status, span=12),
                 dmc.Col(ward_list, span=3),
                 dmc.Col(ward_cyto, span=9),
