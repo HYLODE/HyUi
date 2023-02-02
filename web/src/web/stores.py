@@ -4,9 +4,11 @@ applications
 """
 
 import requests
+import warnings
 from dash import Input, Output, callback, dcc, html
 
 from models.beds import Bed, Department, Room
+from models.sitrep import SitrepRow
 from web import ids
 from web.config import get_settings
 
@@ -56,10 +58,60 @@ def _store_beds(_: int) -> list[dict]:
     return [Bed.parse_obj(row).dict() for row in response.json()]
 
 
+@callback(
+    Output(ids.SITREP_STORE, "data"),
+    Input(ids.STORE_TIMER_1H, "n_intervals"),
+    background=True,
+)
+def _store_all_sitreps(_: int) -> dict:
+    """Return sitrep status for all critical care areas"""
+    SITREP_DEPT2WARD_MAPPING: dict = {
+        "UCH T03 INTENSIVE CARE": "T03",
+        "UCH T06 SOUTH PACU": "T06",
+        "GWB L01 CRITICAL CARE": "GWB",
+        "WMS W01 CRITICAL CARE": "WMS",
+        "NHNN C0 NCCU": "NCCU0",
+        "NHNN C1 NCCU": "NCCU1",
+    }
+    icus = list(SITREP_DEPT2WARD_MAPPING.values())
+    sitreps = {}
+    for icu in icus:
+        response = requests.get(f"{get_settings().api_url}/sitrep/live/{icu}/ui/")
+        if response.status_code != 200:
+            warnings.warn(f"Sitrep not available for {icu}")
+            rows = []
+
+        res = response.json()
+
+        try:
+            # assumes http://uclvlddpragae08:5201
+            assert type(res) is list
+            rows = res
+        except AssertionError:
+            warnings.warn(
+                f"Sitrep endpoint at {get_settings().api_url} did not return list - "
+                f"Retry list is keyed under 'data'"
+            )
+            # see https://github.com/HYLODE/HyUi/issues/179
+            # where we switch to using http://172.16.149.202:5001/
+            try:
+                rows = res["data"]
+            except KeyError as e:
+                warnings.warn("No data returned for sitrep")
+                print(repr(e))
+                rows = []
+
+        res = [SitrepRow.parse_obj(row).dict() for row in rows]
+        sitreps[icu] = res
+
+    return sitreps
+
+
 stores = html.Div(
     [
         dcc.Store(id=ids.DEPT_STORE),
         dcc.Store(id=ids.ROOM_STORE),
         dcc.Store(id=ids.BEDS_STORE),
+        dcc.Store(id=ids.SITREP_STORE),
     ]
 )

@@ -64,6 +64,30 @@
     }
   },
   {
+    "selector": "[?occupied][wim=0]",
+    "style": {
+      "background-color": "green"
+    }
+  },
+  {
+    "selector": "[?occupied][wim=1]",
+    "style": {
+      "background-color": "yellow"
+    }
+  },
+  {
+    "selector": "[?occupied][wim>=2]",
+    "style": {
+      "background-color": "orange"
+    }
+  },
+  {
+    "selector": "[?occupied][wim>=4]",
+    "style": {
+      "background-color": "red"
+    }
+  },
+  {
     "selector": "[dc_status='review'][?occupied]",
     "style": {
       "shape": "tag",

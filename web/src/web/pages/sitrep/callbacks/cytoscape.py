@@ -7,7 +7,6 @@ from datetime import datetime
 from typing import Tuple, Any
 
 from models.census import CensusRow
-from models.sitrep import SitrepRow
 from web.config import get_settings
 from web.pages.sitrep import CAMPUSES, SITREP_DEPT2WARD_MAPPING, ids
 from web.stores import ids as store_ids
@@ -180,45 +179,27 @@ def _store_census(
 @callback(
     Output(ids.SITREP_STORE, "data"),
     Input(ids.DEPT_SELECTOR, "value"),
+    Input(store_ids.SITREP_STORE, "data"),
     prevent_initial_callback=True,
     background=True,
 )
-def _store_sitrep(dept: str) -> list[dict]:
+def _store_sitrep(dept: str, sitreps: dict) -> Any:
     """
-    Use census to provide the CSNs that can be used to query additional data
     Args:
         dept: the department
+        sitreps: dictionary of sitreps
 
     Returns:
         additonal patient level data
 
     """
-    department = SITREP_DEPT2WARD_MAPPING.get(dept)
-    if not department:
-        warnings.warn(f"No sitrep data available for {department}")
+    # ward2dept = {v:k for k,v in SITREP_DEPT2WARD_MAPPING.items()}
+    # department = ward2dept.get(dept)
+    ward = SITREP_DEPT2WARD_MAPPING.get(dept)
+    if not ward:
+        warnings.warn(f"No sitrep data available for {ward}")
         return [{}]
-
-    url = f"{get_settings().api_url}/sitrep/live/{department}/ui"
-    response = requests.get(url).json()
-    try:
-        # assumes http://uclvlddpragae08:5201
-        assert type(response) is list
-        rows = response
-    except AssertionError:
-        warnings.warn(
-            f"Sitrep endpoint at {url} did not return list - "
-            f"Retry list is keyed under 'data'"
-        )
-        # see https://github.com/HYLODE/HyUi/issues/179
-        # where we switch to using http://172.16.149.202:5001/
-        try:
-            rows = response["data"]
-        except KeyError as e:
-            warnings.warn("No data returned for sitrep")
-            print(repr(e))
-            return [{}]
-
-    return [SitrepRow.parse_obj(row).dict() for row in rows]
+    return sitreps[ward]
 
 
 @Timer(text="Discharge updates: Elapsed time: {:.3f} seconds")
@@ -288,6 +269,7 @@ def _make_elements(  # noqa: C901
     depts: list[dict],
     rooms: list[dict],
     beds: list[dict],
+    sitrep: list[dict],
     discharges: list[dict],
     selected_dept: str | None,
     ward_only: bool,
@@ -301,6 +283,7 @@ def _make_elements(  # noqa: C901
         depts: list of dept objects
         rooms: list of room objects
         beds: list of bed objects (from baserow)
+        sitrep: list of sitrep statuses (from hylode)
         discharges: list of discharge statuses (from baserow)
         selected_dept: name of dept or None if show all
         ward_only: True if ward_only not campus; default False
@@ -317,9 +300,12 @@ def _make_elements(  # noqa: C901
     show_rooms = True if ward_only else False
     show_depts = not show_rooms
     bed_parent = "hl7_room" if show_rooms else "department"
+
     # define the 'height' of the map
     y_index_max = max([bed.get("floor_y_index", -1) for bed in beds])
+
     census_lookup = {i.get("location_string"): i for i in census}
+
     # TODO: rebuild discharge_statuses table with encounter as string
     # TODO: fix naming (use 'encounter' in census and 'csn' in discharges)
     # convert csn to string since that's how encounter is stored in EMAP
@@ -330,6 +316,7 @@ def _make_elements(  # noqa: C901
         print(e)
         discharge_lookup = {}
 
+    sitrep_lookup = {i.get("csn"): i for i in sitrep}
     preset_map_positions = (
         False
         if selected_dept not in SITREP_DEPT2WARD_MAPPING.keys()
@@ -347,6 +334,7 @@ def _make_elements(  # noqa: C901
         occupied = census_lookup.get(location_string, {}).get("occupied", False)
         encounter = census_lookup.get(location_string, {}).get("encounter", "")
         discharge_status = discharge_lookup.get(encounter, {}).get("status", "")
+        wim = sitrep_lookup.get(encounter, {}).get("wim_1", -1)
 
         data = dict(
             id=location_string,
@@ -363,6 +351,8 @@ def _make_elements(  # noqa: C901
             occupied=occupied,
             encounter=encounter,
             dc_status=discharge_status,
+            wim=wim,
+            sitrep=sitrep_lookup.get(encounter, {}),
         )
         if preset_map_positions:
             position = dict(
@@ -458,7 +448,14 @@ def _prepare_cyto_elements_campus(
     Build the element list from pts/beds/rooms/depts for the map
     """
     elements = _make_elements(
-        census, depts, rooms, beds, discharges=[{}], selected_dept=None, ward_only=False
+        census,
+        depts,
+        rooms,
+        beds,
+        sitrep=[{}],
+        discharges=[{}],
+        selected_dept=None,
+        ward_only=False,
     )
     return elements
 
@@ -471,6 +468,7 @@ def _prepare_cyto_elements_campus(
         Input(ids.DEPTS_OPEN_STORE, "data"),
         Input(ids.ROOMS_OPEN_STORE, "data"),
         Input(ids.BEDS_STORE, "data"),
+        Input(ids.SITREP_STORE, "data"),
         Input(ids.DISCHARGES_STORE, "data"),
         Input(ids.DEPT_SELECTOR, "value"),
         Input(ids.ACC_BED_SUBMIT_STORE, "data"),
@@ -484,6 +482,7 @@ def _prepare_cyto_elements_ward(
     depts: list[dict],
     rooms: list[dict],
     beds: list[dict],
+    sitrep: list[dict],
     discharges: list[dict],
     dept: str,
     bed_submit_store: dict,
@@ -501,6 +500,7 @@ def _prepare_cyto_elements_ward(
             depts,
             rooms,
             beds,
+            sitrep,
             discharges,
             selected_dept=dept,
             ward_only=True,
