@@ -70,3 +70,25 @@ To be used when updating an existing instance of baserow adjustments to default 
 ```sh
 docker compose --project-name [project name] down
 ```
+## Tips and Tricks
+### Debugging from within the NHS network
+
+Sometimes it can be difficult to debug your staging services when they are deployed via docker.
+
+You can log into the `hyui-web` or `hyui-api` services from a terminal within the `HyUi` directory using the following:
+
+```sh
+docker compose --project-name [project name] exec web bash
+```
+
+```sh
+docker compose --project-name [project name] exec api bash
+```
+
+You can then change the code using vim or open a python console and debug from there.
+
+Remember you will then need to manually make the same changes outside the docker bash terminal!
+
+It may be useful to edit the `docker/api/Dockerfile` or `docker/web/Dockerfile` and add a `--reload` flag to the `ENTRYPOINT` so that code changes from within the container are reloaded automatically. `ENTRYPOINT ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--reload"]` instead of `ENTRYPOINT ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--reload"]`.
+
+If you prefer not to use vim then Visual Studio can SSH into the running containers somehow.
