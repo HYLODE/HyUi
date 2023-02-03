@@ -2,6 +2,7 @@ from dash import Input, Output, callback
 
 from web.pages.electives import ids
 from web.stores import ids as store_ids
+from datetime import date, timedelta
 
 
 @callback(
@@ -38,5 +39,22 @@ def _store_electives(campus: str, electives: list[dict], date: str) -> list[dict
         row["full_name"] = row["first_name"] + " " + row["last_name"]
         row["age_sex"] = str(row["age_in_years"]) + row["sex"][:1]
 
-    print(electives)
     return electives
+
+
+@callback(Output("date_selected", "data"), Input("date_selected", "value"))
+def _get_date(value: date) -> list[dict]:
+    return [
+        {
+            "value": date.today(),
+            "label": date.today().strftime("%A %d"),
+        },
+        {
+            "value": (date.today() + timedelta(days=1)),
+            "label": (date.today() + timedelta(days=1)).strftime("%A %d"),
+        },
+        {
+            "value": (date.today() + timedelta(days=2)),
+            "label": (date.today() + timedelta(days=2)).strftime("%A %d"),
+        },
+    ]

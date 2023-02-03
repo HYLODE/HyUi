@@ -6,10 +6,10 @@ from dash import dash_table as dtable, html
 from pathlib import Path
 from datetime import date, timedelta
 
-
 import web.pages.electives.callbacks  # noqa
 from web.pages.electives import CAMPUSES, ids
 from web.style import replace_colors_in_stylesheet
+
 
 warnings.warn("\nINFO: Confirm that you have imported all the callbacks")
 
@@ -43,11 +43,11 @@ campus_selector = html.Div(
     ]
 )
 
+
 date_selector = html.Div(
     [
         dmc.SegmentedControl(
             id="date_selected",
-            value=date.today(),
             data=[
                 {
                     "value": date.today(),
@@ -62,6 +62,7 @@ date_selector = html.Div(
                     "label": (date.today() + timedelta(days=2)).strftime("%A %d"),
                 },
             ],
+            value=date.today(),
             fullWidth=True,
             persistence=True,
             persistence_type="local",
