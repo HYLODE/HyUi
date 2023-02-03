@@ -78,11 +78,9 @@ electives_list = dmc.Paper(
             {"id": "pacu", "name": "PACU"},
             {"id": "room_name", "name": "Room"},
             {"id": "primary_service", "name": "Specialty"},
-            {"id": "patient_friendly_name", "name": "Operation"},
             {"id": "primary_mrn", "name": "MRN"},
             {"id": "full_name", "name": "Full Name"},
             {"id": "age_sex", "name": "Age / Sex"},
-            {"id": "details", "name": "detailsd"},
             #            {"id": "abnormal_echo", "name": "abnormal_echo"},
             # {
             #     "id": "icu_prob",
@@ -112,6 +110,8 @@ electives_list = dmc.Paper(
     withBorder=True,
 )
 
+patient_info_box = dmc.Paper(dmc.Code(id="patient_info_box", block="True"))
+
 debug_inspector = dmc.Container(
     [
         dmc.Spoiler(
@@ -127,8 +127,6 @@ debug_inspector = dmc.Container(
         )
     ]
 )
-
-patient_info = html.Div([dmc.Modal(id="patient_info_box", children=[])])
 
 inspector = html.Div(
     [
@@ -153,13 +151,13 @@ body = dmc.Container(
             [
                 dmc.Col(campus_selector, offset=0, span=3),
                 dmc.Col(date_selector, offset=3, span=6),
-                dmc.Col(electives_list, span=12),
+                dmc.Col(electives_list, span=7),
+                dmc.Col(patient_info_box, span=5),
             ]
         ),
     ],
-    style={"width": "90vw"},
+    style={"width": "100vw"},
     fluid=True,
-    id="date_selected",
 )
 
 
@@ -171,6 +169,5 @@ def layout() -> dash.html.Div:
             notifications,
             body,
             inspector,
-            patient_info,
         ]
     )

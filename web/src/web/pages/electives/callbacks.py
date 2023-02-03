@@ -62,22 +62,47 @@ def _get_date(value: date) -> list[dict]:
 
 @callback(
     Output("patient_info_box", "children"),
-    Output("patient_info_box", "opened"),
     Input(ids.ELECTIVES_TABLE, "data"),
     Input(ids.ELECTIVES_TABLE, "active_cell"),
     Input(store_ids.ELECTIVES_STORE, "data"),
 )
 def _make_info_box(
     current_table: list[dict], active_cell: dict, electives: list[dict]
-) -> tuple[str, bool]:
+) -> str:
 
-    if active_cell is None:
-        pass
-
-    elif active_cell["column_id"] == "details":
+    string = ""
+    if active_cell is not None:
         patient_mrn = current_table[active_cell["row"]]["primary_mrn"]
-        all_patient_info = [
-            row for row in electives if row["primary_mrn"] == patient_mrn
-        ]
+        pt = [row for row in electives if row["primary_mrn"] == patient_mrn][0]
+        # could make a table? [{k: v} for (k, v) in all_patient_info[0].items()]
 
-    return str(all_patient_info), True
+        string = f""" FURTHER INFORMATION
+MRN: {pt['primary_mrn']}
+PACU: {pt['pacu']}.
+Name: {pt['first_name']} {pt['last_name']}
+Age: {pt['age_in_years']} {pt['sex']}
+Operation:
+{pt['patient_friendly_name']}
+
+Echocardiography:
+Patient has had {pt['num_echo']} echos,
+of which {pt['abnormal_echo']} were abnormal.
+Last echo: [will pull narrative here]
+
+Preassessment date: {pt['preassess_date']}:
+ASA: {pt['asa']}
+Our system has provided the following risk scores:
+    Cardio: {pt['cardio']}
+[etc]
+
+Recent bloods and obs:
+Number of abnormal CRPs: {pt['crp_abnormal_count']}
+Maximum BMI: {pt['bmi_max_value']}
+
+Booked destination: {pt['booked_destination']}
+Protocolised Admission: {pt['protocolised_adm']}
+
+Probability of ICU admission by our model:
+
+        """
+    return string
