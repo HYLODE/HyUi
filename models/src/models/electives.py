@@ -121,13 +121,13 @@ class SurgData(CabData):
     removal_reason: str | None
     status: str | None
     surgical_service: str | None
-    type: str | None  # TODO: FIX RISK - DUPLICATED NAME
+    type: str | None
     count: str | None
     case_schedule_status: str | None
     case_cancel_reason: str | None
     case_cancel_reason_code: str | None
     asa_rating_code: str | None
-    name: str | None  # TODO: FIX RISK - DUPLICATED NAME
+    name: str | None
     patient_friendly_name: str | None
     room_name: str | None
     department_name: str | None
@@ -137,13 +137,13 @@ class SurgData(CabData):
 
 class PreassessData(CabData):
     creation_instant: datetime
-    type: str | None  # TODO: FIX RISK - DUPLICATED NAME
+    type: str | None
     author_type: str | None
     string_value: str | None
     numeric_value: float | None
     date_value: datetime | None
     smart_data_element_epic_id: str | None
-    name: str | None  # TODO: FIX RISK - DUPLICATED NAME
+    name: str | None
     abbreviation: str | None
     data_type: str | None
     concept_type: str | None
@@ -180,7 +180,7 @@ class MergedData(CabData):
     patient_friendly_name: str | None
     department_name: str | None
     preassess_date: date | None
-    cardio: int | None  # TODO: FIX cardio does not appear. wrangle. preassess error.
+    cardio: int | None
     resp: int | None
     cpet: int | None
     mets: int | None

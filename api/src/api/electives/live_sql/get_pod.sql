@@ -2,7 +2,6 @@
 -- 2022-07-21
 -- Query by J Hunter
 -- see https://github.com/HYLODE/HyUi/issues/47#issuecomment-1160706270
--- TODO: parameterise where clause for greater number of days
 SELECT pod.NAME AS PodOrc,
     c.OR_CASE_ID AS OrCaseId,
     c.SURGERY_DATE AS SurgeryDateClarity

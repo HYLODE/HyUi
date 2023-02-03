@@ -314,7 +314,7 @@ def wrangle_labs(labs: pd.DataFrame) -> pd.DataFrame:
     df.loc[:, "value"] = pd.to_numeric(
         df["value"].str.replace("<|(result checked)", "", regex=True),
         errors="coerce",
-    ).dropna()  # TODO: FIX why doesn't this work?
+    ).dropna()
     df["name"] = df["name"].replace({v: k for k, v in lab_names.items()})
     df = df.join(df.pivot(columns="name", values="value"))
 
