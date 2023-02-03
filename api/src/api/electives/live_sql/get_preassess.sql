@@ -113,16 +113,15 @@ WHERE cnf.[Type] = 'Anaesthesia Preprocedure Evaluation'
             LEFT JOIN [CABOODLE_REPORT].[dbo].[TimeOfDayDim] todcase ON scf.[CaseRequestTimeOfDayKey] = todcase.[TimeOfDayKey]
             LEFT JOIN [CABOODLE_REPORT].[dbo].[DateDim] datecancel ON scufx.[CancelDateKey] = datecancel.[DateKey]
         WHERE scf.[PatientDurableKey] > 1
-            AND scf.[PatientDurableKey] IS NOT NULL
-            AND scf.[PrimaryService] != 'Obstetrics'
-            AND scf.[PrimaryService] != 'Neurosurgery'
-            AND scf.[PrimaryService] != 'Paediatric Dental'
-            AND dd.[DepartmentName] != 'NHNN THEATRE SUITE'
-            AND dd.[DepartmentName] != 'RNTNE THEATRE SUITE'
-            AND dd.[DepartmentName] != 'EGA E02 LABOUR WARD'
-            AND dd.[DepartmentName] != 'MCC H-1 THEATRE SUITE'
-            AND dd.[DepartmentName] != 'UCH P02 ENDOSCOPY'
-            AND dd.[DepartmentName] != 'UCH ANAESTHESIA DEPT'
+            AND scf.[PatientDurableKey] IS NOT NULL -- AND scf.[PrimaryService] != 'Obstetrics'
+            -- AND scf.[PrimaryService] != 'Neurosurgery'
+            -- AND scf.[PrimaryService] != 'Paediatric Dental'
+            -- AND dd.[DepartmentName] != 'NHNN THEATRE SUITE'
+            -- AND dd.[DepartmentName] != 'RNTNE THEATRE SUITE'
+            -- AND dd.[DepartmentName] != 'EGA E02 LABOUR WARD'
+            -- AND dd.[DepartmentName] != 'MCC H-1 THEATRE SUITE'
+            -- AND dd.[DepartmentName] != 'UCH P02 ENDOSCOPY'
+            -- AND dd.[DepartmentName] != 'UCH ANAESTHESIA DEPT'
             AND patd.[AgeInYears] >= 18
             AND scufx.[PlannedOperationStartInstant] >= :start_date
             AND scufx.[PlannedOperationStartInstant] < :end_date

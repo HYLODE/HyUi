@@ -9,12 +9,11 @@ WITH surgical_pts AS (
         LEFT JOIN [CABOODLE_REPORT].[dbo].[DepartmentDim] dd ON scf.[OperatingRoomKey] = dd.[DepartmentKey]
         LEFT JOIN [CABOODLE_REPORT].[dbo].[PatientDim] patd ON scf.[PatientDurableKey] = patd.[DurableKey]
     WHERE scf.[PatientDurableKey] > 0
-        AND scf.[PatientDurableKey] IS NOT NULL
-        AND scf.[PrimaryService] != 'Obstetrics'
-        AND scf.[PrimaryService] != 'Neurosurgery'
-        AND scf.[PrimaryService] != 'Paediatric Dental'
-        AND dd.[DepartmentName] != 'NHNN THEATRE SUITE'
-        AND dd.[DepartmentName] != 'RNTNE THEATRE SUITE'
+        AND scf.[PatientDurableKey] IS NOT NULL -- AND scf.[PrimaryService] != 'Obstetrics'
+        -- AND scf.[PrimaryService] != 'Neurosurgery'
+        -- AND scf.[PrimaryService] != 'Paediatric Dental'
+        -- AND dd.[DepartmentName] != 'NHNN THEATRE SUITE'
+        -- AND dd.[DepartmentName] != 'RNTNE THEATRE SUITE'
         AND patd.[AgeInYears] >= 18
         AND scf.[Classification] IN (
             'Elective',
