@@ -82,6 +82,7 @@ electives_list = dmc.Paper(
             {"id": "primary_mrn", "name": "MRN"},
             {"id": "full_name", "name": "Full Name"},
             {"id": "age_sex", "name": "Age / Sex"},
+            {"id": "details", "name": "detailsd"},
             #            {"id": "abnormal_echo", "name": "abnormal_echo"},
             # {
             #     "id": "icu_prob",
@@ -101,7 +102,7 @@ electives_list = dmc.Paper(
         style_data={"color": "black", "backgroundColor": "white"},
         # striped rows
         markdown_options={"html": True},
-        persistence=True,
+        persistence=False,
         persisted_props=["data"],
         sort_action="native",
         filter_action="native",
@@ -126,6 +127,8 @@ debug_inspector = dmc.Container(
         )
     ]
 )
+
+patient_info = html.Div([dmc.Modal(id="patient_info_box", children=[])])
 
 inspector = html.Div(
     [
@@ -168,5 +171,6 @@ def layout() -> dash.html.Div:
             notifications,
             body,
             inspector,
+            patient_info,
         ]
     )

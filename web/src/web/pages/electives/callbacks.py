@@ -58,3 +58,26 @@ def _get_date(value: date) -> list[dict]:
             "label": (date.today() + timedelta(days=2)).strftime("%A %d"),
         },
     ]
+
+
+@callback(
+    Output("patient_info_box", "children"),
+    Output("patient_info_box", "opened"),
+    Input(ids.ELECTIVES_TABLE, "data"),
+    Input(ids.ELECTIVES_TABLE, "active_cell"),
+    Input(store_ids.ELECTIVES_STORE, "data"),
+)
+def _make_info_box(
+    current_table: list[dict], active_cell: dict, electives: list[dict]
+) -> tuple[str, bool]:
+
+    if active_cell is None:
+        pass
+
+    elif active_cell["column_id"] == "details":
+        patient_mrn = current_table[active_cell["row"]]["primary_mrn"]
+        all_patient_info = [
+            row for row in electives if row["primary_mrn"] == patient_mrn
+        ]
+
+    return str(all_patient_info), True
