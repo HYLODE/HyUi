@@ -22,6 +22,6 @@ This link will only work from within the UCLH network, and you will need to cont
 - get involved or learn more [about](about.qmd) the project
 - try the [_alpha_](http://172.16.149.202:8300) version! 😬😱
 - use the original [sitrep](http://uclvlddpragae08:5701/sitrep/T03)
-- checkout the [INFORM-US](Uclvlddpragae08:5703) dashboard
+- checkout the [INFORM-US](http://uclvlddpragae08:5703) dashboard
 
 :::
