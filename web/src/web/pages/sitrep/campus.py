@@ -33,7 +33,7 @@ stores = html.Div(
 campus_selector = dmc.Container(
     [
         dmc.SegmentedControl(
-            id=ids.CAMPUS_SELECTOR,
+            id=ids.DEPT_GROUPER,
             value=[i.get("value") for i in CAMPUSES if i.get("label") == "UCH"][0],
             data=CAMPUSES,
             persistence=True,
