@@ -278,6 +278,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <li><a href="#recreating-defaults-in-baserow" id="toc-recreating-defaults-in-baserow" class="nav-link" data-scroll-target="#recreating-defaults-in-baserow">Recreating defaults in baserow</a></li>
   </ul></li>
   <li><a href="#stop-and-remove-docker-containers" id="toc-stop-and-remove-docker-containers" class="nav-link" data-scroll-target="#stop-and-remove-docker-containers">Stop And Remove Docker Containers</a></li>
+  <li><a href="#tips-and-tricks" id="toc-tips-and-tricks" class="nav-link" data-scroll-target="#tips-and-tricks">Tips and Tricks</a>
+  <ul class="collapse">
+  <li><a href="#debugging-from-within-the-nhs-network" id="toc-debugging-from-within-the-nhs-network" class="nav-link" data-scroll-target="#debugging-from-within-the-nhs-network">Debugging from within the NHS network</a></li>
+  </ul></li>
   </ul></li>
   </ul>
 <div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hylode/hyui/edit/main/hyui/developer/deployment.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/hylode/hyui/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
@@ -343,8 +347,22 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <section id="stop-and-remove-docker-containers" class="level2">
 <h2 class="anchored" data-anchor-id="stop-and-remove-docker-containers">Stop And Remove Docker Containers</h2>
 <div class="sourceCode" id="cb4"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> compose <span class="at">--project-name</span> [project name] down</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="tips-and-tricks" class="level2">
+<h2 class="anchored" data-anchor-id="tips-and-tricks">Tips and Tricks</h2>
+<section id="debugging-from-within-the-nhs-network" class="level3">
+<h3 class="anchored" data-anchor-id="debugging-from-within-the-nhs-network">Debugging from within the NHS network</h3>
+<p>Sometimes it can be difficult to debug your staging services when they are deployed via docker.</p>
+<p>You can log into the <code>hyui-web</code> or <code>hyui-api</code> services from a terminal within the <code>HyUi</code> directory using the following:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> compose <span class="at">--project-name</span> [project name] exec web bash</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> compose <span class="at">--project-name</span> [project name] exec api bash</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>You can then change the code using vim or open a python console and debug from there.</p>
+<p>Remember you will then need to manually make the same changes outside the docker bash terminal!</p>
+<p>It may be useful to edit the <code>docker/api/Dockerfile</code> or <code>docker/web/Dockerfile</code> and add a <code>--reload</code> flag to the <code>ENTRYPOINT</code> so that code changes from within the container are reloaded automatically. <code>ENTRYPOINT ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--reload"]</code> instead of <code>ENTRYPOINT ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--reload"]</code>.</p>
+<p>If you prefer not to use vim then Visual Studio can SSH into the running containers somehow.</p>
 
 
+</section>
 </section>
 </section>
 

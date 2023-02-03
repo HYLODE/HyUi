@@ -270,19 +270,19 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <ul class="collapse">
   <li><a href="#architecture-ideals" id="toc-architecture-ideals" class="nav-link" data-scroll-target="#architecture-ideals">Architecture Ideals</a></li>
   </ul></li>
-  <li><a href="#development" id="toc-development" class="nav-link" data-scroll-target="#development">Development</a>
+  <li><a href="#local-development" id="toc-local-development" class="nav-link" data-scroll-target="#local-development">Local Development</a>
   <ul class="collapse">
   <li><a href="#install-requirements" id="toc-install-requirements" class="nav-link" data-scroll-target="#install-requirements">Install Requirements</a></li>
-  <li><a href="#create-required-virtual-environments" id="toc-create-required-virtual-environments" class="nav-link" data-scroll-target="#create-required-virtual-environments">Create Required Virtual Environments</a></li>
-  <li><a href="#activate-virtual-environment" id="toc-activate-virtual-environment" class="nav-link" data-scroll-target="#activate-virtual-environment">Activate Virtual Environment</a></li>
-  <li><a href="#install-the-website-app-requirements" id="toc-install-the-website-app-requirements" class="nav-link" data-scroll-target="#install-the-website-app-requirements">Install the Website app requirements</a></li>
-  <li><a href="#install-the-api-requirements" id="toc-install-the-api-requirements" class="nav-link" data-scroll-target="#install-the-api-requirements">Install the API requirements</a></li>
-  <li><a href="#install-the-pre-commit-hooks" id="toc-install-the-pre-commit-hooks" class="nav-link" data-scroll-target="#install-the-pre-commit-hooks">Install The pre-commit Hooks</a></li>
-  <li><a href="#configuring-environment-variables" id="toc-configuring-environment-variables" class="nav-link" data-scroll-target="#configuring-environment-variables">Configuring Environment Variables</a></li>
-  <li><a href="#running-the-servers-manually-when-developing" id="toc-running-the-servers-manually-when-developing" class="nav-link" data-scroll-target="#running-the-servers-manually-when-developing">Running The Servers Manually When Developing</a></li>
-  <li><a href="#tips-and-tricks" id="toc-tips-and-tricks" class="nav-link" data-scroll-target="#tips-and-tricks">Tips And Tricks</a></li>
+  <li><a href="#clone-the-hyui-repository-to-your-local-machine." id="toc-clone-the-hyui-repository-to-your-local-machine." class="nav-link" data-scroll-target="#clone-the-hyui-repository-to-your-local-machine.">1. Clone the HyUi repository to your local machine.</a></li>
+  <li><a href="#create-required-virtual-environments" id="toc-create-required-virtual-environments" class="nav-link" data-scroll-target="#create-required-virtual-environments">2. Create Required Virtual Environments</a></li>
+  <li><a href="#activate-virtual-environments" id="toc-activate-virtual-environments" class="nav-link" data-scroll-target="#activate-virtual-environments">3. Activate Virtual Environments</a></li>
+  <li><a href="#install-the-website-app-requirements" id="toc-install-the-website-app-requirements" class="nav-link" data-scroll-target="#install-the-website-app-requirements">4. Install the Website app requirements</a></li>
+  <li><a href="#install-the-api-requirements" id="toc-install-the-api-requirements" class="nav-link" data-scroll-target="#install-the-api-requirements">5. Install the API requirements</a></li>
+  <li><a href="#install-the-pre-commit-hooks" id="toc-install-the-pre-commit-hooks" class="nav-link" data-scroll-target="#install-the-pre-commit-hooks">6. Install the pre-commit Hooks</a></li>
+  <li><a href="#configure-environment-variables" id="toc-configure-environment-variables" class="nav-link" data-scroll-target="#configure-environment-variables">6. Configure Environment Variables</a></li>
+  <li><a href="#running-the-servers-manually-when-developing" id="toc-running-the-servers-manually-when-developing" class="nav-link" data-scroll-target="#running-the-servers-manually-when-developing">7. Running The Servers Manually When Developing</a></li>
   </ul></li>
-  <li><a href="#initialisation" id="toc-initialisation" class="nav-link" data-scroll-target="#initialisation">Initialisation</a></li>
+  <li><a href="#development-within-the-nhs" id="toc-development-within-the-nhs" class="nav-link" data-scroll-target="#development-within-the-nhs">Development within the NHS</a></li>
   </ul>
 <div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hylode/hyui/edit/main/hyui/developer/setup.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/hylode/hyui/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
@@ -315,6 +315,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><code>models</code>: This contains all the Pydantic models that are used to share data between the <code>api</code> and <code>web</code>.</li>
 <li><code>initialise</code>: This sets-up the BaseRow instance that is used for configuration by the user.</li>
 <li><code>cache</code>: This contains the HTTP cache service that serves cached objects from <code>api</code> to <code>web</code> with a 5 minute expiry. See <a href="../developer/deployment.html">the deployment docs</a> for more information.</li>
+<li><code>baserow</code>: We use <a href="https://baserow.io">baserow</a> as a temporary database to that allows us to store information about patients without directly editing EMAP or EPIC. It is not relevant when running HyUI on your local machine, as all mock data will be stored locally. However, it is important to understand when <a href="../developer/deployment.html">deploying</a> HyUI with live data within the NHS.</li>
 </ul>
 <section id="architecture-ideals" class="level3">
 <h3 class="anchored" data-anchor-id="architecture-ideals">Architecture Ideals</h3>
@@ -325,10 +326,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul>
 </section>
 </section>
-<section id="development" class="level2">
-<h2 class="anchored" data-anchor-id="development">Development</h2>
-<p>Clone the HyUi repository to your local machine.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/HYLODE/HyUi.git</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="local-development" class="level2">
+<h2 class="anchored" data-anchor-id="local-development">Local Development</h2>
 <section id="install-requirements" class="level3">
 <h3 class="anchored" data-anchor-id="install-requirements">Install Requirements</h3>
 <ul>
@@ -336,75 +335,83 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li>Install <a href="pyenv-virtualenv">https://github.com/pyenv/pyenv-virtualenv</a></li>
 </ul>
 </section>
+<section id="clone-the-hyui-repository-to-your-local-machine." class="level3">
+<h3 class="anchored" data-anchor-id="clone-the-hyui-repository-to-your-local-machine.">1. Clone the HyUi repository to your local machine.</h3>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/HYLODE/HyUi.git</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
 <section id="create-required-virtual-environments" class="level3">
-<h3 class="anchored" data-anchor-id="create-required-virtual-environments">Create Required Virtual Environments</h3>
+<h3 class="anchored" data-anchor-id="create-required-virtual-environments">2. Create Required Virtual Environments</h3>
 <div class="sourceCode" id="cb2"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pyenv</span> virtualenv 3.11.0 hyui-web</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pyenv</span> virtualenv 3.11.0 hyui-api</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><span style="color:red">As of Feb 2023, Python 3.11.0 causes diskcache / SQLalchemy issues with local development on some machines. For now, we recommend changing the above commands to instead use python 3.10.8.</span></p>
 </section>
-<section id="activate-virtual-environment" class="level3">
-<h3 class="anchored" data-anchor-id="activate-virtual-environment">Activate Virtual Environment</h3>
+<section id="activate-virtual-environments" class="level3">
+<h3 class="anchored" data-anchor-id="activate-virtual-environments">3. Activate Virtual Environments</h3>
 <p>In one shell:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pyenv</span> activate hyui-web</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>In another shell:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pyenv</span> activate hyui-api</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>These will be the Python virtual environments that contains all the dependencies for the Dash web app and the API backend.</p>
+<p>These will be the Python virtual environments that contain all the dependencies for the Dash web app and the API backend.</p>
 </section>
 <section id="install-the-website-app-requirements" class="level3">
-<h3 class="anchored" data-anchor-id="install-the-website-app-requirements">Install the Website app requirements</h3>
+<h3 class="anchored" data-anchor-id="install-the-website-app-requirements">4. Install the Website app requirements</h3>
 <p>In the <code>hyui-web</code> terminal in the root directory:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="at">-e</span> <span class="st">"models[test]"</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="at">-e</span> <span class="st">"web[test]"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="install-the-api-requirements" class="level3">
-<h3 class="anchored" data-anchor-id="install-the-api-requirements">Install the API requirements</h3>
+<h3 class="anchored" data-anchor-id="install-the-api-requirements">5. Install the API requirements</h3>
 <p>In the <code>hyui-api</code> terminal in the root directory:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="at">-e</span> <span class="st">"models[test]"</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="at">-e</span> <span class="st">"api[test]"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="install-the-pre-commit-hooks" class="level3">
-<h3 class="anchored" data-anchor-id="install-the-pre-commit-hooks">Install The pre-commit Hooks</h3>
+<h3 class="anchored" data-anchor-id="install-the-pre-commit-hooks">6. Install the pre-commit Hooks</h3>
 <p>In your shell (<code>hyui-api</code> or <code>hyui-web</code>) run the following command:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pre-commit</span> install</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="configuring-environment-variables" class="level3">
-<h3 class="anchored" data-anchor-id="configuring-environment-variables">Configuring Environment Variables</h3>
-<p>An example environment variable file can be found at <code>.env.example</code>. The environment variables for each app are documented in the Pydantic Settings classes in <code>web/src/web/config.py</code> and <code>api/src/api/config.py</code>. An important one for development and production is the <code>WEB_API_URL</code> variable. This should be set to the host and port of your <code>api</code> server so most likely something like <code>http://api:8000</code> for running in Docker or <code>http://localhost:[port]/mock</code> for development. Note that in development a <code>/mock</code> path has been added. This allows the Dash web app to use all the mock endpoints instead of the live endpoints.</p>
+<section id="configure-environment-variables" class="level3">
+<h3 class="anchored" data-anchor-id="configure-environment-variables">6. Configure Environment Variables</h3>
+<p>You will need to create and configure a <code>.env</code> file in your directory root.</p>
+<p>An example environment variable file can be found at <code>.env.example</code>. The environment variables for each app are documented in the Pydantic Settings classes in <code>web/src/web/config.py</code> and <code>api/src/api/config.py</code>. An important one for development and production is the <code>WEB_API_URL</code> variable. This should be set to the host and port of your <code>api</code> server so most likely something like <code>http://api:8000</code> for running in Docker or <code>http://localhost:[port]/mock</code> for development. The <code>port</code> needs to line up with that specified when starting the FastAPI server below (we have used <code>8092</code> throughout these docs).</p>
+<p>Note that in development a <code>/mock</code> path has been added. This allows the Dash web app to use all the mock endpoints instead of the live endpoints.</p>
 <p>The environment variables are <em>required</em>, and the application will fail if any of these are missing when it attempts to run.</p>
 </section>
 <section id="running-the-servers-manually-when-developing" class="level3">
-<h3 class="anchored" data-anchor-id="running-the-servers-manually-when-developing">Running The Servers Manually When Developing</h3>
+<h3 class="anchored" data-anchor-id="running-the-servers-manually-when-developing">7. Running The Servers Manually When Developing</h3>
 <p>The web server when in the <code>hyui-web</code> shell:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">env</span> <span class="va">$(</span><span class="fu">grep</span> <span class="at">-v</span> <span class="st">'^#'</span> .env <span class="kw">|</span> <span class="fu">xargs</span><span class="va">)</span> python <span class="at">-m</span> web.main</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">env</span> <span class="va">$(</span><span class="fu">grep</span> <span class="at">-v</span> <span class="st">'^#'</span> .env <span class="kw">|</span> <span class="fu">xargs</span><span class="va">)</span> python <span class="at">-m</span> web.app</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>The API server when in the <code>hyui-api</code> shell:</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">env</span> <span class="va">$(</span><span class="fu">grep</span> <span class="at">-v</span> <span class="st">'^#'</span> .env <span class="kw">|</span> <span class="fu">xargs</span><span class="va">)</span> uvicorn api.main:app <span class="at">--reload</span> <span class="at">--port</span> 8092</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Ensure you replace <code>.env</code> with the correct path to your development <code>.env</code> file. The command <code>env $(grep -v '^#' .env | xargs)</code> loads the contents of the <code>.env</code> into the environment just for the current execution. The <code>grep -v '^#'</code> part excludes lines beginning with a <code>#</code> in the env file.</p>
-</section>
-<section id="tips-and-tricks" class="level3">
-<h3 class="anchored" data-anchor-id="tips-and-tricks">Tips And Tricks</h3>
-<section id="debugging-from-within-the-nhs-network" class="level4">
-<h4 class="anchored" data-anchor-id="debugging-from-within-the-nhs-network">Debugging From Within The NHS Network</h4>
-<p>Sometimes it can be difficult to debug your staging services from within the NHS’s firewall on live data. You can log into the <code>hyui-web</code> or <code>hyui-api</code> services from a terminal within the <code>HyUi</code> directory using the following:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> compose <span class="at">--project-name</span> [project name] exec hyui-web bash</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="sourceCode" id="cb11"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> compose <span class="at">--project-name</span> [project name] exec hyui-api bash</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>You can then change the code using vim or open a python console and debug from there. It may be useful to edit the <code>docker/api/Dockerfile</code> or <code>docker/web/Dockerfile</code> and add a <code>--reload</code> flag to the <code>ENTRYPOINT</code> so that code changes from within the container are reloaded automatically. <code>ENTRYPOINT ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--reload"]</code> instead of <code>ENTRYPOINT ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--reload"]</code>.</p>
-<p>If you prefer not to use vim then Visual Studio can SSH into the running containers somehow.</p>
-</section>
-<section id="debugging-on-your-local-machine" class="level4">
-<h4 class="anchored" data-anchor-id="debugging-on-your-local-machine">Debugging On Your Local Machine</h4>
-<p>If you are using PyCharm or another IDE then ensure that the environment variables in <code>.env</code> are loaded. PyCharm has a plugin that can load these when unit testing with <code>pytest</code> or running the main application.</p>
+<p>The <code>--port</code> specified in the <code>hyui-api</code> command should match the port in the <code>WEB_API_URL</code> variable of your <code>.env</code>ironment.</p>
+<p>You can run both these commands from within vscode or pycharm - see instructions <a href="../developer/ide_setup.html">here</a>.</p>
 </section>
 </section>
-</section>
-<section id="initialisation" class="level2">
-<h2 class="anchored" data-anchor-id="initialisation">Initialisation</h2>
-<p>Currently only Baserow needs to be initialised by creating an admin user and setting up the tables required for the rest of the app to function correct. The <code>initialise</code> python package contains the code that does all this.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pyenv</span> virtualenv 3.11.0 hyui-initialise</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pyenv</span> activate hyui-initialise</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="at">-e</span> <span class="st">"initialise"</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> initialise.main <span class="at">--operation</span> baserow</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>You can do this on your local machine but you need to install (with docker). See the <a href="https://baserow.io/docs/installation%2Finstall-with-docker">docs</a>. If you do this then don’t forget to adjust the <code>BASEROW_PUBLIC_URL</code> to point to your local dev version (e.g.&nbsp;<code>http://localhost:80</code>)</p>
+<section id="development-within-the-nhs" class="level2">
+<h2 class="anchored" data-anchor-id="development-within-the-nhs"><a href="../developer/deployment.html">Development within the NHS</a></h2>
+<p>Further information on developing within the NHS found on the <a href="../developer/deployment.html">Deployment</a> page.</p>
+
+<!--
+
+#### Debugging On Your Local Machine
+
+## Initialisation
+
+Currently only Baserow needs to be initialised by creating an admin user and setting up the tables required for the rest of the app to function correct. The `initialise` python package contains the code that does all this.
+
+```sh
+pyenv virtualenv 3.11.0 hyui-initialise
+pyenv activate hyui-initialise
+
+pip install -e "initialise"
+
+python -m initialise.main --operation baserow
+```
+
+You can do this on your local machine but you need to install (with docker).
+See the [docs](https://baserow.io/docs/installation%2Finstall-with-docker).
+If you do this then don't forget to adjust the `BASEROW_PUBLIC_URL` to point to your local dev version (e.g. `http://localhost:80`) -->
 
 
 </section>
