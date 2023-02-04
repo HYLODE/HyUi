@@ -366,8 +366,8 @@ def _make_elements(  # noqa: C901
         )
         if preset_map_positions:
             position = dict(
-                x=bed.get("xpos", 1) * 7,
-                y=bed.get("ypos", 1) * 7,
+                x=bed.get("xpos", 1) * 9,
+                y=bed.get("ypos", 1) * 9,
             )
         else:
             position = dict(

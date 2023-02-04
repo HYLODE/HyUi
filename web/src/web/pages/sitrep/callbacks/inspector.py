@@ -212,7 +212,9 @@ def submit_discharge_status(
             id="_submit_discharge_status_notification_NOT_IN_USE",
             action=show_arg,
             message=msg,
-            icon=DashIconify(icon="ic:round-celebration"),
+            icon=DashIconify(icon="carbon:checkmark-outline"),
+            autoClose=1500,
+            color=colors.green,
         )
 
         return notificaton, disabled, bed_submit_dict
