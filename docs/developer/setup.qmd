@@ -23,8 +23,8 @@ The root directory contains all the libraries that are used to power the HyUi da
 
 ### Install Requirements
 
-- Install [https://github.com/pyenv/pyenv](pyenv)
-- Install [https://github.com/pyenv/pyenv-virtualenv](pyenv-virtualenv)
+- Install [pyenv](https://github.com/pyenv/pyenv)
+- Install [pyenv-virtualenv](https://github.com/pyenv/pyenv-virtualenv)
 
 
 ### 1. Clone the HyUi repository to your local machine.

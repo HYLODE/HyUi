@@ -51,7 +51,7 @@ mock_router.include_router(mock_demo_router)
   - A series of callbacks that fire as the user interacts with the data
 
 
-- Inspect at [http://localhost:8201/demo/demo]()
+- Inspect at [http://localhost:8201/demo/demo](http://localhost:8201/demo/demo)
 
 
 ## Ways of working
