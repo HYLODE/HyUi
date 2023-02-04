@@ -4,10 +4,11 @@ import json
 from dash import Input, Output, State, callback, callback_context
 from dash_iconify import DashIconify
 from typing import Any, Tuple
+from datetime import datetime
 
-from web.pages.sitrep import DISCHARGE_DECISIONS, ids
-from web.pages.sitrep.callbacks.cytoscape import format_census
-from web.pages.sitrep.callbacks.discharges import post_discharge_status
+from web.pages.perrt import DISCHARGE_DECISIONS, ids
+from web.pages.perrt.callbacks.cytoscape import format_census
+from web.pages.perrt.callbacks.discharges import post_discharge_status
 from web.style import colors
 
 DEBUG = True
@@ -27,12 +28,12 @@ def _create_accordion_item(control: Any, panel: Any) -> Any:
 
 @callback(
     [
-        Output(ids.INSPECTOR_WARD_MODAL, "opened"),
-        Output(ids.INSPECTOR_WARD_ACCORDION, "value"),
-        Output(ids.INSPECTOR_WARD_MODAL, "title"),
+        Output(ids.INSPECTOR_CAMPUS_MODAL, "opened"),
+        Output(ids.INSPECTOR_CAMPUS_ACCORDION, "value"),
+        Output(ids.INSPECTOR_CAMPUS_MODAL, "title"),
     ],
-    Input(ids.CYTO_WARD, "tapNode"),
-    State(ids.INSPECTOR_WARD_MODAL, "opened"),
+    Input(ids.CYTO_CAMPUS, "tapNode"),
+    State(ids.INSPECTOR_CAMPUS_MODAL, "opened"),
     prevent_initial_callback=True,
 )
 def open_inspector_modal(node: dict, opened: bool) -> Tuple[bool, list[str], dmc.Group]:
@@ -52,9 +53,6 @@ def open_inspector_modal(node: dict, opened: bool) -> Tuple[bool, list[str], dmc
     bed_color = colors.orange if data.get("occupied") else colors.gray
     bed_number = bed.get("bed_number")
     department = bed.get("department")
-    # room = bed.get("room")
-    # room_type = "Sideroom" if data.get("room", {}).get("is_sidroom") else
-    # "Bay"
 
     modal_title = dmc.Group(
         [
@@ -72,59 +70,70 @@ def open_inspector_modal(node: dict, opened: bool) -> Tuple[bool, list[str], dmc
 
 
 @callback(
-    Output(ids.ACCORDION_ITEM_BED, "children"),
-    Input(ids.CYTO_WARD, "tapNode"),
-    Input(ids.INSPECTOR_WARD_MODAL, "opened"),
+    Output(ids.ACCORDION_ITEM_PERRT, "children"),
+    Input(ids.CYTO_CAMPUS, "tapNode"),
+    Input(ids.INSPECTOR_CAMPUS_MODAL, "opened"),
     prevent_initial_call=True,
 )
 def bed_accordion_item(
     node: dict, modal_open: bool
 ) -> Tuple[dmc.AccordionControl, dmc.AccordionPanel]:
-    """Prepare content for bed accordion item"""
-    if not node or not modal_open:
+    """Prepare content for PERRT accordion item"""
+
+    if not node or not modal_open:  # return quickly if modal or node closed
         control, panel = None, None
         return dmc.AccordionControl(control), dmc.AccordionPanel(panel)
 
-    data = node.get("data", {})
-    bed_status_control_value = data.get("dc_status", "").upper()
+    news = node.get("data", {}).get("news", {})
+    if news:
+        news_text = dmc.Text("Highest/lowest vitals within the last 6 hours")
+        news_content = dmc.Group(
+            [
+                dmc.Stack(
+                    [
+                        dmc.Badge("HR", color=colors.indigo, variant="outline"),
+                        dmc.Badge(
+                            news.get("pulse_max"), color=colors.indigo, variant="filled"
+                        ),
+                        dmc.Badge(
+                            news.get("pulse_min"), color=colors.indigo, variant="filled"
+                        ),
+                    ]
+                ),
+                dmc.Stack(
+                    [
+                        dmc.Badge("RR", color=colors.indigo, variant="outline"),
+                        dmc.Badge(
+                            news.get("resp_max"), color=colors.indigo, variant="filled"
+                        ),
+                        dmc.Badge(
+                            news.get("resp_min"), color=colors.indigo, variant="filled"
+                        ),
+                    ]
+                ),
+            ]
+        )
 
-    # BUG?: SegmentedControl does not reset to original colors after first draw
-    color = "indigo" if bed_status_control_value else "gray"
+    else:
+        news_content = dmc.Group()
+        news_text = dmc.Text("Vitals not available")
 
     control = dmc.Group(
         [
             DashIconify(
-                icon="carbon:logout",
+                icon="carbon:activity",
                 width=20,
             ),
-            dmc.Text("Discharge decision"),
+            dmc.Text("NEWS and vitals"),
         ]
     )
     panel = dmc.Grid(
         [
             dmc.Col(
-                dmc.SegmentedControl(
-                    id=ids.ACC_BED_STATUS_WARD,
-                    data=[i.get("label") for i in DISCHARGE_DECISIONS],
-                    fullWidth=True,
-                    value=bed_status_control_value,
-                    color=color,
-                    persistence=False,
-                ),
-                span=9,
-            ),
-            dmc.Col(
-                dmc.Button(
-                    "Submit",
-                    id=ids.ACC_BED_SUBMIT_WARD,
-                    color="orange",
-                    # variant="default",
-                ),
-                offset=1,
-                span=2,
-            ),
-            dmc.Col(
-                [dmc.Text(id=ids.ACC_BED_DECISION_TEXT, color=colors.gray)],
+                [
+                    news_content,
+                    news_text,
+                ],
                 span=12,
             ),
         ]
@@ -135,7 +144,7 @@ def bed_accordion_item(
 
 @callback(
     Output(ids.ACC_BED_DECISION_TEXT, "children"),
-    Input(ids.ACC_BED_STATUS_WARD, "value"),
+    Input(ids.ACC_BED_STATUS_CAMPUS, "value"),
 )
 def update_decision_description(value: str) -> str:
     description = [
@@ -149,14 +158,14 @@ def update_decision_description(value: str) -> str:
 
 @callback(
     [
-        Output(ids.ACC_BED_SUBMIT_WARD_NOTIFY, "children"),
-        Output(ids.ACC_BED_SUBMIT_WARD, "disabled"),
+        Output(ids.ACC_BED_SUBMIT_CAMPUS_NOTIFY, "children"),
+        Output(ids.ACC_BED_SUBMIT_CAMPUS, "disabled"),
         Output(ids.ACC_BED_SUBMIT_STORE, "data"),
     ],
-    Input(ids.ACC_BED_SUBMIT_WARD, "n_clicks"),
-    Input(ids.ACC_BED_STATUS_WARD, "value"),
-    State(ids.ACC_BED_SUBMIT_WARD, "disabled"),
-    State(ids.CYTO_WARD, "tapNode"),
+    Input(ids.ACC_BED_SUBMIT_CAMPUS, "n_clicks"),
+    Input(ids.ACC_BED_STATUS_CAMPUS, "value"),
+    State(ids.ACC_BED_SUBMIT_CAMPUS, "disabled"),
+    State(ids.CYTO_CAMPUS, "tapNode"),
     prevent_initial_call=True,
 )
 def submit_discharge_status(
@@ -173,11 +182,11 @@ def submit_discharge_status(
     response_status = -1
     response_dict = {}
 
-    if callback_context.triggered_id == ids.ACC_BED_STATUS_WARD:
+    if callback_context.triggered_id == ids.ACC_BED_STATUS_CAMPUS:
         bed_status_control_value = data.get("dc_status", "").upper()
         disabled = True if bed_status_control_value == status else False
         show = False
-    elif callback_context.triggered_id == ids.ACC_BED_SUBMIT_WARD:
+    elif callback_context.triggered_id == ids.ACC_BED_SUBMIT_CAMPUS:
         if status != "blocked":
             encounter = int(data.get("encounter", -1))
             response_status, response_json = post_discharge_status(
@@ -223,8 +232,8 @@ def submit_discharge_status(
 
 @callback(
     Output(ids.ACCORDION_ITEM_PATIENT, "children"),
-    Input(ids.CYTO_WARD, "tapNode"),
-    Input(ids.INSPECTOR_WARD_MODAL, "opened"),
+    Input(ids.CYTO_CAMPUS, "tapNode"),
+    Input(ids.INSPECTOR_CAMPUS_MODAL, "opened"),
     prevent_initial_call=True,
 )
 def patient_accordion_item(
@@ -258,14 +267,22 @@ def patient_accordion_item(
             dmc.Text(control_text),
         ]
     )
-    panel = dmc.Group()
+
+    try:
+        hospital_admit = census.get("hv_admission_dt")
+        hospital_los = int((datetime.utcnow() - hospital_admit).days)
+        text_los = f"Day {hospital_los} (Hospital admission: {datetime.strftime(hospital_admit, '%d %b %Y')})"
+    except TypeError:
+        text_los = "Hospital length of stay unknown"
+
+    panel = dmc.Group([dmc.Text(text_los)])
 
     return dmc.AccordionControl(control), dmc.AccordionPanel(panel)
 
 
 @callback(
     Output(ids.ACCORDION_ITEM_DEBUG, "children"),
-    Input(ids.CYTO_WARD, "tapNode"),
+    Input(ids.CYTO_CAMPUS, "tapNode"),
 )
 def debug_accordion_item(node: dict) -> Tuple[dmc.AccordionControl, dmc.AccordionPanel]:
     """Prepare content for debug accordion item"""
