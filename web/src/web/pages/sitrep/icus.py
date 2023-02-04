@@ -83,12 +83,10 @@ ward_cyto = dmc.Paper(
                 "z-index": 999,
             },
             layout={
-                "name": "circle",
+                "name": "preset",
                 "animate": True,
                 "fit": True,
                 "padding": 10,
-                "startAngle": math.pi * 2 / 3,  # clockwise from 3 O'Clock
-                "sweep": math.pi * 5 / 3,
             },
             stylesheet=cyto_style_sheet,
             responsive=True,

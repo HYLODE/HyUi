@@ -291,6 +291,7 @@ def _make_elements(  # noqa: C901
     discharges: list[dict],
     selected_dept: str | None,
     ward_only: bool,
+    preset_map_positions: bool = False,
 ) -> list[dict]:
     """
     Logic to create elements for cyto map
@@ -303,6 +304,7 @@ def _make_elements(  # noqa: C901
         discharges: list of discharge statuses (from baserow)
         selected_dept: name of dept or None if show all
         ward_only: True if ward_only not campus; default False
+        preset_map_positions: default False
 
     Returns:
         list of elements for cytoscape map
@@ -327,6 +329,12 @@ def _make_elements(  # noqa: C901
         warnings.warn("Possible type error b/c no recent discharges")
         print(e)
         discharge_lookup = {}
+
+    preset_map_positions = (
+        False
+        if selected_dept not in SITREP_DEPT2WARD_MAPPING.keys()
+        else preset_map_positions
+    )
 
     # create beds
     for bed in beds:
@@ -356,10 +364,16 @@ def _make_elements(  # noqa: C901
             encounter=encounter,
             dc_status=discharge_status,
         )
-        position = dict(
-            x=bed.get("floor_x_index", -1) * 40,
-            y=(y_index_max - bed.get("floor_y_index", -1)) * 60,
-        )
+        if preset_map_positions:
+            position = dict(
+                x=bed.get("xpos", 1) * 7,
+                y=bed.get("ypos", 1) * 7,
+            )
+        else:
+            position = dict(
+                x=bed.get("floor_x_index", -1) * 40,
+                y=(y_index_max - bed.get("floor_y_index", -1)) * 60,
+            )
         elements.append(
             dict(
                 data=data,
@@ -460,6 +474,7 @@ def _prepare_cyto_elements_campus(
         Input(ids.DISCHARGES_STORE, "data"),
         Input(ids.DEPT_SELECTOR, "value"),
         Input(ids.ACC_BED_SUBMIT_STORE, "data"),
+        State(ids.DEPT_GROUPER, "value"),
     ],
     prevent_initial_call=True,
 )
@@ -472,13 +487,24 @@ def _prepare_cyto_elements_ward(
     discharges: list[dict],
     dept: str,
     bed_submit_store: dict,
+    dept_grouper: str,
 ) -> list[dict]:
     """
     Build the element list from pts/beds/rooms/depts for the map
+    Use the dept_grouper == ALL_ICUs to trigger the switch to using
+    positions for preset layout
     """
     if callback_context.triggered_id != ids.ACC_BED_SUBMIT_STORE:
+        preset_map_positions = True if dept_grouper == "ALL_ICUS" else False
         elements = _make_elements(
-            census, depts, rooms, beds, discharges, selected_dept=dept, ward_only=True
+            census,
+            depts,
+            rooms,
+            beds,
+            discharges,
+            selected_dept=dept,
+            ward_only=True,
+            preset_map_positions=preset_map_positions,
         )
     elif callback_context.triggered_id == ids.ACC_BED_SUBMIT_STORE:
         node_id = bed_submit_store.get("id")
