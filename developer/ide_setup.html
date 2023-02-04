@@ -296,11 +296,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <section id="notes-on-setting-up-pycharm-for-development-with-specific-reference-to-working-on-a-mac" class="level2">
 <h2 class="anchored" data-anchor-id="notes-on-setting-up-pycharm-for-development-with-specific-reference-to-working-on-a-mac">Notes on setting up PyCharm for development with specific reference to working on a Mac</h2>
-<p>Set up run configurations</p>
+<p>Set up run configurations:</p>
 <ul>
-<li>https://www.jetbrains.com/help/pycharm/run-debug-configuration.html</li>
-<li>install the <strong>EnvFile</strong> plug-in so that the environment file can be read by your run configuration (see https://stackoverflow.com/a/42708476/992999)</li>
-<li>set <code>OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES</code> as an environment variable in your run configuration to avoid <a href="https://stackoverflow.com/a/52230415/992999">errors</a> on recent <em>macos</em> installs</li>
+<li><a href="https://www.jetbrains.com/help/pycharm/run-debug-configuration.html">PyCharm Run/Debug Configurations</a></li>
+<li>Install the <strong>EnvFile</strong> plug-in so that the environment file can be read by your run configuration (see <a href="https://stackoverflow.com/a/42708476/992999">Stackoverflow Answer</a>)</li>
+<li>Set <code>OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES</code> as an environment variable in your run configuration to avoid <a href="https://stackoverflow.com/a/52230415/992999">errors</a> on recent <em>macos</em> installs</li>
 </ul>
 <p>Example configurations here - <a href="../snippets/HyUI-API FastAPI.run.xml">FastAPI</a> - <a href="../snippets/HyUI-Web Plotly Dash.run.xml">Plotly Dash</a></p>
 <p>If you are using PyCharm or another IDE then ensure that the environment variables in <code>.env</code> are loaded. PyCharm has a plugin that can load these when unit testing with <code>pytest</code> or running the main application.</p>
