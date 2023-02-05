@@ -26,12 +26,17 @@ CYTO_WARD = gen_id("cyto ward", __name__)
 PROGRESS_CAMPUS = gen_id("progress campus", __name__)
 PROGRESS_WARD = gen_id("progress ward", __name__)
 
-# inspector
+# modal (campus)
 INSPECTOR_CAMPUS_MODAL = gen_id("inspector campus modal", __name__)
+
+# sidebar (critical care and ward)
 INSPECTOR_WARD_MODAL = gen_id("inspector ward modal", __name__)
 
+INSPECTOR_WARD_SIDEBAR = gen_id("inspector patient sidebar", __name__)
+INSPECTOR_WARD_TITLE = gen_id("inspector patient sidebar title", __name__)
 INSPECTOR_WARD_ACCORDION = gen_id("ward accordion", __name__)
 
+# accordion within sidebar
 ACCORDION_ITEM_BED = gen_id("accordion bed", __name__)
 ACC_BED_DECISION_TEXT = gen_id("bed decision text", __name__)
 ACC_BED_STATUS_WARD = gen_id("bed status ward", __name__)
