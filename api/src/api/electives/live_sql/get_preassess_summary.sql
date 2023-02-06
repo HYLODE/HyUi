@@ -15,8 +15,8 @@ WHERE cnf.[Type] = 'Anaesthesia Preprocedure Evaluation'
     AND scf.[PatientDurableKey] > 1
             AND scf.[PatientDurableKey] IS NOT NULL
             AND patd.[AgeInYears] >= 18
-            AND scufx.PlannedOperationStartInstant >= '2023-02-06'
-    AND scufx.PlannedOperationStartInstant < '2023-02-08'
+            AND scufx.PlannedOperationStartInstant >= :start_date
+    AND scufx.PlannedOperationStartInstant < :end_date
             AND (
                 wlef.[IntendedManagement] IN (
                     '*Unspecified',
