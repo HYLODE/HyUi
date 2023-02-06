@@ -4,19 +4,6 @@ on: [push]
 
 jobs:
   continuous-integration:
-    env:
-      API_STAR_DSN: "postgresql+psycopg2://username:password@host:1234/uds"
-      API_CABOODLE_DSN: "mssql+pyodbc://username:password@host:1234/caboodle_report"
-      API_CLARITY_DSN: "mssql+pyodbc://username:password@host:1234/clarity_report"
-      API_BASEROW_EMAIL: foo@bar.com
-      API_BASEROW_PASSWORD: foobar
-      API_BASEROW_USERNAME: foobar
-      API_BASEROW_APPLICATION_NAME: hyui
-      API_BASEROW_URL: http://foo.bar
-      API_HYCASTLE_URL: http://foo.bar
-      API_HYMIND_URL: http://foo.bar
-      API_TOWERMAIL_URL: http://foo.bar
-
     runs-on: ubuntu-latest
 
     steps:
