@@ -40,5 +40,3 @@ COPY --chown=hyui:root ./docker/web/refresh_cache.sh /app
 RUN chmod +x /app/refresh_cache.sh
 
 ENTRYPOINT ["gunicorn", "--bind", "0.0.0.0", "web.app:server"]
-# for development
-#ENTRYPOINT ["python", "-m", "web.app"]

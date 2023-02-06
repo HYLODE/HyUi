@@ -11,6 +11,7 @@ The root directory contains all the libraries that are used to power the HyUi da
 - `models`: This contains all the Pydantic models that are used to share data between the `api` and `web`.
 - `initialise`: This sets-up the BaseRow instance that is used for configuration by the user.
 - `cache`: This contains the HTTP cache service that serves cached objects from `api` to `web` with a 5 minute expiry. See [the deployment docs](./deployment.qmd) for more information.
+- `baserow`: We use [baserow](https://baserow.io) as a temporary database to that allows us to store information about patients without directly editing EMAP or EPIC. It is not relevant when running HyUI on your local machine, as all mock data will be stored locally. However, it is important to understand when [deploying](deployment.qmd) HyUI with live data within the NHS.
 
 ### Architecture Ideals
 - `web` should only communicate with `api` for data. This allows us to entirely mock data for `web` when developing.
@@ -18,27 +19,30 @@ The root directory contains all the libraries that are used to power the HyUi da
 - Pages in `web/src/web/pages` should be independent of each other so there is minimal/no sharing between two sets of pages. Common code can be put in a separate module or package in `web`.
 
 
-## Development
+## Local Development
 
-Clone the HyUi repository to your local machine.
+### Install Requirements
+
+- Install [pyenv](https://github.com/pyenv/pyenv)
+- Install [pyenv-virtualenv](https://github.com/pyenv/pyenv-virtualenv)
+
+
+### 1. Clone the HyUi repository to your local machine.
 
 ```sh
 git clone https://github.com/HYLODE/HyUi.git
 ```
-
-### Install Requirements
-
-- Install [https://github.com/pyenv/pyenv](pyenv)
-- Install [https://github.com/pyenv/pyenv-virtualenv](pyenv-virtualenv)
-
-### Create Required Virtual Environments
+### 2. Create Required Virtual Environments
 
 ```sh
 pyenv virtualenv 3.11.0 hyui-web
 pyenv virtualenv 3.11.0 hyui-api
 ```
 
-### Activate Virtual Environment
+<span style="color:red">As of Feb 2023, Python 3.11.0 causes diskcache / SQLalchemy issues with local development on some machines. For now, we recommend changing the above commands to instead use python 3.10.8.</span>
+
+
+### 3. Activate Virtual Environments
 
 In one shell:
 
@@ -51,9 +55,9 @@ In another shell:
 pyenv activate hyui-api
 ```
 
-These will be the Python virtual environments that contains all the dependencies for the Dash web app and the API backend.
+These will be the Python virtual environments that contain all the dependencies for the Dash web app and the API backend.
 
-### Install the Website app requirements
+### 4. Install the Website app requirements
 
 In the `hyui-web` terminal in the root directory:
 
@@ -62,7 +66,7 @@ pip install -e "models[test]"
 pip install -e "web[test]"
 ```
 
-### Install the API requirements
+### 5. Install the API requirements
 In the `hyui-api` terminal in the root directory:
 
 ```sh
@@ -70,7 +74,7 @@ pip install -e "models[test]"
 pip install -e "api[test]"
 ```
 
-### Install The pre-commit Hooks
+### 6. Install the pre-commit Hooks
 
 In your shell (`hyui-api` or `hyui-web`) run the following command:
 
@@ -78,18 +82,22 @@ In your shell (`hyui-api` or `hyui-web`) run the following command:
 pre-commit install
 ```
 
-### Configuring Environment Variables
+### 6. Configure Environment Variables
 
-An example environment variable file can be found at `.env.example`. The environment variables for each app are documented in the Pydantic Settings classes in `web/src/web/config.py` and `api/src/api/config.py`. An important one for development and production is the `WEB_API_URL` variable. This should be set to the host and port of your `api` server so most likely something like `http://api:8000` for running in Docker or `http://localhost:[port]/mock` for development. Note that in development a `/mock` path has been added. This allows the Dash web app to use all the mock endpoints instead of the live endpoints.
+You will need to create and configure a `.env` file in your directory root.
+
+An example environment variable file can be found at `.env.example`. The environment variables for each app are documented in the Pydantic Settings classes in `web/src/web/config.py` and `api/src/api/config.py`. An important one for development and production is the `WEB_API_URL` variable. This should be set to the host and port of your `api` server so most likely something like `http://api:8000` for running in Docker or `http://localhost:[port]/mock` for development. The `port` needs to line up with that specified when starting the FastAPI server below (we have used `8092` throughout these docs).
+
+Note that in development a `/mock` path has been added. This allows the Dash web app to use all the mock endpoints instead of the live endpoints.
 
 The environment variables are _required_, and the application will fail if any of these are missing when it attempts to run.
 
-### Running The Servers Manually When Developing
+### 7. Running The Servers Manually When Developing
 
 The web server when in the `hyui-web` shell:
 
 ```sh
-env $(grep -v '^#' .env | xargs) python -m web.main
+env $(grep -v '^#' .env | xargs) python -m web.app
 ```
 
 The API server when in the `hyui-api` shell:
@@ -100,30 +108,18 @@ env $(grep -v '^#' .env | xargs) uvicorn api.main:app --reload --port 8092
 
 Ensure you replace `.env` with the correct path to your development `.env` file. The command `env $(grep -v '^#' .env | xargs)` loads the contents of the `.env` into the environment just for the current execution. The `grep -v '^#'` part excludes lines beginning with a `#` in the env file.
 
+The `--port` specified in the `hyui-api` command should match the port in the `WEB_API_URL` variable of your `.env`ironment.
 
-### Tips And Tricks
+You can run both these commands from within vscode or pycharm - see instructions [here](ide_setup.qmd).
 
-#### Debugging From Within The NHS Network
 
-Sometimes it can be difficult to debug your staging services from within the NHS's firewall on live data. You can log into the `hyui-web` or `hyui-api` services from a terminal within the `HyUi` directory using the following:
+## [Development within the NHS](deployment.qmd)
 
-```sh
-docker compose --project-name [project name] exec hyui-web bash
-```
+Further information on developing within the NHS found on the [Deployment](deployment.qmd) page.
 
-```sh
-docker compose --project-name [project name] exec hyui-api bash
-```
-
-You can then change the code using vim or open a python console and debug from there. It may be useful to edit the `docker/api/Dockerfile` or `docker/web/Dockerfile` and add a `--reload` flag to the `ENTRYPOINT` so that code changes from within the container are reloaded automatically. `ENTRYPOINT ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--reload"]` instead of `ENTRYPOINT ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--reload"]`.
-
-If you prefer not to use vim then Visual Studio can SSH into the running containers somehow.
-
+<!--
 
 #### Debugging On Your Local Machine
-
-If you are using PyCharm or another IDE then ensure that the environment variables in `.env` are loaded. PyCharm has a plugin that can load these when unit testing with `pytest` or running the main application.
-
 
 ## Initialisation
 
@@ -140,4 +136,4 @@ python -m initialise.main --operation baserow
 
 You can do this on your local machine but you need to install (with docker).
 See the [docs](https://baserow.io/docs/installation%2Finstall-with-docker).
-If you do this then don't forget to adjust the `BASEROW_PUBLIC_URL` to point to your local dev version (e.g. `http://localhost:80`)
+If you do this then don't forget to adjust the `BASEROW_PUBLIC_URL` to point to your local dev version (e.g. `http://localhost:80`) -->

@@ -1,7 +1,16 @@
 import dash
 
+import diskcache
+import tempfile
+from uuid import uuid4
 from web.layout.appshell import create_appshell
 from web.config import get_settings
+
+launch_uuid = uuid4()
+cache = diskcache.Cache(tempfile.TemporaryDirectory().name)
+background_callback_manager = dash.DiskcacheManager(
+    cache, cache_by=[lambda: launch_uuid], expire=600  # seconds
+)
 
 app = dash.Dash(
     __name__,
@@ -20,6 +29,7 @@ app = dash.Dash(
             "user-scalable=no",
         }
     ],
+    background_callback_manager=background_callback_manager,
 )
 
 app.config.suppress_callback_exceptions = True

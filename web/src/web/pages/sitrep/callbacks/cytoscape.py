@@ -2,9 +2,9 @@ import dash
 import pandas as pd
 import requests
 import warnings
-from dash import Input, Output, callback, State, callback_context
+from dash import Input, Output, State, callback, callback_context
 from datetime import datetime
-from typing import Tuple
+from typing import Tuple, Any
 
 from models.census import CensusRow
 from models.sitrep import SitrepRow
@@ -13,22 +13,30 @@ from web.pages.sitrep import CAMPUSES, SITREP_DEPT2WARD_MAPPING, ids
 from web.stores import ids as store_ids
 from web.utils import Timer
 
+# =============================================================================
 DEBUG = True
+# =============================================================================
 
 
 @callback(
     Output(ids.DEPTS_OPEN_STORE, "data"),
-    Input(ids.CAMPUS_SELECTOR, "value"),
+    Input(ids.DEPT_GROUPER, "value"),
     Input(store_ids.DEPT_STORE, "data"),
 )
-def _store_depts(campus: str, depts: list[dict]) -> list[dict]:
-    """Need a list of departments for this building"""
-    try:
-        these_depts = [dept for dept in depts if dept.get("location_name") == campus]
-    except TypeError as e:
-        print(e)
-        warnings.warn(f"No departments found at {campus} campus")
-        these_depts = []
+def _store_depts(dept_grouper: str, depts: list[dict]) -> list[dict]:
+    """Need a list of departments for ALL_ICUS or this campus"""
+    if dept_grouper == "ALL_ICUS":
+        icus = SITREP_DEPT2WARD_MAPPING.keys()
+        these_depts = [dept for dept in depts if dept.get("department") in icus]
+    else:
+        try:
+            these_depts = [
+                dept for dept in depts if dept.get("location_name") == dept_grouper
+            ]
+        except TypeError as e:
+            print(e)
+            warnings.warn(f"No departments found at {dept_grouper} campus")
+            these_depts = []
     return these_depts
 
 
@@ -131,32 +139,38 @@ def _store_beds(
 
 @callback(
     Output(ids.CENSUS_STORE, "data"),
-    Input(ids.CAMPUS_SELECTOR, "value"),
+    Input(ids.DEPT_GROUPER, "value"),
     Input(ids.DEPTS_OPEN_STORE_NAMES, "data"),
 )
 def _store_census(
-    campus: str,
+    dept_grouper: str,
     depts_open_names: list[str],
 ) -> list[dict]:
     """
     Store CensusRow as list of dictionaries after filtering out closed
     departments for that building
     Args:
-        campus: one of UCH/WMS/GWB/NHNN
+        dept_grouper: one of UCH/WMS/GWB/NHNN
         depts_open_names: list of departments that are open
 
     Returns:
         Filtered list of CensusRow dictionaries
 
     """
-    campus_short_name = next(
-        i.get("label") for i in CAMPUSES if i.get("value") == campus
-    )
+    if dept_grouper == "ALL_ICUS":
+        response = requests.get(
+            f"{get_settings().api_url}/census/",
+            params={"departments": SITREP_DEPT2WARD_MAPPING.keys()},
+        )
+    else:
+        campus_short_name = next(
+            i.get("label") for i in CAMPUSES if i.get("value") == dept_grouper
+        )
 
-    response = requests.get(
-        f"{get_settings().api_url}/census/campus/",
-        params={"campuses": campus_short_name},
-    )
+        response = requests.get(
+            f"{get_settings().api_url}/census/campus/",
+            params={"campuses": campus_short_name},
+        )
 
     res = [CensusRow.parse_obj(row).dict() for row in response.json()]
     res = [row for row in res if row.get("department") in depts_open_names]
@@ -167,6 +181,7 @@ def _store_census(
     Output(ids.SITREP_STORE, "data"),
     Input(ids.DEPT_SELECTOR, "value"),
     prevent_initial_callback=True,
+    background=True,
 )
 def _store_sitrep(dept: str) -> list[dict]:
     """
@@ -250,13 +265,21 @@ def store_discharge_status(dept: str) -> list[dict]:
         Output(ids.DEPT_SELECTOR, "value"),
     ],
     Input(ids.DEPTS_OPEN_STORE_NAMES, "data"),
-    Input(ids.CAMPUS_SELECTOR, "value"),
+    Input(ids.DEPT_GROUPER, "value"),
 )
-def _dept_select_control(depts: list[str], campus: str) -> Tuple[list[str], str]:
+def _dept_select_control(depts: list[Any], dept_grouper: str) -> Tuple[list[str], str]:
     """Populate select input with data (dept name) and default value"""
-    default = [i.get("default_dept", "") for i in CAMPUSES if i.get("value") == campus][
-        0
-    ]
+    if dept_grouper == "ALL_ICUS":
+        default = "UCH T03 INTENSIVE CARE"
+        depts = [
+            {"value": k, "label": v} for k, v in list(SITREP_DEPT2WARD_MAPPING.items())
+        ]
+    else:
+        default = [
+            i.get("default_dept", "")
+            for i in CAMPUSES
+            if i.get("value") == dept_grouper
+        ][0]
     return depts, default
 
 
@@ -478,7 +501,11 @@ def format_census(census: dict) -> dict:
     lastname = census.get("lastname", "").upper()
     firstname = census.get("firstname", "").title()
     initials = (
-        f"{census.get('firstname', '?')[0]}" f"" f"" f"{census.get('lastname', '?')[0]}"
+        f"{census.get('firstname', '?')[0]}"
+        f""
+        f""
+        f""
+        f"{census.get('lastname', '?')[0]}"
     )
     date_of_birth = census.get("date_of_birth", "1900-01-01")  # default dob
     dob = datetime.fromisoformat(date_of_birth)

@@ -57,10 +57,19 @@
   {
     "selector": "[?occupied]",
     "style": {
-      "background-color": "orange",
+      "background-color": "indigo",
       "border-width": 0,
       "color": "white",
       "background-opacity": 1
+    }
+  },
+  {
+    "selector": "[dc_status='review'][?occupied]",
+    "style": {
+      "shape": "tag",
+      "background-color": "#3d9970",
+      "background-opacity": 1.0,
+      "text-margin-x": -2
     }
   },
   {
@@ -68,6 +77,7 @@
     "style": {
       "shape": "tag",
       "background-color": "olive",
+      "background-opacity": 1.0,
       "text-margin-x": -2
     }
   },
@@ -78,8 +88,7 @@
       "width": 36,
       "height": 36,
       "text-margin-y": 2,
-      "shape": "star",
-      "border-width": 1,
+      "border-width": 3,
       "border-color": "black",
       "color": "black"
     }
