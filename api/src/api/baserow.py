@@ -362,27 +362,27 @@ class BaserowDB:
         return response.json()
 
 
-logging.warning("Baserow module initiation")
-logging.warning("=========================")
-settings = get_settings()
-
-logging.warning("Generating admin token")
-admin_token = _get_user_auth_token(settings)["access_token"]
-
-logging.warning("Getting database token")
-group_id = _get_group_id(settings, admin_token)
-database_token = _get_database_token(settings, admin_token, group_id)
-
-logging.warning("Getting application ID")
-application_id = _get_application_id(settings, admin_token)
-
-logging.warning("Getting tables dictionary")
-tables_dict = _get_table_ids(settings, admin_token, application_id)
-logging.info(str(tables_dict))
-
-
 @lru_cache()
 def get_baserow_db() -> BaserowDB:
+
+    logging.warning("Baserow module initiation")
+    logging.warning("=========================")
+    settings = get_settings()
+
+    logging.warning("Generating admin token")
+    admin_token = _get_user_auth_token(settings)["access_token"]
+
+    logging.warning("Getting database token")
+    group_id = _get_group_id(settings, admin_token)
+    database_token = _get_database_token(settings, admin_token, group_id)
+
+    logging.warning("Getting application ID")
+    application_id = _get_application_id(settings, admin_token)
+
+    logging.warning("Getting tables dictionary")
+    tables_dict = _get_table_ids(settings, admin_token, application_id)
+    logging.info(str(tables_dict))
+
     return BaserowDB(
         settings=settings,
         database_token=database_token,
