@@ -9,6 +9,8 @@ class AppColors(BaseModel):
     aqua: str = "#7FDBFF"
     teal: str = "#39CCCC"
     indigo: str = "#5c7cfa"  # via dbc.theme.default_colors
+    indigo50: str = "#aebefd"  # via https://borderleft.com/toolbox/rgba/
+    indigo67: str = "#92a7fc"
     olive: str = "#3D9970"
     olive50: str = "#9ECCB8"  # 50% white tinted olive [0.5*(x + 255) for x in R,G,B]
     green: str = "#2ECC40"

@@ -3,7 +3,9 @@
     "selector": "node",
     "style": {
       "text-halign": "center",
-      "text-valign": "center"
+      "text-valign": "center",
+      "width": 64,
+      "height": 64
     }
   },
   {
@@ -25,6 +27,7 @@
       "shape": "ellipse",
       "label": "data(bed_number)",
       "color": "gray",
+      "font-size": 30,
       "border-color": "olive",
       "border-width": 2,
       "background-color": "olive",
@@ -35,7 +38,6 @@
     "selector": "[entity='room']",
     "style": {
       "color": "gray",
-      "label": "data(label)",
       "border-width": 1,
       "background-opacity": 0,
       "text-halign": "left"
@@ -57,7 +59,7 @@
   {
     "selector": "[?occupied]",
     "style": {
-      "background-color": "indigo",
+      "background-color": "indigo67",
       "border-width": 0,
       "color": "white",
       "background-opacity": 1
@@ -109,11 +111,10 @@
   {
     "selector": ":selected:",
     "style": {
-      "width": 36,
-      "height": 36,
       "text-margin-y": 2,
       "border-width": 3,
       "border-color": "black",
+      "font-weight": "bold",
       "color": "black"
     }
   }
