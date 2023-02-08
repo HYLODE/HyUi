@@ -16,8 +16,12 @@ This link will only work from within the UCLH network, and you will need to cont
 ::: {.callout-note collapse=true appearance="default"}
 ## Other resources
 
+- Link to the [Teams](https://teams.microsoft.com/l/meetup-join/19:meeting_ZjMzMGNiMjMtN2Q4OC00Zjk5LTgwYzYtZDgzNWY5YzQyMTY3@thread.v2/0?context=%7B%22Tid%22:%2237c354b2-85b0-47f5-b222-07b48d774ee3%22,%22Oid%22:%22d28a7a1f-9bc5-4843-be4b-2f668110b221%22%7D) meeting for the morning sitrep
 - read the user [documentation](user/user.qmd)
 - explore the developer [guide](developer/setup.qmd)
 - get involved or learn more [about](about.qmd) the project
-- try the [_alpha_](http://172.16.149.202:8300) version! 😬😱
+- try the [_alpha_](http://172.16.149.205:8902) version! 😬😱
+- use the original [sitrep](http://uclvlddpragae08:5701/sitrep/T03)
+- checkout the [INFORM-US](http://uclvlddpragae08:5703) dashboard
+
 :::

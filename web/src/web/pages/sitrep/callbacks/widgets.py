@@ -22,7 +22,7 @@ def _progress_bar_bed_count(elements: list[dict]) -> list[dict]:
     discharges = len([i for i in beds if i.get("dc_status") == "discharge"])
     reviews = len([i for i in beds if i.get("dc_status") == "review"])
     exits = len([i for i in beds if i.get("dc_status") in ["excellence"]])
-    hold = occupied - discharges - reviews - exits
+    holding = occupied - discharges - reviews - exits
     empty = N - occupied - blocked
     empty_p = empty / N
 
@@ -51,7 +51,7 @@ def _progress_bar_bed_count(elements: list[dict]) -> list[dict]:
 
     return [
         dict(
-            value=hold / N * 100,
+            value=holding / N * 100,
             color=colors.indigo,
             label=occupied_label,
             tooltip=f"{occupied} residing",
