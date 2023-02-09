@@ -110,7 +110,7 @@ electives_list = dmc.Paper(
     withBorder=True,
 )
 
-patient_info_box = dmc.Paper(dmc.Code(id="patient_info_box", block="True"))
+patient_info_box = dmc.Paper(dmc.Blockquote(id="patient_info_box"))
 
 debug_inspector = dmc.Container(
     [

@@ -87,7 +87,7 @@ Operation:
 Echocardiography:
 Patient has had {pt['num_echo']} echos,
 of which {pt['abnormal_echo']} were abnormal.
-Last echo: [will pull narrative here]
+Last echo: {pt['last_echo']}
 
 Preassessment date: {pt['preassess_date']}:
 ASA: {pt['asa']}
