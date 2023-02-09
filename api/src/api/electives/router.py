@@ -204,7 +204,7 @@ def get_caboodle_pas(
     """
     params = {"days_ahead": days_ahead}
     return _parse_query(
-        "live_sql/pa_summary.sql", session, PreassessSummaryData, params
+        "live_sql/get_pa_summary.sql", session, PreassessSummaryData, params
     )
 
 
