@@ -82,6 +82,7 @@ def prepare_draft(
             how="left",
         )
         .merge(wrangle_pas(pa_summary_df), how="left", on="patient_durable_key")
+        .rename(columns={"narrative": "last_echo"})
     )
 
     # print(df.columns)

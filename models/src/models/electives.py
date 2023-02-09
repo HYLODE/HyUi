@@ -189,6 +189,7 @@ class MergedData(CabData):
     prioritisation: str | None
     num_echo: int | None
     abnormal_echo: int | None
+    last_echo: str | None
     bmi_max_value: float | None
     protocolised_adm: str | None
     post_operative_destination: str

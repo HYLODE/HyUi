@@ -1640,8 +1640,6 @@ def wrangle_echo(df: pd.DataFrame) -> pd.DataFrame:
 
     This is not ideal as IsAbnormal does not necessarily seem to be accurate.
     It also removes lots of potentially useful information.
-
-
     """
     wrangled = (
         df.groupby("patient_durable_key")
@@ -1650,6 +1648,13 @@ def wrangle_echo(df: pd.DataFrame) -> pd.DataFrame:
             columns={"patient_durable_key": "num_echo", "is_abnormal": "abnormal_echo"}
         )
         .reset_index()
+        .merge(
+            df[["patient_durable_key", "narrative", "date_value"]],
+            how="left",
+            on="patient_durable_key",
+        )
+        .sort_values("date_value")
+        .drop_duplicates("patient_durable_key", keep="last")
     )
     return wrangled
 
