@@ -80,7 +80,7 @@ def wrangle_surgical(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def wrangle_preassess(df: pd.DataFrame) -> pd.DataFrame:
+def model_preassess(df: pd.DataFrame) -> pd.DataFrame:
     categories = {
         "cardio": "PROBLEMS - CARDIOVASCULAR|EXERCISE L|CARDIAC|HEART|CHEST PAIN",
         "resp": "RESPIRATORY|COPD|BRONCHIECT",
@@ -261,7 +261,7 @@ def merge_surg_preassess(
 ) -> pd.DataFrame:
     data_surg = wrangle_surgical(surg_data)
 
-    data_preassess = wrangle_preassess(preassess_data)
+    data_preassess = model_preassess(preassess_data)
 
     linked_notes = data_surg.merge(
         data_preassess, on="patient_durable_key", how="left"
@@ -1692,3 +1692,16 @@ def fill_na(df: pd.DataFrame) -> pd.DataFrame:
 
     df.fillna(value=replace_dict, inplace=True)
     return df
+
+
+def wrangle_pas(df: pd.DataFrame) -> pd.DataFrame:
+    return (
+        df[
+            df["creation_instant"]
+            == df.groupby("patient_durable_key")["creation_instant"].transform(max)
+        ]
+        .sort_values(["patient_durable_key", "line_num"])
+        .groupby("patient_durable_key")
+        .agg({"string_value": "".join})
+        .rename(columns={"string_value": "pa_summary"})
+    )

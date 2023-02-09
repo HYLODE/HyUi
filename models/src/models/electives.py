@@ -179,19 +179,14 @@ class MergedData(CabData):
     priority: str | None
     patient_friendly_name: str | None
     department_name: str | None
+    room_name: str | None
     preassess_date: date | None
-    cardio: int | None
-    resp: int | None
-    cpet: int | None
+    pa_summary: str | None
     mets: int | None
     anaesthetic_alert: int | None
     asa_rating_code: str | None
     asa: int | None
-    c_line: int | None
-    a_line: int | None
     prioritisation: str | None
-    crp_abnormal_count: float | None
-    inr_last_value: float | None
     num_echo: int | None
     abnormal_echo: int | None
     bmi_max_value: float | None
@@ -202,7 +197,6 @@ class MergedData(CabData):
     booked_destination: str | None
     pacu: int | None
     icu_prob: float | None
-    room_name: str | None
 
 
 class EchoData(CabData):
@@ -246,3 +240,9 @@ class AxaCodes(BaseModel):
     class Config:
         alias_generator = _to_camel
         allow_population_by_field_name = True
+
+
+class PreassessSummaryData(CabData):
+    creation_instant: datetime
+    string_value: str
+    line_num: int

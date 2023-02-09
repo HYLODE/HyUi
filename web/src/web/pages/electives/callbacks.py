@@ -91,18 +91,12 @@ Last echo: [will pull narrative here]
 
 Preassessment date: {pt['preassess_date']}:
 ASA: {pt['asa']}
-Our system has provided the following risk scores:
-    Cardio: {pt['cardio']}
-[etc]
+Preassessment summary: {pt['pa_summary']}
 
-Recent bloods and obs:
-Number of abnormal CRPs: {pt['crp_abnormal_count']}
 Maximum BMI: {pt['bmi_max_value']}
 
-Booked destination: {pt['booked_destination']}
+Original booking destination destination: {pt['booked_destination']}
 Protocolised Admission: {pt['protocolised_adm']}
-
-Probability of ICU admission by our model:
 
         """
     return string

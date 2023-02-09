@@ -21,6 +21,7 @@ from models.electives import (
     EchoWithAbnormalData,
     AxaCodes,
     ObsData,
+    PreassessSummaryData,
 )
 
 from datetime import timedelta, date
@@ -181,12 +182,30 @@ def get_mock_obs() -> list[type[ObsData]]:
 @router.get("/obs/", response_model=list[ObsData])
 def get_caboodle_obs(
     session: Session = Depends(get_caboodle_session), days_ahead: int = 1
-) -> list[CaboodlePreassessment]:
+) -> list[ObsData]:
     """
     Return caboodle preassessment data
     """
     params = {"days_ahead": days_ahead}
     return _parse_query("live_sql/get_obs.sql", session, ObsData, params)
+
+
+@mock_router.get("/pa_summary/", response_model=list[PreassessSummaryData])
+def get_mock_pas() -> list[type[PreassessSummaryData]]:
+    return _get_mock_sql_rows("pa_summary", PreassessSummaryData)
+
+
+@router.get("/pa_summary/", response_model=list[PreassessSummaryData])
+def get_caboodle_pas(
+    session: Session = Depends(get_caboodle_session), days_ahead: int = 1
+) -> list[PreassessSummaryData]:
+    """
+    Return caboodle preassessment data
+    """
+    params = {"days_ahead": days_ahead}
+    return _parse_query(
+        "live_sql/pa_summary.sql", session, PreassessSummaryData, params
+    )
 
 
 @router.get("/axa/", response_model=list[AxaCodes])
@@ -212,6 +231,7 @@ def get_electives(
     labs = get_caboodle_labs(session=s_caboodle, days_ahead=days_ahead)
     echo = get_caboodle_echo(session=s_caboodle, days_ahead=days_ahead)
     obs = get_caboodle_obs(session=s_caboodle, days_ahead=days_ahead)
+    pa_summary = get_caboodle_pas(session=s_caboodle, days_ahead=days_ahead)
 
     pod = get_clarity_pod(session=s_clarity, days_ahead=days_ahead)
     axa = get_axa_codes()
@@ -227,6 +247,7 @@ def get_electives(
         axa=axa,
         pod=pod,
         to_predict=False,
+        pa_summary=pa_summary,
     )
     df = df.replace({np.nan: None})
     return [MergedData.parse_obj(row) for row in df.to_dict(orient="records")]
@@ -243,6 +264,7 @@ def get_mock_electives(
     obs = _get_mock_sql_rows("obs", ObsData)
     axa = get_axa_codes()
     pod = _get_mock_sql_rows("pod", ClarityPostopDestination)
+    pa_summary = _get_mock_sql_rows("pa_summary", PreassessSummaryData)
 
     df = prepare_draft(
         electives=case,
@@ -253,6 +275,7 @@ def get_mock_electives(
         axa=axa,
         pod=pod,
         to_predict=False,
+        pa_summary=pa_summary,
     )
     df = df.replace({np.nan: None})
     return [MergedData.parse_obj(row) for row in df.to_dict(orient="records")]
