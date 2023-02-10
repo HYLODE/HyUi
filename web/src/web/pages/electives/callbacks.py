@@ -76,12 +76,14 @@ def _make_info_box(
     current_table: list[dict], active_cell: dict, electives: list[dict]
 ) -> str:
     string = ""
-    if active_cell is not None:
+    if active_cell is None:
+        patient_mrn = current_table[0]["primary_mrn"]
+    else:
         patient_mrn = current_table[active_cell["row_id"]]["primary_mrn"]
-        pt = [row for row in electives if row["primary_mrn"] == patient_mrn][0]
-        # could make a table? [{k: v} for (k, v) in all_patient_info[0].items()]
+    pt = [row for row in electives if row["primary_mrn"] == patient_mrn][0]
+    # could make a table? [{k: v} for (k, v) in all_patient_info[0].items()]
 
-        string = f"""FURTHER INFORMATION
+    string = f"""FURTHER INFORMATION
 Name: {pt['first_name']} {pt['last_name']}, {pt['age_in_years']}{pt['sex'][:1]}
 MRN: {pt['primary_mrn']}
 Operation: {pt['patient_friendly_name']}
@@ -101,6 +103,6 @@ Destination on preassessment clinic booking: {pt['pacdest']}
 Preassessment summary:
 {pt['pa_summary']}
 
-        """
+    """
 
     return "\n".join([textwrap.fill(x, 55) for x in string.split("\n")])
