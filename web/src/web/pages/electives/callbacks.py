@@ -71,35 +71,31 @@ def _get_date(value: date) -> list[dict]:
 def _make_info_box(
     current_table: list[dict], active_cell: dict, electives: list[dict]
 ) -> str:
-
     string = ""
     if active_cell is not None:
         patient_mrn = current_table[active_cell["row"]]["primary_mrn"]
         pt = [row for row in electives if row["primary_mrn"] == patient_mrn][0]
         # could make a table? [{k: v} for (k, v) in all_patient_info[0].items()]
 
-        string = f""" FURTHER INFORMATION
-
+        string = f"""FURTHER INFORMATION
+Name: {pt['first_name']} {pt['last_name']}, {pt['age_in_years']}{pt['sex'][:1]}
 MRN: {pt['primary_mrn']}
-PACU: {pt['pacu']}.
-Name: {pt['first_name']} {pt['last_name']}
-Age: {pt['age_in_years']} {pt['sex']}
-Operation:
-{pt['patient_friendly_name']}
+Operation: {pt['patient_friendly_name']}
+PACU: {pt['pacu']}
+
+Original surgical booking destination: {pt['booked_destination']}
+Protocolised Admission: {pt['protocolised_adm']}
 
 Echocardiography:
 Patient has had {pt['num_echo']} echos,
-of which {pt['abnormal_echo']} were abnormal.
+of which {pt['abnormal_echo']} were flagged as abnormal.
 Last echo: {pt['last_echo']}
 
 Preassessment date: {pt['preassess_date']}:
-ASA: {pt['asa']}
-Preassessment summary: {pt['pa_summary']}
-
-Maximum BMI: {pt['bmi_max_value']}
-
-Original booking destination destination: {pt['booked_destination']}
-Protocolised Admission: {pt['protocolised_adm']}
+ASA: {pt['asa']}. Maximum BMI: {pt['bmi_max_value']}.
+Destination on preassessment clinic booking: {pt['pacdest']}
+Preassessment summary:
+{pt['pa_summary']}
 
         """
 

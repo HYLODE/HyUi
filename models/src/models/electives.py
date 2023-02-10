@@ -196,7 +196,7 @@ class MergedData(CabData):
     pod_orc: str | None
     pacdest: str | None
     booked_destination: str | None
-    pacu: int | None
+    pacu: bool | None
     icu_prob: float | None
 
 
