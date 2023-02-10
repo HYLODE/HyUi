@@ -37,9 +37,13 @@ def _store_electives(campus: str, electives: list[dict], date: str) -> list[dict
     if date is not None:
         electives = [row for row in electives if row["surgery_date"] == date]
 
+    i = 0
+
     for row in electives:
         row["full_name"] = row["first_name"] + " " + row["last_name"]
         row["age_sex"] = str(row["age_in_years"]) + row["sex"][:1]
+        row["id"] = i  # this is a row_id for the //current table// only
+        i += 1
 
     return electives
 
@@ -73,7 +77,7 @@ def _make_info_box(
 ) -> str:
     string = ""
     if active_cell is not None:
-        patient_mrn = current_table[active_cell["row"]]["primary_mrn"]
+        patient_mrn = current_table[active_cell["row_id"]]["primary_mrn"]
         pt = [row for row in electives if row["primary_mrn"] == patient_mrn][0]
         # could make a table? [{k: v} for (k, v) in all_patient_info[0].items()]
 
