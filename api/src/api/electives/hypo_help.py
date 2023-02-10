@@ -1655,6 +1655,9 @@ def wrangle_echo(df: pd.DataFrame) -> pd.DataFrame:
         )
         .sort_values("date_value")
         .drop_duplicates("patient_durable_key", keep="last")
+        .rename(
+            columns={"narrative": "last_echo_narrative", "date_value": "last_echo_date"}
+        )
     )
     return wrangled
 

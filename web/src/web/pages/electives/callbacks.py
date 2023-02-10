@@ -93,7 +93,7 @@ Protocolised Admission: {pt['protocolised_adm']}
 Echocardiography:
 Patient has had {pt['num_echo']} echos,
 of which {pt['abnormal_echo']} were flagged as abnormal.
-Last echo: {pt['last_echo']}
+Last echo ({pt['last_echo_date']}): {pt['last_echo_narrative']}
 
 Preassessment date: {pt['preassess_date']}:
 ASA: {pt['asa']}. Maximum BMI: {pt['bmi_max_value']}.
