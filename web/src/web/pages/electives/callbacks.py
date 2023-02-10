@@ -4,6 +4,8 @@ from web.pages.electives import ids
 from web.stores import ids as store_ids
 from datetime import date, timedelta
 
+import textwrap
+
 
 @callback(
     Output(ids.ELECTIVES_TABLE, "data"),
@@ -77,6 +79,7 @@ def _make_info_box(
         # could make a table? [{k: v} for (k, v) in all_patient_info[0].items()]
 
         string = f""" FURTHER INFORMATION
+
 MRN: {pt['primary_mrn']}
 PACU: {pt['pacu']}.
 Name: {pt['first_name']} {pt['last_name']}
@@ -99,4 +102,5 @@ Original booking destination destination: {pt['booked_destination']}
 Protocolised Admission: {pt['protocolised_adm']}
 
         """
-    return string
+
+    return "\n".join([textwrap.fill(x, 55) for x in string.split("\n")])
