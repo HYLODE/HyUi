@@ -76,11 +76,11 @@ electives_list = dmc.Paper(
         id=ids.ELECTIVES_TABLE,
         columns=[
             {"id": "pacu", "name": "PACU"},
-            {"id": "room_name", "name": "Room"},
-            {"id": "primary_service", "name": "Specialty"},
-            {"id": "primary_mrn", "name": "MRN"},
             {"id": "full_name", "name": "Full Name"},
             {"id": "age_sex", "name": "Age / Sex"},
+            {"id": "primary_service", "name": "Specialty"},
+            {"id": "primary_mrn", "name": "MRN"},
+            {"id": "room_name", "name": "Room"},
             #            {"id": "abnormal_echo", "name": "abnormal_echo"},
             # {
             #     "id": "icu_prob",
