@@ -24,9 +24,11 @@ def camel_to_snake(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def make_utc(df: pd.DataFrame) -> pd.DataFrame:
-    for i in df.loc[:, df.columns.str.endswith("instant")]:
-        df[i + "_utc"] = pd.to_datetime(df[i], utc=True)
+def make_utc(df: pd.DataFrame, suffixes: list[str] = ["instant"]) -> pd.DataFrame:
+    """cast dataframe cols to utc where the col name is suffixed by one of suffixes"""
+    for suffix in suffixes:
+        for column in df.loc[:, df.columns.str.endswith(suffix)]:
+            df[column + "_utc"] = pd.to_datetime(df[column], utc=True)
     return df
 
 
