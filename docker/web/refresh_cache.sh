@@ -4,11 +4,11 @@
 # the cache for that endpoint, formatted as below
 curl -H 'X-Varnish-Nuke:1' -f http://cache:8000/docs
 
-# refresh cache for /electives between 6:00 and 6:30
-# while true; do
-#    currenttime=$(date +%H:%M)
-#    if [[ "$currenttime" > "06:00" ]] || [[ "$currenttime" < "06:30" ]]; then
-#      curl -H 'X-Varnish-Nuke:1' -f http://cache:8000/electives/
-#    fi
-#    test "$?" -gt 128 && break
-# done &
+refresh cache for /electives between 6:00 and 6:30
+while true; do
+   currenttime=$(date +%H:%M)
+   if [[ "$currenttime" > "06:00" ]] || [[ "$currenttime" < "06:30" ]]; then
+     curl -H 'X-Varnish-Nuke:1' -f http://cache:8000/electives/
+   fi
+   test "$?" -gt 128 && break
+done &
