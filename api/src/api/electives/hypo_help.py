@@ -20,6 +20,7 @@ import re
 
 
 def camel_to_snake(df: pd.DataFrame) -> pd.DataFrame:
+    """Convert column names of a DataFrame from camelCase to snake_case."""
     df.columns = [re.sub(r"(?<!^)(?=[A-Z])", "_", col).lower() for col in df.columns]
     return df
 
@@ -33,6 +34,7 @@ def make_utc(df: pd.DataFrame, suffixes: list[str] = ["instant"]) -> pd.DataFram
 
 
 def wrangle_surgical(df: pd.DataFrame) -> pd.DataFrame:
+
     terms_dict = {
         "priority": {
             "Two Week Wait": "Cancer Pathway",

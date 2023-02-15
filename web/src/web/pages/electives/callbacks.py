@@ -14,11 +14,6 @@ import textwrap
     Input("date_selected", "value"),
 )
 def _store_electives(campus: str, electives: list[dict], date: str) -> list[dict]:
-    # model_rows = (MergedData.parse_obj(row) for row in electives)
-    # df = pd.DataFrame.from_records(
-    #     (row.dict() for row in model_rows), columns=MergedData.__fields__.keys()
-    # )
-
     campus_dict = {i.get("value"): i.get("label") for i in CAMPUSES}
 
     if campus != []:
@@ -66,6 +61,12 @@ def _get_date(value: date) -> list[dict]:
 def _make_info_box(
     current_table: list[dict], active_cell: dict, electives: list[dict]
 ) -> str:
+    """
+    Outputs text for the patient_info_box.
+    If no cell is selected, automatically first patient.
+    info_box_width is number of characters.
+    """
+    info_box_width = 55
 
     if active_cell is None:
         patient_mrn = current_table[0]["primary_mrn"]
@@ -95,6 +96,5 @@ Preassessment summary: {pa_summary}
 """.format(
         **pt
     )
-    info_box_width = 55
 
     return "\n".join([textwrap.fill(x, info_box_width) for x in string.split("\n")])

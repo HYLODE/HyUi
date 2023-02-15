@@ -44,6 +44,24 @@ def prepare_draft(
     to_predict: bool = False,
 ) -> pd.DataFrame:
 
+    """
+    Prepares the dataframe for the dashboard by merging data from different
+    sources. It loads tables for
+        surgical cases ('electives')
+        pre-assessment
+        labs
+        echos
+        obs
+        the final preassessment summary
+        post-operative destination (from clarity)
+        the list of axa codes and protocolised admissions
+        it merges these tables and cleans them
+        then calculates some additional features
+
+    If to_predict is set to True, it also loads a
+    pre-trained random forest model to predict ICU admission.
+    """
+
     electives_df = to_data_frame(electives, SurgData)
     preassess_df = to_data_frame(preassess, PreassessData)
     pa_summary_df = to_data_frame(pa_summary, PreassessSummaryData)
