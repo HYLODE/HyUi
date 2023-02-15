@@ -32,8 +32,8 @@ def _store_electives(campus: str, electives: list[dict], date: str) -> list[dict
     i = 0
 
     for row in electives:
-        row["full_name"] = row["first_name"] + " " + row["last_name"]
-        row["age_sex"] = str(row["age_in_years"]) + row["sex"][:1]
+        row["full_name"] = "{first_name} {last_name}".format(**row)
+        row["age_sex"] = "{age_in_years}{sex[0]}".format(**row)
         row["id"] = i  # this is a row_id for the //current table// only
         i += 1
     return electives
@@ -66,7 +66,7 @@ def _get_date(value: date) -> list[dict]:
 def _make_info_box(
     current_table: list[dict], active_cell: dict, electives: list[dict]
 ) -> str:
-    string = ""
+
     if active_cell is None:
         patient_mrn = current_table[0]["primary_mrn"]
     else:
@@ -74,26 +74,27 @@ def _make_info_box(
     pt = [row for row in electives if row["primary_mrn"] == patient_mrn][0]
     # could make a table? [{k: v} for (k, v) in all_patient_info[0].items()]
 
-    string = f"""FURTHER INFORMATION
-Name: {pt['first_name']} {pt['last_name']}, {pt['age_in_years']}{pt['sex'][:1]}
-MRN: {pt['primary_mrn']}
-Operation: {pt['patient_friendly_name']}
-PACU: {pt['pacu']}
+    string = """FURTHER INFORMATION
+Name: {first_name} {last_name}, {age_in_years}{sex[0]}
+MRN: {primary_mrn}
+Operation: {patient_friendly_name}
+PACU: {pacu}
 
-Original surgical booking destination: {pt['booked_destination']}
-Protocolised Admission: {pt['protocolised_adm']}
+Original surgical booking destination: {booked_destination}
+Protocolised Admission: {protocolised_adm}
 
 Echocardiography:
-Patient has had {pt['num_echo']} echos,
-of which {pt['abnormal_echo']} were flagged as abnormal.
-Last echo ({pt['last_echo_date']}): {pt['last_echo_narrative']}
+Patient has had {num_echo} echos,
+of which {abnormal_echo} were flagged as abnormal.
+Last echo ({last_echo_date}): {last_echo_narrative}
 
-Preassessment date: {pt['preassess_date']}:
-ASA: {pt['asa']}. Maximum BMI: {pt['bmi_max_value']}.
-Destination on preassessment clinic booking: {pt['pacdest']}
-Preassessment summary:
-{pt['pa_summary']}
+Preassessment date: {preassess_date}:
+ASA: {asa}. Maximum BMI: {bmi_max_value}.
+Destination on preassessment clinic booking: {pacdest}
+Preassessment summary: {pa_summary}
+""".format(
+        **pt
+    )
+    info_box_width = 55
 
-    """
-
-    return "\n".join([textwrap.fill(x, 55) for x in string.split("\n")])
+    return "\n".join([textwrap.fill(x, info_box_width) for x in string.split("\n")])
