@@ -1,6 +1,6 @@
 from dash import Input, Output, callback
 
-from web.pages.electives import ids
+from web.pages.electives import ids, CAMPUSES
 from web.stores import ids as store_ids
 from datetime import date, timedelta
 
@@ -19,15 +19,7 @@ def _store_electives(campus: str, electives: list[dict], date: str) -> list[dict
     #     (row.dict() for row in model_rows), columns=MergedData.__fields__.keys()
     # )
 
-    # I am not sure how to get the "label" rather than the "value" from "CAMPUS";
-    # I have trundled around this without elegance.
-
-    campus_dict = {
-        "UNIVERSITY COLLEGE HOSPITAL CAMPUS": "UCH",
-        "GRAFTON WAY BUILDING": "GWB",
-        "WESTMORELAND STREET": "WMS",
-        "QUEEN SQUARE CAMPUS": "NHNN",
-    }
+    campus_dict = {i.get("value"): i.get("label") for i in CAMPUSES}
 
     if campus != []:
         electives = [
@@ -44,7 +36,6 @@ def _store_electives(campus: str, electives: list[dict], date: str) -> list[dict
         row["age_sex"] = str(row["age_in_years"]) + row["sex"][:1]
         row["id"] = i  # this is a row_id for the //current table// only
         i += 1
-
     return electives
 
 
