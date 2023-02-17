@@ -4,16 +4,17 @@ title: IDE set-up
 
 ## Notes on setting up PyCharm for development with specific reference to working on a Mac
 
-Set up run configurations
+Set up run configurations:
 
-- https://www.jetbrains.com/help/pycharm/run-debug-configuration.html
-- install the **EnvFile** plug-in so that the environment file can be read by your run configuration (see https://stackoverflow.com/a/42708476/992999)
-- set `OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES` as an environment variable in your run configuration to avoid [errors](https://stackoverflow.com/a/52230415/992999) on recent _macos_ installs
+- [PyCharm Run/Debug Configurations](https://www.jetbrains.com/help/pycharm/run-debug-configuration.html)
+- Install the **EnvFile** plug-in so that the environment file can be read by your run configuration (see [Stackoverflow Answer](https://stackoverflow.com/a/42708476/992999))
+- Set `OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES` as an environment variable in your run configuration to avoid [errors](https://stackoverflow.com/a/52230415/992999) on recent _macos_ installs
 
 Example configurations here
 - [FastAPI](../snippets/HyUI-API%20FastAPI.run.xml)
 - [Plotly Dash](../snippets/HyUI-Web%20Plotly%20Dash.run.xml)
 
+If you are using PyCharm or another IDE then ensure that the environment variables in `.env` are loaded. PyCharm has a plugin that can load these when unit testing with `pytest` or running the main application.
 
 ## Notes on setting up VSCode for development
 
@@ -68,11 +69,11 @@ And my sidebar in VS Code (with the `web` labelled as 'HyUI Plotly Dash')
 
 ![](../resources/vscode-workspace-sidebar.png){width=50%}
 
-5. Then prepare nested `.vscode/settings.json` and `.vscode/launch.json` files etc (also visible in the screenshot above). For example, for the `web` module, you need to specify the interpreter, and a debug configuration (in `launch.json`)
+5. Then prepare nested `.vscode/settings.json` and `.vscode/launch.json` files etc (also visible in the screenshot above). For example, for the `web` module, you need to specify the interpreter, and a debug configuration (in `launch.json`).
 
 Beware the absolute paths below ☹. You will need to change these unless your name is also 'steve'.
 
-`settings.json`
+`settings.json`:
 
 ```json
 {
@@ -86,13 +87,10 @@ Beware the absolute paths below ☹. You will need to change these unless your n
 }
 ```
 
-`launch.json`
+`launch.json` under `web`:
 
 ```json
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
         {
@@ -100,7 +98,9 @@ Beware the absolute paths below ☹. You will need to change these unless your n
             "type": "python",
             "request": "launch",
             "module": "web.app",
-            "args": [],
+            "args": [
+                "--reload"
+            ],
             "jinja": true,
             "justMyCode": true,
             "python": "/users/steve/.pyenv/versions/hyui-web/bin/python3",
@@ -114,3 +114,37 @@ Beware the absolute paths below ☹. You will need to change these unless your n
     ]
 }
 ```
+
+`launch.json` under `api`:
+
+```json
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "hyui-api",
+            "type": "python",
+            "request": "launch",
+            "module": "uvicorn",
+            "args": [
+                "api.main:app",
+                "--reload",
+                "--port",
+                "8092",
+            ],
+            "jinja": true,
+            "justMyCode": true,
+            "python": "/users/steve/.pyenv/versions/hyui-api/bin/python3",
+            "cwd": "${workspaceFolder}/src",
+            "envFile": "${workspaceFolder}/../.env",
+            "env": {
+                "OBJC_DISABLE_INITIALIZE_FORK_SAFETY": "YES",
+                "PYTHONUNBUFFERED": "1",
+            }
+        }
+    ]
+}
+```
+### Troubleshooting
+* Follow all the [setup](setup.qmd) instructions and check you can get everything running locally outside vscode first!
+* Check that the locations of python and your `.env` file are correct in your `launch.json` and `settings.json` file. You may need to write absolute paths in `settings.json` (even if `launch.json` uses the `{workSpaceFolder}` variables appropriately). For example, `"python.envFile": "~/Github/HyUi/.env"`).

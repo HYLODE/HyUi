@@ -1,5 +1,3 @@
-import time
-
 import dash
 import dash_mantine_components as dmc
 import json
@@ -199,7 +197,7 @@ def submit_discharge_status(
         show = False
 
     if show:
-        show = "show" if show else "hide"
+        show_arg = "show" if show else "hide"
 
         bed_submit_dict = dict(
             msg=msg,
@@ -212,7 +210,7 @@ def submit_discharge_status(
         notificaton = dmc.Notification(
             title="Saving discharge status",
             id="_submit_discharge_status_notification_NOT_IN_USE",
-            action=show,
+            action=show_arg,
             message=msg,
             icon=DashIconify(icon="ic:round-celebration"),
         )
