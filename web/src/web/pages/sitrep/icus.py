@@ -14,7 +14,8 @@ import web.pages.sitrep.callbacks.cytoscape  # noqa
 import web.pages.sitrep.callbacks.inspector  # noqa
 import web.pages.sitrep.callbacks.widgets  # noqa
 import web.pages.sitrep.callbacks.discharges  # noqa
-from web.pages.sitrep import ids, SITREP_DEPT2WARD_MAPPING
+from web.pages.sitrep import ids
+from web import SITREP_DEPT2WARD_MAPPING
 from web.style import colors, replace_colors_in_stylesheet
 
 dash.register_page(__name__, path="/sitrep/icus", name="Critical Care")

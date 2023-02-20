@@ -17,15 +17,6 @@ CAMPUSES = [
     {"value": "QUEEN SQUARE CAMPUS", "label": "NHNN", "default_dept": "NHNN C1 NCCU"},
 ]
 
-SITREP_DEPT2WARD_MAPPING: dict = {
-    "UCH T03 INTENSIVE CARE": "T03",
-    "UCH T06 SOUTH PACU": "T06",
-    "GWB L01 CRITICAL CARE": "GWB",
-    "WMS W01 CRITICAL CARE": "WMS",
-    "NHNN C0 NCCU": "NCCU0",
-    "NHNN C1 NCCU": "NCCU1",
-}
-
 DISCHARGE_DECISIONS = [
     dict(label="HOLD", value="blocked", description="Not for discharge"),
     dict(

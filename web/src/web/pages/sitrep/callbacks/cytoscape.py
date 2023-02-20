@@ -8,7 +8,8 @@ from typing import Tuple, Any
 
 from models.census import CensusRow
 from web.config import get_settings
-from web.pages.sitrep import CAMPUSES, SITREP_DEPT2WARD_MAPPING, ids
+from web.pages.sitrep import CAMPUSES, ids
+from web import SITREP_DEPT2WARD_MAPPING
 from web.stores import ids as store_ids
 from web.utils import Timer
 
