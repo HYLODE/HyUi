@@ -134,6 +134,7 @@ ENV/
 env.bak/
 venv.bak/
 pythonenv*
+.env.baserow
 
 # Spyder project settings
 .spyderproject
@@ -473,7 +474,7 @@ tags
 
 ### VisualStudioCode ###
 .vscode/*
-*\.vscode*
+*/.vscode/*
 #!.vscode/tasks.json
 #!.vscode/launch.json
 *.code-workspace
@@ -927,3 +928,6 @@ src/api/perrt/admission_probability/generated_data
 
 # local jupyter lab for exploratory work
 jupyter/
+
+
+api/src/api/electives/deploy/*
