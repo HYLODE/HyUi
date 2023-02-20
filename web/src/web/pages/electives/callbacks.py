@@ -9,11 +9,15 @@ import textwrap
 
 @callback(
     Output(ids.ELECTIVES_TABLE, "data"),
+    Output(ids.ELECTIVES_TABLE, "filter_query"),
     Input(ids.CAMPUS_SELECTOR, "value"),
     Input(store_ids.ELECTIVES_STORE, "data"),
     Input("date_selected", "value"),
+    Input("pacu_selector", "value"),
 )
-def _store_electives(campus: str, electives: list[dict], date: str) -> list[dict]:
+def _store_electives(
+    campus: str, electives: list[dict], date: str, pacu_selection: bool
+) -> tuple[list[dict], str]:
     campus_dict = {i.get("value"): i.get("label") for i in CAMPUSES}
 
     if campus != []:
@@ -31,7 +35,11 @@ def _store_electives(campus: str, electives: list[dict], date: str) -> list[dict
         row["age_sex"] = "{age_in_years}{sex[0]}".format(**row)
         row["id"] = i  # this is a row_id for the //current table// only
         i += 1
-    return electives
+
+    if pacu_selection is not None:
+        filter_query = f"{{pacu}} scontains {pacu_selection}"
+    print(filter_query)
+    return electives, filter_query
 
 
 @callback(Output("date_selected", "data"), Input("date_selected", "value"))

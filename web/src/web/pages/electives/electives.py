@@ -42,6 +42,30 @@ campus_selector = html.Div(
         ),
     ]
 )
+pacu_selector = html.Div(
+    [
+        dmc.SegmentedControl(
+            id="pacu_selector",
+            value="",
+            data=[
+                {
+                    "value": "",
+                    "label": "All",
+                },
+                {
+                    "value": "true",
+                    "label": "PACU",
+                },
+                {
+                    "value": "false",
+                    "label": "Not PACU",
+                },
+            ],
+            persistence=True,
+            persistence_type="local",
+        ),
+    ]
+)
 
 
 date_selector = html.Div(
@@ -104,6 +128,7 @@ electives_list = dmc.Paper(
         persisted_props=["data"],
         sort_action="native",
         filter_action="native",
+        filter_query="",
     ),
     shadow="lg",
     p="md",  # padding
@@ -149,8 +174,9 @@ body = dmc.Container(
     [
         dmc.Grid(
             [
-                dmc.Col(campus_selector, offset=0, span=3),
-                dmc.Col(date_selector, offset=3, span=6),
+                dmc.Col(pacu_selector, span=3),
+                dmc.Col(campus_selector, span=4),
+                dmc.Col(date_selector, span=5),
                 dmc.Col(electives_list, span=7),
                 dmc.Col(patient_info_box, span=5),
             ]
