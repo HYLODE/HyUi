@@ -70,8 +70,8 @@ def _store_all_sitreps(_: int) -> dict:
         "UCH T06 SOUTH PACU": "T06",
         "GWB L01 CRITICAL CARE": "GWB",
         "WMS W01 CRITICAL CARE": "WMS",
-        "NHNN C0 NCCU": "NCCU0",
-        "NHNN C1 NCCU": "NCCU1",
+        "NHNN C0 NCCU": "NHNNC0",
+        "NHNN C1 NCCU": "NHNNC1",
     }
     icus = list(SITREP_DEPT2WARD_MAPPING.values())
     sitreps = {}
