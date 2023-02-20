@@ -7,6 +7,7 @@ import requests
 from dash import Input, Output, callback, dcc, html
 
 from models.beds import Bed, Department, Room
+from models.electives import MergedData
 from web import ids
 from web.config import get_settings
 
@@ -56,10 +57,23 @@ def _store_beds(_: int) -> list[dict]:
     return [Bed.parse_obj(row).dict() for row in response.json()]
 
 
+@callback(
+    Output(ids.ELECTIVES_STORE, "data"),
+    Input(ids.STORE_TIMER_6H, "n_intervals"),
+    background=True,
+)
+def _store_electives(_: int) -> list[dict]:
+    response = requests.get(
+        f"{get_settings().api_url}/electives/",
+    )
+    return [MergedData.parse_obj(row).dict() for row in response.json()]
+
+
 stores = html.Div(
     [
         dcc.Store(id=ids.DEPT_STORE),
         dcc.Store(id=ids.ROOM_STORE),
         dcc.Store(id=ids.BEDS_STORE),
+        dcc.Store(id=ids.ELECTIVES_STORE),
     ]
 )

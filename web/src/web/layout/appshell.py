@@ -22,7 +22,14 @@ def create_appshell(nav_data: list | dict) -> dmc.MantineProvider:
             inherit=True,
             children=[
                 dcc.Interval(
-                    id=ids.STORE_TIMER_1H, n_intervals=0, interval=60 * 60 * 1000
+                    id=ids.STORE_TIMER_1H,
+                    n_intervals=0,
+                    interval=60 * 60 * 1000,
+                ),
+                dcc.Interval(
+                    id=ids.STORE_TIMER_6H,
+                    n_intervals=0,
+                    interval=6 * 60 * 60 * 1000,
                 ),
                 stores,
                 dcc.Store(id="theme-store", storage_type="local"),
