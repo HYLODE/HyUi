@@ -19,7 +19,7 @@ from web.style import colors, replace_colors_in_stylesheet
 
 dash.register_page(__name__, path="/sitrep/ward", name="Ward")
 
-with open(Path(__file__).parent / "cyto_style_sheet.json") as f:
+with open(Path(__file__).parent / "cyto_style_default.json") as f:
     cyto_style_sheet = json.load(f)
     cyto_style_sheet = replace_colors_in_stylesheet(cyto_style_sheet)
 

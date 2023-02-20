@@ -1,3 +1,4 @@
+import warnings
 import dash
 import dash_mantine_components as dmc
 import json
@@ -11,6 +12,94 @@ from web.pages.sitrep.callbacks.discharges import post_discharge_status
 from web.style import colors
 
 DEBUG = True
+
+
+def _make_sitrep_badge(organ: str, sitrep):
+
+    if organ == "vent_type_1_4h":
+        value = sitrep.get(organ, "")
+        label = "Respiratory"
+        if value.lower() == "ventilated":
+            color = "red"
+        elif value.lower() in ["hfno", "cpap", "niv"]:
+            color = "orange"
+        elif value.lower() in ["oxygen"]:
+            color = "yellow"
+        elif value.lower() in ["room air"]:
+            color = "green"
+        else:
+            color = "gray"
+
+    elif organ == "n_inotropes_1_4h":
+        value = sitrep.get(organ, 0)
+        label = "Vasopressors"
+        if value >= 2:
+            value = "2+"
+            color = "red"
+        elif value == 1:
+            value = "1"
+            color = "orange"
+        elif value == 0:
+            value = "0"
+            color = "green"
+        else:
+            value = "Unknown"
+            color = "gray"
+
+    elif organ == "had_rrt_1_4h":
+        value = sitrep.get(organ, None)
+        label = "RRT"
+        if value is True:
+            value = "Yes"
+            color = "red"
+        elif value is False:
+            value = "No"
+            color = "green"
+        else:
+            value = "Unknown"
+            color = "gray"
+
+    elif organ == "is_agitated_1_8h":
+        value = sitrep.get(organ, None)
+        label = "Agitation"
+        if value is True:
+            value = "Yes"
+            color = "red"
+        elif value is False:
+            value = "No"
+            color = "green"
+        else:
+            value = "Unknown"
+            color = "gray"
+
+    else:
+        warnings.warn(f"{organ} not recognised to create sitrep badge")
+        label = "Unknown"
+        value = "Unknown"
+        color = "gray"
+
+    return dmc.Stack(
+        [
+            dmc.Badge(label, color="indigo", variant="outline"),
+            dmc.Badge(value, color=color, variant="filled"),
+        ]
+    )
+
+
+def _report_patient_status(sitrep: dict) -> dmc.Group:
+    resp_badge = _make_sitrep_badge("vent_type_1_4h", sitrep)
+    cvs_badge = _make_sitrep_badge("n_inotropes_1_4h", sitrep)
+    rrt_badge = _make_sitrep_badge("had_rrt_1_4h", sitrep)
+    delirium_badge = _make_sitrep_badge("is_agitated_1_8h", sitrep)
+
+    return dmc.Group(
+        [
+            resp_badge,
+            cvs_badge,
+            rrt_badge,
+            delirium_badge,
+        ]
+    )
 
 
 def _format_tapnode(data: dict | None) -> str:
@@ -68,7 +157,7 @@ def open_inspector_modal(node: dict, opened: bool) -> Tuple[bool, list[str], dmc
         ]
     )
 
-    return not opened, ["bed"], modal_title
+    return not opened, ["patient", "bed"], modal_title
 
 
 @callback(
@@ -212,7 +301,9 @@ def submit_discharge_status(
             id="_submit_discharge_status_notification_NOT_IN_USE",
             action=show_arg,
             message=msg,
-            icon=DashIconify(icon="ic:round-celebration"),
+            icon=DashIconify(icon="carbon:checkmark-outline"),
+            autoClose=1500,
+            color=colors.green,
         )
 
         return notificaton, disabled, bed_submit_dict
@@ -230,7 +321,7 @@ def submit_discharge_status(
 def patient_accordion_item(
     node: dict, modal_open: bool
 ) -> Tuple[dmc.AccordionControl, dmc.AccordionPanel]:
-    """Prepare content for bed accordion item"""
+    """Prepare content for patient accordion item"""
     if not node or not modal_open:
         control, panel = None, None
         return dmc.AccordionControl(control), dmc.AccordionPanel(panel)
@@ -244,7 +335,9 @@ def patient_accordion_item(
         censusf = format_census(census)
         sex = censusf.get("sex", "")
         if sex:
-            sex_icon = "carbon:male" if sex.lower() == "m" else "carbon:female"
+            sex_icon = (
+                "carbon:gender-male" if sex.lower() == "m" else "carbon:gender-female"
+            )
         control_text = censusf.get("demographic_slug", "Uh-oh! No patient data?")
 
     control = dmc.Group(
@@ -256,7 +349,26 @@ def patient_accordion_item(
             dmc.Text(control_text),
         ]
     )
-    panel = dmc.Group()
+
+    sitrep = data.get("sitrep", {})
+    if sitrep:
+        sitrep_content = _report_patient_status(sitrep)
+        sitrep_text = dmc.Text("")
+    else:
+        sitrep_content = dmc.Group()
+        sitrep_text = dmc.Text("Sitrep patient data not available")
+
+    panel = dmc.Grid(
+        [
+            dmc.Col(
+                [
+                    sitrep_content,
+                    sitrep_text,
+                ],
+                span=12,
+            )
+        ]
+    )
 
     return dmc.AccordionControl(control), dmc.AccordionPanel(panel)
 
