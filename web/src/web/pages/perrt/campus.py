@@ -1,4 +1,5 @@
 import dash
+from dash import dcc
 import dash_cytoscape as cyto
 import dash_mantine_components as dmc
 import json
@@ -22,11 +23,11 @@ with open(Path(__file__).parent / "cyto_style_sheet.json") as f:
 timers = html.Div([])
 stores = html.Div(
     [
-        dcc.Store(id=ids.CENSUS_STORE),
+        dcc.Loading(dcc.Store(id=ids.CENSUS_STORE), fullscreen=True, type="dot"),
+        dcc.Loading(dcc.Store(id=ids.NEWS_STORE), fullscreen=True, type="dot"),
         dcc.Store(id=ids.DEPTS_OPEN_STORE),
         dcc.Store(id=ids.ROOMS_OPEN_STORE),
         dcc.Store(id=ids.BEDS_STORE),
-        dcc.Store(id=ids.NEWS_STORE),
         dcc.Store(id=ids.DEPTS_OPEN_STORE_NAMES),
         dcc.Store(id=ids.ACC_BED_SUBMIT_STORE),
     ]

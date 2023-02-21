@@ -126,6 +126,6 @@ stores = html.Div(
         dcc.Store(id=ids.ROOM_STORE),
         dcc.Store(id=ids.BEDS_STORE),
         dcc.Store(id=ids.ELECTIVES_STORE),
-        dcc.Store(id=ids.SITREP_STORE),
+        dcc.Loading(dcc.Store(id=ids.SITREP_STORE), fullscreen=True, type="dot"),
     ]
 )
