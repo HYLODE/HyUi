@@ -37,8 +37,7 @@ def _progress_bar_bed_count(elements: list[dict]) -> list[dict]:
 
     blocked_label = _make_progress_label(blocked, N, "blocked")
     empty_label = _make_progress_label(empty, N, "empty")
-    occupied_label = _make_progress_label(occupied, N, "occupied")
-    holding_label = _make_progress_label(holding, N, "residing")
+    occupied_label = _make_progress_label(occupied, N, "residing")
     discharges_label = _make_progress_label(discharges, N, "discharges")
     reviews_label = _make_progress_label(reviews, N, "reviews")
     exits_label = _make_progress_label(exits, N, "EoL")
@@ -54,38 +53,38 @@ def _progress_bar_bed_count(elements: list[dict]) -> list[dict]:
         dict(
             value=holding / N * 100,
             color=colors.indigo,
-            label=holding_label,
-            tooltip=f"{holding} beds",
+            label=occupied_label,
+            tooltip=f"{occupied} residing",
         ),
         dict(
             value=reviews / N * 100,
             color=colors.teal,
             label=reviews_label,
-            tooltip=f"{reviews} beds",
+            tooltip=f"{reviews} review for discharge",
         ),
         dict(
             value=exits / N * 100,
             color=colors.black,
             label=exits_label,
-            tooltip=f"{exits} beds",
+            tooltip=f"{exits} end of life",
         ),
         dict(
             value=discharges / N * 100,
             color=colors.olive,
             label=discharges_label,
-            tooltip=f"{discharges} beds",
+            tooltip=f"{discharges} discharges",
         ),
         dict(
             value=blocked / N * 100,
             color=colors.gray,
             label=blocked_label,
-            tooltip=f"{blocked} beds",
+            tooltip=f"{blocked} closed bed",
         ),
         dict(
             value=empty / N * 100,
             color=empty_colour,
             label=empty_label,
-            tooltip=f"{empty} beds",
+            tooltip=f"{empty} empty beds",
         ),
     ]
 

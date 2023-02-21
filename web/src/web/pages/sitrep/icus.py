@@ -14,12 +14,13 @@ import web.pages.sitrep.callbacks.cytoscape  # noqa
 import web.pages.sitrep.callbacks.inspector  # noqa
 import web.pages.sitrep.callbacks.widgets  # noqa
 import web.pages.sitrep.callbacks.discharges  # noqa
-from web.pages.sitrep import ids, SITREP_DEPT2WARD_MAPPING
+from web.pages.sitrep import ids
+from web import SITREP_DEPT2WARD_MAPPING
 from web.style import colors, replace_colors_in_stylesheet
 
 dash.register_page(__name__, path="/sitrep/icus", name="Critical Care")
 
-with open(Path(__file__).parent / "cyto_style_sheet.json") as f:
+with open(Path(__file__).parent / "cyto_style_icus.json") as f:
     cyto_style_sheet = json.load(f)
     cyto_style_sheet = replace_colors_in_stylesheet(cyto_style_sheet)
 
@@ -83,12 +84,10 @@ ward_cyto = dmc.Paper(
                 "z-index": 999,
             },
             layout={
-                "name": "circle",
+                "name": "preset",
                 "animate": True,
                 "fit": True,
                 "padding": 10,
-                "startAngle": math.pi * 2 / 3,  # clockwise from 3 O'Clock
-                "sweep": math.pi * 5 / 3,
             },
             stylesheet=cyto_style_sheet,
             responsive=True,
@@ -149,14 +148,14 @@ bed_inspector = html.Div(
 
 inspector = html.Div(
     [
-        dmc.Modal(
+        dmc.Drawer(
             id=ids.INSPECTOR_WARD_MODAL,
-            centered=True,
+            # centered=True,
             padding="xs",
             size="60vw",
-            overflow="inside",
+            # overflow="inside",
             overlayColor=colors.gray,
-            overlayOpacity=0.5,
+            overlayOpacity=0.8,
             transition="fade",
             transitionDuration=0,
             children=[bed_inspector],
