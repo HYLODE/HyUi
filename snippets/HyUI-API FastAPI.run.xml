@@ -25,7 +25,7 @@
       </ENTRIES>
     </EXTENSION>
     <option name="SCRIPT_NAME" value="uvicorn" />
-    <option name="PARAMETERS" value="api.main:app --reload --port 8301" />
+    <option name="PARAMETERS" value="api.main:app --reload --port 8200" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="true" />
