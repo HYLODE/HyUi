@@ -11,8 +11,8 @@ input:invalid {
 
 #wrapper {
     padding: 10px;
-    margin-left: 320px;
-    margin-right: 320px;
+    margin-left: 280px;
+    margin-right: 0px;
 }
 
 @media only screen and (max-width: 1500px) {
@@ -20,18 +20,23 @@ input:invalid {
         display: none;
     }
 
-    #wrapper {
-        margin-right: 0;
-    }
-}
-
-@media only screen and (max-width: 1200px) {
     #components-navbar {
         display: none;
     }
 
     #wrapper {
         margin-left: 0;
+    }
+
+}
+
+@media only screen and (max-width: 750px) {
+    .demo-container {
+        flex-direction: column;
+    }
+
+    .demo-controls {
+        width: 100%;
     }
 }
 
@@ -57,14 +62,4 @@ input:invalid {
 
 .demo-control {
     margin: 10px;
-}
-
-@media only screen and (max-width: 750px) {
-    .demo-container {
-        flex-direction: column;
-    }
-
-    .demo-controls {
-        width: 100%;
-    }
 }
