@@ -98,6 +98,6 @@ WHERE scf.[PatientDurableKey] > 1
 	-- 	OR wlef.[IntendedManagement] IS NULL
 	-- )
 	AND patd.[AgeInYears] >= 18
+	AND scufx.CaseScheduleStatusCode = 1 -- 'Scheduled'
 	AND scufx.[PlannedOperationStartInstant] >= :start_date
 	AND scufx.[PlannedOperationStartInstant] < :end_date
-	AND scufx.[CaseCancelReasonCode] != '581'
