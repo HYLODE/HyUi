@@ -5,7 +5,6 @@
 
 - Clone the repository on an NHS server `git clone https://github.com/HYLODE/HyUi.git`.
 - Configure your `.env` variables using `.env.example` as a template.
-- Configure `docker/initialise/.env` variables using `docker/initialise/.env.example.`
 
 ### Using the http cache
 
