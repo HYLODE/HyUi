@@ -24,6 +24,12 @@ class _NavLink(NamedTuple):
 home = _NavLink(title="Home", path="/", icon="carbon:home")
 sitrep_campus = _NavLink(title="Campus", path="/sitrep/campus", icon="carbon:hospital")
 sitrep_ward = _NavLink(title="Ward", path="/sitrep/ward", icon="carbon:hospital-bed")
+electives = _NavLink(
+    title="Electives", path="/surgery/electives", icon="carbon:calendar"
+)
+a_and_e = _NavLink(
+    title="Admissions", path="/a_and_e", icon="fluent:people-queue-24-regular"
+)
 sitrep_icus = _NavLink(
     title="Critical Care", path="/sitrep/icus", icon="healthicons:critical-care-outline"
 )
@@ -78,10 +84,41 @@ def create_side_nave_content() -> dmc.Stack:
                 label=sitrep_ward.title,
                 href=sitrep_ward.path,
             ),
+            dmc.Divider(
+                labelPosition="left",
+                label=[
+                    DashIconify(
+                        icon="carbon:scalpel",
+                        width=20,
+                        style={"marginRight": 10},
+                        color=dmc.theme.DEFAULT_COLORS["indigo"][5],
+                    ),
+                    "Surgery",
+                ],
+                my=20,
+            ),
             create_main_nav_link(
-                icon=sitrep_icus.icon,
-                label=sitrep_icus.title,
-                href=sitrep_icus.path,
+                icon=electives.icon,
+                label=electives.title,
+                href=electives.path,
+            ),
+            dmc.Divider(
+                labelPosition="left",
+                label=[
+                    DashIconify(
+                        icon="healthicons:ambulance-outline",
+                        width=20,
+                        style={"marginRight": 10},
+                        color=dmc.theme.DEFAULT_COLORS["indigo"][5],
+                    ),
+                    "A&E",
+                ],
+                my=20,
+            ),
+            create_main_nav_link(
+                icon=a_and_e.icon,
+                label=a_and_e.title,
+                href=a_and_e.path,
             ),
         ],
     )

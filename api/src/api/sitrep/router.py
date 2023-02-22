@@ -1,3 +1,4 @@
+import warnings
 from datetime import date, datetime
 from pathlib import Path
 from urllib.parse import urlencode
@@ -111,9 +112,16 @@ def get_mock_live_ui(ward: str) -> list[SitrepRow]:
 def get_live_ui(
     response: Response, ward: str, settings: Settings = Depends(get_settings)
 ) -> list[SitrepRow]:
-    response.headers["Cache-Control"] = "public, max-age=300"
+    response.headers["Cache-Control"] = "public, max-age=3600"
     response = requests.get(f"{settings.hycastle_url}/live/icu/{ward}/ui")
-    rows = response.json()["data"]
+    if response.status_code != 200:
+        warnings.warn(f"Failed to get sitrep data for {ward}")
+        print(repr(response))
+        return []
+    try:
+        rows = response.json()["data"]
+    except KeyError:
+        rows = response.json()
     return [SitrepRow.parse_obj(row) for row in rows]
 
 
