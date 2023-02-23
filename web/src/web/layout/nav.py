@@ -27,6 +27,7 @@ sitrep_ward = _NavLink(title="Ward", path="/sitrep/ward", icon="carbon:hospital-
 electives = _NavLink(
     title="Electives", path="/surgery/electives", icon="carbon:calendar"
 )
+pqip = _NavLink(title="PQIP Report", path="/surgery/pqip", icon="mdi:graph-areaspline")
 a_and_e = _NavLink(
     title="Admissions", path="/a_and_e", icon="fluent:people-queue-24-regular"
 )
@@ -107,6 +108,11 @@ def create_side_nave_content() -> dmc.Stack:
                 icon=electives.icon,
                 label=electives.title,
                 href=electives.path,
+            ),
+            create_main_nav_link(
+                icon=pqip.icon,
+                label=pqip.title,
+                href=pqip.path,
             ),
             dmc.Divider(
                 labelPosition="left",
