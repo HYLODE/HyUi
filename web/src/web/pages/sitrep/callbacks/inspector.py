@@ -1,96 +1,25 @@
-import warnings
+from datetime import datetime
 import dash
 import dash_mantine_components as dmc
 import json
-from dash import Input, Output, State, callback, callback_context
+from dash import Input, Output, State, callback, callback_context, html
 from dash_iconify import DashIconify
 from typing import Any, Tuple
 
 from web.pages.sitrep import DISCHARGE_DECISIONS, ids
 from web.pages.sitrep.callbacks.cytoscape import format_census
 from web.pages.sitrep.callbacks.discharges import post_discharge_status
+from web.pages.sitrep.callbacks.utils import make_sitrep_badge
 from web.style import colors
 
 DEBUG = True
 
 
-def _make_sitrep_badge(organ: str, sitrep):
-
-    if organ == "vent_type_1_4h":
-        value = sitrep.get(organ, "")
-        label = "Respiratory"
-        if value.lower() == "ventilated":
-            color = "red"
-        elif value.lower() in ["hfno", "cpap", "niv"]:
-            color = "orange"
-        elif value.lower() in ["oxygen"]:
-            color = "yellow"
-        elif value.lower() in ["room air"]:
-            color = "green"
-        else:
-            color = "gray"
-
-    elif organ == "n_inotropes_1_4h":
-        value = sitrep.get(organ, 0)
-        label = "Vasopressors"
-        if value >= 2:
-            value = "2+"
-            color = "red"
-        elif value == 1:
-            value = "1"
-            color = "orange"
-        elif value == 0:
-            value = "0"
-            color = "green"
-        else:
-            value = "Unknown"
-            color = "gray"
-
-    elif organ == "had_rrt_1_4h":
-        value = sitrep.get(organ, None)
-        label = "RRT"
-        if value is True:
-            value = "Yes"
-            color = "red"
-        elif value is False:
-            value = "No"
-            color = "green"
-        else:
-            value = "Unknown"
-            color = "gray"
-
-    elif organ == "is_agitated_1_8h":
-        value = sitrep.get(organ, None)
-        label = "Agitation"
-        if value is True:
-            value = "Yes"
-            color = "red"
-        elif value is False:
-            value = "No"
-            color = "green"
-        else:
-            value = "Unknown"
-            color = "gray"
-
-    else:
-        warnings.warn(f"{organ} not recognised to create sitrep badge")
-        label = "Unknown"
-        value = "Unknown"
-        color = "gray"
-
-    return dmc.Stack(
-        [
-            dmc.Badge(label, color="indigo", variant="outline"),
-            dmc.Badge(value, color=color, variant="filled"),
-        ]
-    )
-
-
 def _report_patient_status(sitrep: dict) -> dmc.Group:
-    resp_badge = _make_sitrep_badge("vent_type_1_4h", sitrep)
-    cvs_badge = _make_sitrep_badge("n_inotropes_1_4h", sitrep)
-    rrt_badge = _make_sitrep_badge("had_rrt_1_4h", sitrep)
-    delirium_badge = _make_sitrep_badge("is_agitated_1_8h", sitrep)
+    resp_badge = make_sitrep_badge("vent_type_1_4h", sitrep)
+    cvs_badge = make_sitrep_badge("n_inotropes_1_4h", sitrep)
+    rrt_badge = make_sitrep_badge("had_rrt_1_4h", sitrep)
+    delirium_badge = make_sitrep_badge("is_agitated_1_8h", sitrep)
 
     return dmc.Group(
         [
@@ -116,36 +45,47 @@ def _create_accordion_item(control: Any, panel: Any) -> Any:
 
 @callback(
     [
-        Output(ids.INSPECTOR_WARD_MODAL, "opened"),
+        Output(ids.INSPECTOR_WARD_SIDEBAR, "hidden"),
         Output(ids.INSPECTOR_WARD_ACCORDION, "value"),
-        Output(ids.INSPECTOR_WARD_MODAL, "title"),
+        Output(ids.INSPECTOR_WARD_TITLE, "children"),
     ],
-    Input(ids.CYTO_WARD, "tapNode"),
-    State(ids.INSPECTOR_WARD_MODAL, "opened"),
+    Input(ids.CYTO_WARD, "selectedNodeData"),
+    Input(ids.DEPT_SELECTOR, "value"),
     prevent_initial_callback=True,
 )
-def open_inspector_modal(node: dict, opened: bool) -> Tuple[bool, list[str], dmc.Group]:
-    """
-    Open modal
-    prepare modal title
-    define which accordion item is open
-    """
-    if not node:
-        return False, ["bed"], dmc.Group()
+def update_patient_sidebar(
+    nodes: list[dict], _: str
+) -> Tuple[bool, list[str], dmc.Group]:
+    """Update sidebar"""
 
-    data = node.get("data", {})
+    click_title = dmc.Group(
+        [
+            DashIconify(
+                icon="material-symbols:left-click-rounded",
+                color=colors.indigo,
+                width=30,
+            ),
+            dmc.Text(f"Click on a bed for more information", weight=500),
+        ]
+    )
+
+    if (
+        not nodes
+        or len(nodes) != 1
+        or callback_context.triggered_id == ids.DEPT_SELECTOR
+    ):
+        return True, [], dmc.Group(click_title)
+
+    data = nodes[0]
     if data.get("entity") != "bed":
-        return False, ["bed"], dmc.Group()
+        return True, ["bed"], dmc.Group(click_title)
 
     bed = data.get("bed")
     bed_color = colors.orange if data.get("occupied") else colors.gray
     bed_number = bed.get("bed_number")
     department = bed.get("department")
-    # room = bed.get("room")
-    # room_type = "Sideroom" if data.get("room", {}).get("is_sidroom") else
-    # "Bay"
 
-    modal_title = dmc.Group(
+    bed_title = dmc.Group(
         [
             DashIconify(
                 icon="carbon:hospital-bed",
@@ -154,23 +94,23 @@ def open_inspector_modal(node: dict, opened: bool) -> Tuple[bool, list[str], dmc
             ),
             dmc.Text(f"BED {bed_number}", weight=500),
             dmc.Text(f"{department}", color=colors.gray),
-        ]
+        ],
+        pb=20,
     )
 
-    return not opened, ["patient", "bed"], modal_title
+    return False, ["patient", "bed"], bed_title
 
 
 @callback(
     Output(ids.ACCORDION_ITEM_BED, "children"),
     Input(ids.CYTO_WARD, "tapNode"),
-    Input(ids.INSPECTOR_WARD_MODAL, "opened"),
     prevent_initial_call=True,
 )
 def bed_accordion_item(
-    node: dict, modal_open: bool
+    node: dict,
 ) -> Tuple[dmc.AccordionControl, dmc.AccordionPanel]:
     """Prepare content for bed accordion item"""
-    if not node or not modal_open:
+    if not node:
         control, panel = None, None
         return dmc.AccordionControl(control), dmc.AccordionPanel(panel)
 
@@ -186,11 +126,21 @@ def bed_accordion_item(
                 icon="carbon:logout",
                 width=20,
             ),
-            dmc.Text("Discharge decision"),
+            dmc.Text("Discharge decision", size="sm"),
         ]
     )
     panel = dmc.Grid(
         [
+            dmc.Col(
+                [
+                    dmc.Text(
+                        "Ready for discharge/transfer/step-down etc.",
+                        color=colors.gray,
+                        size="sm",
+                    )
+                ],
+                span=12,
+            ),
             dmc.Col(
                 dmc.SegmentedControl(
                     id=ids.ACC_BED_STATUS_WARD,
@@ -199,24 +149,26 @@ def bed_accordion_item(
                     value=bed_status_control_value,
                     color=color,
                     persistence=False,
+                    size="sm",
                 ),
-                span=9,
+                span=12,
+            ),
+            dmc.Col(
+                [dmc.Text(id=ids.ACC_BED_DECISION_TEXT, size="sm", color=colors.gray)],
+                span=6,
             ),
             dmc.Col(
                 dmc.Button(
                     "Submit",
                     id=ids.ACC_BED_SUBMIT_WARD,
                     color="orange",
+                    size="sm",
                     # variant="default",
                 ),
-                offset=1,
-                span=2,
+                span="content",
             ),
-            dmc.Col(
-                [dmc.Text(id=ids.ACC_BED_DECISION_TEXT, color=colors.gray)],
-                span=12,
-            ),
-        ]
+        ],
+        justify="space-between",
     )
 
     return dmc.AccordionControl(control), dmc.AccordionPanel(panel)
@@ -315,14 +267,13 @@ def submit_discharge_status(
 @callback(
     Output(ids.ACCORDION_ITEM_PATIENT, "children"),
     Input(ids.CYTO_WARD, "tapNode"),
-    Input(ids.INSPECTOR_WARD_MODAL, "opened"),
     prevent_initial_call=True,
 )
 def patient_accordion_item(
-    node: dict, modal_open: bool
+    node: dict,
 ) -> Tuple[dmc.AccordionControl, dmc.AccordionPanel]:
     """Prepare content for patient accordion item"""
-    if not node or not modal_open:
+    if not node:
         control, panel = None, None
         return dmc.AccordionControl(control), dmc.AccordionPanel(panel)
 
@@ -338,7 +289,7 @@ def patient_accordion_item(
             sex_icon = (
                 "carbon:gender-male" if sex.lower() == "m" else "carbon:gender-female"
             )
-        control_text = censusf.get("demographic_slug", "Uh-oh! No patient data?")
+        control_text = "{firstname} {lastname} ({age}yrs)".format(**censusf)
 
     control = dmc.Group(
         [
@@ -346,25 +297,41 @@ def patient_accordion_item(
                 icon=sex_icon,
                 width=20,
             ),
-            dmc.Text(control_text),
+            dmc.Text(control_text, size="sm"),
         ]
     )
 
     sitrep = data.get("sitrep", {})
     if sitrep:
-        sitrep_content = _report_patient_status(sitrep)
-        sitrep_text = dmc.Text("")
+
+        dob = dmc.Code(censusf.get("dob_fshort", "DD-MM-CCYY"), block=False)
+        mrn = dmc.Code(censusf.get("mrn", "Unknown"), block=False)
+        csn = dmc.Code(censusf.get("encounter", "Unknown"), block=False)
+        ids_labels = html.Tr([html.Td("DoB"), html.Td("MRN"), html.Td("CSN")])
+        ids_row = html.Tr([html.Td(dob), html.Td(mrn), html.Td(csn)])
+        ids_body = html.Tbody([ids_labels, ids_row])
+        ids_table = dmc.Table([ids_body])
+
+        try:
+            hospital_admit = census.get("hv_admission_dt")
+            hospital_los = str(int((datetime.utcnow() - hospital_admit).days))
+            hospital_admit_str = datetime.strftime(hospital_admit, "%d %b %Y")
+            los_text = dmc.Text(f"Hospital LoS: {hospital_los}", size="sm")
+        except TypeError as e:
+            los_text = dmc.Text(f"Hospital LoS: Unknown", size="sm")
+
+        sitrep_content = [
+            _report_patient_status(sitrep),
+            ids_table,
+            los_text,
+        ]
     else:
-        sitrep_content = dmc.Group()
-        sitrep_text = dmc.Text("Sitrep patient data not available")
+        sitrep_content = [dmc.Text("Sitrep patient data not available", size="sm")]
 
     panel = dmc.Grid(
         [
             dmc.Col(
-                [
-                    sitrep_content,
-                    sitrep_text,
-                ],
+                sitrep_content,
                 span=12,
             )
         ]
@@ -379,13 +346,17 @@ def patient_accordion_item(
 )
 def debug_accordion_item(node: dict) -> Tuple[dmc.AccordionControl, dmc.AccordionPanel]:
     """Prepare content for debug accordion item"""
+    if not node:
+        control, panel = None, None
+        return dmc.AccordionControl(control), dmc.AccordionPanel(panel)
+
     title = dmc.Group(
         [
             DashIconify(
                 icon="carbon:debug",
                 width=20,
             ),
-            dmc.Text("Developer and debug inspector"),
+            dmc.Text("Developer and debug inspector", size="xs"),
         ]
     )
     control = dmc.AccordionControl(title)

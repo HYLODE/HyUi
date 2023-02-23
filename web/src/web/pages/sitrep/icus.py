@@ -2,7 +2,6 @@ import dash
 import dash_cytoscape as cyto
 import dash_mantine_components as dmc
 import json
-import math
 from dash import dcc, html
 from pathlib import Path
 
@@ -11,9 +10,9 @@ import web.pages.sitrep.callbacks.bedlist  # noqa
 # noqa suppresses black errors when linting since you need this import for
 # access to callbacks
 import web.pages.sitrep.callbacks.cytoscape  # noqa
+import web.pages.sitrep.callbacks.discharges  # noqa
 import web.pages.sitrep.callbacks.inspector  # noqa
 import web.pages.sitrep.callbacks.widgets  # noqa
-import web.pages.sitrep.callbacks.discharges  # noqa
 from web.pages.sitrep import ids
 from web import SITREP_DEPT2WARD_MAPPING
 from web.style import colors, replace_colors_in_stylesheet
@@ -23,7 +22,6 @@ dash.register_page(__name__, path="/sitrep/icus", name="Critical Care")
 with open(Path(__file__).parent / "cyto_style_icus.json") as f:
     cyto_style_sheet = json.load(f)
     cyto_style_sheet = replace_colors_in_stylesheet(cyto_style_sheet)
-
 
 timers = html.Div([])
 
@@ -80,7 +78,7 @@ ward_cyto = dmc.Paper(
             id=ids.CYTO_WARD,
             style={
                 # "width": "70vw",  # do not set width; will derive from height
-                "height": "70vh",
+                "height": "50vh",
                 "z-index": 999,
             },
             layout={
@@ -97,11 +95,12 @@ ward_cyto = dmc.Paper(
     ],
     shadow="lg",
     radius="lg",
-    p="md",  # padding
+    p="xs",  # padding
     withBorder=True,
 )
 
 ward_list = dmc.Paper(
+    # Todo: convert to using datatable
     dmc.Table(
         id=ids.BED_SELECTOR_WARD,
         striped=True,
@@ -111,7 +110,7 @@ ward_list = dmc.Paper(
     ),
     shadow="lg",
     radius="lg",
-    p="md",  # padding
+    p="xs",  # padding
     withBorder=True,
 )
 
@@ -130,53 +129,67 @@ debug_inspector = dmc.Container(
     ]
 )
 
-bed_inspector = html.Div(
-    [
-        dmc.AccordionMultiple(
-            id=ids.INSPECTOR_WARD_ACCORDION,
+sidebar_title = html.Div(id=ids.INSPECTOR_WARD_TITLE)
+
+# use html.div to allow the bed inspector to be hidden by settinging the hidden
+# property boolean
+sidebar = html.Div(
+    children=[
+        sidebar_title,
+        html.Div(
+            id=ids.INSPECTOR_WARD_SIDEBAR,
             children=[
-                dmc.AccordionItem(id=ids.ACCORDION_ITEM_PATIENT, value="patient"),
-                dmc.AccordionItem(id=ids.ACCORDION_ITEM_BED, value="bed"),
-                dmc.AccordionItem(id=ids.ACCORDION_ITEM_DEBUG, value="debug"),
+                dmc.AccordionMultiple(
+                    id=ids.INSPECTOR_WARD_ACCORDION,
+                    children=[
+                        dmc.AccordionItem(
+                            id=ids.ACCORDION_ITEM_PATIENT, value="patient"
+                        ),
+                        dmc.AccordionItem(id=ids.ACCORDION_ITEM_BED, value="bed"),
+                        dmc.AccordionItem(id=ids.ACCORDION_ITEM_DEBUG, value="debug"),
+                    ],
+                    chevronPosition="left",
+                    variant="separated",
+                    transitionDuration=0,
+                ),
             ],
-            chevronPosition="left",
-            variant="separated",
-            transitionDuration=0,
-        )
-    ]
+        ),
+    ],
 )
 
-inspector = html.Div(
-    [
-        dmc.Drawer(
-            id=ids.INSPECTOR_WARD_MODAL,
-            # centered=True,
-            padding="xs",
-            size="60vw",
-            # overflow="inside",
-            overlayColor=colors.gray,
-            overlayOpacity=0.8,
-            transition="fade",
-            transitionDuration=0,
-            children=[bed_inspector],
-        )
-    ]
+patient_sidebar = dmc.Container(
+    dmc.Paper(
+        shadow="lg",
+        radius="lg",
+        p="xs",  # padding
+        withBorder=True,
+        children=[sidebar],
+    )
 )
 
 body = dmc.Container(
     [
         dmc.Grid(
             [
-                dmc.Col(dept_selector, span=6),
-                dmc.Col([], span=3, offset=3),
+                dmc.Col(dept_selector, span=3),
+                dmc.Col([], span=6, offset=3),
                 dmc.Col(ward_status, span=12),
                 dmc.Col(ward_list, span=3),
-                dmc.Col(ward_cyto, span=9),
+                # nested grid
+                dmc.Col(
+                    dmc.Grid(
+                        [
+                            # dmc.Col(dmc.Text("Hello World", span=12)),
+                            dmc.Col(ward_cyto, span=12),
+                        ]
+                    ),
+                    span=4,
+                ),
+                dmc.Col(dmc.Grid([dmc.Col(patient_sidebar, span=12)]), span=5),
             ]
-        ),
+        )
     ],
-    style={"width": "90vw"},
-    fluid=True,
+    size="xl",
 )
 
 
@@ -187,6 +200,5 @@ def layout() -> dash.html.Div:
             stores,
             notifications,
             body,
-            inspector,
         ]
     )

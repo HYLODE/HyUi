@@ -66,12 +66,12 @@ def create_header(nav_data: list | dict) -> dmc.Header:
                             [
                                 dmc.MediaQuery(
                                     create_home_link("HyperLocal Demand " "Forecasts"),
-                                    smallerThan="lg",
+                                    smallerThan="xl",
                                     styles={"display": "none"},
                                 ),
                                 dmc.MediaQuery(
                                     create_home_link("HYLODE"),
-                                    largerThan="lg",
+                                    largerThan="xl",
                                     styles={"display": "none"},
                                 ),
                             ],
@@ -98,7 +98,7 @@ def create_header(nav_data: list | dict) -> dmc.Header:
                                                 icon="radix-icons:magnifying-glass"
                                             ),
                                         ),
-                                        smallerThan="md",
+                                        smallerThan="lg",
                                         styles={"display": "none"},
                                     ),
                                     create_header_link(

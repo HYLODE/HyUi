@@ -34,7 +34,7 @@ body = html.Div(
                                         [
                                             "🚧The application is in ",
                                             dmc.Text(
-                                                "alpha ",
+                                                "beta ",
                                                 color=colors.orange,
                                                 style=_inline,
                                             ),

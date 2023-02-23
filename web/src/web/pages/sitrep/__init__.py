@@ -18,25 +18,7 @@ CAMPUSES = [
 ]
 
 DISCHARGE_DECISIONS = [
-    dict(label="HOLD", value="blocked", description="Not for discharge"),
-    dict(
-        label="REVIEW",
-        value="review",
-        description="Review for possible " "discharge later",
-    ),
-    dict(
-        label="DISCHARGE",
-        value="discharge",
-        description="Ready for " "discharge " "now",
-    ),
-    dict(
-        label="EXCELLENCE",
-        value="excellence",
-        description="Excellence in " "the " "End of Life " "pathway",
-    ),
-    dict(
-        label="BLOCKED",
-        value="blocked",
-        description="Block the bed (not " "available for " "admissions)",
-    ),
+    dict(label="READY", value="ready", description="Ready now"),
+    dict(label="REVIEW", value="review", description="Ready soon"),
+    dict(label="NOT READY", value="not ready", description="Not ready"),
 ]

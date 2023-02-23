@@ -29,12 +29,12 @@ def create_footer() -> dmc.Footer:
                             [
                                 dmc.MediaQuery(
                                     create_home_link("HyperLocal Demand " "Forecasts"),
-                                    smallerThan="lg",
+                                    smallerThan="xl",
                                     styles={"display": "none"},
                                 ),
                                 dmc.MediaQuery(
                                     create_home_link("HYLODE"),
-                                    largerThan="lg",
+                                    largerThan="xl",
                                     styles={"display": "none"},
                                 ),
                             ],
