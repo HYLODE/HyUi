@@ -27,7 +27,9 @@ sitrep_ward = _NavLink(title="Ward", path="/sitrep/ward", icon="carbon:hospital-
 electives = _NavLink(
     title="Electives", path="/surgery/electives", icon="carbon:calendar"
 )
-pqip = _NavLink(title="PQIP Report", path="/surgery/pqip", icon="mdi:graph-areaspline")
+pqip = _NavLink(
+    title="PQIP Report", path="/assets/pqip_dashboard.html", icon="mdi:graph-areaspline"
+)
 a_and_e = _NavLink(
     title="Admissions", path="/a_and_e", icon="fluent:people-queue-24-regular"
 )
