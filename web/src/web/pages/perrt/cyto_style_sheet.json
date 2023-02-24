@@ -3,7 +3,9 @@
     "selector": "node",
     "style": {
       "text-halign": "center",
-      "text-valign": "center"
+      "text-valign": "center",
+      "width": 36,
+      "height": 36
     }
   },
   {

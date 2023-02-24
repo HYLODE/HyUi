@@ -77,7 +77,7 @@ campus_cyto = dmc.Paper(
             id=ids.CYTO_CAMPUS,
             style={
                 # "width": "70vw",
-                "height": "70vh",
+                "height": "75vh",
                 "z-index": 999,
             },
             layout={
@@ -130,31 +130,38 @@ bed_inspector = html.Div(
     ]
 )
 
-inspector = html.Div(
-    [
-        dmc.Modal(
-            id=ids.INSPECTOR_CAMPUS_MODAL,
-            centered=True,
-            padding="xs",
-            size="60vw",
-            overflow="inside",
-            overlayColor=colors.gray,
-            overlayOpacity=0.5,
-            transition="fade",
-            transitionDuration=0,
-            children=[bed_inspector],
-        )
+
+sidebar_title = html.Div(id=ids.SIDEBAR_TITLE)
+sidebar_content = html.Div(id=ids.SIDEBAR_CONTENT, children=bed_inspector)
+
+sidebar = html.Div(
+    children=[
+        sidebar_title,
+        sidebar_content,
     ]
+)
+
+patient_sidebar = dmc.Container(
+    dmc.Paper(shadow="lg", radius="lg", p="xs", withBorder=True, children=[sidebar])
 )
 
 body = dmc.Container(
     [
         dmc.Grid(
             [
-                dmc.Col(dept_selector, span=6),
-                dmc.Col(campus_selector, offset=3, span=3),
+                # dmc.Col(dept_selector, span=6),
+                dmc.Col(campus_selector, offset=9, span=3),
                 dmc.Col(campus_status, span=12),
-                dmc.Col(campus_cyto, span=12),
+                # nested grid
+                dmc.Col(
+                    dmc.Grid(
+                        [
+                            dmc.Col(campus_cyto, span=12),
+                        ]
+                    ),
+                    span=9,
+                ),
+                dmc.Col(dmc.Grid([dmc.Col(patient_sidebar)]), span=3),
             ]
         ),
     ],
@@ -170,6 +177,5 @@ def layout() -> dash.html.Div:
             stores,
             notifications,
             body,
-            inspector,
         ]
     )
