@@ -111,10 +111,20 @@ def create_side_nave_content() -> dmc.Stack:
                 label=electives.title,
                 href=electives.path,
             ),
-            create_main_nav_link(
-                icon=pqip.icon,
-                label=pqip.title,
+            dmc.Anchor(
+                dmc.Group(
+                    [
+                        DashIconify(
+                            icon=pqip.icon,
+                            width=20,
+                            color=dmc.theme.DEFAULT_COLORS["indigo"][5],
+                        ),
+                        dmc.Text(pqip.title, size="sm"),
+                    ]
+                ),
                 href=pqip.path,
+                variant="text",
+                target="_blank",
             ),
             dmc.Divider(
                 labelPosition="left",
