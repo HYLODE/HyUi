@@ -33,6 +33,7 @@ pqip = _NavLink(
 a_and_e = _NavLink(
     title="Admissions", path="/a_and_e", icon="fluent:people-queue-24-regular"
 )
+hybye = _NavLink(title="HyBye", path="/hybye/stage", icon="carbon:logout")
 sitrep_icus = _NavLink(
     title="Critical Care", path="/sitrep/icus", icon="healthicons:critical-care-outline"
 )
@@ -93,6 +94,7 @@ def create_side_nave_content() -> dmc.Stack:
                 label=sitrep_ward.title,
                 href=sitrep_ward.path,
             ),
+            create_main_nav_link(icon=hybye.icon, label=hybye.title, href=hybye.path),
             dmc.Divider(
                 labelPosition="left",
                 label=[
