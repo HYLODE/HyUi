@@ -2,7 +2,6 @@ from dash import Input, Output, callback
 
 from web.pages.electives import ids, CAMPUSES
 from web.stores import ids as store_ids
-from datetime import date, timedelta
 
 import textwrap
 
@@ -26,7 +25,11 @@ def _store_electives(
         ]
 
     if date is not None:
-        electives = [row for row in electives if row["surgery_date"] == date]
+        electives = [
+            row
+            for row in electives
+            if row["surgery_date"] >= date[0] and row["surgery_date"] <= date[1]
+        ]
 
     i = 0
 
@@ -38,26 +41,7 @@ def _store_electives(
 
     if pacu_selection is not None:
         filter_query = f"{{pacu}} scontains {pacu_selection}"
-    print(filter_query)
     return electives, filter_query
-
-
-@callback(Output("date_selected", "data"), Input("date_selected", "value"))
-def _get_date(value: date) -> list[dict]:
-    return [
-        {
-            "value": date.today(),
-            "label": date.today().strftime("%A %d"),
-        },
-        {
-            "value": (date.today() + timedelta(days=1)),
-            "label": (date.today() + timedelta(days=1)).strftime("%A %d"),
-        },
-        {
-            "value": (date.today() + timedelta(days=2)),
-            "label": (date.today() + timedelta(days=2)).strftime("%A %d"),
-        },
-    ]
 
 
 @callback(

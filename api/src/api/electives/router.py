@@ -222,7 +222,7 @@ def get_electives(
     response: Response,
     s_caboodle: Session = Depends(get_caboodle_session),
     s_clarity: Session = Depends(get_clarity_session),
-    days_ahead: int = 3,
+    days_ahead: int = 10,
 ) -> list[MergedData]:
     response.headers["Cache-Control"] = "public, max-age=7200"
 
