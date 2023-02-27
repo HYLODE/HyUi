@@ -173,7 +173,6 @@ body = dmc.Container(
                 dmc.Col(electives_list, span=7),
                 dmc.Col(patient_info_box, span=5),
             ],
-            grow=True,
         ),
     ],
     style={"width": "100vw"},
