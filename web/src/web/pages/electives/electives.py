@@ -70,26 +70,11 @@ pacu_selector = html.Div(
 
 date_selector = html.Div(
     [
-        dmc.SegmentedControl(
+        dmc.DateRangePicker(
             id="date_selected",
-            data=[
-                {
-                    "value": date.today(),
-                    "label": date.today().strftime("%A %d"),
-                },
-                {
-                    "value": (date.today() + timedelta(days=1)),
-                    "label": (date.today() + timedelta(days=1)).strftime("%A %d"),
-                },
-                {
-                    "value": (date.today() + timedelta(days=2)),
-                    "label": (date.today() + timedelta(days=2)).strftime("%A %d"),
-                },
-            ],
-            value=date.today(),
-            fullWidth=True,
-            persistence=True,
-            persistence_type="local",
+            minDate=date.today(),
+            maxDate=date.today() + timedelta(days=10),
+            value=[date.today(), (date.today() + timedelta(days=2))],
         ),
     ]
 )
@@ -99,6 +84,7 @@ electives_list = dmc.Paper(
     dtable.DataTable(
         id=ids.ELECTIVES_TABLE,
         columns=[
+            {"id": "surgery_date", "name": "Date"},
             {"id": "pacu", "name": "PACU"},
             {"id": "full_name", "name": "Full Name"},
             {"id": "age_sex", "name": "Age / Sex"},
