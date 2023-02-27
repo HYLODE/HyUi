@@ -68,17 +68,40 @@ pacu_selector = html.Div(
 )
 
 
-date_selector = html.Div(
+multi_date_selector = html.Div(
     [
         dmc.DateRangePicker(
-            id="date_selected",
+            id="multi_date_selector",
             minDate=date.today(),
             maxDate=date.today() + timedelta(days=10),
-            value=[date.today(), (date.today() + timedelta(days=2))],
+            value=[date.today(), (date.today() + timedelta(days=3))],
         ),
     ]
 )
 
+single_date_selector = html.Div(
+    [
+        dmc.DatePicker(
+            id="single_date_selector",
+            minDate=date.today(),
+            maxDate=date.today() + timedelta(days=10),
+            value=date.today(),
+        ),
+    ]
+)
+
+meta_date = html.Div(
+    [
+        dmc.SegmentedControl(
+            id="meta_date",
+            value="single",
+            data=[
+                {"value": "single", "label": "single date"},
+                {"value": "multi", "label": "multiple dates"},
+            ],
+        )
+    ]
+)
 
 electives_list = dmc.Paper(
     dtable.DataTable(
@@ -159,13 +182,18 @@ inspector = html.Div(
 body = dmc.Container(
     [
         dmc.Grid(
-            [
-                dmc.Col(pacu_selector, span=3),
-                dmc.Col(campus_selector, span=4),
-                dmc.Col(date_selector, span=5),
+            children=[
+                dmc.Col(pacu_selector, span=2),
+                dmc.Col(campus_selector, span=2),
+                dmc.Col(meta_date, span=1, offset=2),
+                dmc.Col(
+                    multi_date_selector, span=3, id="mds_col", sx={"display": "none"}
+                ),
+                dmc.Col(single_date_selector, span=3, id="sds_col"),
                 dmc.Col(electives_list, span=7),
                 dmc.Col(patient_info_box, span=5),
-            ]
+            ],
+            grow=True,
         ),
     ],
     style={"width": "100vw"},

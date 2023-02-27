@@ -11,11 +11,18 @@ import textwrap
     Output(ids.ELECTIVES_TABLE, "filter_query"),
     Input(ids.CAMPUS_SELECTOR, "value"),
     Input(store_ids.ELECTIVES_STORE, "data"),
-    Input("date_selected", "value"),
+    Input("multi_date_selector", "value"),
+    Input("single_date_selector", "value"),
+    Input("meta_date", "value"),
     Input("pacu_selector", "value"),
 )
 def _store_electives(
-    campus: str, electives: list[dict], date: str, pacu_selection: bool
+    campus: str,
+    electives: list[dict],
+    multi_date: str,
+    single_date: str,
+    meta_date: str,
+    pacu_selection: bool,
 ) -> tuple[list[dict], str]:
     campus_dict = {i.get("value"): i.get("label") for i in CAMPUSES}
 
@@ -24,15 +31,17 @@ def _store_electives(
             row for row in electives if campus_dict[campus] in row["department_name"]
         ]
 
-    if date is not None:
+    if meta_date == "multi":
         electives = [
             row
             for row in electives
-            if row["surgery_date"] >= date[0] and row["surgery_date"] <= date[1]
+            if row["surgery_date"] >= multi_date[0]
+            and row["surgery_date"] <= multi_date[1]
         ]
+    elif meta_date == "single":
+        electives = [row for row in electives if row["surgery_date"] == single_date]
 
     i = 0
-
     for row in electives:
         row["full_name"] = "{first_name} {last_name}".format(**row)
         row["age_sex"] = "{age_in_years}{sex[0]}".format(**row)
@@ -90,3 +99,16 @@ Preassessment summary: {pa_summary}
     )
 
     return "\n".join([textwrap.fill(x, info_box_width) for x in string.split("\n")])
+
+
+@callback(
+    Output("mds_col", "sx"),
+    Output("sds_col", "sx"),
+    Input("meta_date", "value"),
+)
+def _select_selector(meta_date_value: str) -> tuple[dict, dict]:
+    if meta_date_value == "single":
+        return ({"display": "none"}, {})
+    if meta_date_value == "multi":
+        return ({}, {"display": "none"})
+    return ({}, {})
