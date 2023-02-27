@@ -4,12 +4,12 @@ import requests
 import warnings
 from dash import Input, Output, State, callback, callback_context
 from datetime import datetime
-from typing import Tuple, Any
+from typing import Any, Tuple
 
 from models.census import CensusRow
+from web import SITREP_DEPT2WARD_MAPPING
 from web.config import get_settings
 from web.pages.sitrep import CAMPUSES, ids
-from web import SITREP_DEPT2WARD_MAPPING
 from web.stores import ids as store_ids
 from web.utils import Timer
 
@@ -203,6 +203,30 @@ def _store_sitrep(dept: str, sitreps: dict) -> Any:
     return sitreps[ward]
 
 
+@callback(
+    Output(ids.HYMIND_DC_STORE, "data"),
+    Input(ids.DEPT_SELECTOR, "value"),
+    Input(store_ids.HYMIND_ICU_DC_STORE, "data"),
+    prevent_initial_callback=True,
+    background=True,
+)
+def _store_hymind_dc(dept: str, hymind_dcs: dict) -> Any:
+    """
+    Args:
+        dept: the department
+        hymind_dcs: dictionary of hymind predictions per unit
+
+    Returns:
+        additonal individual level dc predictions for that ward
+
+    """
+    ward = SITREP_DEPT2WARD_MAPPING.get(dept)
+    if not ward:
+        warnings.warn(f"No HyMind Discharge predictions available for {ward}")
+        return [{}]
+    return hymind_dcs[ward]
+
+
 @Timer(text="Discharge updates: Elapsed time: {:.3f} seconds")
 def _get_discharge_updates(delta_hours: int = 48) -> list[dict]:
     response = requests.get(
@@ -271,6 +295,7 @@ def _make_elements(  # noqa: C901
     rooms: list[dict],
     beds: list[dict],
     sitrep: list[dict],
+    hymind: list[dict],
     discharges: list[dict],
     selected_dept: str | None,
     ward_only: bool,
@@ -285,6 +310,7 @@ def _make_elements(  # noqa: C901
         rooms: list of room objects
         beds: list of bed objects (from baserow)
         sitrep: list of sitrep statuses (from hylode)
+        hymind: list of patient level discharge predictions
         discharges: list of discharge statuses (from baserow)
         selected_dept: name of dept or None if show all
         ward_only: True if ward_only not campus; default False
@@ -318,6 +344,7 @@ def _make_elements(  # noqa: C901
         discharge_lookup = {}
 
     sitrep_lookup = {i.get("csn"): i for i in sitrep}
+    hymind_lookup = {i.get("episode_slice_id"): i for i in hymind}
     preset_map_positions = (
         False
         if selected_dept not in SITREP_DEPT2WARD_MAPPING.keys()
@@ -336,6 +363,8 @@ def _make_elements(  # noqa: C901
         encounter = census_lookup.get(location_string, {}).get("encounter", "")
         discharge_status = discharge_lookup.get(encounter, {}).get("status", "")
         wim = sitrep_lookup.get(encounter, {}).get("wim_1", -1)
+        episode_slice_id = sitrep_lookup.get(encounter, {}).get("episode_slice_id", -1)
+        yhat_dc = hymind_lookup.get(episode_slice_id, {}).get("prediction_as_real", -1)
 
         data = dict(
             id=location_string,
@@ -354,6 +383,8 @@ def _make_elements(  # noqa: C901
             dc_status=discharge_status,
             wim=wim,
             sitrep=sitrep_lookup.get(encounter, {}),
+            yhat_dc=yhat_dc,
+            hymind_dc=hymind_lookup.get(episode_slice_id, {}),
         )
         if preset_map_positions:
             position = dict(
@@ -454,6 +485,7 @@ def _prepare_cyto_elements_campus(
         rooms,
         beds,
         sitrep=[{}],
+        hymind=[{}],
         discharges=[{}],
         selected_dept=None,
         ward_only=False,
@@ -470,6 +502,7 @@ def _prepare_cyto_elements_campus(
         Input(ids.ROOMS_OPEN_STORE, "data"),
         Input(ids.BEDS_STORE, "data"),
         Input(ids.SITREP_STORE, "data"),
+        Input(ids.HYMIND_DC_STORE, "data"),
         Input(ids.DISCHARGES_STORE, "data"),
         Input(ids.DEPT_SELECTOR, "value"),
         Input(ids.ACC_BED_SUBMIT_STORE, "data"),
@@ -484,6 +517,7 @@ def _prepare_cyto_elements_ward(
     rooms: list[dict],
     beds: list[dict],
     sitrep: list[dict],
+    hymind: list[dict],
     discharges: list[dict],
     dept: str,
     bed_submit_store: dict,
@@ -502,6 +536,7 @@ def _prepare_cyto_elements_ward(
             rooms,
             beds,
             sitrep,
+            hymind,
             discharges,
             selected_dept=dept,
             ward_only=True,
@@ -527,13 +562,7 @@ def format_census(census: dict) -> dict:
     encounter = str(census.get("encounter", ""))
     lastname = census.get("lastname", "").upper()
     firstname = census.get("firstname", "").title()
-    initials = (
-        f"{census.get('firstname', '?')[0]}"
-        f""
-        f""
-        f""
-        f"{census.get('lastname', '?')[0]}"
-    )
+    initials = f"{census.get('firstname', '?')[0]}" f"{census.get('lastname', '?')[0]}"
     date_of_birth = census.get("date_of_birth", "1900-01-01")  # default dob
     dob = datetime.fromisoformat(date_of_birth)
     dob_fshort = datetime.strftime(dob, "%d-%m-%Y")

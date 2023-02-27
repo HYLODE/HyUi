@@ -34,6 +34,7 @@ stores = html.Div(
         dcc.Store(id=ids.BEDS_STORE),
         dcc.Store(id=ids.DEPTS_OPEN_STORE_NAMES),
         dcc.Store(id=ids.SITREP_STORE),
+        dcc.Store(id=ids.HYMIND_DC_STORE),
         dcc.Store(id=ids.DISCHARGES_STORE),
         dcc.Store(id=ids.ACC_BED_SUBMIT_STORE),
     ]

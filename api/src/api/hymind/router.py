@@ -80,7 +80,7 @@ def get_individual_discharge_predictions(
     ward: str = Query(default=""),
     settings: Settings = Depends(get_settings),
 ) -> list[IcuDischarge]:
-    response.headers["Cache-Control"] = "public, max-age=300"
+    response.headers["Cache-Control"] = "public, max-age=3600"
     response = requests.get(
         f"{settings.hymind_url}/predictions/icu/discharge", params={"ward": ward}
     )
