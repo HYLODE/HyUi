@@ -82,11 +82,15 @@ Echocardiography:
 Patient has had {num_echo} echos,
 of which {abnormal_echo} were flagged as abnormal.
 Last echo ({last_echo_date}): {last_echo_narrative}
+Maximum BMI: {bmi_max_value}.
 
-Preassessment date: {preassess_date}:
-ASA: {asa}. Maximum BMI: {bmi_max_value}.
+Preassessment date: {preassess_date}.
 Destination on preassessment clinic booking: {pacdest}
-Preassessment summary: {pa_summary}
+Nursing outcome: {pac_nursing_outcome}
+Anaesthetic review: {pac_dr_review}
+Nursing issues: {pac_nursing_issues}
+
+
 """.format(
         **pt
     )
