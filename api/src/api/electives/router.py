@@ -266,7 +266,7 @@ def get_electives(
         obs=obs,
         axa=axa,
         pod=pod,
-        to_predict=False,
+        to_predict=True,
         medical_hx=hx,
         pa_summary=pa_summary,
     )
