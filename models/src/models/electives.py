@@ -184,6 +184,7 @@ class MergedData(CabData):
     pac_dr_review: str | None
     pac_nursing_outcome: str | None
     pac_nursing_issues: str | None
+    display_string: str | None
     mets: int | None
     anaesthetic_alert: int | None
     asa_rating_code: str | None
@@ -201,7 +202,6 @@ class MergedData(CabData):
     booked_destination: str | None
     pacu: bool | None
     icu_prob: float | None
-    hx_string: str | None
 
 
 class EchoData(CabData):

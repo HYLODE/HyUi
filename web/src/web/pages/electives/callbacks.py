@@ -78,7 +78,7 @@ PACU: {pacu}
 Original surgical booking destination: {booked_destination}
 Protocolised Admission: {protocolised_adm}
 
-Medical History: {hx_string}
+Medical History: {display_string}
 Echocardiography:
 Patient has had {num_echo} echos,
 of which {abnormal_echo} were flagged as abnormal.
