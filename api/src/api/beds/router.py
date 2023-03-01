@@ -137,7 +137,7 @@ def get_beds(
 
     # drop baserow id and order fields
     for row in rows:
-        row.pop("id")
+        # row.pop("id")
         row.pop("order")
 
     return [Bed.parse_obj(row) for row in rows]
