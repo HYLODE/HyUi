@@ -92,19 +92,13 @@
   {
     "selector": "[dc_status='review'][?occupied]",
     "style": {
-      "shape": "tag",
-      "border-width": 4,
-      "border-color": "olive",
-      "text-margin-x": -2
+      "shape": "concave-hexagon"
     }
   },
   {
     "selector": "[dc_status='ready'][?occupied]",
     "style": {
-      "shape": "tag",
-      "background-color": "olive",
-      "background-opacity": 1.0,
-      "text-margin-x": -2
+      "shape": "tag"
     }
   },
 

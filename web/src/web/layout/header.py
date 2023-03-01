@@ -7,8 +7,9 @@ settings = get_settings()
 
 
 def create_home_link(label: str) -> dmc.Anchor:
+    icon = DashIconify(icon="carbon:satellite-radar", inline=True)
     return dmc.Anchor(
-        label,
+        [icon, " ", label],
         size="xl",
         href="/",
         underline=False,
