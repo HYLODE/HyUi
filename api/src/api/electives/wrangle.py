@@ -105,9 +105,8 @@ def prepare_draft(
         )
         .merge(wrangle_pas(pa_summary_df), how="left", on="patient_durable_key")
         .merge(
-            hx_df.groupby("patient_durable_key")
-            .agg({"display_string": " \n ".join})
-            .rename({"display_string": "hx_string"}),
+            hx_df.groupby("patient_durable_key").agg({"display_string": " ".join}),
+            # .rename({"display_string": "hx_string"}),
             how="left",
             on="patient_durable_key",
         )
