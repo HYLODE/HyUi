@@ -60,7 +60,7 @@ def _make_info_box(
     If no cell is selected, automatically first patient.
     info_box_width is number of characters.
     """
-    info_box_width = 55
+    info_box_width = 65
 
     if active_cell is None:
         patient_mrn = current_table[0]["primary_mrn"]
@@ -78,6 +78,7 @@ PACU: {pacu}
 Original surgical booking destination: {booked_destination}
 Protocolised Admission: {protocolised_adm}
 
+Medical History: {hx_string}
 Echocardiography:
 Patient has had {num_echo} echos,
 of which {abnormal_echo} were flagged as abnormal.

@@ -201,6 +201,7 @@ class MergedData(CabData):
     booked_destination: str | None
     pacu: bool | None
     icu_prob: float | None
+    hx_string: str | None
 
 
 class EchoData(CabData):
@@ -251,3 +252,8 @@ class PreassessSummaryData(CabData):
     string_value: str
     line_num: int
     name: str
+
+
+class MedicalHx(CabData):
+    value: str
+    display_string: str
