@@ -1708,12 +1708,28 @@ def fill_na(df: pd.DataFrame) -> pd.DataFrame:
 
 def wrangle_pas(df: pd.DataFrame) -> pd.DataFrame:
     return (
-        df[
-            df["creation_instant"]
-            == df.groupby("patient_durable_key")["creation_instant"].transform(max)
-        ]
-        .sort_values(["patient_durable_key", "line_num"])
-        .groupby("patient_durable_key")
+        df.sort_values(["patient_durable_key", "creation_instant"])
+        .drop_duplicates("patient_durable_key", keep="last")
+        .loc[:, ["patient_durable_key", "creation_instant"]]
+        .merge(df, on=["patient_durable_key", "creation_instant"], how="left")
+        .replace(
+            {
+                "name": {
+                    "PAC NURSING ISSUES FOR FOLLOW UP": "pac_nursing_issues",
+                    "PAC NURSING OUTCOME": "pac_nursing_outcome",
+                    "PRE-ASSESSMENT ANAESTHETIC REVIEW": "pac_dr_review",
+                }
+            }
+        )
+        .sort_values(["patient_durable_key", "name", "line_num"])
+        .groupby(["patient_durable_key", "name", "creation_instant"])
         .agg({"string_value": "".join})
-        .rename(columns={"string_value": "pa_summary"})
+        .pivot_table(
+            index=["patient_durable_key", "creation_instant"],
+            columns=["name"],
+            values="string_value",
+            aggfunc="".join,
+        )
+        .reset_index()
+        .rename(columns={"creation_instant": "pac_date"})
     )
