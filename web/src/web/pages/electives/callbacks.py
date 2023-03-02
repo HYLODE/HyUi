@@ -19,7 +19,7 @@ def _store_electives(
     campus: str, electives: list[dict], date: str, pacu_selection: bool
 ) -> tuple[list[dict], str]:
 
-    icu_cut_off = 0.5
+    icu_cut_off = (0.2, 0.7)
     preassess_date_cut_off = 90
 
     campus_dict = {i.get("value"): i.get("label") for i in CAMPUSES}
@@ -50,11 +50,11 @@ def _store_electives(
         row["full_name"] = "{first_name} {last_name}".format(**row)
         row["age_sex"] = "{age_in_years}{sex[0]}".format(**row)
 
-        if row["pacu"] and row["icu_prob"] > icu_cut_off:
+        if row["pacu"] and row["icu_prob"] > icu_cut_off[0]:
             row["pacu_yn"] = "✅ BOOKED"
-        elif row["pacu"] and row["icu_prob"] <= icu_cut_off:
-            row["pacu_yn"] = "✅ BOOKED"  # "✅🤷BOOKED"
-        elif not row["pacu"] and row["icu_prob"] > icu_cut_off:
+        elif row["pacu"] and row["icu_prob"] <= icu_cut_off[0]:
+            row["pacu_yn"] = "✅🤷BOOKED"
+        elif not row["pacu"] and row["icu_prob"] > icu_cut_off[1]:
             row["pacu_yn"] = "⚠️Not booked"
         else:
             row["pacu_yn"] = "🏥 No"
