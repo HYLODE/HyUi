@@ -3,11 +3,10 @@ SELECT DISTINCT cnf.[PatientDurableKey],
     cnavd.[StringValue],
     ad.[Name],
     cnavd.AttributeValueLineNumber_X line_num
-FROM [CABOODLE_REPORT].[dbo].[SurgicalCaseFact] scf
-    LEFT JOIN [CABOODLE_REPORT].[dbo].AnesthesiaRecordFact arf ON scf.SurgicalCaseKey = arf.SurgicalCaseKey
-    LEFT JOIN [CABOODLE_REPORT].[dbo].[ClinicalNoteFact] cnf ON cnf.EncounterKey = arf.AnesthesiaNoteEncounterKey
+FROM [CABOODLE_REPORT].[dbo].[ClinicalNoteFact] cnf
     LEFT JOIN [CABOODLE_REPORT].[dbo].[ClinicalNoteAttributeValueDim] cnavd ON cnavd.[ClinicalNoteKey] = cnf.[ClinicalNoteKey]
     LEFT JOIN [CABOODLE_REPORT].[dbo].[AttributeDim] ad ON cnavd.[AttributeKey] = ad.[AttributeKey]
+    LEFT JOIN [CABOODLE_REPORT].[dbo].[SurgicalCaseFact] scf on cnf.PatientDurableKey = scf.PatientDurableKey
     LEFT JOIN [CABOODLE_REPORT].[dbo].[WaitingListEntryFact] wlef ON scf.[SurgicalCaseKey] = wlef.[SurgicalCaseKey]
     LEFT JOIN [CABOODLE_REPORT].[dbo].[SurgicalCaseUclhFactX] scufx ON scf.[SurgicalCaseKey] = scufx.[SurgicalCaseKey]
     LEFT JOIN [CABOODLE_REPORT].[dbo].[PatientDim] patd ON scf.[PatientDurableKey] = patd.[DurableKey]
