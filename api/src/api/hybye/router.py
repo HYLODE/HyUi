@@ -20,10 +20,11 @@ def get_mock_discharges_for_last_n_days(number_of_days: int) -> list[int]:
 
 @router.get("/discharge/n_days/{number_of_days}", response_model=list[DischargeRow])
 def get_discharges_for_last_n_days(
+    number_of_days: int,
     response: Response,
     session: Session = Depends(get_star_session),
-    number_of_days: int = 7,
 ) -> [DischargeRow]:
+    response.headers["Cache-Control"] = "public, max-age=300"
     query = text((Path(__file__).parent / "get_inpatient_discharges.sql").read_text())
     result = session.execute(query, {"days": number_of_days})
 
