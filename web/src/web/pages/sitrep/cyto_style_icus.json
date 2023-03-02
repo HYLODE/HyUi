@@ -44,19 +44,6 @@
     }
   },
   {
-    "selector": "[?closed]",
-    "style": {
-      "background-color": "white",
-      "color": "gray"
-    }
-  },
-  {
-    "selector": "[?blocked]",
-    "style": {
-      "background-color": "gray"
-    }
-  },
-  {
     "selector": "[?occupied]",
     "style": {
       "background-color": "indigo67",
@@ -89,16 +76,20 @@
       "background-color": "red"
     }
   },
+
   {
     "selector": "[dc_status='review'][?occupied]",
     "style": {
-      "shape": "concave-hexagon"
+      "shape": "tag",
+      "text-margin-x": -4
     }
   },
+
   {
     "selector": "[dc_status='ready'][?occupied]",
     "style": {
-      "shape": "tag"
+      "shape": "polygon",
+      "shape-polygon-points": "-1 1 0.6 1 1 0 0.6 -1 -1 -1 -0.6 0 -1 1"
     }
   },
 
@@ -111,5 +102,25 @@
       "font-weight": "bold",
       "color": "navy"
     }
+  },
+
+  {
+    "selector": "[?closed]",
+    "style": {
+      "shape": "octagon",
+      "background-color": "white",
+      "border-width": 2,
+      "border-color": "gray",
+      "color": "gray"
+    }
+  },
+
+  {
+    "selector": "[?blocked]",
+    "style": {
+      "background-color": "white",
+      "border-color": "gray"
+    }
   }
+
 ]

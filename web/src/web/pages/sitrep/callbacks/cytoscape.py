@@ -111,7 +111,7 @@ def _store_beds(
     bedsdf = bedsdf.merge(dfdepts, on="department", how="inner")
 
     bedsdf = bedsdf[bedsdf["bed_number"] != -1]
-    bedsdf = bedsdf[~bedsdf["closed"]]
+    # bedsdf = bedsdf[~bedsdf["closed"]]
 
     def _gen_floor_indices(df: pd.DataFrame) -> pd.DataFrame:
         # now generate floor_y_index
@@ -369,7 +369,7 @@ def _make_elements(  # noqa: C901
             dict(
                 data=data,
                 position=position,
-                grabbable=True,
+                grabbable=False,
                 selectable=True,
                 locked=False,
             )
