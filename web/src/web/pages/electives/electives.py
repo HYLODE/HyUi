@@ -93,12 +93,12 @@ electives_list = dmc.Paper(
         columns=[
             {"id": "surgery_date", "name": "Date"},
             {"id": "pacu_yn", "name": "PACU"},
+            {"id": "preassess_status", "name": "Preassessment"},
             {"id": "full_name", "name": "Full Name"},
             {"id": "age_sex", "name": "Age / Sex"},
             {"id": "patient_friendly_name", "name": "Operation"},
             {"id": "primary_mrn", "name": "MRN"},
-            {"id": "room_name", "name": "Room"},
-            {"id": "preassess_status", "name": "Preassessment Clinic"}
+            {"id": "room_name", "name": "Theatre"},
             #            {"id": "abnormal_echo", "name": "abnormal_echo"},
             # {
             #     "id": "icu_prob",

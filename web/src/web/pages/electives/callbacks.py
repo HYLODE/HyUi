@@ -22,6 +22,20 @@ def _store_electives(
     icu_cut_off = 0.5
     preassess_date_cut_off = 90
 
+    campus_dict = {i.get("value"): i.get("label") for i in CAMPUSES}
+    electives = [
+        row
+        for row in electives
+        if campus_dict.get(campus, "") in row["department_name"]
+    ]
+
+    if date is not None:
+        electives = [
+            row
+            for row in electives
+            if row["surgery_date"] >= date[0] and row["surgery_date"] <= date[1]
+        ]
+
     i = 0
     for row in electives:
         row["id"] = i
@@ -33,11 +47,11 @@ def _store_electives(
         row["pacu_yn"] = (
             "✅ BOOKED"
             if row["pacu"] and row["icu_prob"] > icu_cut_off
-            else "✅🤷‍♀️ BOOKED"
+            else "✅ BOOKED"  # "✅🤷BOOKED"
             if row["pacu"] and row["icu_prob"] < icu_cut_off
             else "⚠️Not booked"
             if not row["pacu"] and row["icu_prob"] > icu_cut_off
-            else "❎ Not booked"
+            else "❌ Not booked"
         )
         row["preassess_status"] = (
             f"⚠️{row['preassess_date']}"
@@ -59,20 +73,6 @@ def _store_electives(
             and row["pac_dr_review"] is None
             else f"✅{row['preassess_date']}"
         )
-
-    campus_dict = {i.get("value"): i.get("label") for i in CAMPUSES}
-    electives = [
-        row
-        for row in electives
-        if campus_dict.get(campus, "") in row["department_name"]
-    ]
-
-    if date is not None:
-        electives = [
-            row
-            for row in electives
-            if row["surgery_date"] >= date[0] and row["surgery_date"] <= date[1]
-        ]
 
     filter_query = (
         f"{{pacu_yn}} scontains {pacu_selection}" if pacu_selection is not None else ""
