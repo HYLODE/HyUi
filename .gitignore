@@ -932,5 +932,6 @@ jupyter/
 #electives models - temporary workaround before mlflow
 api/src/api/electives/deploy/*
 
-#PQIP dashboard
+# PACU dashboard
+web/src/web/assets/pacu_dashboard.html
 web/src/web/assets/pqip_dashboard.html
