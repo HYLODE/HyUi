@@ -1,6 +1,7 @@
 from pathlib import Path
 import random
 from typing import List
+import datetime
 
 from fastapi import APIRouter, Depends, Response
 from sqlalchemy import text
@@ -14,16 +15,28 @@ router = APIRouter(prefix="/hybye")
 mock_router = APIRouter(prefix="/hybye")
 
 
-@mock_router.get("/discharge/n_days/{number_of_days}", response_model=list[int])
-def get_mock_discharges_for_last_n_days(number_of_days: int) -> list[int]:
-    return [random.randint(2, 200) for num in range(number_of_days)]
+@mock_router.get(
+    "/discharge/n_days/{number_of_days}", response_model=List[DischargeRow]
+)
+def get_mock_discharges_for_last_n_days(number_of_days: int) -> List[DischargeRow]:
+    today = datetime.datetime.now().date()
+    last_n_days = [today - datetime.timedelta(days=i) for i in range(number_of_days)]
+
+    mock_discharge_rows: List[DischargeRow] = []
+
+    for day in last_n_days:
+        mock_discharge_rows.append(
+            DischargeRow(discharge_date=day, count=random.randint(20, 200))
+        )
+
+    return mock_discharge_rows
 
 
 @router.get("/discharge/n_days/{number_of_days}", response_model=List[DischargeRow])
 def get_discharges_for_last_n_days(
-        number_of_days: int,
-        response: Response,
-        session: Session = Depends(get_star_session),
+    number_of_days: int,
+    response: Response,
+    session: Session = Depends(get_star_session),
 ) -> List[DischargeRow]:
     """
     Parameters
