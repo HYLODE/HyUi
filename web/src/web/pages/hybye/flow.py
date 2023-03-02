@@ -12,8 +12,8 @@ dash.register_page(__name__, path="/hybye/flow", name="Hospital Flow")
 
 body = html.Div(
     [
+        html.H2("Discharge Flow Dashboard"),
         dcc.Graph(id="discharge_flow"),
-        # dcc.Input(id="input_days", type="number", placeholder="Days", value="14", debounce=True)
         dmc.NumberInput(
             id="input_days",
             label="Days",
@@ -25,7 +25,7 @@ body = html.Div(
             stepHoldInterval=100,
             step=7,
             icon=DashIconify(icon="material-symbols:calendar-month"),
-            style={"width": 200, "margin-left": 100}
+            style={"width": 200, "margin-left": 100},
         ),
     ]
 )
@@ -43,7 +43,6 @@ def _get_discharge_flow(days=7):
             "y": "Count Discharged",
             "x": "Date",
         },
-        title="Discharge Flow",
     )
 
     return fig

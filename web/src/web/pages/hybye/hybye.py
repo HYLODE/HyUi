@@ -1,6 +1,7 @@
 import dash
 import dash_mantine_components as dmc
 from dash import html
+from dash_iconify import DashIconify
 
 import web.pages.sitrep.callbacks.cytoscape  # noqa
 
@@ -21,7 +22,34 @@ body = html.Div(
                         dmc.Text(
                             "This is a work in progress for the discharge prediction model.",
                             style={"padding-top": "2rem", "fontSize": 20},
-                        )
+                        ),
+                        dmc.Divider(style={"padding-top": "2rem"}),
+                        dmc.List(
+                            [
+                                dmc.ListItem(
+                                    dmc.Anchor(
+                                        dmc.Group(
+                                            [
+                                                dmc.Text(
+                                                    "Discharge Overview: Patient flow indicators",
+                                                    style={
+                                                        "padding-top": "2rem",
+                                                        "fontSize": 20,
+                                                    },
+                                                ),
+                                                dmc.Button(
+                                                    "Open Flow Dashboard",
+                                                    leftIcon=DashIconify(
+                                                        icon="mdi:clipboard-flow"
+                                                    ),
+                                                ),
+                                            ]
+                                        ),
+                                        href="/hybye/flow",
+                                    )
+                                )
+                            ]
+                        ),
                     ]
                 ),
             ]
