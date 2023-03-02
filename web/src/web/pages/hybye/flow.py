@@ -1,6 +1,7 @@
 import dash
 from dash import html, dcc, callback, Output, Input
 import dash_mantine_components as dmc
+from dash_iconify import DashIconify
 import pandas as pd
 import requests
 import plotly.express as ex
@@ -23,6 +24,8 @@ body = html.Div(
             stepHoldDelay=500,
             stepHoldInterval=100,
             step=7,
+            icon=DashIconify(icon="material-symbols:calendar-month"),
+            style={"width": 200, "margin-left": 100}
         ),
     ]
 )
