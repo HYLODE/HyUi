@@ -1624,7 +1624,6 @@ def generate_icu_binary_from_emap(
     )
 
     # generate ICU binary
-    print("generating ICU binary")
     data.loc[:, "ICU_binary"] = np.where(
         data.loc[:, "ICU_PACU_next_ward"] == "ICU/PACU", 1, 0
     )
