@@ -118,7 +118,7 @@ PACU:
     Protocolised Admission: {protocolised_adm}
 
 PREASSESSMENT:
-    Preassessment date: {preassess_date}
+    Preassessment note started: {preassess_date}
     Nursing outcome: {pac_nursing_outcome}
     Anaesthetic review: {pac_dr_review}
     Nursing issues: {pac_nursing_issues}
