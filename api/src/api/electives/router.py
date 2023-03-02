@@ -225,7 +225,7 @@ def get_medical_hx(
 @mock_router.get("/hx/", response_model=list[MedicalHx])
 def get_mock_medical_hx() -> list[type[MedicalHx]]:
 
-    return _get_mock_sql_rows("hx", MedicalHx)
+    return _get_mock_sql_rows("new_hx", MedicalHx)
 
 
 @router.get("/axa/", response_model=list[AxaCodes])
@@ -283,7 +283,7 @@ def get_mock_electives(
     labs = _get_mock_sql_rows("labs", LabData)
     echo = _get_mock_sql_rows("echo_2", EchoWithAbnormalData)
     obs = _get_mock_sql_rows("obs", ObsData)
-    hx = get_mock_medical_hx("hx", MedicalHx)
+    hx = _get_mock_sql_rows("new_hx", MedicalHx)
     axa = get_axa_codes()
     pod = _get_mock_sql_rows("pod", ClarityPostopDestination)
     pa_summary = _get_mock_sql_rows("pa_summary", PreassessSummaryData)

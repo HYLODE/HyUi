@@ -248,12 +248,12 @@ class AxaCodes(BaseModel):
 
 
 class PreassessSummaryData(CabData):
-    creation_instant: datetime
-    string_value: str
-    line_num: int
-    name: str
+    creation_instant: datetime | None
+    string_value: str | None
+    line_num: int | None
+    name: str | None
 
 
 class MedicalHx(CabData):
-    value: str
-    display_string: str
+    value: str | None
+    display_string: str | None

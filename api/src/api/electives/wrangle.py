@@ -73,6 +73,7 @@ def prepare_draft(
     axa_codes = to_data_frame(axa, AxaCodes)
     pod_df = to_data_frame(pod, ClarityPostopDestination)
     hx_df = to_data_frame(medical_hx, MedicalHx)
+    print(hx_df)
 
     # axa_codes = camel_to_snake(
     #    pd.read_csv(

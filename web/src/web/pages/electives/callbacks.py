@@ -67,7 +67,6 @@ def _make_info_box(
     else:
         patient_mrn = current_table[active_cell["row_id"]]["primary_mrn"]
     pt = [row for row in electives if row["primary_mrn"] == patient_mrn][0]
-    # could make a table? [{k: v} for (k, v) in all_patient_info[0].items()]
 
     string = """FURTHER INFORMATION
 Name: {first_name} {last_name}, {age_in_years}{sex[0]}
