@@ -57,7 +57,7 @@ pacu_selector = html.Div(
                     "label": "PACU",
                 },
                 {
-                    "value": "Not",
+                    "value": "No",
                     "label": "Not PACU",
                 },
             ],
