@@ -32,7 +32,7 @@ def create_appshell(nav_data: list | dict) -> dmc.MantineProvider:
                     interval=6 * 60 * 60 * 1000,
                 ),
                 stores,
-                dcc.Store(id="theme-store", storage_type="local"),
+                # dcc.Store(id="theme-store", storage_type="local"),
                 dcc.Location(id="url"),
                 dmc.NotificationsProvider(
                     [
