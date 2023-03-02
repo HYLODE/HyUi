@@ -57,7 +57,7 @@ pacu_selector = html.Div(
                     "label": "PACU",
                 },
                 {
-                    "value": "No",
+                    "value": "Not",
                     "label": "Not PACU",
                 },
             ],
@@ -98,6 +98,7 @@ electives_list = dmc.Paper(
             {"id": "patient_friendly_name", "name": "Operation"},
             {"id": "primary_mrn", "name": "MRN"},
             {"id": "room_name", "name": "Room"},
+            {"id": "preassess_status", "name": "Preassessment Clinic"}
             #            {"id": "abnormal_echo", "name": "abnormal_echo"},
             # {
             #     "id": "icu_prob",
