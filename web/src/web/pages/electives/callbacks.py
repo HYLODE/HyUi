@@ -19,7 +19,7 @@ def _store_electives(
     campus: str, electives: list[dict], date: str, pacu_selection: bool
 ) -> tuple[list[dict], str]:
 
-    icu_cut_off = (0.2, 0.7)
+    icu_cut_off = (0.05, 0.5)
     preassess_date_cut_off = 90
 
     campus_dict = {i.get("value"): i.get("label") for i in CAMPUSES}
