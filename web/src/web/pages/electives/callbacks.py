@@ -107,7 +107,7 @@ def _make_info_box(
     Operation ({surgery_date}): {patient_friendly_name}
 
 PACU:
-    BOOKED FOR PACU: {pacu}
+    Booked for PACU: {pacu}
     Original surgical booking destination: {booked_destination}
     Destination on preassessment clinic booking: {pacdest}
     Protocolised Admission: {protocolised_adm}
@@ -123,11 +123,9 @@ EPIC MEDICAL HISTORY:
     Maximum BMI: {bmi_max_value}.
 
 ECHOCARDIOGRAPHY:
-{first_name} has had {num_echo} echos,
-of which {abnormal_echo} were flagged as abnormal.
-Last echo ({last_echo_date}): {last_echo_narrative}
-
-OTHER INFORMATION:
+    {first_name} has had {num_echo} echos,
+    of which {abnormal_echo} were flagged as abnormal.
+    Last echo ({last_echo_date}): {last_echo_narrative}
 """.format(
         **pt
     )
