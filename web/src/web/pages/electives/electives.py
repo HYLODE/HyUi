@@ -94,7 +94,7 @@ model_calibrator = html.Div(
             max=100,
             step=5,
             showLabelOnHover=False,
-            value=[50, 4],
+            value=[0, 60],
         ),
         dmc.Text("model calibration"),
     ]
