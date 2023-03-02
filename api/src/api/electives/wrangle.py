@@ -73,7 +73,6 @@ def prepare_draft(
     axa_codes = to_data_frame(axa, AxaCodes)
     pod_df = to_data_frame(pod, ClarityPostopDestination)
     hx_df = to_data_frame(medical_hx, MedicalHx)
-    print(hx_df)
 
     # axa_codes = camel_to_snake(
     #    pd.read_csv(
@@ -83,7 +82,6 @@ def prepare_draft(
     #    )
     # )
 
-    # print(axa_codes.columns)
     if to_predict:
         df = (
             merge_surg_preassess(surg_data=electives_df, preassess_data=preassess_df)
@@ -180,7 +178,6 @@ def prepare_draft(
                 on="patient_durable_key",
             )
         )
-        # print(df.columns)
         # create pacu label
         df["pacu"] = np.where(
             df["booked_destination"].astype(str).str.contains("PACU")
