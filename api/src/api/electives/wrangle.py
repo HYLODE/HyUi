@@ -2,14 +2,14 @@ import numpy as np
 import pandas as pd
 from pydantic import BaseModel
 
-from api.config import get_settings
-
 # from imblearn.pipeline import Pipeline
 # from sklearn.model_selection import RandomizedSearchCV, StratifiedKFold
 # from sklearn.linear_model import BayesianRidge
 # from sklearn.ensemble import RandomForestClassifier
 # from category_encoders import TargetEncoder
 from api.convert import to_data_frame
+import pickle
+from pathlib import Path
 
 from models.electives import (
     PreassessSummaryData,
@@ -114,31 +114,38 @@ def prepare_draft(
             )
         )
 
-        import mlflow
+        model_loc = "deploy/feb-3-xgb.pkl"
+        with open((Path(__file__).parent / model_loc), "rb") as pickle_file:
+            pipeline = pickle.load(pickle_file)
 
-        model_name = "hrishee-electives-rfr-pipeline"
-        model_version = 4
-        mlflow_var = get_settings().mlflow_url
-        mlflow.set_tracking_uri(mlflow_var)
-        mlflowmodel = mlflow.pyfunc.load_model(
-            model_uri=f"models:/{model_name}/{model_version}/pipeline"
-        )
-        input_col_dict = mlflowmodel.metadata.signature.inputs.to_dict()
-        inputs = [i["name"] for i in input_col_dict]
-        dtypes = {
-            input_dict["name"]: "<U0" if input_dict["type"] == "string" else "float32"
-            for input_dict in input_col_dict
-        }
-        future_X = df[inputs].copy().astype(dtypes)
-        preds = mlflowmodel.predict(future_X)
+        model = pipeline.best_estimator_
+        cols = model[1].feature_names_in_
+        preds = model.predict_proba(df[cols])[:, 1]
+
+        # model_name='hrishee-feb-3-xgb'
+        # model_version = 4
+        # mlflow_var = get_settings().mlflow_url
+        # mlflow.set_tracking_uri(mlflow_var)
+        # mlflowmodel = mlflow.pyfunc.load_model(
+        #     model_uri=f"models:/{model_name}/{model_version}/pipeline"
+        # )
+        # input_col_dict = mlflowmodel.metadata.signature.inputs.to_dict()
+        # inputs = [i["name"] for i in input_col_dict]
+        # dtypes = {
+        #     input_dict["name"]: "<U0" if input_dict["type"] == "string" else "float32"
+        #     for input_dict in input_col_dict
+        # }
+        # future_X = model[inputs].copy().astype(dtypes)
+        # preds = model.predict(future_X)
+
         df["icu_prob"] = preds
 
-        # print(df.columns)
         # create pacu label
         df["pacu"] = np.where(
-            df["booked_destination"].astype(str).str.contains("PACU")
-            | df["pacdest"].astype(str).str.contains("PACU")
-            | df["pod_orc"].astype(str).str.contains("PACU"),
+            # df["booked_destination"].astype(str).str.contains("PACU")
+            # | df["pacdest"].astype(str).str.contains("PACU")
+            # |
+            df["pod_orc"].astype(str).str.contains("PACU"),
             True,
             False,
         )
