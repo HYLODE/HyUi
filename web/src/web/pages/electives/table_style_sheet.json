@@ -8,7 +8,7 @@
   },
   {
     "if": {
-      "column_id": "pacu"
+      "column_id": "pacu_yn"
     },
     "fontWeight": "bold",
     "textAlign": "left",
@@ -16,6 +16,12 @@
     "minWidth": "2vw",
     "maxWidth": "5vw",
     "whitespace": "normal"
+  },
+  {
+    "if": {
+      "column_id": "age_sex"
+    },
+    "textAlign": "centre"
   },
   {
     "if": {
@@ -28,7 +34,10 @@
     "if": {
       "column_id": "patient_friendly_name"
     },
-    "textAlign": "left"
+    "textAlign": "left",
+    "height": "auto",
+    "whitespace": "normal",
+    "maxWidth": "20vw"
   },
   {
     "if": {

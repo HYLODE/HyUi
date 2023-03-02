@@ -53,11 +53,11 @@ pacu_selector = html.Div(
                     "label": "All",
                 },
                 {
-                    "value": "true",
+                    "value": "BOOKED",
                     "label": "PACU",
                 },
                 {
-                    "value": "false",
+                    "value": "No",
                     "label": "Not PACU",
                 },
             ],
@@ -67,31 +67,23 @@ pacu_selector = html.Div(
     ]
 )
 
-
 date_selector = html.Div(
-    [
-        dmc.SegmentedControl(
-            id="date_selected",
-            data=[
-                {
-                    "value": date.today(),
-                    "label": date.today().strftime("%A %d"),
-                },
-                {
-                    "value": (date.today() + timedelta(days=1)),
-                    "label": (date.today() + timedelta(days=1)).strftime("%A %d"),
-                },
-                {
-                    "value": (date.today() + timedelta(days=2)),
-                    "label": (date.today() + timedelta(days=2)).strftime("%A %d"),
-                },
-            ],
-            value=date.today(),
-            fullWidth=True,
-            persistence=True,
-            persistence_type="local",
-        ),
-    ]
+    # dmc.Tooltip(
+    #     label="Double-click on a date to select a single day",
+    #     multiline=True,
+    #     position="top",
+    #     openDelay=500,
+    #     children=[
+    dmc.DateRangePicker(
+        id="date_selector",
+        minDate=date.today(),
+        maxDate=date.today() + timedelta(days=10),
+        allowSingleDateInRange=True,
+        fullWidth=True,
+        value=[date.today(), (date.today() + timedelta(days=3))],
+    ),
+    # ],
+    # )
 )
 
 
@@ -99,12 +91,14 @@ electives_list = dmc.Paper(
     dtable.DataTable(
         id=ids.ELECTIVES_TABLE,
         columns=[
-            {"id": "pacu", "name": "PACU"},
+            {"id": "surgery_date", "name": "Date"},
+            {"id": "pacu_yn", "name": "PACU"},
+            {"id": "preassess_status", "name": "Preassessment"},
             {"id": "full_name", "name": "Full Name"},
             {"id": "age_sex", "name": "Age / Sex"},
-            {"id": "primary_service", "name": "Specialty"},
+            {"id": "patient_friendly_name", "name": "Operation"},
             {"id": "primary_mrn", "name": "MRN"},
-            {"id": "room_name", "name": "Room"},
+            {"id": "room_name", "name": "Theatre"},
             #            {"id": "abnormal_echo", "name": "abnormal_echo"},
             # {
             #     "id": "icu_prob",
@@ -173,13 +167,13 @@ inspector = html.Div(
 body = dmc.Container(
     [
         dmc.Grid(
-            [
-                dmc.Col(pacu_selector, span=3),
-                dmc.Col(campus_selector, span=4),
+            children=[
+                dmc.Col(pacu_selector, span=4),
+                dmc.Col(campus_selector, span=3),
                 dmc.Col(date_selector, span=5),
                 dmc.Col(electives_list, span=7),
                 dmc.Col(patient_info_box, span=5),
-            ]
+            ],
         ),
     ],
     style={"width": "100vw"},

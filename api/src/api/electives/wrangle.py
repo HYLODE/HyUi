@@ -21,6 +21,7 @@ from models.electives import (
     EchoWithAbnormalData,
     ObsData,
     AxaCodes,
+    MedicalHx,
 )
 from api.electives.hypo_help import (
     merge_surg_preassess,
@@ -41,6 +42,7 @@ def prepare_draft(
     axa: list[type[BaseModel]],
     pod: list[type[BaseModel]],
     pa_summary: list[type[BaseModel]],
+    medical_hx: list[type[BaseModel]],
     to_predict: bool = False,
 ) -> pd.DataFrame:
 
@@ -70,6 +72,9 @@ def prepare_draft(
     obs_df = to_data_frame(obs, ObsData)
     axa_codes = to_data_frame(axa, AxaCodes)
     pod_df = to_data_frame(pod, ClarityPostopDestination)
+    hx_df = to_data_frame(medical_hx, MedicalHx)
+    print(hx_df)
+
     # axa_codes = camel_to_snake(
     #    pd.read_csv(
     #        "axa_codes.csv",
@@ -100,6 +105,12 @@ def prepare_draft(
             how="left",
         )
         .merge(wrangle_pas(pa_summary_df), how="left", on="patient_durable_key")
+        .merge(
+            hx_df.groupby("patient_durable_key").agg({"display_string": ". ".join}),
+            # .rename({"display_string": "hx_string"}),
+            how="left",
+            on="patient_durable_key",
+        )
     )
 
     # print(df.columns)

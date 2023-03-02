@@ -22,6 +22,7 @@ from models.electives import (
     AxaCodes,
     ObsData,
     PreassessSummaryData,
+    MedicalHx,
 )
 
 from datetime import timedelta, date
@@ -208,6 +209,25 @@ def get_caboodle_pas(
     )
 
 
+@router.get("/hx/", response_model=list[MedicalHx])
+def get_medical_hx(
+    session: Session = Depends(get_caboodle_session), days_ahead: int = 1
+) -> list[MedicalHx]:
+
+    return _parse_query(
+        "live_sql/new_hx.sql",
+        session,
+        MedicalHx,
+        params={"days_ahead": days_ahead},
+    )
+
+
+@mock_router.get("/hx/", response_model=list[MedicalHx])
+def get_mock_medical_hx() -> list[type[MedicalHx]]:
+
+    return _get_mock_sql_rows("new_hx", MedicalHx)
+
+
 @router.get("/axa/", response_model=list[AxaCodes])
 def get_axa_codes() -> list[AxaCodes]:
     model = AxaCodes
@@ -222,7 +242,7 @@ def get_electives(
     response: Response,
     s_caboodle: Session = Depends(get_caboodle_session),
     s_clarity: Session = Depends(get_clarity_session),
-    days_ahead: int = 3,
+    days_ahead: int = 10,
 ) -> list[MergedData]:
     response.headers["Cache-Control"] = "public, max-age=7200"
 
@@ -232,7 +252,7 @@ def get_electives(
     echo = get_caboodle_echo(session=s_caboodle, days_ahead=days_ahead)
     obs = get_caboodle_obs(session=s_caboodle, days_ahead=days_ahead)
     pa_summary = get_caboodle_pas(session=s_caboodle, days_ahead=days_ahead)
-
+    hx = get_medical_hx(session=s_caboodle, days_ahead=days_ahead)
     pod = get_clarity_pod(session=s_clarity, days_ahead=days_ahead)
     axa = get_axa_codes()
 
@@ -247,6 +267,7 @@ def get_electives(
         axa=axa,
         pod=pod,
         to_predict=False,
+        medical_hx=hx,
         pa_summary=pa_summary,
     )
     df = df.replace({np.nan: None})
@@ -262,6 +283,7 @@ def get_mock_electives(
     labs = _get_mock_sql_rows("labs", LabData)
     echo = _get_mock_sql_rows("echo_2", EchoWithAbnormalData)
     obs = _get_mock_sql_rows("obs", ObsData)
+    hx = _get_mock_sql_rows("new_hx", MedicalHx)
     axa = get_axa_codes()
     pod = _get_mock_sql_rows("pod", ClarityPostopDestination)
     pa_summary = _get_mock_sql_rows("pa_summary", PreassessSummaryData)
@@ -274,6 +296,7 @@ def get_mock_electives(
         obs=obs,
         axa=axa,
         pod=pod,
+        medical_hx=hx,
         to_predict=False,
         pa_summary=pa_summary,
     )

@@ -1,4 +1,4 @@
-SELECT distinct cnf.[PatientDurableKey],
+SELECT DISTINCT cnf.[PatientDurableKey],
     cnf.[CreationInstant],
     cnavd.[StringValue],
     ad.[Name],
@@ -11,7 +11,7 @@ FROM [CABOODLE_REPORT].[dbo].[ClinicalNoteFact] cnf
     LEFT JOIN [CABOODLE_REPORT].[dbo].[SurgicalCaseUclhFactX] scufx ON scf.[SurgicalCaseKey] = scufx.[SurgicalCaseKey]
     LEFT JOIN [CABOODLE_REPORT].[dbo].[PatientDim] patd ON scf.[PatientDurableKey] = patd.[DurableKey]
 WHERE cnf.[Type] = 'Anaesthesia Preprocedure Evaluation'
-    AND ad.[SmartDataElementEpicId] = 'UK#071'
+    AND ad.[SmartDataElementEpicId] IN ('UK#071', 'UCLH#3616', 'UCLH#548')
     AND scf.[PatientDurableKey] > 1
     AND scf.[PatientDurableKey] IS NOT NULL
     AND patd.[AgeInYears] >= 18
