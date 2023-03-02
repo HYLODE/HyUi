@@ -102,32 +102,41 @@ def _make_info_box(
     pt = [row for row in electives if row["primary_mrn"] == patient_mrn][0]
 
     string = """FURTHER INFORMATION
-Name: {first_name} {last_name}, {age_in_years}{sex[0]}
-MRN: {primary_mrn}
-Operation: {patient_friendly_name}
-PACU: {pacu}
+    Name: {first_name} {last_name}, {age_in_years}{sex[0]}
+    MRN: {primary_mrn}
+    Operation ({surgery_date}): {patient_friendly_name}
 
-Original surgical booking destination: {booked_destination}
-Protocolised Admission: {protocolised_adm}
+PACU:
+    BOOKED FOR PACU: {pacu}
+    Original surgical booking destination: {booked_destination}
+    Destination on preassessment clinic booking: {pacdest}
+    Protocolised Admission: {protocolised_adm}
 
-Medical History: {display_string}
-Maximum BMI: {bmi_max_value}.
+PREASSESSMENT:
+    Preassessment date: {preassess_date}
+    Nursing outcome: {pac_nursing_outcome}
+    Anaesthetic review: {pac_dr_review}
+    Nursing issues: {pac_nursing_issues}
 
+EPIC MEDICAL HISTORY:
+    {display_string}
+    Maximum BMI: {bmi_max_value}.
 
-Echocardiography:
-Patient has had {num_echo} echos,
+ECHOCARDIOGRAPHY:
+{first_name} has had {num_echo} echos,
 of which {abnormal_echo} were flagged as abnormal.
 Last echo ({last_echo_date}): {last_echo_narrative}
 
-
-Preassessment date: {preassess_date}.
-Destination on preassessment clinic booking: {pacdest}
-Nursing outcome: {pac_nursing_outcome}
-Anaesthetic review: {pac_dr_review}
-Nursing issues: {pac_nursing_issues}
-
+OTHER INFORMATION:
 """.format(
         **pt
     )
 
-    return "\n".join([textwrap.fill(x, info_box_width) for x in string.split("\n")])
+    return "\n".join(
+        [
+            textwrap.fill(
+                x, info_box_width, initial_indent="", subsequent_indent="        "
+            )
+            for x in string.split("\n")
+        ]
+    )
