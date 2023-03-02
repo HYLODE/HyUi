@@ -23,12 +23,15 @@ def _store_electives(
     preassess_date_cut_off = 90
 
     campus_dict = {i.get("value"): i.get("label") for i in CAMPUSES}
+
+    # filter by campus
     electives = [
         row
         for row in electives
         if campus_dict.get(campus, "") in row["department_name"]
     ]
 
+    # filter by surgical date
     if date is not None:
         electives = [
             row
@@ -36,43 +39,38 @@ def _store_electives(
             if row["surgery_date"] >= date[0] and row["surgery_date"] <= date[1]
         ]
 
+    # add row_ids after these filters
     i = 0
     for row in electives:
         row["id"] = i
         i += 1
 
+        # add front-end columns
+
         row["full_name"] = "{first_name} {last_name}".format(**row)
         row["age_sex"] = "{age_in_years}{sex[0]}".format(**row)
 
-        row["pacu_yn"] = (
-            "✅ BOOKED"
-            if row["pacu"] and row["icu_prob"] > icu_cut_off
-            else "✅ BOOKED"  # "✅🤷BOOKED"
-            if row["pacu"] and row["icu_prob"] < icu_cut_off
-            else "⚠️Not booked"
-            if not row["pacu"] and row["icu_prob"] > icu_cut_off
-            else "❌ Not booked"
-        )
-        row["preassess_status"] = (
-            f"⚠️{row['preassess_date']}"
-            if (
-                datetime.strptime(row["surgery_date"], "%Y-%m-%d").date()
-                - datetime.strptime(row["preassess_date"], "%Y-%m-%d").date()
-            ).days
-            > preassess_date_cut_off
-            else f"✅{row['preassess_date']}"
-            if row["pac_nursing_outcome"] in ("OK to proceed", "Fit for surgery")
-            else f"⚠️{row['preassess_date']}"
-            if row["pac_nursing_outcome"]
-            in (
-                "Referred to anaesthetist",
-                "Yes",
-                "Further tests / optimisation required",
-                "Not fit for surgery",
-            )
-            and row["pac_dr_review"] is None
-            else f"✅{row['preassess_date']}"
-        )
+        if row["pacu"] and row["icu_prob"] > icu_cut_off:
+            row["pacu_yn"] = "✅ BOOKED"
+        elif row["pacu"] and row["icu_prob"] <= icu_cut_off:
+            row["pacu_yn"] = "✅ BOOKED"  # "✅🤷BOOKED"
+        elif not row["pacu"] and row["icu_prob"] > icu_cut_off:
+            row["pacu_yn"] = "⚠️Not booked"
+        else:
+            row["pacu_yn"] = "🏥 No"
+
+        preassess_in_advance = (
+            datetime.strptime(row["surgery_date"], "%Y-%m-%d").date()
+            - datetime.strptime(row["preassess_date"], "%Y-%m-%d").date()
+        ).days
+
+        if preassess_in_advance <= preassess_date_cut_off and (
+            row["pac_dr_review"] is not None
+            or row["pac_nursing_outcome"] in ("OK to proceed", "Fit for surgery", None)
+        ):
+            row["preassess_status"] = f"✅{row['preassess_date']}"
+        else:
+            row["preassess_status"] = f"⚠️{row['preassess_date']}"
 
     filter_query = (
         f"{{pacu_yn}} scontains {pacu_selection}" if pacu_selection is not None else ""
