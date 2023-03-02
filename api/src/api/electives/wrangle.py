@@ -110,6 +110,12 @@ def prepare_draft(
                 how="left",
                 on="patient_durable_key",
             )
+            .merge(
+                hx_df.groupby("patient_durable_key").agg({"display_string": ". ".join}),
+                # .rename({"display_string": "hx_string"}),
+                how="left",
+                on="patient_durable_key",
+            )
         )
 
         model_loc = "deploy/feb-3-xgb.pkl"
