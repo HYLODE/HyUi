@@ -38,11 +38,15 @@ def _store_electives(
     for row in electives:
         row["full_name"] = "{first_name} {last_name}".format(**row)
         row["age_sex"] = "{age_in_years}{sex[0]}".format(**row)
+        if row["pacu"]:
+            row["pacu_yn"] = "BOOKED"
+        else:
+            row["pacu_yn"] = "No"
         row["id"] = i  # this is a row_id for the //current table// only
         i += 1
 
     if pacu_selection is not None:
-        filter_query = f"{{pacu}} scontains {pacu_selection}"
+        filter_query = f"{{pacu_yn}} scontains {pacu_selection}"
     return electives, filter_query
 
 

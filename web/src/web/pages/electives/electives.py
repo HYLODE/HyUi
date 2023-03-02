@@ -53,11 +53,11 @@ pacu_selector = html.Div(
                     "label": "All",
                 },
                 {
-                    "value": "true",
+                    "value": "BOOKED",
                     "label": "PACU",
                 },
                 {
-                    "value": "false",
+                    "value": "No",
                     "label": "Not PACU",
                 },
             ],
@@ -92,10 +92,10 @@ electives_list = dmc.Paper(
         id=ids.ELECTIVES_TABLE,
         columns=[
             {"id": "surgery_date", "name": "Date"},
-            {"id": "pacu", "name": "PACU"},
+            {"id": "pacu_yn", "name": "PACU"},
             {"id": "full_name", "name": "Full Name"},
             {"id": "age_sex", "name": "Age / Sex"},
-            {"id": "primary_service", "name": "Specialty"},
+            {"id": "patient_friendly_name", "name": "Operation"},
             {"id": "primary_mrn", "name": "MRN"},
             {"id": "room_name", "name": "Room"},
             #            {"id": "abnormal_echo", "name": "abnormal_echo"},
