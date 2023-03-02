@@ -2,8 +2,6 @@ import dash
 import dash_mantine_components as dmc
 from dash import html
 
-# noqa suppresses black errors when linting since you need this import for
-# access to callbacks
 import web.pages.sitrep.callbacks.cytoscape  # noqa
 
 dash.register_page(__name__, path="/hybye/stage", name="HyBye")
