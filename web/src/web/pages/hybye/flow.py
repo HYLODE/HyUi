@@ -18,7 +18,12 @@ icon_style = {"margin-left": 18, "color": "rgb(173, 181, 189)"}
 
 body = html.Div(
     [
-        html.H2("Hospital Flow Dashboard"),
+        html.H1(
+            children=[
+                "Hospital Flow Dashboard",
+                DashIconify(icon="mdi:clipboard-flow", style={"padding-top": "0.5rem"}),
+            ]
+        ),
         dcc.Graph(id="discharge_flow"),
         dmc.SimpleGrid(
             cols=2,
