@@ -15,7 +15,7 @@ def _get_discharge_flow(days: int = 7, campuses: str = "UCH") -> ex.line:
     df = pd.read_json(url)
     fig = ex.line(
         y=df["count"],
-        x=df["date"],
+        x=df["event_date"],
         labels={
             "y": "Patients Discharged",
             "x": "Date",
