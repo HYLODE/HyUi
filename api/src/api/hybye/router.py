@@ -115,5 +115,7 @@ def get_admissions_for_last_n_days(
 
     for row in result:
         admission_rows.append(HospitalFlowRow.parse_obj(row))
+        
+    print(admission_rows)
 
     return admission_rows

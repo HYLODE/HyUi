@@ -1,5 +1,5 @@
 SELECT
-    DATE (hv.admission_datetime) AS admission_date, COUNT (*)
+    DATE (hv.admission_datetime) AS event_date, COUNT (*)
 FROM star.hospital_visit hv
     JOIN star.location_visit lv
 ON lv.hospital_visit_id = hv.hospital_visit_id

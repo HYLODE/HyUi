@@ -4,5 +4,5 @@ from pydantic import BaseModel
 
 
 class HospitalFlowRow(BaseModel):
-    date: date
+    event_date: date
     count: int
