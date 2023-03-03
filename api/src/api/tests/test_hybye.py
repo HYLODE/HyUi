@@ -1,7 +1,7 @@
 from api.main import app
 from fastapi.testclient import TestClient
 
-from models.hybye import DischargeRow
+from models.hybye import HospitalFlowRow
 
 client = TestClient(app)
 
@@ -12,7 +12,7 @@ def test_get_mock_discharges_for_last_n_days() -> None:
 
     assert len(response.json()) == 28
 
-    rendered_response = [DischargeRow.parse_obj(row) for row in response.json()]
+    rendered_response = [HospitalFlowRow.parse_obj(row) for row in response.json()]
     assert rendered_response is not None
 
 

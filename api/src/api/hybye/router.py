@@ -9,7 +9,7 @@ from sqlmodel import Session
 
 from api.wards import CAMPUSES
 from api.db import get_star_session
-from models.hybye import DischargeRow
+from models.hybye import HospitalFlowRow
 
 router = APIRouter(prefix="/hybye")
 
@@ -17,11 +17,11 @@ mock_router = APIRouter(prefix="/hybye")
 
 
 @mock_router.get(
-    "/discharge/n_days/{number_of_days}", response_model=List[DischargeRow]
+    "/discharge/n_days/{number_of_days}", response_model=List[HospitalFlowRow]
 )
 def get_mock_discharges_for_last_n_days(
     number_of_days: int, campuses: list[str] = Query(default=[])
-) -> List[DischargeRow]:
+) -> List[HospitalFlowRow]:
     today = datetime.datetime.now().date()
     last_n_days = [today - datetime.timedelta(days=i) for i in range(number_of_days)]
 
@@ -33,23 +33,23 @@ def get_mock_discharges_for_last_n_days(
     if not any(campus in campuses for campus in CAMPUSES):
         raise KeyError("Invalid campus name")
 
-    mock_discharge_rows: List[DischargeRow] = []
+    mock_discharge_rows: List[HospitalFlowRow] = []
 
     for day in last_n_days:
         mock_discharge_rows.append(
-            DischargeRow(discharge_date=day, count=random.randint(20, 200))
+            HospitalFlowRow(discharge_date=day, count=random.randint(20, 200))
         )
 
     return mock_discharge_rows
 
 
-@router.get("/discharge/n_days/{number_of_days}", response_model=List[DischargeRow])
+@router.get("/discharge/n_days/{number_of_days}", response_model=List[HospitalFlowRow])
 def get_discharges_for_last_n_days(
     number_of_days: int,
     response: Response,
     session: Session = Depends(get_star_session),
     campuses: list[str] = Query(default=[]),
-) -> List[DischargeRow]:
+) -> List[HospitalFlowRow]:
     """
     Parameters
     ----------
@@ -60,7 +60,7 @@ def get_discharges_for_last_n_days(
 
     Returns
     -------
-    List of DischargeRow objects (datetime.date, int)
+    List of HospitalFlowRow objects (datetime.date, int)
     """
     departments: list = []
     # Get all the wards for a given campus using api.wards collections
@@ -73,9 +73,47 @@ def get_discharges_for_last_n_days(
         query, {"days": number_of_days, "departments": departments}
     )
 
-    discharge_rows: List[DischargeRow] = []
+    discharge_rows: List[HospitalFlowRow] = []
 
     for row in result:
-        discharge_rows.append(DischargeRow.parse_obj(row))
+        discharge_rows.append(HospitalFlowRow.parse_obj(row))
 
     return discharge_rows
+
+
+@router.get("/discharge/n_days/{number_of_days}", response_model=List[HospitalFlowRow])
+def get_admissions_for_last_n_days(
+    number_of_days: int,
+    response: Response,
+    session: Session = Depends(get_star_session),
+    campuses: list[str] = Query(default=[]),
+) -> List[HospitalFlowRow]:
+    """
+    Parameters
+    ----------
+    campuses: str, campus code as per the dictionary in api.wards.CAMPUSES
+    number_of_days: int, number of days to look retrospectively for
+    response: Response - leave as default
+    session: Session - leave as default
+
+    Returns
+    -------
+    List of HospitalFlowRow objects (datetime.date, int) for admissions for last n days
+    """
+    departments: list = []
+    # Get all the wards for a given campus using api.wards collections
+    for campus in campuses:
+        departments.extend(CAMPUSES.get(campus, []))
+
+    response.headers["Cache-Control"] = "public, max-age=300"
+    query = text((Path(__file__).parent / "get_inpatient_admissions.sql").read_text())
+    result = session.execute(
+        query, {"days": number_of_days, "departments": departments}
+    )
+
+    admisions_rows: List[HospitalFlowRow] = []
+
+    for row in result:
+        admisions_rows.append(HospitalFlowRow.parse_obj(row))
+
+    return admisions_rows
