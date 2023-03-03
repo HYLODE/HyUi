@@ -44,12 +44,10 @@ def _get_discharge_flow(days: int = 7, campuses: str = "UCH") -> ex.line:
 
     figure.update_layout(legend_title_text="Flow")
 
-    patient_net = df["Admitted"] - df["Discharged"]
+    patient_net = df["Discharged"] - df["Admitted"]
     patient_net = f"Timeframe Net Balance: {patient_net.sum(axis=0)}"
 
     flow_average = df.mean(axis=0, numeric_only=True)
-    flow_average = (
-        f"Admitted: {flow_average[0]:.2f} → Discharged: {flow_average[1]:.2f}"
-    )
+    flow_average = f"Daily averages - Admitted: {flow_average[0]:.2f} → Discharged: {flow_average[1]:.2f}"
 
     return figure, patient_net, flow_average
