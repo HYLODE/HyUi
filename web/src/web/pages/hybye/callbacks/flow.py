@@ -11,16 +11,35 @@ from web.config import get_settings
     Input("campus_select", "value"),
 )
 def _get_discharge_flow(days: int = 7, campuses: str = "UCH") -> ex.line:
-    url = f"{get_settings().api_url}/hybye/discharge/n_days/{days}?campuses={campuses}"
-    df = pd.read_json(url)
+    discharged = pd.read_json(
+        f"{get_settings().api_url}/hybye/discharge/n_days/{days}?campuses={campuses}"
+    )
+    admitted = pd.read_json(
+        f"{get_settings().api_url}/hybye/admitted/n_days/{days}?campuses={campuses}"
+    )
+
+    df = pd.merge(
+        discharged,
+        admitted,
+        on="event_date",
+        suffixes=("_discharged", "_admitted"),
+        how="left",
+    )
+    df = df.rename(
+        columns={"count_discharged": "Discharged", "count_admitted": "Admitted"}
+    )
+
     fig = ex.line(
-        y=df["count"],
-        x=df["event_date"],
+        df,
+        y=["Discharged", "Admitted"],
+        x="event_date",
         labels={
-            "y": "Patients Discharged",
-            "x": "Date",
+            "value": "Number of Patients",
+            "event_date": "Date",
         },
         title=f"{campuses} Discharges",
     )
+
+    fig.update_layout(legend_title_text="Flow")
 
     return fig

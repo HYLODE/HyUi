@@ -19,6 +19,9 @@ mock_router = APIRouter(prefix="/hybye")
 @mock_router.get(
     "/discharge/n_days/{number_of_days}", response_model=List[HospitalFlowRow]
 )
+@mock_router.get(
+    "/admitted/n_days/{number_of_days}", response_model=List[HospitalFlowRow]
+)
 def get_mock_discharges_for_last_n_days(
     number_of_days: int, campuses: list[str] = Query(default=[])
 ) -> List[HospitalFlowRow]:
@@ -37,7 +40,7 @@ def get_mock_discharges_for_last_n_days(
 
     for day in last_n_days:
         mock_discharge_rows.append(
-            HospitalFlowRow(discharge_date=day, count=random.randint(20, 200))
+            HospitalFlowRow(event_date=day, count=random.randint(20, 200))
         )
 
     return mock_discharge_rows
