@@ -39,7 +39,7 @@ def _get_discharge_flow(days: int = 7, campuses: str = "UCH") -> ex.line:
             "value": "Number of Patients",
             "event_date": "Date",
         },
-        title=f"{campuses} Discharges",
+        title=f"{campuses} Flow",
     )
 
     figure.update_layout(legend_title_text="Flow")
