@@ -81,7 +81,7 @@ def get_discharges_for_last_n_days(
     return discharge_rows
 
 
-@router.get("/discharge/n_days/{number_of_days}", response_model=List[HospitalFlowRow])
+@router.get("/admitted/n_days/{number_of_days}", response_model=List[HospitalFlowRow])
 def get_admissions_for_last_n_days(
     number_of_days: int,
     response: Response,
@@ -111,9 +111,9 @@ def get_admissions_for_last_n_days(
         query, {"days": number_of_days, "departments": departments}
     )
 
-    admisions_rows: List[HospitalFlowRow] = []
+    admission_rows: List[HospitalFlowRow] = []
 
     for row in result:
-        admisions_rows.append(HospitalFlowRow.parse_obj(row))
+        admission_rows.append(HospitalFlowRow.parse_obj(row))
 
-    return admisions_rows
+    return admission_rows
