@@ -3,10 +3,11 @@ import random
 from typing import List
 import datetime
 
-from fastapi import APIRouter, Depends, Response
+from fastapi import APIRouter, Depends, Response, Query
 from sqlalchemy import text
 from sqlmodel import Session
 
+from api.wards import CAMPUSES
 from api.db import get_star_session
 from models.hybye import DischargeRow
 
@@ -18,9 +19,19 @@ mock_router = APIRouter(prefix="/hybye")
 @mock_router.get(
     "/discharge/n_days/{number_of_days}", response_model=List[DischargeRow]
 )
-def get_mock_discharges_for_last_n_days(number_of_days: int) -> List[DischargeRow]:
+def get_mock_discharges_for_last_n_days(
+    number_of_days: int, campuses: list[str] = Query(default=[])
+) -> List[DischargeRow]:
     today = datetime.datetime.now().date()
     last_n_days = [today - datetime.timedelta(days=i) for i in range(number_of_days)]
+
+    # Return nothing if no campuses queried
+    if len(campuses) < 1:
+        return []
+
+    # If not given any valid campus names raise error
+    if not any(campus in campuses for campus in CAMPUSES):
+        raise KeyError("Invalid campus name")
 
     mock_discharge_rows: List[DischargeRow] = []
 
@@ -37,21 +48,30 @@ def get_discharges_for_last_n_days(
     number_of_days: int,
     response: Response,
     session: Session = Depends(get_star_session),
+    campuses: list[str] = Query(default=[]),
 ) -> List[DischargeRow]:
     """
     Parameters
     ----------
-    number_of_days: int, number of days to look back at
-    response: Response - default
-    session: Session - default
+    campuses: str, campus code as per the dictionary in api.wards.CAMPUSES
+    number_of_days: int, number of days to look retrospectively for
+    response: Response - leave as default
+    session: Session - leave as default
 
     Returns
     -------
     List of DischargeRow objects (datetime.date, int)
     """
+    departments: list = []
+    # Get all the wards for a given campus using api.wards collections
+    for campus in campuses:
+        departments.extend(CAMPUSES.get(campus, []))
+
     response.headers["Cache-Control"] = "public, max-age=300"
     query = text((Path(__file__).parent / "get_inpatient_discharges.sql").read_text())
-    result = session.execute(query, {"days": number_of_days})
+    result = session.execute(
+        query, {"days": number_of_days, "departments": departments}
+    )
 
     discharge_rows: List[DischargeRow] = []
 
