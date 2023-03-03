@@ -4,9 +4,10 @@ import dash_mantine_components as dmc
 from dash_iconify import DashIconify
 
 from web.pages.hybye.callbacks import flow  # noqa
-from api.src.api.wards import CAMPUSES
 
 dash.register_page(__name__, path="/hybye/flow", name="Hospital Flow")
+
+CAMPUSES = ["UCH", "WMS", "GWB", "NHNN"]
 
 body = html.Div(
     [
