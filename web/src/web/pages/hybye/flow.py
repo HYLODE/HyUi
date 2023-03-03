@@ -4,6 +4,7 @@ import dash_mantine_components as dmc
 from dash_iconify import DashIconify
 
 from web.pages.hybye.callbacks import flow  # noqa
+from api.src.api.wards import CAMPUSES
 
 dash.register_page(__name__, path="/hybye/flow", name="Hospital Flow")
 
@@ -11,12 +12,21 @@ body = html.Div(
     [
         html.H2("Discharge Flow Dashboard"),
         dcc.Graph(id="discharge_flow"),
+        dmc.Select(
+            label="Select Site",
+            description="Site to view discharges from",
+            id="campus_select",
+            value="UCH",
+            data=[{"value": campus, "label": campus} for campus in CAMPUSES],
+            style={"width": 200, "margin-left": 100},
+            icon=DashIconify(icon="material-symbols:local-hospital"),
+        ),
         dmc.NumberInput(
             id="input_days",
             label="Days",
             description="Days to graph back",
             value=14,
-            min=2,
+            min=7,
             debounce=1,
             stepHoldDelay=500,
             stepHoldInterval=100,
