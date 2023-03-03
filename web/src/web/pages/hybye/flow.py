@@ -1,12 +1,9 @@
 import dash
-from dash import html, dcc, callback, Output, Input
+from dash import html, dcc
 import dash_mantine_components as dmc
 from dash_iconify import DashIconify
-import pandas as pd
-import requests
-import plotly.express as ex
 
-from web.config import get_settings
+from web.pages.hybye.callbacks import flow  # noqa
 
 dash.register_page(__name__, path="/hybye/flow", name="Hospital Flow")
 
@@ -29,23 +26,6 @@ body = html.Div(
         ),
     ]
 )
-
-
-@callback(Output("discharge_flow", "figure"), Input("input_days", "value"))
-def _get_discharge_flow(days=7):
-    url = f"{get_settings().api_url}/hybye/discharge/n_days/{days}"
-    print(url)
-    df = pd.read_json(url)
-    fig = ex.line(
-        y=df["count"],
-        x=df["discharge_date"],
-        labels={
-            "y": "Count Discharged",
-            "x": "Date",
-        },
-    )
-
-    return fig
 
 
 def layout() -> dash.html.Div:
