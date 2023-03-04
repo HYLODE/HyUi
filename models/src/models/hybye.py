@@ -24,4 +24,4 @@ class CensusData(BaseModel):
     mrn: str | None
     lastname: str | None
     firstname: str | None
-    date_of_birth: datetime | None
+    date_of_birth: date | None
