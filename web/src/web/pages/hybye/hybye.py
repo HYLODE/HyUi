@@ -1,9 +1,8 @@
 import dash
 import dash_mantine_components as dmc
 from dash import html
+from dash_iconify import DashIconify
 
-# noqa suppresses black errors when linting since you need this import for
-# access to callbacks
 import web.pages.sitrep.callbacks.cytoscape  # noqa
 
 dash.register_page(__name__, path="/hybye/stage", name="HyBye")
@@ -23,7 +22,34 @@ body = html.Div(
                         dmc.Text(
                             "This is a work in progress for the discharge prediction model.",
                             style={"padding-top": "2rem", "fontSize": 20},
-                        )
+                        ),
+                        dmc.Divider(style={"padding-top": "2rem"}),
+                        dmc.List(
+                            [
+                                dmc.ListItem(
+                                    dmc.Anchor(
+                                        dmc.Group(
+                                            [
+                                                dmc.Text(
+                                                    "Discharge Overview: Patient flow indicators",
+                                                    style={
+                                                        "padding-top": "2rem",
+                                                        "fontSize": 20,
+                                                    },
+                                                ),
+                                                dmc.Button(
+                                                    "Open Flow Dashboard",
+                                                    leftIcon=DashIconify(
+                                                        icon="mdi:clipboard-flow"
+                                                    ),
+                                                ),
+                                            ]
+                                        ),
+                                        href="/hybye/flow",
+                                    )
+                                )
+                            ]
+                        ),
                     ]
                 ),
             ]
