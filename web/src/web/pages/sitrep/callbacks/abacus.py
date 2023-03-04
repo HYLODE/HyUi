@@ -1,12 +1,18 @@
 from dash import Input, Output, callback
 
 from web.pages.sitrep import ids
+from web.stores import ids as store_ids
+
 import math
-from web import TEST_ABACUS_PROBABILITIES, TEST_CAPACITY_DICT
+import random
 
 
-@callback(Output(ids.ABACUS, "elements"), Input(ids.DEPT_SELECTOR, "value"))
-def _make_abacus(dept: str) -> list[dict]:
+@callback(
+    Output(ids.ABACUS_CHART, "elements"),
+    Input(ids.DEPT_SELECTOR, "value"),
+    Input(store_ids.ABACUS_STORE, "data"),
+)
+def _make_abacus(dept: str, abacus_store: dict) -> list[dict]:
     """
     Make the Abacus
     Inputs
@@ -25,20 +31,26 @@ def _make_abacus(dept: str) -> list[dict]:
             - set out like an abacus
             - opacity colour-coded probabilities
     """
-    probs = TEST_ABACUS_PROBABILITIES  # sorry temporary
-    num_beds = TEST_CAPACITY_DICT  # sorry temporary
+
+    dept_abacus = abacus_store[dept]
 
     SPACING = 40
     ROW_HEIGHT = 60
+    NUM_BEDS_RANGE = (15, 20)
 
-    i = 0
-    # elements = [
-    #     {"data": {"id": "out"}},
-    # ]
     elements = []
-    for date, beds in dict(sorted(probs.items())).items():
-        capacity_node = {"data": {"id": date}, "grabbable": False, "selectable": False}
+    for i, individual_day_dict in enumerate(dept_abacus):
+        date = individual_day_dict["date"]
+        beds = individual_day_dict["probabilities"]
+
+        capacity_node = {
+            "data": {"id": date},
+            "grabbable": False,
+            "selectable": False,
+        }
         elements.append(capacity_node)
+        num_beds = random.randint(NUM_BEDS_RANGE[0], NUM_BEDS_RANGE[1])
+
         for j, bed in enumerate(beds):
             x = j * SPACING
             y = i * ROW_HEIGHT
@@ -49,10 +61,10 @@ def _make_abacus(dept: str) -> list[dict]:
                     "label": date,
                     "prob": round(bed, 1),
                     "sqrt_prob": math.sqrt(bed),
-                    "parent": date if j <= num_beds[date] else "out",
+                    "parent": date if j <= num_beds else "out",
                 },
                 "position": {"x": x, "y": y},
-                "classes": f"abacus bed{j} {'in' if j <= num_beds[date] else 'out'}",
+                "classes": f"abacus bed{j} {'in' if j <= num_beds else 'out'}",
                 "grabbable": False,
                 "selectable": True,
             }
@@ -66,5 +78,5 @@ def _make_abacus(dept: str) -> list[dict]:
             "selectable": False,
         }
         elements.append(edge)
-        i += 1
+
     return elements

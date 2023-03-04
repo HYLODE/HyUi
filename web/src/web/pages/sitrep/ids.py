@@ -22,7 +22,10 @@ BED_SELECTOR_WARD = gen_id("bed selector ward", __name__)
 # content
 CYTO_CAMPUS = gen_id("cyto campus", __name__)
 CYTO_WARD = gen_id("cyto ward", __name__)
-ABACUS = gen_id("abacus", __name__)
+
+# abacus
+ABACUS_CHART = gen_id("abacus chart", __name__)
+ABACUS_STORE = gen_id("abacus store", __name__)
 
 PROGRESS_CAMPUS = gen_id("progress campus", __name__)
 PROGRESS_WARD = gen_id("progress ward", __name__)

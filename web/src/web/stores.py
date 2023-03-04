@@ -7,9 +7,11 @@ import requests
 import warnings
 from dash import Input, Output, callback, dcc, html
 
+from web import SITREP_DEPT2WARD_MAPPING
+
 from models.beds import Bed, Department, Room
 from models.electives import MergedData
-from models.sitrep import SitrepRow
+from models.sitrep import SitrepRow, Abacus
 from web import ids
 from web.config import get_settings
 
@@ -120,6 +122,22 @@ def _store_all_sitreps(_: int) -> dict:
     return sitreps
 
 
+@callback(
+    Output(ids.ABACUS_STORE, "data"),
+    Input(ids.STORE_TIMER_6H, "n_intervals"),
+    background=True,
+)
+def _store_all_abacus(_: int) -> dict:
+    abaci = {}
+    for long, short in SITREP_DEPT2WARD_MAPPING.items():
+        response = requests.get(
+            f"{get_settings().api_url}/sitrep/abacus/?department={short}"
+        )
+        res = [Abacus.parse_obj(row).dict() for row in response.json()]
+        abaci[long] = res
+    return abaci
+
+
 stores = html.Div(
     [
         dcc.Store(id=ids.DEPT_STORE),
@@ -127,5 +145,6 @@ stores = html.Div(
         dcc.Store(id=ids.BEDS_STORE),
         dcc.Store(id=ids.ELECTIVES_STORE),
         dcc.Store(id=ids.SITREP_STORE),
+        dcc.Store(id=ids.ABACUS_STORE),
     ]
 )

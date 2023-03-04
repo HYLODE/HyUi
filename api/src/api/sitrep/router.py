@@ -1,13 +1,14 @@
 import warnings
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from urllib.parse import urlencode
-
+import numpy as np
 import requests
 from fastapi import APIRouter, Depends, Response
 from fastapi.responses import RedirectResponse
 from sqlalchemy import create_engine
 from sqlmodel import Session
+
 
 from api.config import Settings, get_settings
 
@@ -15,10 +16,7 @@ from api.baserow import BaserowAuthenticator
 
 # TODO: Give sitrep its own CensusRow model so we do not have interdependencies.
 from models.census import CensusRow
-from models.sitrep import (
-    SitrepRow,
-    BedRow,
-)
+from models.sitrep import SitrepRow, BedRow, Abacus
 
 CORE_FIELDS = [
     "department",
@@ -144,3 +142,21 @@ def update_bed_row(
         },
         json=data,
     )
+
+
+@mock_router.get("/abacus/", response_model=list[Abacus])
+def get_mock_abacus(department: str) -> list[Abacus]:
+    num_beds = 24
+    num_days = 7
+    output = []
+    for d in range(num_days):
+        histogram, _ = np.histogram(np.random.randn(num_beds), bins=num_beds)
+        output.append(
+            Abacus(
+                date=(date.today() + timedelta(days=d)).strftime("%Y-%m-%d"),
+                probabilities=np.divide(
+                    np.flip(np.cumsum(histogram)), num_beds
+                ).tolist(),
+            ),
+        )
+    return output
