@@ -14,7 +14,7 @@ from web.config import get_settings
 )
 def _get_discharge_flow(days: int = 7, campuses: str = "UCH") -> ex.line:
     discharged = pd.read_json(
-        f"{get_settings().api_url}/hybye/discharge/n_days/{days}?campuses={campuses}"
+        f"{get_settings().api_url}/hybye/discharged/n_days/{days}?campuses={campuses}"
     )
     admitted = pd.read_json(
         f"{get_settings().api_url}/hybye/admitted/n_days/{days}?campuses={campuses}"

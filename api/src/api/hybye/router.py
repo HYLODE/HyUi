@@ -17,7 +17,7 @@ mock_router = APIRouter(prefix="/hybye")
 
 
 @mock_router.get(
-    "/discharge/n_days/{number_of_days}", response_model=List[HospitalFlowRow]
+    "/discharged/n_days/{number_of_days}", response_model=List[HospitalFlowRow]
 )
 @mock_router.get(
     "/admitted/n_days/{number_of_days}", response_model=List[HospitalFlowRow]
@@ -63,7 +63,7 @@ def get_mock_flow_for_last_n_days(
     return mock_discharge_rows
 
 
-@router.get("/discharge/n_days/{number_of_days}", response_model=List[HospitalFlowRow])
+@router.get("/discharged/n_days/{number_of_days}", response_model=List[HospitalFlowRow])
 def get_discharges_for_last_n_days(
     number_of_days: int,
     response: Response,

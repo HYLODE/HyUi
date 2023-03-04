@@ -7,7 +7,7 @@ client = TestClient(app)
 
 
 def test_get_mock_discharges_for_last_n_days() -> None:
-    response = client.get("/mock/hybye/discharge/n_days/28?campuses=UCH")
+    response = client.get("/mock/hybye/discharged/n_days/28?campuses=UCH")
     assert response.status_code == 200
 
     assert len(response.json()) == 28
@@ -17,12 +17,12 @@ def test_get_mock_discharges_for_last_n_days() -> None:
 
 
 def test_mock_no_campuses_behaviour() -> None:
-    response = client.get("/mock/hybye/discharge/n_days/28")
+    response = client.get("/mock/hybye/discharged/n_days/28")
     assert response.status_code == 200
 
     assert len(response.json()) == 0
 
 
 def test_mock_invalid_campus_behaviour() -> None:
-    response = client.get("/mock/hybye/discharge/n_days/100?campuses=KCH")
+    response = client.get("/mock/hybye/discharged/n_days/100?campuses=KCH")
     assert response.status_code == 400
