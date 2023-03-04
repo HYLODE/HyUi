@@ -156,7 +156,7 @@ def _fetch_flow_data(
 # =============== INPATIENT CENSUS ===============
 
 
-@router.get("/census/uch")
+@router.get("/census/uch", response_model=List[CensusData])
 def get_inpatient_census(
     response: Response,
     session: Session = Depends(get_star_session),
