@@ -63,25 +63,12 @@ def get_discharges_for_last_n_days(
 
     Returns
     -------
-    List of HospitalFlowRow objects (datetime.date, int)
+    List of HospitalFlowRow objects (datetime.date, int) for discharges for the last n days
     """
-    departments: list = []
-    # Get all the wards for a given campus using api.wards collections
-    for campus in campuses:
-        departments.extend(CAMPUSES.get(campus, []))
 
-    response.headers["Cache-Control"] = "public, max-age=300"
-    query = text((Path(__file__).parent / "get_inpatient_discharges.sql").read_text())
-    result = session.execute(
-        query, {"days": number_of_days, "departments": departments}
+    return _fetch_flow_data(
+        campuses, number_of_days, response, session, "get_inpatient_discharges.sql"
     )
-
-    discharge_rows: List[HospitalFlowRow] = []
-
-    for row in result:
-        discharge_rows.append(HospitalFlowRow.parse_obj(row))
-
-    return discharge_rows
 
 
 @router.get("/admitted/n_days/{number_of_days}", response_model=List[HospitalFlowRow])
@@ -103,13 +90,28 @@ def get_admissions_for_last_n_days(
     -------
     List of HospitalFlowRow objects (datetime.date, int) for admissions for last n days
     """
+
+    return _fetch_flow_data(
+        campuses, number_of_days, response, session, "get_inpatient_admissions.sql"
+    )
+
+
+def _fetch_flow_data(
+    campuses: list[str],
+    number_of_days: int,
+    response: Response,
+    session: Session,
+    sql_file: str,
+) -> List[HospitalFlowRow]:
     departments: list = []
+    
     # Get all the wards for a given campus using api.wards collections
     for campus in campuses:
         departments.extend(CAMPUSES.get(campus, []))
 
     response.headers["Cache-Control"] = "public, max-age=300"
-    query = text((Path(__file__).parent / "get_inpatient_admissions.sql").read_text())
+
+    query = text((Path(__file__).parent / sql_file).read_text())
     result = session.execute(
         query, {"days": number_of_days, "departments": departments}
     )
