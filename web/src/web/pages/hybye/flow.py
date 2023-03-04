@@ -24,7 +24,7 @@ body = html.Div(
                 DashIconify(icon="mdi:clipboard-flow", style={"padding-top": "0.5rem"}),
             ]
         ),
-        dcc.Graph(id="discharge_flow"),
+        dmc.LoadingOverlay(children=dcc.Graph(id="discharge_flow")),
         dmc.SimpleGrid(
             cols=2,
             children=[
