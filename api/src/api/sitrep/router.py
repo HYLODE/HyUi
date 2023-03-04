@@ -151,12 +151,12 @@ def get_mock_abacus(department: str) -> list[Abacus]:
     output = []
     for d in range(num_days):
         histogram, _ = np.histogram(np.random.randn(num_beds), bins=num_beds)
+        probs = np.divide(np.flip(np.cumsum(histogram)), num_beds)
+        probs[: np.random.randint(5, 15)] = 1
         output.append(
             Abacus(
                 date=(date.today() + timedelta(days=d)).strftime("%Y-%m-%d"),
-                probabilities=np.divide(
-                    np.flip(np.cumsum(histogram)), num_beds
-                ).tolist(),
+                probabilities=probs.tolist(),
             ),
         )
     return output
