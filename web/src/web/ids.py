@@ -7,3 +7,5 @@ ROOM_STORE = gen_id("rooms all store", __name__)
 BEDS_STORE = gen_id("beds all store", __name__)
 ELECTIVES_STORE = gen_id("electives all store", __name__)
 SITREP_STORE = gen_id("sitrep all store", __name__)
+
+ABACUS_STORE = gen_id("abacus all store", __name__)

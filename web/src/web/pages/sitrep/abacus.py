@@ -36,7 +36,7 @@ dept_selector = dmc.Container(
 abacus = dmc.Paper(
     [
         cyto.Cytoscape(
-            id=ids.ABACUS,
+            id=ids.ABACUS_CHART,
             style={
                 # "width": "70vw",
                 "height": "70vh",
