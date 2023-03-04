@@ -9,13 +9,14 @@ from sqlmodel import Session
 
 from api.wards import CAMPUSES
 from api.db import get_star_session
-from models.hybye import HospitalFlowRow
+from models.hybye import HospitalFlowRow, CensusData
 
 router = APIRouter(prefix="/hybye")
 
 mock_router = APIRouter(prefix="/hybye")
 
 
+# =============== Hospital Flow ===============
 @mock_router.get(
     "/discharged/n_days/{number_of_days}", response_model=List[HospitalFlowRow]
 )
@@ -26,8 +27,8 @@ def get_mock_flow_for_last_n_days(
     response: Response, number_of_days: int, campuses: list[str] = Query(default=[])
 ) -> List[HospitalFlowRow]:
     """
-    Mock get admission/discharges function which emulates the response of the live function.
-    Raises KeyError on invalid campus name, which doesn't replicate true behaviour.
+    Mock get admission/discharges function which emulates the response of the live
+    function.
 
     Parameters
     ----------
@@ -50,7 +51,7 @@ def get_mock_flow_for_last_n_days(
     if not any(campus in campuses for campus in CAMPUSES):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Invalid request: {campuses} is not found in the available campuses",
+            detail=f"Invalid request: {campuses} is not found in the available campuses",  # noqa
         )
 
     mock_discharge_rows: List[HospitalFlowRow] = []
@@ -80,7 +81,7 @@ def get_discharges_for_last_n_days(
 
     Returns
     -------
-    List of HospitalFlowRow objects (datetime.date, int) for discharges for the last n days
+    List of HospitalFlowRow objects for discharges for the last n days
     """
 
     return _fetch_flow_data(
@@ -105,7 +106,7 @@ def get_admissions_for_last_n_days(
 
     Returns
     -------
-    List of HospitalFlowRow objects (datetime.date, int) for admissions for last n days
+    List of HospitalFlowRow objects for admissions for last n days
     """
 
     return _fetch_flow_data(
@@ -130,7 +131,7 @@ def _fetch_flow_data(
     if not any(campus in campuses for campus in CAMPUSES):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Invalid request: {campuses} is not found in the available campuses",
+            detail=f"Invalid request: {campuses} is not found in the available campuses",  # noqa
         )
 
     # Get all the wards for a given campus using api.wards collections
@@ -150,3 +151,23 @@ def _fetch_flow_data(
         admission_rows.append(HospitalFlowRow.parse_obj(row))
 
     return admission_rows
+
+
+# =============== INPATIENT CENSUS ===============
+
+
+@router.get("/census/uch")
+def get_inpatient_census(
+    response: Response,
+    session: Session = Depends(get_star_session),
+) -> List[CensusData]:
+    response.headers["Cache-Control"] = "public, max-age=300"
+    query = text((Path(__file__).parent / "uch_admits_census.sql").read_text())
+    result = session.execute(query)
+
+    census_data: List[CensusData] = []
+
+    for row in result:
+        census_data.append(CensusData.parse_obj(row))
+
+    return census_data
