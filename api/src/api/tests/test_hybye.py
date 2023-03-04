@@ -16,8 +16,13 @@ def test_get_mock_discharges_for_last_n_days() -> None:
     assert rendered_response is not None
 
 
-def test_mock_behaviour_is_valid() -> None:
+def test_mock_no_campuses_behaviour() -> None:
     response = client.get("/mock/hybye/discharge/n_days/28")
     assert response.status_code == 200
 
     assert len(response.json()) == 0
+
+
+def test_mock_invalid_campus_behaviour() -> None:
+    response = client.get("/mock/hybye/discharge/n_days/100?campuses=KCH")
+    assert response.status_code == 400

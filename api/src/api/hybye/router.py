@@ -3,7 +3,7 @@ import random
 from typing import List
 import datetime
 
-from fastapi import APIRouter, Depends, Response, Query
+from fastapi import APIRouter, Depends, Response, Query, HTTPException, status
 from sqlalchemy import text
 from sqlmodel import Session
 
@@ -22,9 +22,23 @@ mock_router = APIRouter(prefix="/hybye")
 @mock_router.get(
     "/admitted/n_days/{number_of_days}", response_model=List[HospitalFlowRow]
 )
-def get_mock_discharges_for_last_n_days(
-    number_of_days: int, campuses: list[str] = Query(default=[])
+def get_mock_flow_for_last_n_days(
+    response: Response, number_of_days: int, campuses: list[str] = Query(default=[])
 ) -> List[HospitalFlowRow]:
+    """
+    Mock get admission/discharges function which emulates the response of the live function.
+    Raises KeyError on invalid campus name, which doesn't replicate true behaviour.
+
+    Parameters
+    ----------
+    response: default Response object for overriding status codes
+    number_of_days: int
+    campuses: list of campus names as per `api.wards`
+
+    Returns
+    -------
+    List of HospitalFlowRow data
+    """
     today = datetime.datetime.now().date()
     last_n_days = [today - datetime.timedelta(days=i) for i in range(number_of_days)]
 
@@ -32,9 +46,12 @@ def get_mock_discharges_for_last_n_days(
     if len(campuses) < 1:
         return []
 
-    # If not given any valid campus names raise error
+    # If not given invalid campus names raise HTTPException
     if not any(campus in campuses for campus in CAMPUSES):
-        raise KeyError("Invalid campus name")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid request: {campuses} is not found in the available campuses",
+        )
 
     mock_discharge_rows: List[HospitalFlowRow] = []
 
@@ -104,7 +121,18 @@ def _fetch_flow_data(
     sql_file: str,
 ) -> List[HospitalFlowRow]:
     departments: list = []
-    
+
+    # Return nothing if no campuses queried
+    if len(campuses) < 1:
+        return []
+
+    # If not given invalid campus names raise HTTPException
+    if not any(campus in campuses for campus in CAMPUSES):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid request: {campuses} is not found in the available campuses",
+        )
+
     # Get all the wards for a given campus using api.wards collections
     for campus in campuses:
         departments.extend(CAMPUSES.get(campus, []))
