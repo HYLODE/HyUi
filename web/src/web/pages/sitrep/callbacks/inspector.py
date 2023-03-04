@@ -278,6 +278,20 @@ def patient_accordion_item(
         return dmc.AccordionControl(control), dmc.AccordionPanel(panel)
 
     data = node.get("data", {})
+
+    if data.get("closed"):
+        control = dmc.Group(
+            [
+                DashIconify(
+                    icon="carbon:close-outline",
+                    width=20,
+                ),
+                dmc.Text("Bed closed", size="sm"),
+            ]
+        )
+        panel = None
+        return dmc.AccordionControl(control), dmc.AccordionPanel(panel)
+
     census = data.get("census", {})
     occupied = census.get("occupied", False)
     sex_icon = "carbon:person"

@@ -9500,7 +9500,7 @@
     "floor": 3,
     "location_name": "UNIVERSITY COLLEGE HOSPITAL CAMPUS",
     "bed_number": 29,
-    "closed": false,
+    "closed": true,
     "xpos": 90,
     "ypos": 100
   },
