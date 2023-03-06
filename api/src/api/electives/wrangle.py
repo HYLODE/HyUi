@@ -184,9 +184,13 @@ def aggregation(
         pred_demand = [return_coeff(expression, i) for i in range(n + 1)]
         return pred_demand
 
-    agg_series = agg_series.apply(lambda x: pred_proba_to_pred_demand(x))
-    agg_df = pd.DataFrame(
-        {"date": agg_series.index, "probabilities": agg_series.values}
-    )
+    agg_series = agg_series.apply(pred_proba_to_pred_demand)
+    # agg_df = (
+    #     pd.DataFrame(agg_series)
+    #     .reset_index()
+    #     .rename(columns={"surgery_date": "date", "icu_prob": "probabilities"})
+    # )
+
+    agg_df = pd.DataFrame({"date": agg_series.index, "probabilities": agg_series.array})
 
     return agg_df
