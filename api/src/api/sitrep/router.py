@@ -11,9 +11,9 @@ from sqlmodel import Session
 
 from api.config import Settings, get_settings
 
+from web.config import get_settings as web_settings
+from api.convert import parse_to_data_frame
 from api.baserow import BaserowAuthenticator
-
-from api.electives.router import get_electives_aggregate
 
 # TODO: Give sitrep its own CensusRow model so we do not have interdependencies.
 from models.census import CensusRow
@@ -172,8 +172,11 @@ def get_abacus(
     # extract current set of beds
 
     # pull electives data
-    agg_electives = get_electives_aggregate(days_ahead=num_days)
+    response = requests.get(url=f"{web_settings().api_url}/electives/aggregate/")
+    agg_electives = parse_to_data_frame(response.json()["data"], Abacus)
     # get non elective aggregates (bournville?)
     # compile these into one aggregate probability distribution
 
-    return [Abacus.parse_obj(row) for row in agg_electives.to_dict(orient="records")]
+    agg_df = agg_electives  # for now
+
+    return [Abacus.parse_obj(row) for row in agg_df.to_dict(orient="records")]
