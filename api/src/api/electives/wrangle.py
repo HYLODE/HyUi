@@ -140,7 +140,7 @@ def prepare_draft(
 
 
 def aggregation(
-    individual_level_predictions: pd.Dataframe,
+    individual_level_predictions: pd.DataFrame,
     date_column: str,
     pred_column: str,
 ) -> pd.Series:
