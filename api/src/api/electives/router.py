@@ -345,4 +345,4 @@ def get_electives_aggregate(
         pred_column="icu_prob",
     )
 
-    return [Abacus.parse_obj(row) for row in agg_df.to_dict(orient="records")]
+    return [Abacus.parse_obj(row) for row in agg_df.to_dict()]
