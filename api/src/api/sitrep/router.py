@@ -9,7 +9,6 @@ from fastapi.responses import RedirectResponse
 from sqlalchemy import create_engine
 from sqlmodel import Session
 
-
 from api.config import Settings, get_settings
 
 from api.baserow import BaserowAuthenticator
@@ -160,3 +159,14 @@ def get_mock_abacus(department: str) -> list[Abacus]:
             ),
         )
     return output
+
+
+@router.get("/abacus/", response_model=list[Abacus])
+def get_abacus(department: str) -> list[Abacus]:  # should add days_ahead variable
+    # build an output set of dates
+    # extract current set of beds
+    # pull electives data
+    # get non elective aggregates (bournville?)
+    # compile these into one aggregate probability distribution
+
+    pass
