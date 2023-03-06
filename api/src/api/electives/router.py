@@ -304,7 +304,7 @@ def get_mock_electives(
     return [MergedData.parse_obj(row) for row in df.to_dict(orient="records")]
 
 
-@router.get("/agg", response_model=list[Abacus])
+@router.get("/aggregate", response_model=list[Abacus])
 def get_electives_aggregate(
     response: Response,
     s_caboodle: Session = Depends(get_caboodle_session),
@@ -339,10 +339,14 @@ def get_electives_aggregate(
         pa_summary=pa_summary,
     )
 
-    agg_df = aggregation(
-        individual_level_predictions=df,
-        date_column="surgery_date",
-        pred_column="icu_prob",
+    agg_df = (
+        aggregation(
+            individual_level_predictions=df,
+            date_column="surgery_date",
+            pred_column="icu_prob",
+        )
+        .to_frame()
+        .reset_index(names="date")
     )
 
     return [Abacus.parse_obj(row) for row in agg_df.to_dict()]
