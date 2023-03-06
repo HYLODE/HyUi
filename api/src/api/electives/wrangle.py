@@ -1,5 +1,7 @@
 import numpy as np
 import pandas as pd
+import sympy as sym
+
 from pydantic import BaseModel
 
 import pickle
@@ -135,3 +137,53 @@ def prepare_draft(
     else:
         df["icu_prob"] = 0
     return df
+
+
+def aggregation(
+    individual_level_predictions: pd.Dataframe,
+    date_column: str,
+    pred_column: str,
+) -> pd.Series:
+
+    # this code is from HyMind - Jen had got from Zella I think
+    # TODO get my head around this
+    # to instead write something that doesn't need sympy etc
+    # I think it should be possible fairly easily with eg. scipy.comb
+
+    agg_series = individual_level_predictions.groupby(date_column)[pred_column].apply(
+        list
+    )
+
+    s = sym.Symbol("s")
+    r = sym.Symbol("r")
+    syms = sym.symbols("r0:175")
+    core_expression = (1 - r) + r * s
+
+    def ex(ri: sym.Symbol) -> sym.Expr:
+        return core_expression.subs({r: ri})
+
+    def build_expression(n: int) -> sym.Expr:
+        expression = 1
+        for i in range(n):
+            expression = expression * ex(syms[i])
+        return expression
+
+    def expression_subs(
+        expression: sym.Expr, n: int, predictions: list[float]
+    ) -> sym.Expr:
+        substitution = dict(zip(syms[0:n], predictions[0:n]))
+        return expression.subs(substitution)
+
+    def return_coeff(expression: sym.Expr, i: int) -> sym.Expr:
+        return sym.expand(expression).coeff(s, i)
+
+    def pred_proba_to_pred_demand(predictions_proba: list[float]) -> dict[int, float]:
+        n = len(predictions_proba)
+        expression = build_expression(n)
+        expression = expression_subs(expression, n, predictions_proba)
+        pred_demand_dict = {i: return_coeff(expression, i) for i in range(n + 1)}
+        return pred_demand_dict
+
+    agg_series = agg_series.apply(lambda x: pred_proba_to_pred_demand(x))
+
+    return agg_series

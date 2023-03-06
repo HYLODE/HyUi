@@ -10,7 +10,7 @@ from sqlalchemy import text, create_engine
 from sqlmodel import Session
 
 from api.db import get_caboodle_session, get_clarity_session
-from api.electives.wrangle import prepare_draft  # , prepare_electives
+from api.electives.wrangle import prepare_draft, aggregation  # , prepare_electives
 from models.electives import (
     CaboodlePreassessment,
     ClarityPostopDestination,
@@ -24,7 +24,7 @@ from models.electives import (
     PreassessSummaryData,
     MedicalHx,
 )
-
+from models.sitrep import Abacus
 from datetime import timedelta, date
 
 
@@ -302,3 +302,47 @@ def get_mock_electives(
     )
     df = df.replace({np.nan: None})
     return [MergedData.parse_obj(row) for row in df.to_dict(orient="records")]
+
+
+@router.get("/agg", response_model=list[Abacus])
+def get_electives_aggregate(
+    response: Response,
+    s_caboodle: Session = Depends(get_caboodle_session),
+    s_clarity: Session = Depends(get_clarity_session),
+    days_ahead: int = 7,
+) -> list[Abacus]:
+
+    response.headers["Cache-Control"] = "public, max-age=7200"
+
+    case = get_caboodle_cases(session=s_caboodle, days_ahead=days_ahead)
+    preassess = get_caboodle_preassess(session=s_caboodle, days_ahead=days_ahead)
+    labs = get_caboodle_labs(session=s_caboodle, days_ahead=days_ahead)
+    echo = get_caboodle_echo(session=s_caboodle, days_ahead=days_ahead)
+    obs = get_caboodle_obs(session=s_caboodle, days_ahead=days_ahead)
+    pa_summary = get_caboodle_pas(session=s_caboodle, days_ahead=days_ahead)
+    hx = get_medical_hx(session=s_caboodle, days_ahead=days_ahead)
+    pod = get_clarity_pod(session=s_clarity, days_ahead=days_ahead)
+    axa = get_axa_codes()
+
+    # pod = _parse_query("live_pod.sql", s_clarity, ClarityPostopDestination, params)
+
+    df = prepare_draft(
+        electives=case,
+        preassess=preassess,
+        labs=labs,
+        echo=echo,
+        obs=obs,
+        axa=axa,
+        pod=pod,
+        to_predict=True,
+        medical_hx=hx,
+        pa_summary=pa_summary,
+    )
+
+    agg_df = aggregation(
+        individual_level_predictions=df,
+        date_column="surgery_date",
+        pred_column="icu_prob",
+    )
+
+    return [Abacus.parse_obj(row) for row in agg_df.to_dict(orient="records")]
