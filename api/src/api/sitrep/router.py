@@ -8,11 +8,12 @@ from fastapi import APIRouter, Depends, Response
 from fastapi.responses import RedirectResponse
 from sqlalchemy import create_engine
 from sqlmodel import Session
-from api.convert import parse_to_data_frame
 
 from api.config import Settings, get_settings
 
 from api.baserow import BaserowAuthenticator
+
+from api.electives.router import get_electives_aggregate
 
 # TODO: Give sitrep its own CensusRow model so we do not have interdependencies.
 from models.census import CensusRow
@@ -163,19 +164,16 @@ def get_mock_abacus(department: str, num_days: int = 7) -> list[Abacus]:
 
 
 @router.get("/abacus/", response_model=list[Abacus])
-def get_abacus(department: str, num_days: int = 7) -> list[Abacus]:
+def get_abacus(
+    department: str, num_days: int = 7, settings: Settings = Depends(get_settings)
+) -> list[Abacus]:
 
     # build an output set of dates
     # extract current set of beds
 
     # pull electives data
-    agg_electives_response = requests.get(
-        f"{get_settings().api_url}/electives/aggregate/",
-    )
-    electives_df = parse_to_data_frame(agg_electives_response.json()["data"], Abacus)
-
+    agg_electives = get_electives_aggregate(days_ahead=num_days)
     # get non elective aggregates (bournville?)
     # compile these into one aggregate probability distribution
-    abacaus_df = electives_df  # for now
 
-    return [Abacus.parse_obj(row) for row in abacaus_df.to_dict(orient="records")]
+    return [Abacus.parse_obj(row) for row in agg_electives.to_dict(orient="records")]
