@@ -311,7 +311,6 @@ def get_electives_aggregate(
     s_clarity: Session = Depends(get_clarity_session),
     days_ahead: int = 7,
 ) -> list[Abacus]:
-
     response.headers["Cache-Control"] = "public, max-age=7200"
 
     case = get_caboodle_cases(session=s_caboodle, days_ahead=days_ahead)
@@ -338,11 +337,10 @@ def get_electives_aggregate(
         medical_hx=hx,
         pa_summary=pa_summary,
     )
-
-    agg_df = aggregation(
-        individual_level_predictions=df,
-        date_column="surgery_date",
-        pred_column="icu_prob",
+    agg_df = (
+        df.groupby("department_name")
+        .apply(aggregation, date_column="surgery_date", pred_column="icu_prob")
+        .reset_index()[["department_name", "date", "probabilities"]]
     )
 
     return [Abacus.parse_obj(row) for row in agg_df.to_dict(orient="records")]
@@ -380,5 +378,6 @@ def get_mock_electives_aggregate() -> list[Abacus]:
         date_column="surgery_date",
         pred_column="icu_prob",
     )
+    agg_df["department_name"] = "UCH T03 INTENSIVE CARE"
 
     return [Abacus.parse_obj(row) for row in agg_df.to_dict(orient="records")]

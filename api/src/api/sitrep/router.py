@@ -11,7 +11,6 @@ from sqlmodel import Session
 
 from api.config import Settings, get_settings
 
-from web.config import get_settings as web_settings
 from api.convert import parse_to_data_frame
 from api.baserow import BaserowAuthenticator
 
@@ -146,7 +145,7 @@ def update_bed_row(
 
 
 @mock_router.get("/abacus/", response_model=list[Abacus])
-def get_mock_abacus(department: str, num_days: int = 7) -> list[Abacus]:
+def get_mock_abacus(num_days: int = 7) -> list[Abacus]:
     num_beds = 24
     num_days = 7
     output = []
@@ -165,15 +164,19 @@ def get_mock_abacus(department: str, num_days: int = 7) -> list[Abacus]:
 
 @router.get("/abacus/", response_model=list[Abacus])
 def get_abacus(
-    department: str, num_days: int = 7, settings: Settings = Depends(get_settings)
+    num_days: int = 7, settings: Settings = Depends(get_settings)
 ) -> list[Abacus]:
 
     # build an output set of dates
     # extract current set of beds
 
     # pull electives data
-    response = requests.get(url=f"{web_settings().api_url}/electives/aggregate/")
-    agg_electives = parse_to_data_frame(response.json()["data"], Abacus)
+    response = requests.get(url=f"{settings.api_url}/electives/aggregate/")
+    agg_electives = parse_to_data_frame(response.json(), Abacus)
+    agg_df = agg_electives.copy()
+    agg_df["probabilities"] = agg_df["probabilities"].apply(
+        lambda x: (1 - np.cumsum(x)).tolist()
+    )
     # get non elective aggregates (bournville?)
     # compile these into one aggregate probability distribution
 

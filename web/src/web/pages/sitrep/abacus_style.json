@@ -21,13 +21,13 @@
   {
     "selector": ".in",
     "style": {
-      "background-color": "mapData(sqrt_prob, 0, 1, #FFFFFF, #5c7cfa)"
+      "background-color": "mapData(prob, 0, 1, #FFFFFF, #5c7cfa)"
     }
   },
   {
     "selector": ".out",
     "style": {
-      "background-color": "mapData(sqrt_prob, 0, 1, #FFFFFF, #FF0000)"
+      "background-color": "mapData(prob, 0, 1, #FFFFFF, #FF0000)"
     }
   }
 ]
