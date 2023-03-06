@@ -8,6 +8,7 @@ from fastapi import APIRouter, Depends, Response
 from fastapi.responses import RedirectResponse
 from sqlalchemy import create_engine
 from sqlmodel import Session
+from api.convert import parse_to_data_frame
 
 from api.config import Settings, get_settings
 
@@ -144,7 +145,7 @@ def update_bed_row(
 
 
 @mock_router.get("/abacus/", response_model=list[Abacus])
-def get_mock_abacus(department: str) -> list[Abacus]:
+def get_mock_abacus(department: str, num_days: int = 7) -> list[Abacus]:
     num_beds = 24
     num_days = 7
     output = []
@@ -162,11 +163,19 @@ def get_mock_abacus(department: str) -> list[Abacus]:
 
 
 @router.get("/abacus/", response_model=list[Abacus])
-def get_abacus(department: str) -> list[Abacus]:  # should add days_ahead variable
+def get_abacus(department: str, num_days: int = 7) -> list[Abacus]:
+
     # build an output set of dates
     # extract current set of beds
+
     # pull electives data
+    agg_electives_response = requests.get(
+        f"{get_settings().api_url}/electives/aggregate/",
+    )
+    electives_df = parse_to_data_frame(agg_electives_response.json()["data"], Abacus)
+
     # get non elective aggregates (bournville?)
     # compile these into one aggregate probability distribution
+    abacaus_df = electives_df  # for now
 
-    pass
+    return [Abacus.parse_obj(row) for row in abacaus_df.to_dict(orient="records")]
