@@ -1,8 +1,11 @@
+import datetime
+
 import dash
 import dash_mantine_components as dmc
-from dash import html, dash_table
+from dash import html, dash_table, dcc, Output, callback, Input
 from dash_iconify import DashIconify
 import pandas as pd
+import plotly.express as ex
 
 from web.config import get_settings
 
@@ -10,8 +13,6 @@ dash.register_page(__name__, path="/hybye/inpatients", name="Census")
 
 df = pd.read_json(f"{get_settings().api_url}/hybye/census/uch")
 df = df[(df["occupied"]) & (df["patient_class"] == "INPATIENT")]
-
-# print(df.head())
 
 cols_select = [
     "department",
@@ -29,22 +30,23 @@ cols_select = [
 
 body = html.Div(
     [
-        html.H1(
-            children=[
-                "UCH Inpatient State",
-                DashIconify(
-                    icon="material-symbols:inpatient-rounded",
-                    style={"padding-top": "0.5rem"},
-                ),
-            ]
-        ),
-        dash_table.DataTable(
-            df.to_dict("records"),
-            columns=[{"id": col, "name": col} for col in cols_select],
-        ),
+        html.H1("UCH Inpatient State"),
+        dcc.Graph("los_plot"),
+        dmc.Button("Render Results", id="trigger"),
     ]
 )
 
 
 def layout() -> dash.html.Div:
     return html.Div(children=[body])
+
+
+@callback(Output("los_plot", "figure"), Input("trigger", "n_clicks"))
+def _return_los_plot(n_clicks):
+    df.ovl_admission = pd.to_datetime(df.ovl_admission, utc=True)
+    df["los"] = datetime.datetime.now(tz=datetime.timezone.utc) - df.ovl_admission
+    df["los"] = df.los.dt.days
+
+    print(df.los)
+
+    return ex.histogram(df["los"], marginal="box")
