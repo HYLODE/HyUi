@@ -16,6 +16,8 @@ class Settings(BaseSettings):
     hymind_url: AnyHttpUrl
     towermail_url: AnyHttpUrl
 
+    api_url: AnyHttpUrl
+
     echo_sql: bool = False
 
     class Config:
