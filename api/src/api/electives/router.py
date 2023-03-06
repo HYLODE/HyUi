@@ -339,14 +339,10 @@ def get_electives_aggregate(
         pa_summary=pa_summary,
     )
 
-    agg_df = (
-        aggregation(
-            individual_level_predictions=df,
-            date_column="surgery_date",
-            pred_column="icu_prob",
-        )
-        .to_frame()
-        .reset_index(names="date")
+    agg_df = aggregation(
+        individual_level_predictions=df,
+        date_column="surgery_date",
+        pred_column="icu_prob",
     )
 
-    return [Abacus.parse_obj(row) for row in agg_df.to_dict()]
+    return [Abacus.parse_obj(row) for row in agg_df.to_dict(orient="records")]

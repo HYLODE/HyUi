@@ -216,7 +216,7 @@ def aggregation(
     individual_level_predictions: pd.DataFrame,
     date_column: str,
     pred_column: str,
-) -> pd.Series:
+) -> pd.DataFrame:
 
     # this code is from HyMind - Jen had got from Zella I think
     # TODO get my head around this
@@ -250,13 +250,16 @@ def aggregation(
     def return_coeff(expression: sym.Expr, i: int) -> sym.Expr:
         return sym.expand(expression).coeff(s, i)
 
-    def pred_proba_to_pred_demand(predictions_proba: list[float]) -> dict[int, float]:
+    def pred_proba_to_pred_demand(predictions_proba: list[float]) -> list[float]:
         n = len(predictions_proba)
         expression = build_expression(n)
         expression = expression_subs(expression, n, predictions_proba)
-        pred_demand_dict = {i: return_coeff(expression, i) for i in range(n + 1)}
-        return pred_demand_dict
+        pred_demand = [return_coeff(expression, i) for i in range(n + 1)]
+        return pred_demand
 
     agg_series = agg_series.apply(lambda x: pred_proba_to_pred_demand(x))
+    agg_df = pd.DataFrame(
+        {"date": agg_series.index, "probabilities": agg_series.values}
+    )
 
-    return agg_series
+    return agg_df
