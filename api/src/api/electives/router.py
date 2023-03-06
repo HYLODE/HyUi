@@ -304,7 +304,7 @@ def get_mock_electives(
     return [MergedData.parse_obj(row) for row in df.to_dict(orient="records")]
 
 
-@router.get("/aggregate", response_model=list[Abacus])
+@router.get("/aggregate/", response_model=list[Abacus])
 def get_electives_aggregate(
     response: Response,
     s_caboodle: Session = Depends(get_caboodle_session),
@@ -338,6 +338,42 @@ def get_electives_aggregate(
         medical_hx=hx,
         pa_summary=pa_summary,
     )
+
+    agg_df = aggregation(
+        individual_level_predictions=df,
+        date_column="surgery_date",
+        pred_column="icu_prob",
+    )
+
+    return [Abacus.parse_obj(row) for row in agg_df.to_dict(orient="records")]
+
+
+@mock_router.get("/aggregate/", response_model=list[Abacus])
+def get_mock_electives_aggregate() -> list[Abacus]:
+    case = _get_mock_sql_rows("surg", SurgData)
+    preassess = _get_mock_sql_rows("preassess", PreassessData)
+    labs = _get_mock_sql_rows("labs", LabData)
+    echo = _get_mock_sql_rows("echo_2", EchoWithAbnormalData)
+    obs = _get_mock_sql_rows("obs", ObsData)
+    hx = _get_mock_sql_rows("new_hx", MedicalHx)
+    axa = get_axa_codes()
+    pod = _get_mock_sql_rows("pod", ClarityPostopDestination)
+    pa_summary = _get_mock_sql_rows("pa_summary", PreassessSummaryData)
+
+    df = prepare_draft(
+        electives=case,
+        preassess=preassess,
+        labs=labs,
+        echo=echo,
+        obs=obs,
+        axa=axa,
+        pod=pod,
+        medical_hx=hx,
+        to_predict=False,
+        pa_summary=pa_summary,
+    )
+
+    df["icu_prob"] = np.random.rand(df.shape[0])
 
     agg_df = aggregation(
         individual_level_predictions=df,

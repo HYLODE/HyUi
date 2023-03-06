@@ -30,5 +30,5 @@ class IndividualDischargePrediction(BaseModel):
 
 
 class Abacus(BaseModel):
-    date: date
-    probabilities: list
+    date: date | None
+    probabilities: float | list[float]
