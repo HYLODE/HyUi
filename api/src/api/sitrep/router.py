@@ -157,6 +157,7 @@ def get_mock_abacus(num_days: int = 7) -> list[Abacus]:
             Abacus(
                 date=(date.today() + timedelta(days=d)).strftime("%Y-%m-%d"),
                 probabilities=probs.tolist(),
+                department_name="UCH T03 INTENSIVE CARE",
             ),
         )
     return output
