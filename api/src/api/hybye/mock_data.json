@@ -1,0 +1,18 @@
+[ {
+    "location_id": 351331579,
+    "department": "UCH T14 SOUTH ASU",
+    "location_string": "1020100165^T14SASU SR35^SR35-35",
+    "ovl_admission": "2023-02-25T12:05:00+00:00",
+    "ovl_hv_id": 123456,
+    "open_visits_n": 1,
+    "cvl_admission": "2023-02-21T21:40:00+00:00",
+    "cvl_discharge": "2023-02-25T10:19:00+00:00",
+    "cvl_hv_id": 744012176,
+    "ovl_ghost": false,
+    "occupied": true,
+    "patient_class": "INPATIENT",
+    "mrn": "987654321",
+    "lastname": "SMITH",
+    "firstname": "JOHN",
+    "date_of_birth": "1960-01-01"
+  }]

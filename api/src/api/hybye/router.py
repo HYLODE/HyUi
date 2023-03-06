@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 import random
 from typing import List
@@ -171,3 +172,12 @@ def get_inpatient_census(
         census_data.append(CensusData.parse_obj(row))
 
     return census_data
+
+
+@mock_router.get("/census/uch", response_model=List[CensusData])
+def get_mock_inpatient_census() -> List[CensusData]:
+    mock_path = Path(__file__).parent / "mock_data.json"
+    with mock_path.open(encoding="UTF-8") as file:
+        data = json.load(file)
+
+    return [CensusData.parse_obj(row) for row in data]
