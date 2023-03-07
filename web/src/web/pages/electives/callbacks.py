@@ -4,7 +4,7 @@ from web.pages.electives import ids, CAMPUSES
 from web.stores import ids as store_ids
 
 import textwrap
-from datetime import datetime
+from datetime import datetime, date, timedelta
 
 
 @callback(
@@ -138,3 +138,13 @@ ECHOCARDIOGRAPHY:
             for x in string.split("\n")
         ]
     )
+
+
+@callback(
+    Output("date_selector", "minDate"),
+    Output("date_selector", "maxDate"),
+    Output("date_selector", "value"),
+    Input("date_selector", "value"),
+)
+def _update_date_selector(dates_selected: list) -> tuple:
+    return (date.today(), date.today() + timedelta(days=10), dates_selected)

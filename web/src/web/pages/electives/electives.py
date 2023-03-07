@@ -76,8 +76,8 @@ date_selector = html.Div(
     #     children=[
     dmc.DateRangePicker(
         id="date_selector",
-        minDate=date.today(),
-        maxDate=date.today() + timedelta(days=10),
+        # minDate=date.today(),
+        # maxDate=date.today() + timedelta(days=10),
         allowSingleDateInRange=True,
         fullWidth=True,
         value=[date.today(), (date.today() + timedelta(days=3))],
