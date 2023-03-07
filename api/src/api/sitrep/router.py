@@ -157,7 +157,7 @@ def get_mock_abacus(num_days: int = 7) -> list[Abacus]:
             Abacus(
                 date=(date.today() + timedelta(days=d)).strftime("%Y-%m-%d"),
                 probabilities=probs.tolist(),
-                department_name="UCH T03 INTENSIVE CARE",
+                campus="UCH",
             ),
         )
     return output
@@ -180,7 +180,5 @@ def get_abacus(
     )
     # get non elective aggregates (bournville?)
     # compile these into one aggregate probability distribution
-
-    agg_df = agg_electives  # for now
 
     return [Abacus.parse_obj(row) for row in agg_df.to_dict(orient="records")]

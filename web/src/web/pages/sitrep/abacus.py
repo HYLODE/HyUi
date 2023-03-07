@@ -7,9 +7,8 @@ from pathlib import Path
 
 import web.pages.sitrep.callbacks.abacus  # noqa
 
-from web.pages.sitrep import ids
+from web.pages.sitrep import ids, CAMPUSES
 from web.style import replace_colors_in_stylesheet
-from web import SITREP_DEPT2WARD_MAPPING
 
 dash.register_page(__name__, path="/sitrep/abacus", name="Abacus")
 
@@ -20,19 +19,17 @@ with open(Path(__file__).parent / "abacus_style.json") as f:
 timers = html.Div([])
 stores = html.Div([])
 
-dept_selector = dmc.Container(
+campus_selector = html.Div(
     [
         dmc.SegmentedControl(
-            id=ids.DEPT_SELECTOR,
-            value="UCH T03 INTENSIVE CARE",
-            data=[
-                {"value": k, "label": v}
-                for k, v in list(SITREP_DEPT2WARD_MAPPING.items())
-            ],
+            id=ids.CAMPUS_SELECTOR,
+            value=[i.get("value") for i in CAMPUSES if i.get("label") == "UCH"][0],
+            data=CAMPUSES,
+            persistence=True,
+            persistence_type="local",
         ),
-    ],
+    ]
 )
-
 abacus = dmc.Paper(
     [
         cyto.Cytoscape(
@@ -65,7 +62,7 @@ body = dmc.Container(
     [
         dmc.Grid(
             [
-                dmc.Col(dept_selector, offset=9, span=3),
+                dmc.Col(campus_selector, offset=9, span=3),
                 dmc.Col(abacus, span=12),
             ]
         ),

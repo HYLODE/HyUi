@@ -1,6 +1,6 @@
 from dash import Input, Output, callback
 
-from web.pages.sitrep import ids
+from web.pages.sitrep import ids, CAMPUSES
 from web.stores import ids as store_ids
 
 # import math
@@ -9,12 +9,15 @@ import random
 
 @callback(
     Output(ids.ABACUS_CHART, "elements"),
-    Input(ids.DEPT_SELECTOR, "value"),
+    Input(ids.CAMPUS_SELECTOR, "value"),
     Input(store_ids.ABACUS_STORE, "data"),
 )
 def _make_abacus(dept: str, abacus_store: list[dict]) -> list[dict]:
+    campus_dict = {i.get("value"): i.get("label") for i in CAMPUSES}
 
-    dept_abacus = [row for row in abacus_store if dept in row["department_name"]]
+    dept_abacus = [
+        row for row in abacus_store if campus_dict.get(dept, "") in row["campus"]
+    ]
 
     SPACING = 40
     ROW_HEIGHT = 60
