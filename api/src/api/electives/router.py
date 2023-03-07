@@ -337,10 +337,12 @@ def get_electives_aggregate(
         medical_hx=hx,
         pa_summary=pa_summary,
     )
+    df["campus"] = df["department_name"].str.split()[0]
+
     agg_df = (
-        df.groupby("department_name")
+        df.groupby("campus")
         .apply(aggregation, date_column="surgery_date", pred_column="icu_prob")
-        .reset_index()[["department_name", "date", "probabilities"]]
+        .reset_index()[["campus", "date", "probabilities"]]
     )
 
     return [Abacus.parse_obj(row) for row in agg_df.to_dict(orient="records")]
@@ -378,6 +380,6 @@ def get_mock_electives_aggregate() -> list[Abacus]:
         date_column="surgery_date",
         pred_column="icu_prob",
     )
-    agg_df["department_name"] = "UCH T03 INTENSIVE CARE"
+    agg_df["campus"] = "UCH"
 
     return [Abacus.parse_obj(row) for row in agg_df.to_dict(orient="records")]
