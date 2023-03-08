@@ -147,4 +147,11 @@ ECHOCARDIOGRAPHY:
     Input("date_selector", "value"),
 )
 def _update_date_selector(dates_selected: list) -> tuple:
-    return (date.today(), date.today() + timedelta(days=10), dates_selected)
+    if dates_selected is None:
+        return (
+            date.today(),
+            date.today() + timedelta(days=10),
+            [date.today(), (date.today() + timedelta(days=3))],
+        )
+    else:
+        return (date.today(), date.today() + timedelta(days=10), dates_selected)
