@@ -337,7 +337,7 @@ def get_electives_aggregate(
         medical_hx=hx,
         pa_summary=pa_summary,
     )
-    df["campus"] = df["department_name"].str.split()[0]
+    df["campus"] = df["department_name"].str.split(" ").str[0]
 
     agg_df = (
         df.groupby("campus")
