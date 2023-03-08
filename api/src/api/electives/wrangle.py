@@ -9,7 +9,8 @@ from pydantic import BaseModel
 # from category_encoders import TargetEncoder
 from api.convert import to_data_frame
 import pickle
-from pathlib import Path
+import requests
+from api.config import get_settings
 
 from models.electives import (
     PreassessSummaryData,
@@ -118,13 +119,25 @@ def prepare_draft(
             )
         )
 
-        model_loc = "deploy/feb-3-xgb.pkl"
-        with open((Path(__file__).parent / model_loc), "rb") as pickle_file:
-            pipeline = pickle.load(pickle_file)
+        model_name = "hrishee-electives-rfr-pipeline"
+        model_version = "4"
 
-        model = pipeline.best_estimator_
+        mlflow_var = get_settings().mlflow_url
+        model_uri = f"{mlflow_var}/api/2.0/mlflow/registered-models/get"
+        response = requests.get(
+            model_uri, params={"name": model_name, "version": model_version}
+        )
+        source = response.json()["registered_model"]["latest_versions"][0]["source"]
+        ml_exp, run_id = source.split("/")[4:6]
+        mlflowmodel_url = (
+            f"{mlflow_var}/get-artifact?path=pipeline/model.pkl&run_uuid={run_id}"
+        )
+        mlflowmodel = pickle.loads(requests.get(mlflowmodel_url).content)
+        model = mlflowmodel.best_estimator_
         cols = model[1].feature_names_in_
         preds = model.predict_proba(df[cols])[:, 1]
+
+        df["icu_prob"] = preds
 
         # model_name='hrishee-feb-3-xgb'
         # model_version = 4
