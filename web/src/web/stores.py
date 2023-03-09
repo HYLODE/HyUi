@@ -7,6 +7,8 @@ import requests
 import warnings
 from dash import Input, Output, callback, dcc, html
 
+import pandas as pd
+
 # from web import SITREP_DEPT2WARD_MAPPING
 
 from models.beds import Bed, Department, Room
@@ -130,27 +132,43 @@ def _store_all_sitreps(_: int) -> dict:
 @callback(
     Output(ids.ABACUS_STORE, "data"),
     Input(ids.STORE_TIMER_6H, "n_intervals"),
+    Input(ids.SITREP_STORE, "data"),
     background=True,
 )
-def _store_all_abacus(_: int) -> list[dict]:
-
+def _store_all_abacus(_: int, sitrep_store: list[dict]) -> list[dict]:
     if get_settings().api_url.split("/")[-1] == "mock":
         num_beds = 24
         num_days = 7
-        output = []
-        for d in range(num_days):
-            histogram, _ = np.histogram(np.random.randn(num_beds), bins=num_beds)
-            probs = np.divide(np.flip(np.cumsum(histogram)), num_beds)
-            probs[: np.random.randint(5, 15)] = 1
-            output.append(
-                Abacus(
-                    date=(date.today() + timedelta(days=d)).strftime("%Y-%m-%d"),
-                    probabilities=probs.tolist(),
-                    campus="UCH",
-                ),
-            )
+        p, d, c = [], [], []
+        for campus in ["UCH", "GWB", "WMS", "NHNN"]:
+            for i in range(num_days):
+                histogram, _ = np.histogram(np.random.randn(num_beds), bins=num_beds)
+                probs = np.divide(np.flip(np.cumsum(histogram)), num_beds)
+                probs[: np.random.randint(5, 15)] = 1
+                p.append(probs.tolist())
+                d.append((date.today() + timedelta(days=i)).strftime("%Y-%m-%d"))
+                c.append(campus)
+        return [
+            Abacus.parse_obj(row).dict()
+            for row in pd.DataFrame(
+                columns=["campus", "date", "probabilities"], data=zip(c, d, p)
+            ).to_dict(orient="records")
+        ]
+        #  I'm not sure why this stopped working...
+        #  output.append(
+        #     Abacus(
+        #         date=(date.today() + timedelta(days=d)).strftime("%Y-%m-%d"),
+        #         probabilities=probs.tolist(),
+        #         campus="UCH",
+        #     ),
+        # )
+
     else:
         # get current number of beds
+        # UCH_store = sitrep_store["T03"] + sitrep_store["T06"]
+        # WMS_store = sitrep_store["WMS"]
+        # GWB_store = sitrep_store["GWB"]
+        # NHNN_store = sitrep_store["NHNNC1"] + sitrep_store["NHNNC0"]
 
         elective_pmf = parse_to_data_frame(
             requests.get(url=f"{get_settings().api_url}/electives/aggregate/").json(),
@@ -169,11 +187,9 @@ def _store_all_abacus(_: int) -> list[dict]:
         abacus_cmf["probabilities"] = abacus_pmf["probabilities"].apply(
             lambda x: (1 - np.cumsum(x)).tolist()
         )
-        output = [
+        return [
             Abacus.parse_obj(row).dict() for row in abacus_cmf.to_dict(orient="records")
         ]
-
-    return output
 
 
 stores = html.Div(
