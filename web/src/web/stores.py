@@ -7,7 +7,7 @@ import requests
 import warnings
 from dash import Input, Output, callback, dcc, html
 
-import pandas as pd
+# import pandas as pd
 
 # from web import SITREP_DEPT2WARD_MAPPING
 
@@ -18,7 +18,7 @@ from web import ids
 from web.config import get_settings
 from web.convert import parse_to_data_frame
 
-from datetime import date, timedelta
+# from datetime import date, timedelta
 
 import numpy as np
 
@@ -136,82 +136,103 @@ def _store_all_sitreps(_: int) -> dict:
     background=True,
 )
 def _store_all_abacus(_: int, sitrep_store: dict) -> list[dict]:
-    if get_settings().api_url.split("/")[-1] == "mock":
-        num_beds = 24
-        num_days = 7
-        p, d, c = [], [], []
-        for campus in ["UCH", "GWB", "WMS", "NHNN"]:
-            for i in range(num_days):
-                histogram, _ = np.histogram(np.random.randn(num_beds), bins=num_beds)
-                probs = np.divide(np.flip(np.cumsum(histogram)), num_beds)
-                probs[: np.random.randint(5, 15)] = 1
-                p.append(probs.tolist())
-                d.append((date.today() + timedelta(days=i)).strftime("%Y-%m-%d"))
-                c.append(campus)
-        return [
-            Abacus.parse_obj(row).dict()
-            for row in pd.DataFrame(
-                columns=["campus", "date", "probabilities"], data=zip(c, d, p)
-            ).to_dict(orient="records")
-        ]
-        #  I'm not sure why this stopped working...
-        #  output.append(
-        #     Abacus(
-        #         date=(date.today() + timedelta(days=d)).strftime("%Y-%m-%d"),
-        #         probabilities=probs.tolist(),
-        #         campus="UCH",
-        #     ),
-        # )
+    # if get_settings().api_url.split("/")[-1] == "mock":
+    #     num_beds = 24
+    #     num_days = 7
+    #     p, d, c = [], [], []
+    #     for campus in ["UCH", "GWB", "WMS", "NHNN"]:
+    #         for i in range(num_days):
+    #             histogram, _ = np.histogram(np.random.randn(num_beds), bins=num_beds)
+    #             probs = np.divide(np.flip(np.cumsum(histogram)), num_beds)
+    #             probs[: np.random.randint(5, 15)] = 1
+    #             p.append(probs.tolist())
+    #             d.append((date.today() + timedelta(days=i)).strftime("%Y-%m-%d"))
+    #             c.append(campus)
+    #     return [
+    #         Abacus.parse_obj(row).dict()
+    #         for row in pd.DataFrame(
+    #             columns=["campus", "date", "probabilities"], data=zip(c, d, p)
+    #         ).to_dict(orient="records")
+    #     ]
+    #     #  I'm not sure why this stopped working...
+    #     #  output.append(
+    #     #     Abacus(
+    #     #         date=(date.today() + timedelta(days=d)).strftime("%Y-%m-%d"),
+    #     #         probabilities=probs.tolist(),
+    #     #         campus="UCH",
+    #     #     ),
+    # #     # )
 
-    else:
-        UCH = sitrep_store["T03"] + sitrep_store["T06"]
-        WMS = sitrep_store["WMS"]
-        GWB = sitrep_store["GWB"]
-        NHNN = sitrep_store["NHNNC1"] + sitrep_store["NHNNC0"]
+    # else:
+    grouped_stores = {
+        "UCH": sitrep_store["T03"] + sitrep_store["T06"],
+        "WMS": sitrep_store["WMS"],
+        "GWB": sitrep_store["GWB"],
+        "NHNN": sitrep_store["NHNNC1"] + sitrep_store["NHNNC0"],
+    }
 
-        # get current number of occupied beds
-        for dept in [UCH, WMS, GWB, NHNN]:
-            occupied_beds = len(dept)
+    all_elective_pmf = parse_to_data_frame(
+        requests.get(url=f"{get_settings().api_url}/electives/aggregate/").json(),
+        Abacus,
+    )
+
+    abaci = []
+
+    for d in all_elective_pmf["date"].unique():
+        for campus_short, sitrep_data in grouped_stores.items():
+            occupied_beds = len(sitrep_data)
             discharge_ready = len(
-                [a for a in dept if a["discharge_ready_1_4h"] == "Yes"]
+                [a for a in sitrep_data if a["discharge_ready_1_4h"] == "Yes"]
             )
+
             occupied_pmf = np.zeros(occupied_beds + 1)
             occupied_pmf[occupied_beds] = 1
 
+            # TODO: placeholder -  using "discharge ready" rather than modelled
+            #  - unsure best place to get from?
             discharge_pmf = np.zeros(discharge_ready + 1)
             discharge_pmf[discharge_ready] = -1
             # ?? are these bits the right parts of the census store?
 
-        # placeholder non-electives code - poisson around manually entered lambda
-        # should be a api call to aggregate part of bournville?
-        lam = 3
-        repts = 1000
-        non_elective_pmf, _ = np.histogram(
-            np.random.poisson(lam, repts), bins=range(0, 20, 1), density=True
-        )
+            elective_df = all_elective_pmf[
+                (all_elective_pmf["campus"] == campus_short)
+                & (all_elective_pmf["date"] == d)
+            ]
+            elective_pmf = np.array(elective_df.loc[0, "probabilities"])
+            # TODO: placeholder non-electives code - poisson
+            # around manually entered lambda
+            # should be an api call to aggregate part of bournville?
 
-        # electives aggregate
-        elective_pmf = parse_to_data_frame(
-            requests.get(url=f"{get_settings().api_url}/electives/aggregate/").json(),
-            Abacus,
-        )
-        # combine pmfs
-        abacus_pmf = np.convolve(
-            np.convolve(np.convolve(occupied_pmf, discharge_pmf), elective_pmf),
-            non_elective_pmf,
-        )
-        # temporary combination when just one value
-        # abacus_pmf = elective_pmf
+            lam = 2
+            repts = 1000
+            n_beds = 20
+            non_elective_pmf, _ = np.histogram(
+                np.random.poisson(lam, repts), bins=range(0, n_beds, 1), density=True
+            )
 
-        # cumulative distribution function
-        abacus_cmf = abacus_pmf.copy()
-        abacus_cmf["probabilities"] = (
-            abacus_pmf["probabilities"].apply(lambda x: (1 - np.cumsum(x))).tolist()
-        )
+            # combine pmfs (per date per campus)
+            abacus_pmf = np.convolve(
+                np.convolve(np.convolve(occupied_pmf, discharge_pmf), elective_pmf),
+                non_elective_pmf,
+            )
 
-        return [
-            Abacus.parse_obj(row).dict() for row in abacus_cmf.to_dict(orient="records")
-        ]
+            # make cumulative function
+            abacus_cmf = np.cumsum(abacus_pmf)
+            if np.sum(abacus_cmf) < 0:
+                abacus_cmf = abacus_cmf + 1
+
+            abaci.append(
+                Abacus(
+                    date=d,
+                    probabilities=abacus_cmf,
+                    campus=campus_short,
+                )
+            )
+
+    return abaci
+
+
+# [Abacus.parse_obj(row).dict() for row in abaci.to_dict(orient="records")]
 
 
 stores = html.Div(

@@ -122,8 +122,8 @@ def prepare_draft(
             )
         )
 
-        model_name = "hrishee-electives-rfr-pipeline"
-        model_version = "4"
+        model_name = "hrishee-electives-xgb-pipeline"
+        model_version = "2"
 
         mlflow_var = get_settings().mlflow_url
         model_uri = f"{mlflow_var}/api/2.0/mlflow/registered-models/get"
