@@ -7,7 +7,7 @@ import requests
 import warnings
 from dash import Input, Output, callback, dcc, html
 
-# import pandas as pd
+import pandas as pd
 
 # from web import SITREP_DEPT2WARD_MAPPING
 
@@ -176,7 +176,7 @@ def _store_all_abacus(_: int, sitrep_store: dict) -> list[dict]:
         Abacus,
     )
 
-    abaci = []
+    pf, df, cf = [], [], []
 
     for d in all_elective_pmf["date"].unique():
         for campus_short, sitrep_data in grouped_stores.items():
@@ -224,15 +224,24 @@ def _store_all_abacus(_: int, sitrep_store: dict) -> list[dict]:
             if np.sum(abacus_cmf) < 0:
                 abacus_cmf = abacus_cmf + 1
 
-            abaci.append(
-                Abacus(
-                    date=d,
-                    probabilities=abacus_cmf.tolist(),
-                    campus=campus_short,
-                )
-            )
+            pf.append(abacus_cmf.tolist())
+            df.append(d)
+            cf.append(campus_short)
 
-    return abaci
+            # abaci.append(
+            #     Abacus(
+            #         date=d,
+            #         probabilities=abacus_cmf.tolist(),
+            #         campus=campus_short,
+            #     )
+            # )
+
+    return [
+        Abacus.parse_obj(row).dict()
+        for row in pd.DataFrame(
+            columns=["campus", "date", "probabilities"], data=zip(cf, df, pf)
+        ).to_dict(orient="records")
+    ]
 
 
 # [Abacus.parse_obj(row).dict() for row in abaci.to_dict(orient="records")]
