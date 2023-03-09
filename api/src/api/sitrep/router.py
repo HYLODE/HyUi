@@ -1,8 +1,7 @@
 import warnings
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 from pathlib import Path
 from urllib.parse import urlencode
-import numpy as np
 import requests
 from fastapi import APIRouter, Depends, Response
 from fastapi.responses import RedirectResponse
@@ -11,12 +10,11 @@ from sqlmodel import Session
 
 from api.config import Settings, get_settings
 
-from api.convert import parse_to_data_frame
 from api.baserow import BaserowAuthenticator
 
 # TODO: Give sitrep its own CensusRow model so we do not have interdependencies.
 from models.census import CensusRow
-from models.sitrep import SitrepRow, BedRow, Abacus
+from models.sitrep import SitrepRow, BedRow
 
 CORE_FIELDS = [
     "department",
@@ -142,43 +140,3 @@ def update_bed_row(
         },
         json=data,
     )
-
-
-@mock_router.get("/abacus/", response_model=list[Abacus])
-def get_mock_abacus(num_days: int = 7) -> list[Abacus]:
-    num_beds = 24
-    num_days = 7
-    output = []
-    for d in range(num_days):
-        histogram, _ = np.histogram(np.random.randn(num_beds), bins=num_beds)
-        probs = np.divide(np.flip(np.cumsum(histogram)), num_beds)
-        probs[: np.random.randint(5, 15)] = 1
-        output.append(
-            Abacus(
-                date=(date.today() + timedelta(days=d)).strftime("%Y-%m-%d"),
-                probabilities=probs.tolist(),
-                campus="UCH",
-            ),
-        )
-    return output
-
-
-@router.get("/abacus/", response_model=list[Abacus])
-def get_abacus(
-    num_days: int = 7, settings: Settings = Depends(get_settings)
-) -> list[Abacus]:
-
-    # build an output set of dates
-    # extract current set of beds
-
-    # pull electives data
-    response = requests.get(url=f"{settings.api_url}/electives/aggregate/")
-    agg_electives = parse_to_data_frame(response.json(), Abacus)
-    agg_df = agg_electives.copy()
-    agg_df["probabilities"] = agg_df["probabilities"].apply(
-        lambda x: (1 - np.cumsum(x)).tolist()
-    )
-    # get non elective aggregates (bournville?)
-    # compile these into one aggregate probability distribution
-
-    return [Abacus.parse_obj(row) for row in agg_df.to_dict(orient="records")]

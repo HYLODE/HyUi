@@ -14,6 +14,11 @@ from models.electives import MergedData
 from models.sitrep import SitrepRow, Abacus
 from web import ids
 from web.config import get_settings
+from web.convert import parse_to_data_frame
+
+from datetime import date, timedelta
+
+import numpy as np
 
 
 # TODO: add a refresh button as an input to the store functions pulling from
@@ -128,16 +133,47 @@ def _store_all_sitreps(_: int) -> dict:
     background=True,
 )
 def _store_all_abacus(_: int) -> list[dict]:
-    # abaci = {}
-    # for long, short in SITREP_DEPT2WARD_MAPPING.items():
-    #     response = requests.get(
-    #         f"{get_settings().api_url}/sitrep/abacus/?department={short}"
-    #     )
-    #     res = [Abacus.parse_obj(row).dict() for row in response.json()]
-    #     abaci[long] = res
-    response = requests.get(f"{get_settings().api_url}/sitrep/abacus/")
 
-    return [Abacus.parse_obj(row).dict() for row in response.json()]
+    if get_settings().api_url.split("/")[-1] == "mock":
+        num_beds = 24
+        num_days = 7
+        output = []
+        for d in range(num_days):
+            histogram, _ = np.histogram(np.random.randn(num_beds), bins=num_beds)
+            probs = np.divide(np.flip(np.cumsum(histogram)), num_beds)
+            probs[: np.random.randint(5, 15)] = 1
+            output.append(
+                Abacus(
+                    date=(date.today() + timedelta(days=d)).strftime("%Y-%m-%d"),
+                    probabilities=probs.tolist(),
+                    campus="UCH",
+                ),
+            )
+    else:
+        # get current number of beds
+
+        elective_pmf = parse_to_data_frame(
+            requests.get(url=f"{get_settings().api_url}/electives/aggregate/").json(),
+            Abacus,
+        )
+
+        # combine pmfs
+        # abacus_cmf = np.convolve(
+        #     np.convolve(np.convolve(admitted_pmf, discharged_pmf), electives_pmf),
+        #     non_electives_pmf,
+        # )
+        abacus_pmf = elective_pmf
+
+        # combine to cumulative distribution function
+        abacus_cmf = abacus_pmf.copy()
+        abacus_cmf["probabilities"] = abacus_pmf["probabilities"].apply(
+            lambda x: (1 - np.cumsum(x)).tolist()
+        )
+        output = [
+            Abacus.parse_obj(row).dict() for row in abacus_cmf.to_dict(orient="records")
+        ]
+
+    return output
 
 
 stores = html.Div(
