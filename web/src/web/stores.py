@@ -198,7 +198,10 @@ def _store_all_abacus(_: int, sitrep_store: dict) -> list[dict]:
                 (all_elective_pmf["campus"] == campus_short)
                 & (all_elective_pmf["date"] == d)
             ]
-            elective_pmf = np.array(elective_df["probabilities"].values[0])
+            if elective_df.empty:
+                elective_pmf = np.zeros(10)
+            else:
+                elective_pmf = np.array(elective_df["probabilities"].values[0])
             # TODO: placeholder non-electives code - poisson
             # around manually entered lambda
             # should be an api call to aggregate part of bournville?
