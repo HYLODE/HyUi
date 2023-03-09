@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
-import sympy as sym
+
+# import sympy as sym
 
 from pydantic import BaseModel
 
@@ -227,43 +228,80 @@ def aggregation(
         list
     )
 
-    s = sym.Symbol("s")
-    r = sym.Symbol("r")
-    syms = sym.symbols("r0:175")
-    core_expression = (1 - r) + r * s
+    # s = sym.Symbol("s")
+    # r = sym.Symbol("r")
+    # syms = sym.symbols("r0:175")
+    # core_expression = (1 - r) + r * s
 
-    def ex(ri: sym.Symbol) -> sym.Expr:
-        return core_expression.subs({r: ri})
+    # def ex(ri: sym.Symbol) -> sym.Expr:
+    #     return core_expression.subs({r: ri})
 
-    def build_expression(n: int) -> sym.Expr:
-        expression = 1
-        for i in range(n):
-            expression = expression * ex(syms[i])
-        return expression
+    # def build_expression(n: int) -> sym.Expr:
+    #     expression = 1
+    #     for i in range(n):
+    #         expression = expression * ex(syms[i])
+    #     return expression
 
-    def expression_subs(
-        expression: sym.Expr, n: int, predictions: list[float]
-    ) -> sym.Expr:
-        substitution = dict(zip(syms[0:n], predictions[0:n]))
-        return expression.subs(substitution)
+    # def expression_subs(
+    #     expression: sym.Expr, n: int, predictions: list[float]
+    # ) -> sym.Expr:
+    #     substitution = dict(zip(syms[0:n], predictions[0:n]))
+    #     return expression.subs(substitution)
 
-    def return_coeff(expression: sym.Expr, i: int) -> sym.Expr:
-        return sym.expand(expression).coeff(s, i)
+    # def return_coeff(expression: sym.Expr, i: int) -> sym.Expr:
+    #     return sym.expand(expression).coeff(s, i)
 
-    def pred_proba_to_pred_demand(predictions_proba: list[float]) -> list[float]:
-        n = len(predictions_proba)
-        expression = build_expression(n)
-        expression = expression_subs(expression, n, predictions_proba)
-        pred_demand = [return_coeff(expression, i) for i in range(n + 1)]
-        return pred_demand
+    # def pred_proba_to_pred_demand(predictions_proba: list[float]) -> list[float]:
+    #     n = len(predictions_proba)
+    #     expression = build_expression(n)
+    #     expression = expression_subs(expression, n, predictions_proba)
+    #     pred_demand = [return_coeff(expression, i) for i in range(n + 1)]
+    #     return pred_demand
 
-    agg_series = agg_series.apply(pred_proba_to_pred_demand)
-    # agg_df = (
-    #     pd.DataFrame(agg_series)
-    #     .reset_index()
-    #     .rename(columns={"surgery_date": "date", "icu_prob": "probabilities"})
+    # agg_demand = agg_series.apply(pred_proba_to_pred_demand)
+
+    # agg_demand_df = pd.DataFrame(
+    #     {"date": agg_demand.index, "probabilities": agg_demand.array}
     # )
 
-    agg_df = pd.DataFrame({"date": agg_series.index, "probabilities": agg_series.array})
+    def poisson_binomial(probs: list[float]) -> list[float]:
+        # we want a poisson binomial distribution for electives.
+        # I have adapted the maths from
+        # https://github.com/tsakim/poibin/blob/master/poibin.py
 
-    return agg_df
+        # this uses a discrete fourier transform of the PB dist
+        # timeit() 895us vs 1.71s.
+        # the output is the same as above
+
+        success_probs = np.array(probs)
+        number_trials = len(probs)
+        omega = 2 * np.pi / (number_trials + 1)
+        chi = np.empty(number_trials + 1, dtype=complex)
+        chi[0] = 1
+        half_number_trials = int(number_trials / 2 + number_trials % 2)
+
+        exp_value = np.exp(omega * np.arange(1, half_number_trials + 1) * 1j)
+
+        xy = 1 - success_probs + success_probs * exp_value[:, np.newaxis]
+
+        argz_sum = np.arctan2(xy.imag, xy.real).sum(axis=1)
+
+        exparg = np.log(np.abs(xy)).sum(axis=1)
+        d_value = np.exp(exparg)
+        chi[1 : half_number_trials + 1] = d_value * np.exp(argz_sum * 1j)
+
+        # set second half of chis:
+        chi[half_number_trials + 1 : number_trials + 1] = np.conjugate(
+            chi[1 : number_trials - half_number_trials + 1][::-1]
+        )
+
+        chi /= number_trials + 1
+        xi = np.fft.fft(chi)
+        xi += np.finfo(type(xi[0])).eps
+        return xi.real.tolist()  # type: ignore
+
+    agg_demand_2 = agg_series.apply(poisson_binomial)
+    agg_demand_df_2 = pd.DataFrame(
+        {"date": agg_demand_2.index, "probabilities": agg_demand_2.array}
+    )
+    return agg_demand_df_2
