@@ -135,7 +135,7 @@ def _store_all_sitreps(_: int) -> dict:
     Input(ids.SITREP_STORE, "data"),
     background=True,
 )
-def _store_all_abacus(_: int, sitrep_store: list[dict]) -> list[dict]:
+def _store_all_abacus(_: int, sitrep_store: dict) -> list[dict]:
     if get_settings().api_url.split("/")[-1] == "mock":
         num_beds = 24
         num_days = 7
@@ -164,29 +164,51 @@ def _store_all_abacus(_: int, sitrep_store: list[dict]) -> list[dict]:
         # )
 
     else:
-        # get current number of beds
-        # UCH_store = sitrep_store["T03"] + sitrep_store["T06"]
-        # WMS_store = sitrep_store["WMS"]
-        # GWB_store = sitrep_store["GWB"]
-        # NHNN_store = sitrep_store["NHNNC1"] + sitrep_store["NHNNC0"]
+        UCH = sitrep_store["T03"] + sitrep_store["T06"]
+        WMS = sitrep_store["WMS"]
+        GWB = sitrep_store["GWB"]
+        NHNN = sitrep_store["NHNNC1"] + sitrep_store["NHNNC0"]
 
+        # get current number of occupied beds
+        for dept in [UCH, WMS, GWB, NHNN]:
+            occupied_beds = len(dept)
+            discharge_ready = len(
+                [a for a in dept if a["discharge_ready_1_4h"] == "Yes"]
+            )
+            occupied_pmf = np.zeros(occupied_beds + 1)
+            occupied_pmf[occupied_beds] = 1
+
+            discharge_pmf = np.zeros(discharge_ready + 1)
+            discharge_pmf[discharge_ready] = -1
+            # ?? are these bits the right parts of the census store?
+
+        # placeholder non-electives code - poisson around manually entered lambda
+        # should be a api call to aggregate part of bournville?
+        lam = 3
+        repts = 1000
+        non_elective_pmf, _ = np.histogram(
+            np.random.poisson(lam, repts), bins=range(0, 20, 1), density=True
+        )
+
+        # electives aggregate
         elective_pmf = parse_to_data_frame(
             requests.get(url=f"{get_settings().api_url}/electives/aggregate/").json(),
             Abacus,
         )
-
         # combine pmfs
-        # abacus_cmf = np.convolve(
-        #     np.convolve(np.convolve(admitted_pmf, discharged_pmf), electives_pmf),
-        #     non_electives_pmf,
-        # )
-        abacus_pmf = elective_pmf
-
-        # combine to cumulative distribution function
-        abacus_cmf = abacus_pmf.copy()
-        abacus_cmf["probabilities"] = abacus_pmf["probabilities"].apply(
-            lambda x: (1 - np.cumsum(x)).tolist()
+        abacus_pmf = np.convolve(
+            np.convolve(np.convolve(occupied_pmf, discharge_pmf), elective_pmf),
+            non_elective_pmf,
         )
+        # temporary combination when just one value
+        # abacus_pmf = elective_pmf
+
+        # cumulative distribution function
+        abacus_cmf = abacus_pmf.copy()
+        abacus_cmf["probabilities"] = (
+            abacus_pmf["probabilities"].apply(lambda x: (1 - np.cumsum(x))).tolist()
+        )
+
         return [
             Abacus.parse_obj(row).dict() for row in abacus_cmf.to_dict(orient="records")
         ]
