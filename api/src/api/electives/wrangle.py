@@ -219,14 +219,13 @@ def aggregation(
     pred_column: str,
 ) -> pd.DataFrame:
 
+    agg_series = individual_level_predictions.groupby(date_column)[pred_column].apply(
+        list
+    )
     # this code is from HyMind - Jen had got from Zella I think
     # TODO get my head around this
     # to instead write something that doesn't need sympy etc
     # I think it should be possible fairly easily with eg. scipy.comb
-
-    agg_series = individual_level_predictions.groupby(date_column)[pred_column].apply(
-        list
-    )
 
     # s = sym.Symbol("s")
     # r = sym.Symbol("r")

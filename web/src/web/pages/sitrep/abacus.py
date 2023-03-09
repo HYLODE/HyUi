@@ -2,7 +2,7 @@ import dash
 import dash_cytoscape as cyto
 import dash_mantine_components as dmc
 import json
-from dash import html
+from dash import html, dcc
 from pathlib import Path
 
 import web.pages.sitrep.callbacks.abacus  # noqa
@@ -17,7 +17,15 @@ with open(Path(__file__).parent / "abacus_style.json") as f:
     abacus_style = replace_colors_in_stylesheet(abacus_style)
 
 timers = html.Div([])
-stores = html.Div([])
+stores = html.Div(
+    [
+        dcc.Store(id=ids.ROOMS_OPEN_STORE),
+        dcc.Store(id=ids.BEDS_STORE),
+        dcc.Store(id=ids.CENSUS_STORE),
+        dcc.Store(id=ids.SITREP_STORE),
+        dcc.Store(id=ids.DISCHARGES_STORE),
+    ]
+)
 
 campus_selector = html.Div(
     [
