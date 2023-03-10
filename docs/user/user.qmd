@@ -2,6 +2,31 @@
 title: User guide for HYLODE
 ---
 
+# HySys
+Your first port of call for all questions HySys should be the [top-level repository documentation](https://github.com/HYLODE/HySys/blob/main/hylode/README.md). Some tips and tricks for particularly common patterns are given here.
 
+## Deployment
+Deployment instructions for a fresh installation of HySys are provided in the readme linked to above. To redeploy an already existing deployment on the NHS network:
+
+1. Navigate to the directory containing the checked out repository. Locations are provided [here](https://github.com/HYLODE/HySys/blob/main/hylode/README.md) for the `staging_red` and `prod` deployments.
+2. Navigate to the the `hylode/` directory (containing `docker-compose.yml`)
+3. From within a `tmux` or `screen` session, execute the `bin/up.sh` script to deploy most of the back-end HySys services
+    - you can execute this by running `./bin/up.sh` on the command line
+    - it's recommended to run this command inside a `tmux` or `screen` session
+
+This will redeploy all *non-interactive* services - everything but the HyMind `Lab` and `Field`.
+
+### Interactive service deployment
+To deploy the `HyMind Lab` and `HyMind Field` services, execute `./bin/interactive-up.sh`. Again, it's recommended that you do this within a `screen` or `tmux` session.
+
+## Taking services down
+To take down all running services - including interactive services described above:
+
+1. Navigate to the directory containing the checked out repository. Locations are provided [here](https://github.com/HYLODE/HySys/blob/main/hylode/README.md) for the `staging_red` and `prod` deployments.
+2. Navigate to the the `hylode/` directory (containing `docker-compose.yml`)
+3. Run `./bin/down.sh` from the command line
+    - Optionally provide the `--remove-orphans` flag to remove hanging containers and networks. This **will not** remove any associated docker volumes, so is safe from a data-loss perspective.
+
+## Please note
 - the application is only accessible from within the UCLH network
 - usernames and passwords are available after training from the development team
