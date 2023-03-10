@@ -4,7 +4,6 @@ import json
 import warnings
 from dash import dash_table as dtable, html
 from pathlib import Path
-from datetime import date, timedelta
 
 import web.pages.electives.callbacks  # noqa
 from web.pages.electives import CAMPUSES, ids
@@ -68,22 +67,11 @@ pacu_selector = html.Div(
 )
 
 date_selector = html.Div(
-    # dmc.Tooltip(
-    #     label="Double-click on a date to select a single day",
-    #     multiline=True,
-    #     position="top",
-    #     openDelay=500,
-    #     children=[
     dmc.DateRangePicker(
         id="date_selector",
-        minDate=date.today(),
-        maxDate=date.today() + timedelta(days=10),
         allowSingleDateInRange=True,
         fullWidth=True,
-        value=[date.today(), (date.today() + timedelta(days=3))],
     ),
-    # ],
-    # )
 )
 
 
