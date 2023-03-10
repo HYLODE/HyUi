@@ -1,18 +1,24 @@
 from functools import lru_cache
 
-from pydantic import BaseSettings, SecretStr, AnyHttpUrl
+from pydantic import BaseSettings, SecretStr, AnyHttpUrl, AnyUrl, Field
 
 
 class Settings(BaseSettings):
+    debug: int = Field(..., env="DEBUG")  # 0 = False, 1 = True
     username: str
     password: SecretStr
     secret_key: SecretStr
 
     # The port to use when running in development mode.
-    development_port: str = "8300"
+    development_port: str = "8000"
 
     api_url: AnyHttpUrl
     baserow_public_url: AnyHttpUrl
+    celery_dash_broker_url: AnyUrl
+    celery_dash_result_backend: AnyUrl
+    redis_cache: AnyUrl
+
+    slack_log_webhook: SecretStr
 
     class Config:
         # The prefix below scopes the .env variables.

@@ -50,7 +50,7 @@ def test_function():
 def sql_query_from_file(query_file, sql_dir=None, verbose=True):
     """Read SQL from a text file"""
     if not sql_dir:
-        sql_dir = Path.cwd() / "sql"
+        sql_dir = Path(__file__).parent.resolve() / "sql"
     f = sql_dir / query_file
     query = f.read_text()
     if verbose:
@@ -59,6 +59,7 @@ def sql_query_from_file(query_file, sql_dir=None, verbose=True):
 
 
 ### Build the flexible query class
+
 
 # This produces a sql query given some parameters as input
 # It is significantly simplified from the first iteration
@@ -143,7 +144,6 @@ class FlexibleSqlQuery:
         self.generate_query()
 
     def others(self, subtype: str, end_time: str, hv_ids: np.array):
-
         # Make sure that we can't change the purpose of different queries
         if self.type:
             if self.type != "others":
@@ -154,18 +154,15 @@ class FlexibleSqlQuery:
             self.type = "others"
 
         if subtype == "labs":
-
             # Again we are hard coding that labs query has to be from this file
             self.unformatted_query = sql_query_from_file("Labs_V3.sql", verbose=False)
 
         elif subtype == "consults":
-
             self.unformatted_query = sql_query_from_file(
                 "Consults_V3.sql", verbose=False
             )
 
         elif subtype == "others":
-
             self.unformatted_query = sql_query_from_file("Others_V3.sql", verbose=False)
             # Note that for others the time window is how far to look back for recent theatres and ICU
 
@@ -194,7 +191,8 @@ class FlexibleSqlQuery:
 # Potentially should have some rules about returning nas (2 values for the slope, 3 values for the r value)
 def linear_slope(x_input: np.array, returns: str) -> int:
     """Function that takes an series and returns the slope of a linear fit or r value
-    Takes a numpy array as its input, requires to specify whether it should return r value or slope"""
+    Takes a numpy array as its input, requires to specify whether it should return r value or slope
+    """
 
     # Name the various inputs for R value
     R = ("r", "R", "r value", "r-value", "r_value", "R value", "R-value", "R_value")
@@ -532,7 +530,6 @@ def run_pipeline(date_list: list, engine, now: bool = False) -> pd.DataFrame:
 
     # Work through all of the dates to get ICU admission after 24h from ward patients
     for number, date in enumerate(date_list):
-
         if not now:
             # Using 09:30 as this is when sitrep is - change the start time on both of the sql queries, formatted for postgres, alternating day and night
             end_time = "DATE '" + str(date) + " 09:30:00'"
@@ -1112,7 +1109,6 @@ def run_pipeline(date_list: list, engine, now: bool = False) -> pd.DataFrame:
         )
 
         for colname in cols_for_agg:
-
             all_colnames = [
                 f"Mean_{colname}",
                 f"Slope_{colname}",
@@ -1141,14 +1137,12 @@ def run_pipeline(date_list: list, engine, now: bool = False) -> pd.DataFrame:
             )
 
         for colname in cols_for_last:
-
             # We're looping through all of the columns calling these aggregate functions
             final_inputs.loc[:, colname] = Transformed_dataframe.groupby(
                 "hospital_visit_id"
             ).agg(**{colname: pd.NamedAgg(colname, aggfunc="last")})
 
         for colname in cols_for_count:
-
             # We're looping through all of the columns calling these aggregate functions
             final_inputs.loc[:, colname] = Transformed_dataframe.groupby(
                 "hospital_visit_id"

@@ -3,19 +3,13 @@ from types import SimpleNamespace
 from typing import Any
 
 from web.pages.sitrep import ids
-from web.pages.sitrep.callbacks.cytoscape import format_census
+from web.pages.sitrep.callbacks.census import format_census
 
 DEBUG = True
 
 
 @callback(Output(ids.BED_SELECTOR_WARD, "children"), Input(ids.CYTO_WARD, "elements"))
 def _prep_bed_selector(elements: list[dict]) -> list[Any]:
-    data = [
-        ele.get("data", {})
-        for ele in elements
-        if ele.get("data", {}).get("entity") == "bed"
-    ]
-
     header = [
         html.Thead(
             [
@@ -29,6 +23,15 @@ def _prep_bed_selector(elements: list[dict]) -> list[Any]:
                 )
             ]
         )
+    ]
+
+    if not elements:
+        return header + []
+
+    data = [
+        ele.get("data", {})
+        for ele in elements
+        if ele.get("data", {}).get("entity") == "bed"
     ]
 
     rows = []

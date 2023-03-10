@@ -10,7 +10,8 @@ from pathlib import Path
 import web.pages.sitrep.callbacks.cytoscape  # noqa
 import web.pages.sitrep.callbacks.inspector  # noqa
 import web.pages.sitrep.callbacks.widgets  # noqa
-from web.pages.sitrep import CAMPUSES, ids
+from web.pages.sitrep.layouts.widgets import campus_selector
+from web.pages.sitrep import ids
 from web.style import colors, replace_colors_in_stylesheet
 
 dash.register_page(__name__, path="/sitrep/campus", name="Campus")
@@ -27,18 +28,6 @@ stores = html.Div(
         dcc.Store(id=ids.ROOMS_OPEN_STORE),
         dcc.Store(id=ids.BEDS_STORE),
         dcc.Store(id=ids.DEPTS_OPEN_STORE_NAMES),
-    ]
-)
-
-campus_selector = dmc.Container(
-    [
-        dmc.SegmentedControl(
-            id=ids.DEPT_GROUPER,
-            value=[i.get("value") for i in CAMPUSES if i.get("label") == "UCH"][0],
-            data=CAMPUSES,
-            persistence=True,
-            persistence_type="local",
-        ),
     ]
 )
 

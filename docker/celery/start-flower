@@ -1,0 +1,19 @@
+#!/bin/bash
+
+set -o errexit
+set -o nounset
+
+# this -A app must match the one below
+worker_ready() {
+    celery -A web.celery.celery_app inspect ping
+}
+
+until worker_ready; do
+  >&2 echo 'Celery workers not available'
+  sleep 1
+done
+>&2 echo 'Celery workers are available'
+
+# NOTE: any changes to the app here must also be made in the worker_ready
+# function above
+celery -A web.celery.celery_app flower --address=0.0.0.0 --port=5557

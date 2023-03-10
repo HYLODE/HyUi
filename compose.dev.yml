@@ -1,0 +1,167 @@
+x-no-proxy: &no-proxy localhost,127.0.0.1,uclvlddpragae07,uclvlddpragae08,api,web,cache,baserow,redis,celery_worker
+
+x-proxy-common: &proxy-common
+  NO_PROXY: *no-proxy
+  no_proxy: *no-proxy
+
+x-build-args-common: &build-args-common
+  <<: *proxy-common
+  HYLODE_UID: ${HYLODE_UID}
+
+services:
+  api:
+    build:
+      dockerfile: docker/api/Dockerfile
+      args:
+        <<: *build-args-common
+    environment:
+      <<: *proxy-common
+    env_file: .env.dev
+    ports:
+      - ${API_PORT}:8000
+    networks:
+      - hyui
+
+  web:
+    build:
+      dockerfile: docker/web/Dockerfile
+      args:
+        <<: *build-args-common
+    environment:
+      <<: *proxy-common
+    # Using differnt environment variables
+    env_file: .env.dev
+    ports:
+      - ${WEB_PORT}:8000 # switch from 8000 (exposed by gunicorn + app.server) to 8300 which is the dev port
+      - 10001:10001 # port on which debug.py listens
+    # add in a volumes section
+    volumes:
+    # attach as bind mounts so you can edit the code whilst the container still runs
+      - ./web/src/web:/app/web
+      - ./models/src/models:/app/models
+    depends_on:
+      - baserow
+      - api
+      - redis
+#      - cache
+#    healthcheck:
+#      test: ["CMD", "./refresh_cache.sh"]
+#      interval: 5m30s
+#      timeout: 30s
+#      retries: 5
+#      start_period: 30s
+    networks:
+      - hyui
+
+  redis:
+    image: redis:7.0-alpine
+    environment:
+      <<: *proxy-common
+    ports:
+      - 6379:6379
+    networks:
+      - hyui
+
+  redisinsight:
+    image: redislabs/redisinsight
+    environment:
+      <<: *proxy-common
+    ports:
+      - 8309:8001
+    depends_on:
+      - redis
+    volumes:
+      - redisinsight:/db
+    networks:
+      - hyui
+
+  celery_worker:
+    build:
+      dockerfile: docker/celery/Dockerfile
+      args:
+        <<: *build-args-common
+    environment:
+      <<: *proxy-common
+    #  mount code directly for development but COPY in production
+    #  (hence delete these lines)
+    volumes:
+      - ./web/src/web:/app/web
+      - ./models/src/models:/app/models
+    command: /app/start-worker
+    env_file:
+      - .env.dev
+    depends_on:
+      - redis
+    networks:
+      - hyui
+
+  celery_beat:
+    build:
+      dockerfile: docker/celery/Dockerfile
+      args:
+        <<: *build-args-common
+    environment:
+      <<: *proxy-common
+    command: /app/start-beat
+    env_file:
+      - .env.dev
+    depends_on:
+      - redis
+    networks:
+      - hyui
+
+
+  celery_flower:
+    build:
+      dockerfile: docker/celery/Dockerfile
+      args:
+        <<: *build-args-common
+    environment:
+      <<: *proxy-common
+    command: /app/start-flower
+    ports:
+      - "${FLOWER_PORT}:5557"
+    env_file:
+      - .env.dev
+    depends_on:
+      - redis
+      - celery_worker
+    networks:
+      - hyui
+
+
+#  cache:
+#    build:
+#      dockerfile: docker/cache/Dockerfile
+#      args:
+#        <<: *build-args-common
+#    environment:
+#      <<: *proxy-common
+#    env_file: .env
+#    ports:
+#      - "${CACHE_PORT}:8000"
+#    command: "-p default_keep=300"
+#    depends_on:
+#      - api
+#    networks:
+#      - hyui
+
+  baserow:
+    image: baserow/baserow:1.16.0
+    environment:
+      <<: *proxy-common
+    env_file: .env.dev
+    ports:
+      - ${BASEROW_PORT}:80
+      - 8443:443
+    networks:
+      - hyui
+    volumes:
+      - baserow-data:/baserow/data
+
+networks:
+  hyui:
+
+volumes:
+  baserow-data:
+  redisinsight:

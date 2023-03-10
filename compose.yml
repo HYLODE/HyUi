@@ -41,34 +41,105 @@ services:
     depends_on:
       - baserow
       - api
-      - cache
-    healthcheck:
-      test: ["CMD", "./refresh_cache.sh"]
-      interval: 5m30s
-      timeout: 30s
-      retries: 5
-      start_period: 30s
+      - redis
+      # - cache
+    # healthcheck:
+    #   test: [ "CMD", "./refresh_cache.sh" ]
+    #   interval: 5m30s
+    #   timeout: 30s
+    #   retries: 5
+    #   start_period: 30s
     networks:
       - hyui
 
-  cache:
+  redis:
+    image: redis:7.0-alpine
+    environment:
+      <<: *proxy-common
+    ports:
+      - 6379:6379
+    networks:
+      - hyui
+
+  redisinsight:
+    image: redislabs/redisinsight
+    environment:
+      <<: *proxy-common
+    ports:
+      - 8309:8001
+    networks:
+      - hyui
+    depends_on:
+      - redis
+    volumes:
+      - redisinsight:/db
+
+  celery_worker:
     build:
-      dockerfile: docker/cache/Dockerfile
+      dockerfile: docker/celery/Dockerfile
       args:
         <<: *build-args-common
     environment:
       <<: *proxy-common
-    env_file: .env
-    ports:
-      - "${CACHE_PORT}:8000"
-    command: "-p default_keep=300"
+    command: /app/start-worker
+    env_file:
+      - .env
     depends_on:
-      - api
+      - redis
     networks:
       - hyui
 
+  celery_beat:
+    build:
+      dockerfile: docker/celery/Dockerfile
+      args:
+        <<: *build-args-common
+    environment:
+      <<: *proxy-common
+    command: /app/start-beat
+    env_file:
+      - .env
+    depends_on:
+      - redis
+    networks:
+      - hyui
+
+  celery_flower:
+    build:
+      dockerfile: docker/celery/Dockerfile
+      args:
+        <<: *build-args-common
+    environment:
+      <<: *proxy-common
+    command: /app/start-flower
+    ports:
+      - "${FLOWER_PORT}:5557"
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - celery_worker
+    networks:
+      - hyui
+
+  # cache:
+  #   build:
+  #     dockerfile: docker/cache/Dockerfile
+  #     args:
+  #       <<: *build-args-common
+  #   environment:
+  #     <<: *proxy-common
+  #   env_file: .env
+  #   ports:
+  #     - "${CACHE_PORT}:8000"
+  #   command: "-p default_keep=300"
+  #   depends_on:
+  #     - api
+  #   networks:
+  #     - hyui
+
   baserow:
-    image: baserow/baserow:1.13.1
+    image: baserow/baserow:1.16.0
     environment:
       <<: *proxy-common
     env_file: .env
@@ -82,5 +153,7 @@ services:
 networks:
   hyui:
 
+
 volumes:
   baserow-data:
+  redisinsight:

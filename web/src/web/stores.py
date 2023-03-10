@@ -5,122 +5,137 @@ applications
 
 import requests
 import warnings
+import orjson
 from dash import Input, Output, callback, dcc, html
 
 from models.beds import Bed, Department, Room
 from models.electives import MergedData
 from models.sitrep import SitrepRow
-from web import ids
+from web import ids, SITREP_DEPT2WARD_MAPPING
 from web.config import get_settings
+from web.logger import logger, logger_timeit
 
+from web.celery import redis_client
+from web.celery_tasks import get_response
+from web.celery_config import beat_schedule  # single source of truth for tasks
 
 # TODO: add a refresh button as an input to the store functions pulling from
 #  baserow so that changes from baserow edits can be brought through (
 #  although a page refresh may do the same thing?)
 
 
+def _get_or_refresh_cache(
+    task: dict, url: str = None, expires: int = None
+) -> list[dict]:
+    """
+    Get or refresh a store using the task defined in beat_schedule
+
+    Parameters
+    ----------
+    task : dict - as defined in beat_schedule
+    url : str - if you wish to override (i.e. when need to build for a specific endpoint)
+    expires : int
+
+    Returns
+    -------
+    list[dict]
+
+    """
+    if not url:
+        url, cache_key = beat_schedule[task]["args"]  # tuple unpacking
+    else:
+        _, cache_key = beat_schedule[task]["args"]  # tuple unpacking
+
+    if not expires:
+        expires = beat_schedule.get(task).get("kwargs").get("expires")
+
+    cached_data = redis_client.get(cache_key)
+
+    if cached_data is None:
+        logger.info(f"Fetching {task} from API")
+        fetch_data_task = get_response.delay(url, cache_key, expires)
+        data, _ = fetch_data_task.get()
+    else:
+        logger.info(f"Fetching {task} from cached data")
+        data = orjson.loads(cached_data)
+
+    return data
+
+
 @callback(
     Output(ids.DEPT_STORE, "data"),
     Input(ids.STORE_TIMER_1H, "n_intervals"),
-    background=True,
 )
+@logger_timeit()
 def _store_departments(_: int) -> list[dict]:
     """Store all open departments"""
-    response = requests.get(
-        f"{get_settings().api_url}/baserow/departments/",
-    )
-    depts = [Department.parse_obj(row).dict() for row in response.json()]
+    task = ids.DEPT_STORE
+    data = _get_or_refresh_cache(task)
+    depts = [Department.parse_obj(row).dict() for row in data]
     return [d for d in depts if not d.get("closed_perm_01")]
 
 
 @callback(
     Output(ids.ROOM_STORE, "data"),
     Input(ids.STORE_TIMER_1H, "n_intervals"),
-    background=True,
 )
+@logger_timeit()
 def _store_rooms(_: int) -> list[dict]:
     """Store all rooms with beds"""
-    response = requests.get(
-        f"{get_settings().api_url}/baserow/rooms/",
-    )
-    rooms = [Room.parse_obj(row).dict() for row in response.json()]
+    task = ids.ROOM_STORE
+    data = _get_or_refresh_cache(task)
+    rooms = [Room.parse_obj(row).dict() for row in data]
     return [r for r in rooms if r.get("has_beds")]
 
 
 @callback(
     Output(ids.BEDS_STORE, "data"),
     Input(ids.STORE_TIMER_1H, "n_intervals"),
-    background=True,
 )
+@logger_timeit()
 def _store_beds(_: int) -> list[dict]:
-    response = requests.get(
-        f"{get_settings().api_url}/baserow/beds/",
-    )
-    return [Bed.parse_obj(row).dict() for row in response.json()]
+    task = ids.BEDS_STORE
+    data = _get_or_refresh_cache(task)
+    return [Bed.parse_obj(row).dict() for row in data]
 
 
 @callback(
     Output(ids.ELECTIVES_STORE, "data"),
     Input(ids.STORE_TIMER_6H, "n_intervals"),
-    background=True,
 )
+@logger_timeit()
 def _store_electives(_: int) -> list[dict]:
-    response = requests.get(
-        f"{get_settings().api_url}/electives/",
-    )
-    return [MergedData.parse_obj(row).dict() for row in response.json()]
+    task = ids.ELECTIVES_STORE
+    data = _get_or_refresh_cache(task)
+    return [MergedData.parse_obj(row).dict() for row in data]
 
 
 @callback(
     Output(ids.SITREP_STORE, "data"),
     Input(ids.STORE_TIMER_1H, "n_intervals"),
-    background=True,
 )
+@logger_timeit()
 def _store_all_sitreps(_: int) -> dict:
-    """Return sitrep status for all critical care areas"""
-    SITREP_DEPT2WARD_MAPPING: dict = {
-        "UCH T03 INTENSIVE CARE": "T03",
-        "UCH T06 SOUTH PACU": "T06",
-        "GWB L01 CRITICAL CARE": "GWB",
-        "WMS W01 CRITICAL CARE": "WMS",
-        "NHNN C0 NCCU": "NHNNC0",
-        "NHNN C1 NCCU": "NHNNC1",
-    }
-    icus = list(SITREP_DEPT2WARD_MAPPING.values())
+    """
+    Return sitrep status for all critical care areas
+    Uses the beat_schedule defined in web.celery_config to hold urls
+    """
     sitreps = {}
-    for icu in icus:
-        response = requests.get(f"{get_settings().api_url}/sitrep/live/{icu}/ui/")
-        if response.status_code != 200:
-            warnings.warn(f"Sitrep not available for {icu}")
-            rows = []
-
-        res = response.json()
-
-        try:
-            # assumes http://uclvlddpragae08:5201
-            assert type(res) is list
-            rows = res
-        except AssertionError:
-            warnings.warn(
-                f"Sitrep endpoint at {get_settings().api_url} did not return list - "
-                f"Retry list is keyed under 'data'"
-            )
-            # see https://github.com/HYLODE/HyUi/issues/179
-            # where we switch to using http://172.16.149.202:5001/
-            try:
-                rows = res["data"]
-            except KeyError as e:
-                warnings.warn("No data returned for sitrep")
-                print(repr(e))
-                rows = []
-
-        res = [SitrepRow.parse_obj(row).dict() for row in rows]
-        sitreps[icu] = res
+    for task, conf in beat_schedule.items():
+        if not task.startswith(ids.SITREP_STORE):
+            continue
+        data = _get_or_refresh_cache(task)
+        # FIXME: hacky way to get sitrep ICU b/c we know the 2nd arg (the key)
+        # is the icu url and the last component is the icu
+        # kkey = f"{web_ids.SITREP_STORE}-{icu}"
+        icu = conf.get("args")[1].split("-")[-1]
+        assert icu in SITREP_DEPT2WARD_MAPPING.values()
+        sitreps[icu] = [SitrepRow.parse_obj(row).dict() for row in data]
 
     return sitreps
 
 
-stores = html.Div(
+web_stores = html.Div(
     [
         dcc.Store(id=ids.DEPT_STORE),
         dcc.Store(id=ids.ROOM_STORE),

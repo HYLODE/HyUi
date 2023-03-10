@@ -3,9 +3,9 @@ from datetime import datetime, timedelta
 from fastapi import APIRouter, Depends, Query, Response
 from pathlib import Path
 
-from api.baserow import BaserowAuthenticator
+from api.logger import logger, logger_timeit
+from api.baserow import BaserowDB, get_baserow_db
 from api.config import Settings, get_settings
-from api.utils import Timer
 from api.wards import (
     CAMPUSES,
     MISSING_DEPARTMENT_LOCATIONS,
@@ -29,22 +29,18 @@ def get_mock_departments() -> list[Department]:
 
 
 @router.get("/departments", response_model=list[Department])
-def get_departments(settings: Settings = Depends(get_settings)) -> list[Department]:
-    baserow_auth = BaserowAuthenticator(
-        settings.baserow_url,
-        settings.baserow_email,
-        settings.baserow_password.get_secret_value(),
-    )
+@logger_timeit()
+def get_departments(baserow: BaserowDB = Depends(get_baserow_db)) -> list[Department]:
     params = {
         "size": 200,  # The maximum size of a page.
         "user_field_names": "true",
     }
 
-    rows = baserow_auth.get_rows("hyui", "departments", params)
+    rows = baserow.get_rows("departments", params)
 
     # drop baserow id and order fields
     for row in rows:
-        row.pop("id")
+        # row.pop("id")
         row.pop("order")
 
     return [Department.parse_obj(row) for row in rows]
@@ -58,22 +54,18 @@ def get_mock_rooms() -> list[Room]:
 
 
 @router.get("/rooms", response_model=list[Room])
-def get_rooms(settings: Settings = Depends(get_settings)) -> list[Room]:
-    baserow_auth = BaserowAuthenticator(
-        settings.baserow_url,
-        settings.baserow_email,
-        settings.baserow_password.get_secret_value(),
-    )
+@logger_timeit()
+def get_rooms(baserow: BaserowDB = Depends(get_baserow_db)) -> list[Room]:
     params = {
         "size": 200,  # The maximum size of a page.
         "user_field_names": "true",
     }
 
-    rows = baserow_auth.get_rows("hyui", "rooms", params)
+    rows = baserow.get_rows("rooms", params)
 
     # drop baserow id and order fields
     for row in rows:
-        row.pop("id")
+        # row.pop("id")
         row.pop("order")
 
     return [Room.parse_obj(row) for row in rows]
@@ -98,20 +90,16 @@ def get_mock_beds(
 
 
 @router.get("/beds", response_model=list[Bed])
-@Timer(text="Get baserow/beds route: Elapsed time: {:.4f}")
+@logger_timeit()
 def get_beds(
     response: Response,
     departments: list[str] = Query(default=[]),
     locations: list[str] = Query(default=[]),
-    settings: Settings = Depends(get_settings),
+    baserow: BaserowDB = Depends(get_baserow_db),
 ) -> list[Bed]:
     response.headers["Cache-Control"] = "public, max-age=300"
-    baserow_auth = BaserowAuthenticator(
-        settings.baserow_url,
-        settings.baserow_email,
-        settings.baserow_password.get_secret_value(),
-    )
-    field_ids = baserow_auth.get_fields("hyui", "beds")
+
+    field_ids = baserow.tables_dict.get("beds").get("fields")
     params = {
         "size": 200,  # The maximum size of a page.
         "user_field_names": "true",
@@ -122,24 +110,26 @@ def get_beds(
         for department in departments:
             department_field_id = field_ids["department"]
             params[f"filter__field_{department_field_id}__equal"] = department
-            rows.extend(baserow_auth.get_rows("hyui", "beds", params))
+            rows.extend(baserow.get_rows("beds", params))
             params.pop(f"filter__field_{department_field_id}__equal")
 
         for location in locations:
             location_string_field_id = field_ids["location_string"]
             params[f"filter__field_{location_string_field_id}__equal"] = location
-            rows.extend(baserow_auth.get_rows("hyui", "beds", params))
+            rows.extend(baserow.get_rows("beds", params))
             params.pop(f"filter__field_{location_string_field_id}__equal")
 
     else:
         # get everything
-        rows = baserow_auth.get_rows("hyui", "beds", params)
+        rows = baserow.get_rows("beds", params)
 
     # drop baserow id and order fields
     for row in rows:
-        row.pop("id")
+        # preserve bed id to use in patching
+        # row.pop("id")
         row.pop("order")
 
+    logger.info(f"Returning {len(rows)} beds")
     return [Bed.parse_obj(row) for row in rows]
 
 
@@ -171,18 +161,13 @@ def get_mock_campus(
 
 
 @router.get("/campus", response_model=list[Bed])
-@Timer(text="Get baserow/campus route: Elapsed time: {:.4f}")
+@logger_timeit()
 def get_campus(
     response: Response,
     campuses: list[str] = Query(default=[]),
-    settings: Settings = Depends(get_settings),
+    baserow: BaserowDB = Depends(get_baserow_db),
 ) -> list[Bed]:
     response.headers["Cache-Control"] = "public, max-age=300"
-    baserow_auth = BaserowAuthenticator(
-        settings.baserow_url,
-        settings.baserow_email,
-        settings.baserow_password.get_secret_value(),
-    )
     departments: list = []
     for campus in campuses:
         departments.extend(CAMPUSES.get(campus, []))
@@ -192,7 +177,7 @@ def get_campus(
         if missing_locations := MISSING_DEPARTMENT_LOCATIONS.get(department):
             locations.extend(missing_locations)
 
-    field_ids = baserow_auth.get_fields("hyui", "beds")
+    field_ids = baserow.tables_dict.get("beds").get("fields")
     params = {
         "size": 200,  # The maximum size of a page.
         "user_field_names": "true",
@@ -203,22 +188,22 @@ def get_campus(
         for department in departments:
             department_field_id = field_ids["department"]
             params[f"filter__field_{department_field_id}__equal"] = department
-            rows.extend(baserow_auth.get_rows("hyui", "beds", params))
+            rows.extend(baserow.get_rows("beds", params))
             params.pop(f"filter__field_{department_field_id}__equal")
 
         for location in locations:
             location_string_field_id = field_ids["location_string"]
             params[f"filter__field_{location_string_field_id}__equal"] = location
-            rows.extend(baserow_auth.get_rows("hyui", "beds", params))
+            rows.extend(baserow.get_rows("beds", params))
             params.pop(f"filter__field_{location_string_field_id}__equal")
 
     else:
         # get everything
-        rows = baserow_auth.get_rows("hyui", "beds", params)
+        rows = baserow.get_rows("beds", params)
 
     # drop baserow id and order fields
     for row in rows:
-        row.pop("id")
+        # row.pop("id")
         row.pop("order")
 
     return [Bed.parse_obj(row) for row in rows]
@@ -227,19 +212,15 @@ def get_campus(
 @mock_router.get("/closed/", response_model=list[Bed])
 def get_mock_closed_beds() -> list[Bed]:
     return [
-        Bed(location_string="LOC1", closed=True, covid=True, xpos=100, ypos=100),
-        Bed(location_string="LOC1", closed=True, covid=False, xpos=100, ypos=100),
+        Bed(id=1, location_string="LOC1", closed=True, covid=True, xpos=100, ypos=100),
+        Bed(id=2, location_string="LOC1", closed=True, covid=False, xpos=100, ypos=100),
     ]
 
 
 @router.get("/closed/", response_model=list[Bed])
-def get_closed_beds(settings: Settings = Depends(get_settings)) -> list[Bed]:
-    baserow_auth = BaserowAuthenticator(
-        settings.baserow_url,
-        settings.baserow_email,
-        settings.baserow_password.get_secret_value(),
-    )
-    field_ids = baserow_auth.get_fields("hyui", "beds")
+@logger_timeit()
+def get_closed_beds(baserow: BaserowDB = Depends(get_baserow_db)) -> list[Bed]:
+    field_ids = baserow.tables_dict.get("beds").get("fields")
 
     closed_field_id = field_ids["closed"]
 
@@ -249,7 +230,7 @@ def get_closed_beds(settings: Settings = Depends(get_settings)) -> list[Bed]:
         f"filter__field_{closed_field_id}__boolean": True,
     }
 
-    rows = baserow_auth.get_rows("hyui", "beds", params)
+    rows = baserow.get_rows("beds", params)
     return [Bed.parse_obj(row) for row in rows]
 
 
@@ -270,14 +251,10 @@ def post_mock_discharge_status(
 
 
 @router.post("/discharge_status/", response_model=DischargeStatus)
+@logger_timeit()
 def post_discharge_status(
-    csn: int, status: str, settings: Settings = Depends(get_settings)
+    csn: int, status: str, baserow: BaserowDB = Depends(get_baserow_db)
 ) -> DischargeStatus:
-    baserow_auth = BaserowAuthenticator(
-        settings.baserow_url,
-        settings.baserow_email,
-        settings.baserow_password.get_secret_value(),
-    )
     params = {"user_field_names": True}
 
     payload = {
@@ -286,8 +263,7 @@ def post_discharge_status(
         "modified_at": datetime.utcnow().isoformat(),
     }
 
-    result = baserow_auth.post_row(
-        "hyui",
+    result = baserow.post_row(
         "discharge_statuses",
         params=params,
         payload=payload,
@@ -298,9 +274,9 @@ def post_discharge_status(
 
 
 @mock_router.get("/discharge_status/", response_model=list[DischargeStatus])
-@Timer(text="Get rows route: Elapsed time: {:.4f}")
 def get_mock_discharge_status(
-    delta_hours: int = 72, settings: Settings = Depends(get_settings)  # noqa  # noqa
+    delta_hours: int = 72,
+    baserow: BaserowDB = Depends(get_baserow_db),
 ) -> list[DischargeStatus]:
     rows = [
         DischargeStatus(
@@ -322,19 +298,13 @@ def get_mock_discharge_status(
 
 
 @router.get("/discharge_status/", response_model=list[DischargeStatus])
+@logger_timeit()
 def get_discharge_status(
-    delta_hours: int = 72, settings: Settings = Depends(get_settings)
+    delta_hours: int = 72, baserow: BaserowDB = Depends(get_baserow_db)
 ) -> list[DischargeStatus]:
-    baserow_auth = BaserowAuthenticator(
-        settings.baserow_url,
-        settings.baserow_email,
-        settings.baserow_password.get_secret_value(),
-    )
-    _table = "discharge_statuses"
+    _table_dict = baserow.tables_dict.get("discharge_statuses")
 
-    field_ids = baserow_auth.get_fields("hyui", _table)
-
-    modified_at_field_id = field_ids["modified_at"]
+    modified_at_field_id = _table_dict.get("fields").get("modified_at")
     horizon = (datetime.utcnow() - timedelta(hours=float(delta_hours))).isoformat()
 
     params = {
@@ -344,5 +314,5 @@ def get_discharge_status(
         f"filter__field_{modified_at_field_id}__date_after": horizon,
     }
 
-    rows = baserow_auth.get_rows("hyui", _table, params)
+    rows = baserow.get_rows(_table_dict.get("name"), params)
     return [DischargeStatus.parse_obj(row) for row in rows]

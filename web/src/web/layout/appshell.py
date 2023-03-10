@@ -4,7 +4,7 @@ from dash import dcc, html, page_container
 from web.layout.header import create_header
 from web.layout.nav import create_navbar_drawer, create_side_navbar
 from web import ids
-from web.stores import stores
+from web.stores import web_stores
 
 
 def create_appshell(nav_data: list | dict) -> dmc.MantineProvider:
@@ -22,6 +22,11 @@ def create_appshell(nav_data: list | dict) -> dmc.MantineProvider:
             inherit=True,
             children=[
                 dcc.Interval(
+                    id=ids.STORE_TIMER_15M,
+                    n_intervals=0,
+                    interval=15 * 60 * 1000,
+                ),
+                dcc.Interval(
                     id=ids.STORE_TIMER_1H,
                     n_intervals=0,
                     interval=60 * 60 * 1000,
@@ -31,8 +36,8 @@ def create_appshell(nav_data: list | dict) -> dmc.MantineProvider:
                     n_intervals=0,
                     interval=6 * 60 * 60 * 1000,
                 ),
-                stores,
-                # dcc.Store(id="theme-store", storage_type="local"),
+                # stores generated at app level
+                web_stores,
                 dcc.Location(id="url"),
                 dmc.NotificationsProvider(
                     [

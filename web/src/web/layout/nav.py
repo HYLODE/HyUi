@@ -22,8 +22,10 @@ class _NavLink(NamedTuple):
 
 
 home = _NavLink(title="Home", path="/", icon="carbon:home")
+scratch = _NavLink(title="Scratch", path="/demo", icon="ph:number-square-three-light")
+
 sitrep_campus = _NavLink(title="Campus", path="/sitrep/campus", icon="carbon:hospital")
-sitrep_ward = _NavLink(title="Ward", path="/sitrep/ward", icon="carbon:hospital-bed")
+# sitrep_ward = _NavLink(title="Ward", path="/sitrep/ward", icon="carbon:hospital-bed")
 electives = _NavLink(
     title="Electives", path="/surgery/electives", icon="carbon:calendar"
 )
@@ -39,7 +41,7 @@ sitrep_icus = _NavLink(
 perrt = _NavLink(title="PERRT", path="/sitrep/perrt", icon="carbon:stethoscope")
 
 ed_predictor = _NavLink(
-    title="ED Predictor", path="/ed_pred", icon="carbon:machine-learning-model"
+    title="ED Predictor", path="/ed/table", icon="carbon:machine-learning-model"
 )
 
 
@@ -92,11 +94,11 @@ def create_side_nave_content() -> dmc.Stack:
                 label=sitrep_campus.title,
                 href=sitrep_campus.path,
             ),
-            create_main_nav_link(
-                icon=sitrep_ward.icon,
-                label=sitrep_ward.title,
-                href=sitrep_ward.path,
-            ),
+            # create_main_nav_link(
+            #     icon=sitrep_ward.icon,
+            #     label=sitrep_ward.title,
+            #     href=sitrep_ward.path,
+            # ),
             dmc.Divider(
                 labelPosition="left",
                 label=[
@@ -148,23 +150,28 @@ def create_side_nave_content() -> dmc.Stack:
                 label=perrt.title,
                 href=perrt.path,
             ),
-            dmc.Divider(
-                labelPosition="left",
-                label=[
-                    DashIconify(
-                        icon="carbon:machine-learning-model",
-                        width=20,
-                        style={"marginRight": 10},
-                        color=dmc.theme.DEFAULT_COLORS["indigo"][5],
-                    ),
-                    "Predictive models",
-                ],
-                my=20,
-            ),
             create_main_nav_link(
                 icon=ed_predictor.icon,
                 label=ed_predictor.title,
                 href=ed_predictor.path,
+            ),
+            dmc.Divider(
+                labelPosition="left",
+                label=[
+                    DashIconify(
+                        icon="carbon:code",
+                        width=20,
+                        style={"marginRight": 10},
+                        color=dmc.theme.DEFAULT_COLORS["indigo"][5],
+                    ),
+                    "Development",
+                ],
+                my=20,
+            ),
+            create_main_nav_link(
+                icon=scratch.icon,
+                label=scratch.title,
+                href=scratch.path,
             ),
         ],
     )

@@ -1,21 +1,31 @@
-from typing import Any, List, Dict
-from web.config import get_settings
-
+"""
+Callbacks for the ED model
+"""
 from datetime import datetime
-import requests
-from dash import callback, Output, Input
+from typing import Any, Dict, List
 
-from models.ed import EmergencyDepartmentPatient, AggregateAdmissionRow
+from dash import Input, Output, callback
+
+from models.ed import AggregateAdmissionRow, EmergencyDepartmentPatient
+from web.config import get_settings
+from web.logger import logger, logger_timeit
+from web.celery_tasks import requests_try_cache
 
 
+@logger_timeit()
 def _get_individual_patients() -> list[EmergencyDepartmentPatient]:
-    response = requests.get(f"{get_settings().api_url}/ed/individual/")
-    return [EmergencyDepartmentPatient.parse_obj(row) for row in response.json()]
+    # response = requests.get(f"{get_settings().api_url}/ed/individual/")
+    url = f"{get_settings().api_url}/ed/individual/"
+    data, response_code = requests_try_cache(url)
+    return [EmergencyDepartmentPatient.parse_obj(row) for row in data]
 
 
+@logger_timeit()
 def _get_aggregations() -> list[AggregateAdmissionRow]:
-    response = requests.get(f"{get_settings().api_url}/ed/aggregate/")
-    return [AggregateAdmissionRow.parse_obj(row) for row in response.json()]
+    # response = requests.get(f"{get_settings().api_url}/ed/aggregate/")
+    url = f"{get_settings().api_url}/ed/aggregate/"
+    data, response_code = requests_try_cache(url)
+    return [AggregateAdmissionRow.parse_obj(row) for row in data]
 
 
 def _prettify_datetime(s: datetime) -> str:

@@ -1,0 +1,12 @@
+#!/bin/bash
+# https://testdriven.io/courses/fastapi-celery/docker/#H-7-entrypoint
+# https://stackoverflow.com/questions/39082768/what-does-set-e-and-exec-do-for-docker-entrypoint-scripts/39082923#39082923
+
+# if any of the commands in your code fails for any reason, the entire script fails
+set -o errexit
+# fail exit if one of your pipe command fails
+set -o pipefail
+# exits if any of your variables is not set
+set -o nounset
+
+exec "$@"

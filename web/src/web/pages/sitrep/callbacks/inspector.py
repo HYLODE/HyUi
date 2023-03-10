@@ -7,7 +7,7 @@ from dash_iconify import DashIconify
 from typing import Any, Tuple
 
 from web.pages.sitrep import DISCHARGE_DECISIONS, ids
-from web.pages.sitrep.callbacks.cytoscape import format_census
+from web.pages.sitrep.callbacks.census import format_census
 from web.pages.sitrep.callbacks.discharges import post_discharge_status
 from web.pages.sitrep.callbacks.utils import make_sitrep_badge
 from web.style import colors
@@ -317,7 +317,6 @@ def patient_accordion_item(
 
     sitrep = data.get("sitrep", {})
     if sitrep:
-
         dob = dmc.Code(censusf.get("dob_fshort", "DD-MM-CCYY"), block=False)
         mrn = dmc.Code(censusf.get("mrn", "Unknown"), block=False)
         csn = dmc.Code(censusf.get("encounter", "Unknown"), block=False)

@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set -o errexit
+set -o nounset
+
+rm -f './celerybeat.pid'
+
+# simple declaration
+# celery -A web.app.celery beat -l info
+
+# using watchfiles and passing the above as a string
+watchfiles --filter python \
+  'celery -A web.celery.celery_app beat --loglevel=info'

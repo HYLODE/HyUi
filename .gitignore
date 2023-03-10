@@ -865,6 +865,9 @@ MigrationBackup/
 
 ### HyUI ###
 
+#logs
+*.log*
+
 # docs (via Quarto)
 docs/.quarto/
 docs/_site/
@@ -935,3 +938,9 @@ api/src/api/electives/deploy/*
 # PACU dashboard
 web/src/web/assets/pacu_dashboard.html
 web/src/web/assets/pqip_dashboard.html
+.env.dev
+
+# redis/celery detritus
+celerybeat-schedule.db
+dump.rdb
+.env.dev.local

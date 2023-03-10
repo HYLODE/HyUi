@@ -1,4 +1,4 @@
-FROM python:3.11.0
+FROM python:3.10.10
 
 SHELL ["/bin/bash", "-o", "pipefail", "-e", "-u", "-x", "-c"]
 
@@ -39,4 +39,7 @@ COPY --chown=hyui:root ./web/src/web /app/web
 COPY --chown=hyui:root ./docker/web/refresh_cache.sh /app
 RUN chmod +x /app/refresh_cache.sh
 
-ENTRYPOINT ["gunicorn", "--bind", "0.0.0.0", "web.app:server"]
+# Switching to CMD since this can be over-ridden by the COMMAND in the docker compose
+# https://devtron.ai/blog/cmd-and-entrypoint-differences/#:~:text=CMD%3A%20Sets%20default%20parameters%20that,Docker%20containers%20with%20CLI%20parameters.
+# ENTRYPOINT ["gunicorn", "--bind", "0.0.0.0", "web.app:server"]
+CMD ["gunicorn", "--config", "web/gunicorn_config.py", "web.app:server"]

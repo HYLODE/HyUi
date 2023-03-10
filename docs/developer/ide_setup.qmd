@@ -145,6 +145,50 @@ Beware the absolute paths below ☹. You will need to change these unless your n
     ]
 }
 ```
+
+### Developing and debugging with docker compose
+
+Imagine you wish to debug the web container and its interactions with the other services.
+This specific issue arose when I was working with Plotly Dash's background callbacks and experimenting with using Celery as the background callback manager.
+
+The following eventually allowed me to run the web app as part of a docker compose configuration, and debug from VSCode.
+
+- I duplicated `./web/Dockerfile` as `./web/Dockerfile.dev` and swapped the `ENTRYPOINT` command for `CMD` which allowed me to override that `gunicorn` based command with `python debugpy` in the `compose.dev.yml` file
+- I duplicated `./compose.yml` as `./compose.dev.yml` and then ...
+    - mounted the models and the web modules as bind mounts
+    - added the `5678` port mapping for `debugpy`
+    - adjusted the default web port mapping to `8300` (from `8000`) since that's the development port specified in `./web/src/web/config.py`
+    - I added in an override `COMMAND` to run `debugpy`
+    ```yml
+    command: ["sh", "-c", "pip install debugpy -t /tmp && python /tmp/debugpy --wait-for-client --listen 0.0.0.0:5678 -m web.app"]
+    ```
+- I opened a terminal and ran `docker compose -f compose.dev.yml up -d` for all the services except `web` (i.e. `api`, `baserow`, `redis` etc.)
+- I opened another terminal and ran `docker compose -f compose.dev.yml up web`
+- I created an entry in `launch.json` as follows and ensured that the `localRoot` mapped to the root of the `web` module (rather than the workspace)
+```json
+        {
+            "name": "Python: Remote Attach - web",
+            "type": "python",
+            "request": "attach",
+            "connect": {
+                "host": "localhost",
+                "port": 5678
+            },
+            "pathMappings": [
+                {
+                    // adjust localRoot so VSCode breakpoints are recognised
+                    "localRoot": "${workspaceFolder}/web/src",
+                    "remoteRoot": "."
+                }
+            ],
+            "justMyCode": true
+        },
+```
+- Set the Plotly Dash `debug` argument to `debug=False` else each code change means app restarts and the debugger is detached/broken
+- I then ran this debug configuration and it all worked ....!! 🥳
+
+
+
 ### Troubleshooting
 * Follow all the [setup](setup.qmd) instructions and check you can get everything running locally outside vscode first!
 * Check that the locations of python and your `.env` file are correct in your `launch.json` and `settings.json` file. You may need to write absolute paths in `settings.json` (even if `launch.json` uses the `{workSpaceFolder}` variables appropriately). For example, `"python.envFile": "~/Github/HyUi/.env"`).

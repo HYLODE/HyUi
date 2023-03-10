@@ -1,0 +1,14 @@
+#!/bin/bash
+
+set -o errexit
+set -o nounset
+
+# simple declaration
+# celery -A main.celery_app worker --loglevel=info
+
+# Do not call celery -A web.celery_app.celery_app even though it's defined there
+# You must instead start it from the main app.py file that defines the dash app
+# https://community.plotly.com/t/celery-not-registering-background-callbacks-in-task-list/69536/7?u=drstevok
+# using watchfiles and passing the above as a string
+watchfiles --filter python \
+  'celery -A web.celery.celery_app worker --loglevel=info'

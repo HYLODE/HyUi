@@ -5,7 +5,7 @@ from dash_iconify import DashIconify
 
 # noqa suppresses black errors when linting since you need this import for
 # access to callbacks
-import web.pages.sitrep.callbacks.cytoscape  # noqa
+# import web.pages.sitrep.callbacks.cytoscape  # noqa
 from web.style import colors
 
 dash.register_page(__name__, path="/", name="Home")

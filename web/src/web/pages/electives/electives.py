@@ -1,16 +1,19 @@
 import dash
 import dash_mantine_components as dmc
 import json
-import warnings
 from dash import dash_table as dtable, html
 from pathlib import Path
+from datetime import date, timedelta
 
 import web.pages.electives.callbacks  # noqa
 from web.pages.electives import CAMPUSES, ids
 from web.style import replace_colors_in_stylesheet
 
 
-warnings.warn("\nINFO: Confirm that you have imported all the callbacks")
+import logging
+
+logger = logging.getLogger(__name__)
+logger.debug("Confirm that you have imported all the callbacks")
 
 dash.register_page(__name__, path="/surgery/electives", name="Electives")
 
@@ -67,11 +70,22 @@ pacu_selector = html.Div(
 )
 
 date_selector = html.Div(
+    # dmc.Tooltip(
+    #     label="Double-click on a date to select a single day",
+    #     multiline=True,
+    #     position="top",
+    #     openDelay=500,
+    #     children=[
     dmc.DateRangePicker(
         id="date_selector",
+        minDate=date.today(),
+        maxDate=date.today() + timedelta(days=10),
         allowSingleDateInRange=True,
         fullWidth=True,
+        value=[date.today(), (date.today() + timedelta(days=3))],
     ),
+    # ],
+    # )
 )
 
 
