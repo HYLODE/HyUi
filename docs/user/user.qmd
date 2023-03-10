@@ -27,6 +27,11 @@ To take down all running services - including interactive services described abo
 3. Run `./bin/down.sh` from the command line
     - Optionally provide the `--remove-orphans` flag to remove hanging containers and networks. This **will not** remove any associated docker volumes, so is safe from a data-loss perspective.
 
+### In-band predictions
+Current and past model predictions arising as a result of the HySys pipeline are written to corresponding tables within the `hymind` schema within the `hylode` database found in the `postgres` service of each environment.
+
+The latest predictions are available via the HyMind API REST endpoint. The [HySys](https://github.com/HYLODE/HySys/blob/main/hylode/README.md) documentation details the URL of the documentation of this API - look for `HYMIND_API_WEB_PORT`.
+
 ## Please note
 - the application is only accessible from within the UCLH network
 - usernames and passwords are available after training from the development team
