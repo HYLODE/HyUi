@@ -865,6 +865,9 @@ MigrationBackup/
 
 ### HyUI ###
 
+#logs
+*.log*
+
 # docs (via Quarto)
 docs/.quarto/
 docs/_site/

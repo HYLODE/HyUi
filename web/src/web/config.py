@@ -14,6 +14,8 @@ class Settings(BaseSettings):
     api_url: AnyHttpUrl
     baserow_public_url: AnyHttpUrl
 
+    slack_log_webhook: SecretStr
+
     class Config:
         # The prefix below scopes the .env variables.
         env_prefix = "web_"

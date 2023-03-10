@@ -18,6 +18,8 @@ class Settings(BaseSettings):
 
     echo_sql: bool = False
 
+    slack_log_webhook: SecretStr
+
     class Config:
         # The prefix below scopes the .env variables.
         env_prefix = "api_"

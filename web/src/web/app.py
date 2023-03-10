@@ -5,19 +5,15 @@ from uuid import uuid4
 
 from web.config import get_settings
 from web.layout.appshell import create_appshell
+from web.logger import logger
+
+logger.info("Web app starting")
 
 launch_uuid = uuid4()
 cache = diskcache.Cache(tempfile.TemporaryDirectory().name)
 background_callback_manager = dash.DiskcacheManager(
     cache, cache_by=[lambda: launch_uuid], expire=600  # seconds
 )
-
-# external_scripts = [
-#     {
-#         "src": "https://plausible.io/js/script.js",
-#         "data-domain": "hylode.org",
-#     }
-# ]
 
 app = dash.Dash(
     __name__,

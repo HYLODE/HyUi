@@ -3,11 +3,8 @@ from dash.dash_table import DataTable, FormatTemplate
 import dash_bootstrap_components as dbc
 import web.pages.ed.callbacks  # noqa
 from dash import html, dcc
-import warnings
 
-dash.register_page(__name__, path="/ed_pred/", name="Ed")
-
-warnings.warn("\nINFO: Confirm that you have imported all the callbacks")
+dash.register_page(__name__, path="/ed_pred/", name="ED")
 
 
 def layout() -> dbc.Container:

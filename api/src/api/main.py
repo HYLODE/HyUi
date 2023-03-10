@@ -33,6 +33,9 @@ from api.hymind.router import (
 )
 from api.perrt.router import mock_router as mock_perrt_router, router as perrt_router
 from api.ros.router import router as ros_router
+from api.logger import logger
+
+logger.info("API app starting")
 
 app = FastAPI(
     default_response_class=ORJSONResponse,

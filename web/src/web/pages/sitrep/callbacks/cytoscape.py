@@ -13,9 +13,9 @@ from web import SITREP_DEPT2WARD_MAPPING
 from web.stores import ids as store_ids
 from web.utils import Timer
 
-# =============================================================================
-DEBUG = True
-# =============================================================================
+from web.logger import logger
+
+logger.info("Preparing cytoscape map")
 
 
 @callback(
