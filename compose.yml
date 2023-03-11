@@ -79,6 +79,40 @@ services:
     volumes:
       - baserow-data:/baserow/data
 
+  prometheus:
+    image: prom/prometheus:latest
+    environment:
+      <<: *proxy-common
+    env_file: .env
+    restart: unless-stopped
+    ports:
+      - "${PROMETHEUS_PORT}:9090"
+    volumes:
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    networks:
+      - hyui
+
+  grafana:
+    build:
+      dockerfile: docker/grafana/Dockerfile
+      args:
+        <<: *build-args-common
+    env_file:
+      - ./docker/grafana/config.monitoring
+    environment:
+      <<: *proxy-common
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: "/var/lib/grafana/dashboards/hyui_api.json"
+    restart: unless-stopped
+    user: "472"
+    depends_on:
+      - prometheus
+    ports:
+      - "${GRAFANA_PORT}:3000"
+    networks:
+      - hyui
+
 networks:
   hyui:
 

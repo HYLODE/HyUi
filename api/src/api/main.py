@@ -3,7 +3,9 @@ Entry point and main file for the FastAPI backend
 """
 
 from fastapi import FastAPI, APIRouter, Request, Response
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import ORJSONResponse
+from prometheus_fastapi_instrumentator import Instrumentator
 from typing import Any
 
 from api.census.router import router as census_router, mock_router as mock_census_router
@@ -76,6 +78,11 @@ mock_router.include_router(mock_hymind_router)
 app.include_router(mock_router)
 
 
+@app.get("/ping")
+async def pong() -> dict[str, str]:
+    return {"ping": "hyui pong!"}
+
+
 @app.middleware("http")
 async def add_cache_control_header(request: Request, call_next: Any) -> Response:
     response = await call_next(request)
@@ -84,6 +91,12 @@ async def add_cache_control_header(request: Request, call_next: Any) -> Response
     return response
 
 
-@app.get("/ping")
-async def pong() -> dict[str, str]:
-    return {"ping": "hyui pong!"}
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+Instrumentator().instrument(app).expose(app)
