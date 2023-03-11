@@ -80,15 +80,16 @@ services:
       - baserow-data:/baserow/data
 
   prometheus:
-    image: prom/prometheus:latest
+    build:
+      dockerfile: docker/prometheus/Dockerfile
+      args:
+        <<: *build-args-common
     environment:
       <<: *proxy-common
     env_file: .env
     restart: unless-stopped
     ports:
       - "${PROMETHEUS_PORT}:9090"
-    volumes:
-      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
     networks:
