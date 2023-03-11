@@ -9,13 +9,15 @@ rule_files:
 
 scrape_configs:
   - job_name: "prometheus"
-
     static_configs:
-      - targets: ["prometheus:8304"]
+      - targets:
+        - "localhost:9090"
 
+  - job_name: "api"
+    static_configs:
+      - targets:
+        - "api:8000"
   - job_name: "app"
-    dns_sd_configs:
-      - names: ["app"]
-        port: 8301
-        type: A
-        refresh_interval: 5s
+    static_configs:
+      - targets:
+          - "web:8000"
