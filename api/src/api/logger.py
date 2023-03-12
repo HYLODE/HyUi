@@ -3,7 +3,7 @@ import notifiers
 from loguru import logger
 from notifiers.logging import NotificationHandler
 from pathlib import Path
-from web.config import get_settings
+from api.config import get_settings
 from datetime import datetime
 import time
 from collections.abc import Callable
