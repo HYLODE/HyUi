@@ -23,7 +23,7 @@ class _NavLink(NamedTuple):
 
 home = _NavLink(title="Home", path="/", icon="carbon:home")
 sitrep_campus = _NavLink(title="Campus", path="/sitrep/campus", icon="carbon:hospital")
-sitrep_ward = _NavLink(title="Ward", path="/sitrep/ward", icon="carbon:hospital-bed")
+# sitrep_ward = _NavLink(title="Ward", path="/sitrep/ward", icon="carbon:hospital-bed")
 electives = _NavLink(
     title="Electives", path="/surgery/electives", icon="carbon:calendar"
 )
@@ -92,11 +92,11 @@ def create_side_nave_content() -> dmc.Stack:
                 label=sitrep_campus.title,
                 href=sitrep_campus.path,
             ),
-            create_main_nav_link(
-                icon=sitrep_ward.icon,
-                label=sitrep_ward.title,
-                href=sitrep_ward.path,
-            ),
+            # create_main_nav_link(
+            #     icon=sitrep_ward.icon,
+            #     label=sitrep_ward.title,
+            #     href=sitrep_ward.path,
+            # ),
             dmc.Divider(
                 labelPosition="left",
                 label=[

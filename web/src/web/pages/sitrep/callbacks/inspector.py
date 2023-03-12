@@ -7,7 +7,7 @@ from dash_iconify import DashIconify
 from typing import Any, Tuple
 
 from web.pages.sitrep import DISCHARGE_DECISIONS, ids
-from web.pages.sitrep.callbacks.cytoscape import format_census
+from web.pages.sitrep.callbacks.census import format_census
 from web.pages.sitrep.callbacks.discharges import post_discharge_status
 from web.pages.sitrep.callbacks.utils import make_sitrep_badge
 from web.style import colors
