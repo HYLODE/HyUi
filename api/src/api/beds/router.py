@@ -5,12 +5,12 @@ from pathlib import Path
 
 from api.baserow import BaserowAuthenticator
 from api.config import Settings, get_settings
-from api.utils import Timer
 from api.wards import (
     CAMPUSES,
     MISSING_DEPARTMENT_LOCATIONS,
 )
 from models.beds import Bed, Department, DischargeStatus, Room
+from api.logger import logger_timeit
 
 router = APIRouter(
     prefix="/baserow",
@@ -29,6 +29,7 @@ def get_mock_departments() -> list[Department]:
 
 
 @router.get("/departments", response_model=list[Department])
+@logger_timeit()
 def get_departments(settings: Settings = Depends(get_settings)) -> list[Department]:
     baserow_auth = BaserowAuthenticator(
         settings.baserow_url,
@@ -58,6 +59,7 @@ def get_mock_rooms() -> list[Room]:
 
 
 @router.get("/rooms", response_model=list[Room])
+@logger_timeit()
 def get_rooms(settings: Settings = Depends(get_settings)) -> list[Room]:
     baserow_auth = BaserowAuthenticator(
         settings.baserow_url,
@@ -98,7 +100,7 @@ def get_mock_beds(
 
 
 @router.get("/beds", response_model=list[Bed])
-@Timer(text="Get baserow/beds route: Elapsed time: {:.4f}")
+@logger_timeit()
 def get_beds(
     response: Response,
     departments: list[str] = Query(default=[]),
@@ -171,7 +173,7 @@ def get_mock_campus(
 
 
 @router.get("/campus", response_model=list[Bed])
-@Timer(text="Get baserow/campus route: Elapsed time: {:.4f}")
+@logger_timeit()
 def get_campus(
     response: Response,
     campuses: list[str] = Query(default=[]),
@@ -233,6 +235,7 @@ def get_mock_closed_beds() -> list[Bed]:
 
 
 @router.get("/closed/", response_model=list[Bed])
+@logger_timeit()
 def get_closed_beds(settings: Settings = Depends(get_settings)) -> list[Bed]:
     baserow_auth = BaserowAuthenticator(
         settings.baserow_url,
@@ -270,6 +273,7 @@ def post_mock_discharge_status(
 
 
 @router.post("/discharge_status/", response_model=DischargeStatus)
+@logger_timeit()
 def post_discharge_status(
     csn: int, status: str, settings: Settings = Depends(get_settings)
 ) -> DischargeStatus:
@@ -298,7 +302,6 @@ def post_discharge_status(
 
 
 @mock_router.get("/discharge_status/", response_model=list[DischargeStatus])
-@Timer(text="Get rows route: Elapsed time: {:.4f}")
 def get_mock_discharge_status(
     delta_hours: int = 72, settings: Settings = Depends(get_settings)  # noqa  # noqa
 ) -> list[DischargeStatus]:
@@ -322,6 +325,7 @@ def get_mock_discharge_status(
 
 
 @router.get("/discharge_status/", response_model=list[DischargeStatus])
+@logger_timeit()
 def get_discharge_status(
     delta_hours: int = 72, settings: Settings = Depends(get_settings)
 ) -> list[DischargeStatus]:
