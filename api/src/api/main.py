@@ -4,6 +4,7 @@ Entry point and main file for the FastAPI backend
 
 from fastapi import FastAPI, APIRouter, Request, Response
 from fastapi.responses import ORJSONResponse
+from fastapi_utils.tasks import repeat_every
 from typing import Any
 
 from api.census.router import router as census_router, mock_router as mock_census_router
@@ -32,7 +33,9 @@ from api.hymind.router import (
     mock_router as mock_hymind_router,
 )
 from api.perrt.router import mock_router as mock_perrt_router, router as perrt_router
+from api.perrt.admission_probability.predictions_script import run_prediction_pipeline
 from api.ros.router import router as ros_router
+
 
 app = FastAPI(
     default_response_class=ORJSONResponse,
@@ -74,6 +77,15 @@ mock_router.include_router(mock_hymind_router)
 
 # Finally include the mock router.
 app.include_router(mock_router)
+
+
+@app.on_event("startup")
+@repeat_every(seconds=120, raise_exceptions=True)
+def refresh_perrt_icu_admission_predictions() -> None:
+    print("running")
+    predictions = run_prediction_pipeline()
+    app.state.perrt.icu_adm_predictions = predictions
+    print("done")
 
 
 @app.middleware("http")
