@@ -11,6 +11,8 @@ class Settings(BaseSettings):
     baserow_url: AnyHttpUrl
     baserow_email: str
     baserow_password: SecretStr
+    baserow_application_name: str
+    baserow_username: str
 
     hycastle_url: AnyHttpUrl
     hymind_url: AnyHttpUrl
