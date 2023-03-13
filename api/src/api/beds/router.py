@@ -1,12 +1,11 @@
 import json
-import logging
 from datetime import datetime, timedelta
 from fastapi import APIRouter, Depends, Query, Response
 from pathlib import Path
 
+from api.logger import logger, logger_timeit
 from api.baserow import BaserowDB, get_baserow_db
 from api.config import Settings, get_settings
-from api.utils import Timer
 from api.wards import (
     CAMPUSES,
     MISSING_DEPARTMENT_LOCATIONS,
@@ -30,7 +29,7 @@ def get_mock_departments() -> list[Department]:
 
 
 @router.get("/departments", response_model=list[Department])
-@Timer(text="Get departments route: Elapsed time: {:.4f}")
+@logger_timeit()
 def get_departments(baserow: BaserowDB = Depends(get_baserow_db)) -> list[Department]:
     params = {
         "size": 200,  # The maximum size of a page.
@@ -55,7 +54,7 @@ def get_mock_rooms() -> list[Room]:
 
 
 @router.get("/rooms", response_model=list[Room])
-@Timer(text="Get rooms route: Elapsed time: {:.4f}")
+@logger_timeit()
 def get_rooms(baserow: BaserowDB = Depends(get_baserow_db)) -> list[Room]:
     params = {
         "size": 200,  # The maximum size of a page.
@@ -91,7 +90,7 @@ def get_mock_beds(
 
 
 @router.get("/beds", response_model=list[Bed])
-@Timer(text="Get baserow/beds route: Elapsed time: {:.4f}")
+@logger_timeit()
 def get_beds(
     response: Response,
     departments: list[str] = Query(default=[]),
@@ -129,7 +128,7 @@ def get_beds(
         row.pop("id")
         row.pop("order")
 
-    logging.info(f"Returning {len(rows)} beds")
+    logger.info(f"Returning {len(rows)} beds")
     return [Bed.parse_obj(row) for row in rows]
 
 
@@ -161,7 +160,7 @@ def get_mock_campus(
 
 
 @router.get("/campus", response_model=list[Bed])
-@Timer(text="Get baserow/campus route: Elapsed time: {:.4f}")
+@logger_timeit()
 def get_campus(
     response: Response,
     campuses: list[str] = Query(default=[]),
@@ -218,6 +217,7 @@ def get_mock_closed_beds() -> list[Bed]:
 
 
 @router.get("/closed/", response_model=list[Bed])
+@logger_timeit()
 def get_closed_beds(baserow: BaserowDB = Depends(get_baserow_db)) -> list[Bed]:
     field_ids = baserow.get_fields("beds")
 
@@ -250,6 +250,7 @@ def post_mock_discharge_status(
 
 
 @router.post("/discharge_status/", response_model=DischargeStatus)
+@logger_timeit()
 def post_discharge_status(
     csn: int, status: str, baserow: BaserowDB = Depends(get_baserow_db)
 ) -> DischargeStatus:
@@ -272,7 +273,6 @@ def post_discharge_status(
 
 
 @mock_router.get("/discharge_status/", response_model=list[DischargeStatus])
-@Timer(text="Get mock discharge status route: Elapsed time: {:.4f}")
 def get_mock_discharge_status(
     delta_hours: int = 72,
     baserow: BaserowDB = Depends(get_baserow_db),
@@ -297,6 +297,7 @@ def get_mock_discharge_status(
 
 
 @router.get("/discharge_status/", response_model=list[DischargeStatus])
+@logger_timeit()
 def get_discharge_status(
     delta_hours: int = 72, baserow: BaserowDB = Depends(get_baserow_db)
 ) -> list[DischargeStatus]:
