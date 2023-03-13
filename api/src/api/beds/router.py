@@ -227,8 +227,8 @@ def get_campus(
 @mock_router.get("/closed/", response_model=list[Bed])
 def get_mock_closed_beds() -> list[Bed]:
     return [
-        Bed(location_string="LOC1", closed=True, covid=True, xpos=100, ypos=100),
-        Bed(location_string="LOC1", closed=True, covid=False, xpos=100, ypos=100),
+        Bed(id=1, location_string="LOC1", closed=True, covid=True, xpos=100, ypos=100),
+        Bed(id=2, location_string="LOC1", closed=True, covid=False, xpos=100, ypos=100),
     ]
 
 
