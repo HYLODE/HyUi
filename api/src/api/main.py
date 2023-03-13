@@ -36,7 +36,6 @@ from api.perrt.router import mock_router as mock_perrt_router, router as perrt_r
 from api.perrt.admission_probability.predictions_script import run_prediction_pipeline
 from api.ros.router import router as ros_router
 
-
 app = FastAPI(
     default_response_class=ORJSONResponse,
 )
@@ -82,9 +81,9 @@ app.include_router(mock_router)
 @app.on_event("startup")
 @repeat_every(seconds=120, raise_exceptions=True)
 def refresh_perrt_icu_admission_predictions() -> None:
-    print("running")
+    print("pred start")
     predictions = run_prediction_pipeline()
-    app.state.perrt.icu_adm_predictions = predictions
+    app.state.perrt_icu_adm_predictions = predictions
     print("done")
 
 

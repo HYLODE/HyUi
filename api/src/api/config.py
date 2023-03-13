@@ -18,6 +18,8 @@ class Settings(BaseSettings):
 
     echo_sql: bool = False
 
+    icu_admission_predictions: bool = False
+
     class Config:
         # The prefix below scopes the .env variables.
         env_prefix = "api_"

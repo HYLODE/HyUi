@@ -1,8 +1,9 @@
 # Ignore xgboost import, it's required for pickled file
 import xgboost  # noqa: F401
-from fastapi import Depends
-from api.db import get_star_session
-from sqlmodel import Session
+
+# from api.db import get_star_session
+# from sqlmodel import Session
+from sqlalchemy import create_engine
 
 import pickle
 import pandas as pd
@@ -15,7 +16,7 @@ import re
 # from sqlalchemy import create_engine
 from .functions import run_pipeline  # type: ignore
 
-# from api.config import get_settings
+from api.config import get_settings
 
 
 # def get_emapdb_engine():
@@ -52,10 +53,18 @@ def write_predictions(predictions_map: dict) -> None:
         pickle.dump(predictions_map, f)
 
 
-def run_prediction_pipeline(session: Session = Depends(get_star_session)) -> dict:
+def run_prediction_pipeline() -> dict:
     # most return variables unused for our use case
+
+    settings = get_settings()
+
+    if settings.icu_admission_predictions:
+        return {}
+
     dataset, _, _, _, _ = run_pipeline(
-        list([pd.to_datetime("now").date()]), session, now=True
+        list([pd.to_datetime("now").date()]),
+        create_engine(settings.star_dsn, echo=settings.echo_sql),
+        now=True,
     )
 
     return get_predictions(dataset)
