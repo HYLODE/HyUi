@@ -7,7 +7,7 @@ Serve the PERRT endpoints
 import datetime as dt
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, Query, Response
+from fastapi import APIRouter, Depends, Query, Response, Request
 from sqlmodel import Session
 
 from api.convert import parse_to_data_frame, to_data_frame
@@ -19,6 +19,11 @@ from models.perrt import EmapConsults, EmapCpr, EmapVitalsLong, EmapVitalsWide
 router = APIRouter(prefix="/perrt")
 mock_router = APIRouter(prefix="/perrt")
 _this_file = Path(__file__)
+
+
+@router.get("/icu_admission_preciction", response_model=dict)
+def get_icu_admission_preciction(request: Request) -> dict:
+    return dict(request.app.state.perrt_icu_adm_predictions)
 
 
 @router.get("/cpr", response_model=list[EmapCpr])
