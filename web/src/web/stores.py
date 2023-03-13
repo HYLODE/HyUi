@@ -10,7 +10,8 @@ from dash import Input, Output, callback, dcc, html
 from models.beds import Bed, Department, Room
 from models.electives import MergedData
 from models.sitrep import SitrepRow
-from web import ids
+from models.hymind import IcuDischarge
+from web import ids, SITREP_DEPT2WARD_MAPPING
 from web.config import get_settings
 
 
@@ -78,14 +79,6 @@ def _store_electives(_: int) -> list[dict]:
 )
 def _store_all_sitreps(_: int) -> dict:
     """Return sitrep status for all critical care areas"""
-    SITREP_DEPT2WARD_MAPPING: dict = {
-        "UCH T03 INTENSIVE CARE": "T03",
-        "UCH T06 SOUTH PACU": "T06",
-        "GWB L01 CRITICAL CARE": "GWB",
-        "WMS W01 CRITICAL CARE": "WMS",
-        "NHNN C0 NCCU": "NHNNC0",
-        "NHNN C1 NCCU": "NHNNC1",
-    }
     icus = list(SITREP_DEPT2WARD_MAPPING.values())
     sitreps = {}
     for icu in icus:
@@ -120,12 +113,52 @@ def _store_all_sitreps(_: int) -> dict:
     return sitreps
 
 
+@callback(
+    Output(ids.HYMIND_ICU_DC_STORE, "data"),
+    Input(ids.STORE_TIMER_1H, "n_intervals"),
+    background=True,
+)
+def _store_all_hymind_dc_predictions(_: int) -> dict:
+    """Return hymind predictions for all areas"""
+    icus = list(SITREP_DEPT2WARD_MAPPING.values())
+    yhats = {}
+    for icu in icus:
+        response = requests.get(
+            f"{get_settings().api_url}/hymind/discharge/individual/{icu}/"
+        )
+        if response.status_code != 200:
+            warnings.warn(f"HyMind d/c predictions not available for {icu}")
+            rows = []
+        else:
+            rows = response.json()
+
+        res = [IcuDischarge.parse_obj(row).dict() for row in rows]
+        yhats[icu] = res
+
+    return yhats
+
+
 stores = html.Div(
     [
-        dcc.Store(id=ids.DEPT_STORE),
-        dcc.Store(id=ids.ROOM_STORE),
-        dcc.Store(id=ids.BEDS_STORE),
-        dcc.Store(id=ids.ELECTIVES_STORE),
-        dcc.Loading(dcc.Store(id=ids.SITREP_STORE), fullscreen=True, type="dot"),
+        dcc.Loading(
+            children=[dcc.Store(id=ids.DEPT_STORE)], type="dot", fullscreen=True
+        ),
+        dcc.Loading(
+            children=[dcc.Store(id=ids.ROOM_STORE)], type="dot", fullscreen=True
+        ),
+        dcc.Loading(
+            children=[dcc.Store(id=ids.BEDS_STORE)], type="dot", fullscreen=True
+        ),
+        dcc.Loading(
+            children=[dcc.Store(id=ids.ELECTIVES_STORE)], type="dot", fullscreen=True
+        ),
+        dcc.Loading(
+            children=[dcc.Store(id=ids.SITREP_STORE)], type="dot", fullscreen=True
+        ),
+        dcc.Loading(
+            children=[dcc.Store(id=ids.HYMIND_ICU_DC_STORE)],
+            type="dot",
+            fullscreen=True,
+        ),
     ]
 )
