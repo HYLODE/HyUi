@@ -2,86 +2,86 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://github.com/HYLODE/HyUi/notes/provisioning.html</loc>
-    <lastmod>2023-03-13T12:12:31.595Z</lastmod>
+    <lastmod>2023-03-13T12:15:51.738Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/HYLODE/HyUi/developer/documentation.html</loc>
-    <lastmod>2023-03-13T12:12:33.583Z</lastmod>
+    <lastmod>2023-03-13T12:15:52.634Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/HYLODE/HyUi/developer/deployment.html</loc>
-    <lastmod>2023-03-13T12:12:34.311Z</lastmod>
+    <lastmod>2023-03-13T12:15:53.298Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/HYLODE/HyUi/developer/demo.html</loc>
-    <lastmod>2023-03-13T12:12:34.707Z</lastmod>
+    <lastmod>2023-03-13T12:15:53.654Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/HYLODE/HyUi/developer/infrastructure.html</loc>
-    <lastmod>2023-03-13T12:12:35.071Z</lastmod>
+    <lastmod>2023-03-13T12:15:53.974Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/HYLODE/HyUi/developer/setup.html</loc>
-    <lastmod>2023-03-13T12:12:35.775Z</lastmod>
+    <lastmod>2023-03-13T12:15:54.598Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/HYLODE/HyUi/developer/ide_setup.html</loc>
-    <lastmod>2023-03-13T12:12:36.191Z</lastmod>
+    <lastmod>2023-03-13T12:15:54.982Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/HYLODE/HyUi/about.html</loc>
-    <lastmod>2023-03-13T12:12:36.539Z</lastmod>
+    <lastmod>2023-03-13T12:15:55.298Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/HYLODE/HyUi/index.html</loc>
-    <lastmod>2023-03-13T12:12:36.903Z</lastmod>
+    <lastmod>2023-03-13T12:15:55.630Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/HYLODE/HyUi/contributor_guide/CONTRIBUTING.html</loc>
-    <lastmod>2023-03-13T12:12:37.623Z</lastmod>
+    <lastmod>2023-03-13T12:15:56.306Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/HYLODE/HyUi/contributor_guide/updating_gitignore.html</loc>
-    <lastmod>2023-03-13T12:12:37.992Z</lastmod>
+    <lastmod>2023-03-13T12:15:56.646Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/HYLODE/HyUi/contributor_guide/pre_commit_hooks.html</loc>
-    <lastmod>2023-03-13T12:12:38.732Z</lastmod>
+    <lastmod>2023-03-13T12:15:57.306Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/HYLODE/HyUi/contributor_guide/CODE_OF_CONDUCT.html</loc>
-    <lastmod>2023-03-13T12:12:39.128Z</lastmod>
+    <lastmod>2023-03-13T12:15:57.666Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/HYLODE/HyUi/user/user.html</loc>
-    <lastmod>2023-03-13T12:12:39.508Z</lastmod>
+    <lastmod>2023-03-13T12:15:57.978Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/HYLODE/HyUi/vignettes/beds_v3UCLH.html</loc>
-    <lastmod>2023-03-13T12:12:39.984Z</lastmod>
+    <lastmod>2023-03-13T12:15:58.402Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/HYLODE/HyUi/vignettes/icu-tap-emergency-predictions.html</loc>
-    <lastmod>2023-03-13T12:12:40.456Z</lastmod>
+    <lastmod>2023-03-13T12:15:58.850Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/HYLODE/HyUi/vignettes/beds_v3NHNN.html</loc>
-    <lastmod>2023-03-13T12:12:40.888Z</lastmod>
+    <lastmod>2023-03-13T12:15:59.242Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/HYLODE/HyUi/vignettes/icu-tap-elective-predictions.html</loc>
-    <lastmod>2023-03-13T12:12:41.432Z</lastmod>
+    <lastmod>2023-03-13T12:15:59.698Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/HYLODE/HyUi/vignettes/icu-tap-aggregate-probs.html</loc>
-    <lastmod>2023-03-13T12:12:41.812Z</lastmod>
+    <lastmod>2023-03-13T12:16:00.054Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/HYLODE/HyUi/vignettes/vignettes.html</loc>
-    <lastmod>2023-03-13T12:12:42.244Z</lastmod>
+    <lastmod>2023-03-13T12:16:00.438Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/HYLODE/HyUi/vignettes/wrangle_beds.html</loc>
-    <lastmod>2023-03-13T12:12:42.684Z</lastmod>
+    <lastmod>2023-03-13T12:16:00.838Z</lastmod>
   </url>
 </urlset>
