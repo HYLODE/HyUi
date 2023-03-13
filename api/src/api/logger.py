@@ -44,7 +44,7 @@ def logger_timeit(*, level: str = "DEBUG") -> Callable:
 
 
 # Log file
-log_file = Path(__file__).parent / "web.log"
+log_file = Path(__file__).parent / "api.log"
 logger.add(
     log_file,
     rotation="5MB",
@@ -58,7 +58,7 @@ logger.add(
 slack_settings = {"webhook_url": get_settings().slack_log_webhook.get_secret_value()}
 slack_bot = notifiers.get_notifier("slack")
 slack_bot.notify(
-    message=f"{datetime.now().isoformat()} | HyUi (Web) logging started",
+    message=f"{datetime.now().isoformat()} | HyUi (API) logging started",
     **slack_settings,
 )
 slack_handler = NotificationHandler("slack", defaults=slack_settings)
@@ -69,6 +69,6 @@ logger.success("Web logging configured and running")
 logger.info(
     "Log files exist within the docker container but can also be "
     "captured by redirecting at the commad line e.g."
-    "docker-compose logs -f web > web.log 2>&1 &"
+    "docker-compose logs -f api > api.log 2>&1 &"
 )
 # https://stackoverflow.com/a/68960206/992999
