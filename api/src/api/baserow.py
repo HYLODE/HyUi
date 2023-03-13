@@ -1,13 +1,11 @@
 import json
-import logging
-import requests
 import time
-import warnings
+import requests
 from functools import lru_cache
 from typing import Any, cast
 
+from api.logger import logger, logger_timeit
 from api.config import Settings, get_settings
-from api.utils import Timer
 
 
 def _admin_auth_headers(token: str) -> dict[str, str]:
@@ -30,7 +28,7 @@ def _simple_auth_headers(token: str) -> dict[str, str]:
     }
 
 
-@Timer(text="Getting admin auth token: Elapsed time {:0.4f} seconds")
+@logger_timeit()
 def _get_user_auth_token(settings: Settings) -> dict[str, str]:
     """
 
@@ -46,7 +44,7 @@ def _get_user_auth_token(settings: Settings) -> dict[str, str]:
     Returns:
         {access_token, refresh_token)
     """
-    logging.warning("Authenticating as admin via username/password")
+    logger.info("Authenticating as admin via username/password")
     msg = """
     This typically happens on docker compose up.
     We need to wait for the base row container to be ready before asking for
@@ -54,8 +52,9 @@ def _get_user_auth_token(settings: Settings) -> dict[str, str]:
     number of times at fixed intervals and only fail if no token is available
     12 x 5 seconds (1 minute)
     """
-    logging.warning(msg)
+    logger.debug(msg)
 
+    @logger_timeit()
     def _request_token() -> Any:
         # access tokens valid for 10m
         # refresh tokens valid for 168h
@@ -74,7 +73,7 @@ def _get_user_auth_token(settings: Settings) -> dict[str, str]:
     while attempt < max_attempts:
         response = _request_token()
         if response.status_code == 502:
-            logging.warning(
+            logger.warning(
                 f"Bad gateway on attempt {attempt}: check baserow "
                 f"again in 5 seconds"
             )
@@ -89,7 +88,7 @@ def _get_user_auth_token(settings: Settings) -> dict[str, str]:
         access_token = cast(str, response.json()["access_token"])
         refresh_token = cast(str, response.json()["refresh_token"])
     else:
-        logging.error("Failed to authenticate as admin")
+        logger.error("Failed to authenticate as admin")
         raise BaserowException(
             f"unexpected response {response.status_code}: "
             f""
@@ -103,7 +102,7 @@ def _get_user_auth_token(settings: Settings) -> dict[str, str]:
 def _refresh_user_auth_token(settings: Settings) -> str:
     # access tokens valid for 10m
     # refresh tokens valid for 168h
-    warnings.warn("Refreshing user authentication")
+    logger.info("Refreshing user authentication")
     refresh_token = _get_user_auth_token(settings)["refresh_token"]
     response = requests.post(
         f"{settings.baserow_url}/api/user/token-refresh/",
@@ -112,35 +111,37 @@ def _refresh_user_auth_token(settings: Settings) -> str:
     )
 
     if response.status_code == 200:
-        print("SUCCESS: refreshed access token")
+        logger.success("Refreshed access token")
         access_token = cast(str, response.json()["access_token"])
     else:
-        raise BaserowException(
-            "ERROR: unable to refresh access token"
-            f"unexpected response {response.status_code}: "
-            f"{str(response.content)}"
+        msg = (
+            "ERROR: unable to refresh access token unexpected response {"
+            "response.status_code}: {str(response.content)}"
         )
+        logger.error(msg)
+        raise BaserowException(msg)
     return access_token
 
 
+@logger_timeit()
 def _get_database_token(settings: Settings, auth_token: str, group_id: int) -> str:
     response = requests.get(
         url=f"{settings.baserow_url}/api/database/tokens/",
         headers=_admin_auth_headers(auth_token),
     )
     if response.status_code != 200:
-        raise BaserowException(
-            f"Error {response.status_code}: unable to " f"list database " f"tokens"
-        )
+        msg = f"Error {response.status_code}: unable to list database tokens"
+        logger.error(msg)
+        raise BaserowException(msg)
     token_list = [token for token in response.json() if token.get("group") == group_id]
     tokens = iter(token_list)
 
     try:
         token = next(tokens).get("key", "")
-        logging.info("Using existing database read/write token")
-        warnings.warn("Assumes that all tokens are equal with full " "permissions ")
+        logger.info("Using existing database read/write token")
+        logger.info("Assumes that all tokens are equal with full permissions")
     except StopIteration:
-        logging.info("Generating database read/write token")
+        logger.info("Generating database read/write token")
         response = requests.post(
             url=f"{settings.baserow_url}/api/database/tokens/",
             headers=_admin_auth_headers(auth_token),
@@ -153,33 +154,33 @@ def _get_database_token(settings: Settings, auth_token: str, group_id: int) -> s
         if response.status_code == 200:
             token = response.json().get("key", "")
         else:
-            raise BaserowException(
-                f"Error {response.status_code}: unable to " f"generate database token"
-            )
+            msg = f"Error {response.status_code}: unable to generate database token"
+            logger.error(msg)
+            raise BaserowException(msg)
     return token  # type: ignore
 
 
+@logger_timeit()
 def _get_group_id(settings: Settings, auth_token: str) -> int:
-    logging.info("Getting default group_id.")
+    logger.info("Getting default group_id.")
     response = requests.get(
         f"{settings.baserow_url}/api/groups/",
         headers=_admin_auth_headers(auth_token),
     )
     if response.status_code != 200:
-        raise BaserowException(
-            f"unexpected response {response.status_code}: "
-            f""
-            f"{str(response.content)}"
-        )
+        msg = f"unexpected response {response.status_code}: {str(response.content)}"
+        logger.error(msg)
+        raise BaserowException(msg)
 
     data = response.json()
     group = data[0]
     group_name = group["name"]
     group_id = group["id"]
-    logging.info(f"Using group '{group_name} with id {group_id}.")
+    logger.info(f"Using group '{group_name} with id {group_id}.")
     return cast(int, group_id)
 
 
+@logger_timeit()
 def _get_application_id(settings: Settings, auth_token: str) -> int:
     def _request(auth_token: str) -> Any:
         return requests.get(
@@ -190,11 +191,11 @@ def _get_application_id(settings: Settings, auth_token: str) -> int:
     response = _request(auth_token)
 
     if response.status_code == 401:
-        warnings.warn("Authentication error: will attempt to refresh")
+        logger.warning("Authentication error: will attempt to refresh")
         auth_token = _refresh_user_auth_token(settings)
         response = _request(auth_token)
         if response.status_code != 200:
-            warnings.warn("ERROR Failed trying to refresh access token")
+            logger.error("Failed trying to refresh access token")
             raise BaserowException(
                 f"unexpected response {response.status_code}: "
                 f"{str(response.content)}"
@@ -216,15 +217,11 @@ def _get_application_id(settings: Settings, auth_token: str) -> int:
     )
 
 
+@logger_timeit()
 def _get_table_ids(settings: Settings, auth_token: str, application_id: int) -> dict:
     """Return a dictionary of table names and ids"""
 
-    url = (
-        f"{settings.baserow_url}/api/database/tables/database/"
-        f""
-        f""
-        f"{application_id}/"
-    )
+    url = f"{settings.baserow_url}/api/database/tables/database/" f"{application_id}/"
 
     def _request(url: str, auth_token: str) -> requests.Response:
         return requests.get(
@@ -235,11 +232,11 @@ def _get_table_ids(settings: Settings, auth_token: str, application_id: int) -> 
     response = _request(url, auth_token)
 
     if response.status_code == 401:
-        warnings.warn("Authentication error: will attempt to refresh")
+        logger.warning("Authentication error: will attempt to refresh")
         auth_token = _refresh_user_auth_token(settings)
         response = _request(url, auth_token)
         if response.status_code != 200:
-            warnings.warn("ERROR Failed trying to refresh access token")
+            logger.error("Failed trying to refresh access token")
             raise BaserowException(
                 f"unexpected response {response.status_code}: "
                 f"{str(response.content)}"
@@ -247,9 +244,7 @@ def _get_table_ids(settings: Settings, auth_token: str, application_id: int) -> 
 
     if response.status_code != 200:
         raise BaserowException(
-            f"unexpected response {response.status_code}"
-            f": "
-            f"{str(response.content)}"
+            f"unexpected response {response.status_code}: {str(response.content)}"
         )
 
     lofd = response.json()  # lofd=list of dict
@@ -282,6 +277,7 @@ class BaserowDB:
         self.database_token = database_token
         self.tables_dict = tables_dict
 
+    @logger_timeit()
     def get_rows(
         self,
         table_name: str,
@@ -321,6 +317,7 @@ class BaserowDB:
 
         return rows
 
+    @logger_timeit()
     def get_fields(self, table_name: str) -> dict[str, int]:
 
         auth_token = self.database_token
@@ -337,6 +334,7 @@ class BaserowDB:
 
         return {row["name"]: row["id"] for row in response.json()}
 
+    @logger_timeit()
     def post_row(
         self,
         table_name: str,
@@ -364,24 +362,22 @@ class BaserowDB:
 
 @lru_cache()
 def get_baserow_db() -> BaserowDB:
-
-    logging.warning("Baserow module initiation")
-    logging.warning("=========================")
+    logger.info("Baserow module initiation")
     settings = get_settings()
 
-    logging.warning("Generating admin token")
+    logger.info("Generating admin token")
     admin_token = _get_user_auth_token(settings)["access_token"]
 
-    logging.warning("Getting database token")
+    logger.info("Getting database token")
     group_id = _get_group_id(settings, admin_token)
     database_token = _get_database_token(settings, admin_token, group_id)
 
-    logging.warning("Getting application ID")
+    logger.info("Getting application ID")
     application_id = _get_application_id(settings, admin_token)
 
-    logging.warning("Getting tables dictionary")
+    logger.info("Getting tables dictionary")
     tables_dict = _get_table_ids(settings, admin_token, application_id)
-    logging.info(str(tables_dict))
+    logger.info(str(tables_dict))
 
     return BaserowDB(
         settings=settings,
