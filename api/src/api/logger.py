@@ -65,7 +65,7 @@ slack_handler = NotificationHandler("slack", defaults=slack_settings)
 logger.add(slack_handler, level="ERROR")
 
 # Set-up complete
-logger.success("Web logging configured and running")
+logger.success("API logging configured and running")
 logger.info(
     "Log files exist within the docker container but can also be "
     "captured by redirecting at the commad line e.g."

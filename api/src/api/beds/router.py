@@ -305,6 +305,7 @@ def get_discharge_status(
 
     field_ids = baserow.get_fields(_table)
 
+    # TODO: hold the field ids in the baserow object
     modified_at_field_id = field_ids["modified_at"]
     horizon = (datetime.utcnow() - timedelta(hours=float(delta_hours))).isoformat()
 
