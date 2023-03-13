@@ -40,8 +40,6 @@ from sklearn.metrics import (
     ConfusionMatrixDisplay,
 )
 
-# _this_file = Path(__file__)
-
 
 def test_function():
     print(os.getcwd())

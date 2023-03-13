@@ -18,6 +18,7 @@ from .functions import run_pipeline  # type: ignore
 
 from api.config import get_settings
 
+_this_file = Path(__file__)
 
 # def get_emapdb_engine():
 #     get_settings().star_dsn
@@ -26,7 +27,7 @@ from api.config import get_settings
 
 def get_predictions(dataset: pd.DataFrame) -> dict:
     # Load the model and shap model
-    with open("final_model.pkl", "rb") as f:
+    with open(f"{_this_file.parent.resolve()}/final_model.pkl", "rb") as f:
         model = pickle.load(f)
 
     # Remove columns with 'ward' in them (these may cause model drift)
