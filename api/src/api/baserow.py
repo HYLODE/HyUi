@@ -4,6 +4,7 @@ import warnings
 from typing import Any, cast
 
 from api.utils import Timer
+from api.logger import logger_timeit, logger
 
 
 class BaserowException(Exception):
@@ -21,6 +22,7 @@ class BaserowAuthenticator:
         self.email = email
         self.password = password
 
+    @logger_timeit()
     def _get_user_auth_token(
         self,
     ) -> dict[str, str]:
@@ -31,7 +33,7 @@ class BaserowAuthenticator:
         )
         # access tokens valid for 10m
         # refresh tokens valid for 168h
-        warnings.warn("Authenticating via username/password")
+        logger.info("Authenticating via username/password")
 
         if response.status_code == 200:
             access_token = cast(str, response.json()["access_token"])
@@ -45,10 +47,11 @@ class BaserowAuthenticator:
         baserow_tokens = {"access_token": access_token, "refresh_token": refresh_token}
         return baserow_tokens
 
+    @logger_timeit()
     def _refresh_user_auth_token(self) -> str:
         # access tokens valid for 10m
         # refresh tokens valid for 168h
-        warnings.warn("Refreshing user authentication")
+        logger.info("Refreshing user authentication")
         # refresh_token = BASEROW_REFRESH_TOKEN  # from the outer scope
         refresh_token = self._get_user_auth_token()["refresh_token"]
         response = requests.post(
@@ -58,9 +61,10 @@ class BaserowAuthenticator:
         )
 
         if response.status_code == 200:
-            print("SUCCESS: refreshed access token")
+            logger.success("Refreshed access token")
             access_token = cast(str, response.json()["access_token"])
         else:
+            logger.error("Unable to refresh access token")
             raise BaserowException(
                 "ERROR: unable to refresh access token"
                 f"unexpected response {response.status_code}: "
@@ -75,7 +79,9 @@ class BaserowAuthenticator:
             "Authorization": f"JWT {auth_token}",
         }
 
+    @logger_timeit()
     def _get_application_id(self, auth_token: str, application_name: str) -> int | None:
+        @logger_timeit()
         def _request(auth_token: str) -> Any:
             return requests.get(
                 f"{self.baserow_url}/api/applications/",
@@ -85,17 +91,18 @@ class BaserowAuthenticator:
         response = _request(auth_token)
 
         if response.status_code == 401:
-            warnings.warn("Authentication error: will attempt to refresh")
+            logger.warning("Authentication error: will attempt to refresh")
             auth_token = self._refresh_user_auth_token()
             response = _request(auth_token)
             if response.status_code != 200:
-                warnings.warn("ERROR Failed trying to refresh access token")
+                logger.error("Failed trying to refresh access token")
                 raise BaserowException(
                     f"unexpected response {response.status_code}: "
                     f"{str(response.content)}"
                 )
 
         if response.status_code != 200:
+            logger.error(str(response.content))
             raise BaserowException(
                 f"unexpected response {response.status_code}: "
                 f"{str(response.content)}"
@@ -110,9 +117,11 @@ class BaserowAuthenticator:
             None,
         )
 
+    @logger_timeit()
     def _get_table_id(
         self, auth_token: str, application_id: int, table_name: str
     ) -> int | None:
+        @logger_timeit()
         def _request(auth_token: str) -> Any:
             return requests.get(
                 f"{self.baserow_url}/api/database/tables/database/{application_id}/",
@@ -122,11 +131,11 @@ class BaserowAuthenticator:
         response = _request(auth_token)
 
         if response.status_code == 401:
-            warnings.warn("Authentication error: will attempt to refresh")
+            logger.warning("Authentication error: will attempt to refresh")
             auth_token = self._refresh_user_auth_token()
             response = _request(auth_token)
             if response.status_code != 200:
-                warnings.warn("ERROR Failed trying to refresh access token")
+                logger.warning("ERROR Failed trying to refresh access token")
                 raise BaserowException(
                     f"unexpected response {response.status_code}: "
                     f"{str(response.content)}"
@@ -147,6 +156,7 @@ class BaserowAuthenticator:
             None,
         )
 
+    @logger_timeit()
     def get_rows(
         self,
         application_name: str,
@@ -179,10 +189,13 @@ class BaserowAuthenticator:
         while True:
 
             params["page"] = params["page"] + 1
-            with Timer(text="get_rows.requests: Elapsed time: {:.4f}"):
-                response = requests.get(
+
+            @logger_timeit()
+            def _get_rows():
+                return requests.get(
                     rows_url, headers=self._auth_headers(auth_token), params=params
                 )
+            response = _get_rows()
 
             if response.status_code != 200:
                 raise BaserowException(
