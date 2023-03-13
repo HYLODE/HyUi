@@ -929,5 +929,9 @@ src/api/perrt/admission_probability/generated_data
 # local jupyter lab for exploratory work
 jupyter/
 
-
+#electives models - temporary workaround before mlflow
 api/src/api/electives/deploy/*
+
+# PACU dashboard
+web/src/web/assets/pacu_dashboard.html
+web/src/web/assets/pqip_dashboard.html

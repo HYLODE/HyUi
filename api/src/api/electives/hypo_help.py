@@ -9,7 +9,7 @@ This aims to solve the issue that otherwise changes in individual functions
 would need to be transferred manually between two github repos.
 
 """
-
+from typing import Any
 import numpy as np
 import pandas as pd
 
@@ -1708,12 +1708,70 @@ def fill_na(df: pd.DataFrame) -> pd.DataFrame:
 
 def wrangle_pas(df: pd.DataFrame) -> pd.DataFrame:
     return (
-        df[
-            df["creation_instant"]
-            == df.groupby("patient_durable_key")["creation_instant"].transform(max)
-        ]
-        .sort_values(["patient_durable_key", "line_num"])
-        .groupby("patient_durable_key")
+        df.sort_values(["patient_durable_key", "creation_instant"])
+        .drop_duplicates("patient_durable_key", keep="last")
+        .loc[:, ["patient_durable_key", "creation_instant"]]
+        .merge(df, on=["patient_durable_key", "creation_instant"], how="left")
+        .replace(
+            {
+                "name": {
+                    "PAC NURSING ISSUES FOR FOLLOW UP": "pac_nursing_issues",
+                    "PAC NURSING OUTCOME": "pac_nursing_outcome",
+                    "PRE-ASSESSMENT ANAESTHETIC REVIEW": "pac_dr_review",
+                }
+            }
+        )
+        .sort_values(["patient_durable_key", "name", "line_num"])
+        .groupby(["patient_durable_key", "name", "creation_instant"])
         .agg({"string_value": "".join})
-        .rename(columns={"string_value": "pa_summary"})
+        .pivot_table(
+            index=["patient_durable_key", "creation_instant"],
+            columns=["name"],
+            values="string_value",
+            aggfunc="".join,
+        )
+        .reset_index()
+        .rename(columns={"creation_instant": "pac_date"})
     )
+
+
+def wrangle_hx(hx: pd.DataFrame) -> pd.DataFrame:
+    icd_codes = (
+        ("A00", "B99", "I"),
+        ("C00", "D48", "II"),
+        ("D50", "D89", "III"),
+        ("E00", "E90", "IV"),
+        ("F00", "F99", "V"),
+        ("G00", "G99", "VI"),
+        ("H00", "H59", "VII"),
+        ("H60", "H95", "VIII"),
+        ("I00", "I99", "IX"),
+        ("J00", "J99", "X"),
+        ("K00", "K93", "XI"),
+        ("L00", "L99", "XII"),
+        ("M00", "M99", "XIII"),
+        ("N00", "N99", "XIV"),
+        ("O00", "O99", "XV"),
+        ("P00", "P96", "XVI"),
+        ("Q00", "Q99", "XVII"),
+        ("R00", "R99", "XVIII"),
+        ("S00", "T98", "XIX"),
+        ("U00", "U99", "XX"),
+        ("V01", "Y98", "XXI"),
+        ("Z00", "Z99", "XXII"),
+    )
+
+    def _get_class(code: str, icd_codes: dict) -> Any:
+        for icd in icd_codes:
+            if code >= icd[0] and code <= icd[1]:
+                return icd[2]
+        return None
+
+    hx = hx.drop(hx[hx["value"] == "#NC"].index)
+    hx["class"] = hx["value"].str.slice(0, 3).apply(_get_class, icd_codes=icd_codes)
+
+    one_hot = pd.get_dummies(hx["class"])
+    one_hot["patient_durable_key"] = hx["patient_durable_key"]
+    counts = one_hot.groupby("patient_durable_key").sum()
+
+    return counts

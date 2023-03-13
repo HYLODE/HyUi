@@ -27,6 +27,9 @@ sitrep_ward = _NavLink(title="Ward", path="/sitrep/ward", icon="carbon:hospital-
 electives = _NavLink(
     title="Electives", path="/surgery/electives", icon="carbon:calendar"
 )
+pqip = _NavLink(
+    title="PACU Report", path="/assets/pacu_dashboard.html", icon="mdi:graph-areaspline"
+)
 a_and_e = _NavLink(
     title="Admissions", path="/a_and_e", icon="fluent:people-queue-24-regular"
 )
@@ -35,6 +38,10 @@ sitrep_icus = _NavLink(
     title="Critical Care", path="/sitrep/icus", icon="healthicons:critical-care-outline"
 )
 perrt = _NavLink(title="PERRT", path="/sitrep/perrt", icon="carbon:stethoscope")
+
+ed_predictor = _NavLink(
+    title="ED Predictor", path="/ed_pred", icon="carbon:machine-learning-model"
+)
 
 
 def create_side_navbar() -> dmc.Navbar:
@@ -109,6 +116,21 @@ def create_side_nave_content() -> dmc.Stack:
                 label=electives.title,
                 href=electives.path,
             ),
+            dmc.Anchor(
+                dmc.Group(
+                    [
+                        DashIconify(
+                            icon=pqip.icon,
+                            width=20,
+                            color=dmc.theme.DEFAULT_COLORS["indigo"][5],
+                        ),
+                        dmc.Text(pqip.title, size="sm"),
+                    ]
+                ),
+                href=pqip.path,
+                variant="text",
+                target="_blank",
+            ),
             dmc.Divider(
                 labelPosition="left",
                 label=[
@@ -122,17 +144,29 @@ def create_side_nave_content() -> dmc.Stack:
                 ],
                 my=20,
             ),
-            # create_main_nav_link(
-            #     icon=a_and_e.icon,
-            #     label=a_and_e.title,
-            #     href=a_and_e.path,
-            # ),
             create_main_nav_link(
                 icon=perrt.icon,
                 label=perrt.title,
                 href=perrt.path,
             ),
-
+            dmc.Divider(
+                labelPosition="left",
+                label=[
+                    DashIconify(
+                        icon="carbon:machine-learning-model",
+                        width=20,
+                        style={"marginRight": 10},
+                        color=dmc.theme.DEFAULT_COLORS["indigo"][5],
+                    ),
+                    "Predictive models",
+                ],
+                my=20,
+            ),
+            create_main_nav_link(
+                icon=ed_predictor.icon,
+                label=ed_predictor.title,
+                href=ed_predictor.path,
+            ),
         ],
     )
 

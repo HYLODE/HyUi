@@ -1,7 +1,8 @@
+from datetime import datetime
 import dash
 import dash_mantine_components as dmc
 import json
-from dash import Input, Output, State, callback, callback_context
+from dash import Input, Output, State, callback, callback_context, html
 from dash_iconify import DashIconify
 from typing import Any, Tuple
 
@@ -125,7 +126,7 @@ def bed_accordion_item(
                 icon="carbon:logout",
                 width=20,
             ),
-            dmc.Text("Discharge decision"),
+            dmc.Text("Discharge decision", size="sm"),
         ]
     )
     panel = dmc.Grid(
@@ -133,7 +134,9 @@ def bed_accordion_item(
             dmc.Col(
                 [
                     dmc.Text(
-                        "Ready for discharge/transfer/step-down etc.", color=colors.gray
+                        "Ready for discharge/transfer/step-down etc.",
+                        color=colors.gray,
+                        size="sm",
                     )
                 ],
                 span=12,
@@ -146,11 +149,12 @@ def bed_accordion_item(
                     value=bed_status_control_value,
                     color=color,
                     persistence=False,
+                    size="sm",
                 ),
                 span=12,
             ),
             dmc.Col(
-                [dmc.Text(id=ids.ACC_BED_DECISION_TEXT, color=colors.gray)],
+                [dmc.Text(id=ids.ACC_BED_DECISION_TEXT, size="sm", color=colors.gray)],
                 span=6,
             ),
             dmc.Col(
@@ -158,6 +162,7 @@ def bed_accordion_item(
                     "Submit",
                     id=ids.ACC_BED_SUBMIT_WARD,
                     color="orange",
+                    size="sm",
                     # variant="default",
                 ),
                 span="content",
@@ -273,6 +278,20 @@ def patient_accordion_item(
         return dmc.AccordionControl(control), dmc.AccordionPanel(panel)
 
     data = node.get("data", {})
+
+    if data.get("closed"):
+        control = dmc.Group(
+            [
+                DashIconify(
+                    icon="carbon:close-outline",
+                    width=20,
+                ),
+                dmc.Text("Bed closed", size="sm"),
+            ]
+        )
+        panel = None
+        return dmc.AccordionControl(control), dmc.AccordionPanel(panel)
+
     census = data.get("census", {})
     occupied = census.get("occupied", False)
     sex_icon = "carbon:person"
@@ -284,7 +303,7 @@ def patient_accordion_item(
             sex_icon = (
                 "carbon:gender-male" if sex.lower() == "m" else "carbon:gender-female"
             )
-        control_text = censusf.get("demographic_slug", "Uh-oh! No patient data?")
+        control_text = "{firstname} {lastname} ({age}yrs)".format(**censusf)
 
     control = dmc.Group(
         [
@@ -292,25 +311,41 @@ def patient_accordion_item(
                 icon=sex_icon,
                 width=20,
             ),
-            dmc.Text(control_text),
+            dmc.Text(control_text, size="sm"),
         ]
     )
 
     sitrep = data.get("sitrep", {})
     if sitrep:
-        sitrep_content = _report_patient_status(sitrep)
-        sitrep_text = dmc.Text("")
+
+        dob = dmc.Code(censusf.get("dob_fshort", "DD-MM-CCYY"), block=False)
+        mrn = dmc.Code(censusf.get("mrn", "Unknown"), block=False)
+        csn = dmc.Code(censusf.get("encounter", "Unknown"), block=False)
+        ids_labels = html.Tr([html.Td("DoB"), html.Td("MRN"), html.Td("CSN")])
+        ids_row = html.Tr([html.Td(dob), html.Td(mrn), html.Td(csn)])
+        ids_body = html.Tbody([ids_labels, ids_row])
+        ids_table = dmc.Table([ids_body])
+
+        try:
+            hospital_admit = census.get("hv_admission_dt")
+            hospital_los = str(int((datetime.utcnow() - hospital_admit).days))
+            hospital_admit_str = datetime.strftime(hospital_admit, "%d %b %Y")
+            los_text = dmc.Text(f"Hospital LoS: {hospital_los}", size="sm")
+        except TypeError as e:
+            los_text = dmc.Text(f"Hospital LoS: Unknown", size="sm")
+
+        sitrep_content = [
+            _report_patient_status(sitrep),
+            ids_table,
+            los_text,
+        ]
     else:
-        sitrep_content = dmc.Group()
-        sitrep_text = dmc.Text("Sitrep patient data not available")
+        sitrep_content = [dmc.Text("Sitrep patient data not available", size="sm")]
 
     panel = dmc.Grid(
         [
             dmc.Col(
-                [
-                    sitrep_content,
-                    sitrep_text,
-                ],
+                sitrep_content,
                 span=12,
             )
         ]
@@ -335,7 +370,7 @@ def debug_accordion_item(node: dict) -> Tuple[dmc.AccordionControl, dmc.Accordio
                 icon="carbon:debug",
                 width=20,
             ),
-            dmc.Text("Developer and debug inspector"),
+            dmc.Text("Developer and debug inspector", size="xs"),
         ]
     )
     control = dmc.AccordionControl(title)

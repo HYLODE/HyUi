@@ -32,7 +32,7 @@ def create_appshell(nav_data: list | dict) -> dmc.MantineProvider:
                     interval=6 * 60 * 60 * 1000,
                 ),
                 stores,
-                dcc.Store(id="theme-store", storage_type="local"),
+                # dcc.Store(id="theme-store", storage_type="local"),
                 dcc.Location(id="url"),
                 dmc.NotificationsProvider(
                     [
@@ -40,12 +40,7 @@ def create_appshell(nav_data: list | dict) -> dmc.MantineProvider:
                         create_side_navbar(),
                         create_navbar_drawer(),
                         html.Div(
-                            dmc.Container(
-                                size="xl",
-                                # fluid=True,
-                                pt=90,
-                                children=page_container,
-                            ),
+                            dmc.Container(size="xxl", pt=90, children=page_container),
                             id="wrapper",
                         ),
                     ]

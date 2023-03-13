@@ -1,10 +1,10 @@
 import dash
-
 import diskcache
 import tempfile
 from uuid import uuid4
-from web.layout.appshell import create_appshell
+
 from web.config import get_settings
+from web.layout.appshell import create_appshell
 
 launch_uuid = uuid4()
 cache = diskcache.Cache(tempfile.TemporaryDirectory().name)
@@ -12,9 +12,17 @@ background_callback_manager = dash.DiskcacheManager(
     cache, cache_by=[lambda: launch_uuid], expire=600  # seconds
 )
 
+# external_scripts = [
+#     {
+#         "src": "https://plausible.io/js/script.js",
+#         "data-domain": "hylode.org",
+#     }
+# ]
+
 app = dash.Dash(
     __name__,
     use_pages=True,
+    # external_scripts=external_scripts,
     external_stylesheets=[
         "assets/style.css",
         # include google fonts
@@ -31,6 +39,27 @@ app = dash.Dash(
     ],
     background_callback_manager=background_callback_manager,
 )
+
+app.index_string = """
+<!DOCTYPE html>
+<html>
+    <head>
+        <script defer data-domain="hylode.org" src="https://plausible.io/js/script.js"></script>
+        {%metas%}
+        <title>{%title%}</title>
+        {%favicon%}
+        {%css%}
+    </head>
+    <body>
+        {%app_entry%}
+        <footer>
+            {%config%}
+            {%scripts%}
+            {%renderer%}
+        </footer>
+    </body>
+</html>
+"""
 
 app.config.suppress_callback_exceptions = True
 app.layout = create_appshell([dash.page_registry.values()])

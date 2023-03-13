@@ -181,7 +181,10 @@ class MergedData(CabData):
     department_name: str | None
     room_name: str | None
     preassess_date: date | None
-    pa_summary: str | None
+    pac_dr_review: str | None
+    pac_nursing_outcome: str | None
+    pac_nursing_issues: str | None
+    display_string: str | None
     mets: int | None
     anaesthetic_alert: int | None
     asa_rating_code: str | None
@@ -245,6 +248,12 @@ class AxaCodes(BaseModel):
 
 
 class PreassessSummaryData(CabData):
-    creation_instant: datetime
-    string_value: str
-    line_num: int
+    creation_instant: datetime | None
+    string_value: str | None
+    line_num: int | None
+    name: str | None
+
+
+class MedicalHx(CabData):
+    value: str | None
+    display_string: str | None

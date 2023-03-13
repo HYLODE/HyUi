@@ -58,3 +58,6 @@ format:
     theme: cosmo
     css: styles.css
     toc: true
+    include-in-header:
+      text: |
+        <script defer data-domain="uclhal.org" src="https://plausible.io/js/script.js"></script>
