@@ -22,6 +22,9 @@ CYTO_CAMPUS = gen_id("cyto campus", __name__)
 PROGRESS_CAMPUS = gen_id("progress campus", __name__)
 
 # inspector
+SIDEBAR_TITLE = gen_id("sidebar title", __name__)
+SIDEBAR_CONTENT = gen_id("sidebar content", __name__)
+
 INSPECTOR_CAMPUS_MODAL = gen_id("inspector campus modal", __name__)
 INSPECTOR_CAMPUS_ACCORDION = gen_id("campus accordion", __name__)
 

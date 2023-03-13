@@ -44,7 +44,8 @@ app.index_string = """
 <!DOCTYPE html>
 <html>
     <head>
-        <script defer data-domain="hylode.org" src="https://plausible.io/js/script.js"></script>
+        <script defer data-domain="hylode.org"
+            src="https://plausible.io/js/script.js"></script>
         {%metas%}
         <title>{%title%}</title>
         {%favicon%}
@@ -67,4 +68,4 @@ app.layout = create_appshell([dash.page_registry.values()])
 server = app.server
 
 if __name__ == "__main__":
-    app.run_server(host="0.0.0.0", port=get_settings().development_port, debug=True)
+    app.run_server(host="0.0.0.0", port=get_settings().port, debug=True)

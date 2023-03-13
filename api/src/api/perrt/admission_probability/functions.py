@@ -40,6 +40,8 @@ from sklearn.metrics import (
     ConfusionMatrixDisplay,
 )
 
+# _this_file = Path(__file__)
+
 
 def test_function():
     print(os.getcwd())
@@ -50,7 +52,7 @@ def test_function():
 def sql_query_from_file(query_file, sql_dir=None, verbose=True):
     """Read SQL from a text file"""
     if not sql_dir:
-        sql_dir = Path.cwd() / "sql"
+        sql_dir = Path(__file__).parent.resolve() / "sql"
     f = sql_dir / query_file
     query = f.read_text()
     if verbose:

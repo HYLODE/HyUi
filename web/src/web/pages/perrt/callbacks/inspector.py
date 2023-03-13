@@ -1,7 +1,7 @@
 import dash
 import dash_mantine_components as dmc
 import json
-from dash import Input, Output, State, callback, callback_context
+from dash import Input, Output, State, callback, callback_context, html
 from dash_iconify import DashIconify
 from typing import Any, Tuple
 from datetime import datetime
@@ -28,33 +28,43 @@ def _create_accordion_item(control: Any, panel: Any) -> Any:
 
 @callback(
     [
-        Output(ids.INSPECTOR_CAMPUS_MODAL, "opened"),
+        Output(ids.SIDEBAR_CONTENT, "hidden"),
         Output(ids.INSPECTOR_CAMPUS_ACCORDION, "value"),
-        Output(ids.INSPECTOR_CAMPUS_MODAL, "title"),
+        Output(ids.SIDEBAR_TITLE, "children"),
     ],
-    Input(ids.CYTO_CAMPUS, "tapNode"),
-    State(ids.INSPECTOR_CAMPUS_MODAL, "opened"),
+    Input(ids.CYTO_CAMPUS, "selectedNodeData"),
     prevent_initial_callback=True,
 )
-def open_inspector_modal(node: dict, opened: bool) -> Tuple[bool, list[str], dmc.Group]:
+def update_patient_sidebar(nodes: list[dict]) -> Tuple[bool, list[str], dmc.Group]:
     """
     Open modal
     prepare modal title
     define which accordion item is open
     """
-    if not node:
-        return False, ["bed"], dmc.Group()
+    click_title = dmc.Group(
+        [
+            DashIconify(
+                icon="material-symbols:left-click-rounded",
+                color=colors.indigo,
+                width=30,
+            ),
+            dmc.Text(f"Click on a bed for more information", weight=500),
+        ]
+    )
 
-    data = node.get("data", {})
+    if not nodes or len(nodes) != 1:
+        return True, [], dmc.Group(click_title)
+
+    data = nodes[0]
     if data.get("entity") != "bed":
-        return False, ["bed"], dmc.Group()
+        return True, ["bed"], dmc.Group(click_title)
 
     bed = data.get("bed")
     bed_color = colors.orange if data.get("occupied") else colors.gray
     bed_number = bed.get("bed_number")
     department = bed.get("department")
 
-    modal_title = dmc.Group(
+    bed_title = dmc.Group(
         [
             DashIconify(
                 icon="carbon:hospital-bed",
@@ -63,28 +73,31 @@ def open_inspector_modal(node: dict, opened: bool) -> Tuple[bool, list[str], dmc
             ),
             dmc.Text(f"BED {bed_number}", weight=500),
             dmc.Text(f"{department}", color=colors.gray),
-        ]
+        ],
+        pb=20,
     )
 
-    return not opened, ["bed"], modal_title
+    return False, ["bed"], bed_title
 
 
 @callback(
     Output(ids.ACCORDION_ITEM_PERRT, "children"),
-    Input(ids.CYTO_CAMPUS, "tapNode"),
-    Input(ids.INSPECTOR_CAMPUS_MODAL, "opened"),
+    Input(ids.CYTO_CAMPUS, "selectedNodeData"),
     prevent_initial_call=True,
 )
-def bed_accordion_item(
-    node: dict, modal_open: bool
+def perrt_accordion_item(
+    nodes: list[dict],
 ) -> Tuple[dmc.AccordionControl, dmc.AccordionPanel]:
     """Prepare content for PERRT accordion item"""
-
-    if not node or not modal_open:  # return quickly if modal or node closed
-        control, panel = None, None
+    control, panel = None, None
+    if not nodes or len(nodes) != 1:
         return dmc.AccordionControl(control), dmc.AccordionPanel(panel)
 
-    news = node.get("data", {}).get("news", {})
+    data = nodes[0]
+    if data.get("entity") != "bed":
+        return dmc.AccordionControl(control), dmc.AccordionPanel(panel)
+
+    news = data.get("news", {})
     if news:
         news_text = dmc.Text("Highest/lowest vitals within the last 6 hours")
         news_content = dmc.Group(
@@ -233,14 +246,12 @@ def submit_discharge_status(
 @callback(
     Output(ids.ACCORDION_ITEM_PATIENT, "children"),
     Input(ids.CYTO_CAMPUS, "tapNode"),
-    Input(ids.INSPECTOR_CAMPUS_MODAL, "opened"),
-    prevent_initial_call=True,
 )
 def patient_accordion_item(
-    node: dict, modal_open: bool
+    node: dict,
 ) -> Tuple[dmc.AccordionControl, dmc.AccordionPanel]:
     """Prepare content for bed accordion item"""
-    if not node or not modal_open:
+    if not node:
         control, panel = None, None
         return dmc.AccordionControl(control), dmc.AccordionPanel(panel)
 

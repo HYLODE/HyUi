@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     secret_key: SecretStr
 
     # The port to use when running in development mode.
-    development_port: str = "8300"
+    port: str
 
     api_url: AnyHttpUrl
     baserow_public_url: AnyHttpUrl
