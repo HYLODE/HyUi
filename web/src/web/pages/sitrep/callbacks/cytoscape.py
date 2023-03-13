@@ -83,8 +83,8 @@ def _make_elements(  # noqa: C901
     try:
         discharge_lookup = {str(i.get("csn")): i for i in discharges}
     except TypeError as e:
-        warnings.warn("Possible type error b/c no recent discharges")
-        print(e)
+        logger.warning("Possible type error b/c no recent discharges")
+        logger.exception(e)
         discharge_lookup = {}
 
     sitrep_lookup = {i.get("csn"): i for i in sitrep}
