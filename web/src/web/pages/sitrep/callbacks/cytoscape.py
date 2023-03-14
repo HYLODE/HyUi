@@ -87,7 +87,13 @@ def _make_elements(  # noqa: C901
         logger.exception(e)
         discharge_lookup = {}
 
-    sitrep_lookup = {i.get("csn"): i for i in sitrep}
+    try:
+        sitrep_lookup = {i.get("csn"): i for i in sitrep}
+    except TypeError as e:
+        logger.warning("Possible type error b/c sitrep empty?")
+        logger.exception(e)
+        sitrep_lookup = {}
+
     preset_map_positions = (
         False
         if selected_dept not in SITREP_DEPT2WARD_MAPPING.keys()
