@@ -28,6 +28,13 @@ def _simple_auth_headers(token: str) -> dict[str, str]:
     }
 
 
+def _request(url: str, auth_token: str) -> requests.Response:
+    return requests.get(
+        url=url,
+        headers=_admin_auth_headers(auth_token),
+    )
+
+
 @logger_timeit()
 def _get_user_auth_token(settings: Settings) -> dict[str, str]:
     """
@@ -218,23 +225,19 @@ def _get_application_id(settings: Settings, auth_token: str) -> int:
 
 
 @logger_timeit()
-def _get_table_ids(settings: Settings, auth_token: str, application_id: int) -> dict:
-    """Return a dictionary of table names and ids"""
+def _get_table_dict(settings: Settings, auth_token: str, application_id: int) -> dict:
+    """Return a dictionary of table ids, names, and a sub dict of fields and
+    ids"""
 
-    url = f"{settings.baserow_url}/api/database/tables/database/" f"{application_id}/"
-
-    def _request(url: str, auth_token: str) -> requests.Response:
-        return requests.get(
-            url=url,
-            headers=_admin_auth_headers(auth_token),
-        )
-
-    response = _request(url, auth_token)
+    tables_url = (
+        f"{settings.baserow_url}/api/database/tables/database" f"/{application_id}/"
+    )
+    response = _request(tables_url, auth_token)
 
     if response.status_code == 401:
         logger.warning("Authentication error: will attempt to refresh")
         auth_token = _refresh_user_auth_token(settings)
-        response = _request(url, auth_token)
+        response = _request(tables_url, auth_token)
         if response.status_code != 200:
             logger.error("Failed trying to refresh access token")
             raise BaserowException(
@@ -247,8 +250,26 @@ def _get_table_ids(settings: Settings, auth_token: str, application_id: int) -> 
             f"unexpected response {response.status_code}: {str(response.content)}"
         )
 
-    lofd = response.json()  # lofd=list of dict
-    return {d.get("name"): d.get("id") for d in lofd}  #
+    # table ids
+    table_dict = {}
+    for d in response.json():
+        tid, name = d.get("id"), d.get("name")
+        fields_url = f"{settings.baserow_url}/api/database/fields/table/{tid}/"
+        response = _request(fields_url, auth_token)
+
+        if response.status_code != 200:
+            logger.error(f"Failed to fetch fields for table {name}")
+            raise BaserowException(f"{str(response.content)}")
+
+        fields = {row["name"]: row["id"] for row in response.json()}
+
+        table_dict[name] = dict(
+            id=tid,
+            name=name,
+            fields=fields,
+        )
+
+    return table_dict
 
 
 class BaserowException(Exception):
@@ -278,6 +299,23 @@ class BaserowDB:
         self.tables_dict = tables_dict
 
     @logger_timeit()
+    def get_fields(self, table_name: str) -> dict[str, int]:
+
+        auth_token = self.database_token
+        table_id = self.tables_dict.get(table_name, {}).get("id")
+
+        url = f"{self.baserow_url}/api/database/fields/table/{table_id}/"
+        response = requests.get(url, headers=_simple_auth_headers(auth_token))
+
+        if response.status_code != 200:
+            raise BaserowException(
+                f"unexpected response {response.status_code}: "
+                f"{str(response.content)}"
+            )
+
+        return {row["name"]: row["id"] for row in response.json()}
+
+    @logger_timeit()
     def get_rows(
         self,
         table_name: str,
@@ -290,7 +328,7 @@ class BaserowDB:
         """
         # auth_token = self._get_user_auth_token()["access_token"]
         auth_token = self.database_token
-        table_id = self.tables_dict.get(table_name)
+        table_id = self.tables_dict.get(table_name, {}).get("id")
         rows_url = f"{self.baserow_url}/api/database/rows/table/{table_id}/"
 
         params["page"] = 0
@@ -318,23 +356,6 @@ class BaserowDB:
         return rows
 
     @logger_timeit()
-    def get_fields(self, table_name: str) -> dict[str, int]:
-
-        auth_token = self.database_token
-        table_id = self.tables_dict.get(table_name)
-
-        url = f"{self.baserow_url}/api/database/fields/table/{table_id}/"
-        response = requests.get(url, headers=_simple_auth_headers(auth_token))
-
-        if response.status_code != 200:
-            raise BaserowException(
-                f"unexpected response {response.status_code}: "
-                f"{str(response.content)}"
-            )
-
-        return {row["name"]: row["id"] for row in response.json()}
-
-    @logger_timeit()
     def post_row(
         self,
         table_name: str,
@@ -343,7 +364,7 @@ class BaserowDB:
     ) -> Any:
 
         auth_token = self.database_token
-        table_id = self.tables_dict.get(table_name)
+        table_id = self.tables_dict.get(table_name, {}).get("id")
         url = f"{self.baserow_url}/api/database/rows/table/{table_id}/"
 
         response = requests.post(
@@ -376,8 +397,7 @@ def get_baserow_db() -> BaserowDB:
     application_id = _get_application_id(settings, admin_token)
 
     logger.info("Getting tables dictionary")
-    tables_dict = _get_table_ids(settings, admin_token, application_id)
-    logger.info(str(tables_dict))
+    tables_dict = _get_table_dict(settings, admin_token, application_id)
 
     return BaserowDB(
         settings=settings,
