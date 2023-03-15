@@ -23,7 +23,12 @@ _this_file = Path(__file__)
 
 @router.get("/icu_admission_preciction", response_model=dict)
 def get_icu_admission_preciction(request: Request) -> dict:
-    return dict(request.app.state.perrt_icu_adm_predictions)
+    return {x: y for x, y in request.app.state.perrt_icu_adm_predictions}
+
+
+@mock_router.get("/icu_admission_preciction", response_model=dict)
+def get_mock_icu_admission_preciction() -> dict:
+    return {"699999996": 0.85, "674628501": 0.3}
 
 
 @router.get("/cpr", response_model=list[EmapCpr])

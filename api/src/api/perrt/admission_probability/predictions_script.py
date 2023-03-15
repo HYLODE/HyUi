@@ -8,7 +8,8 @@ from sqlalchemy import create_engine
 import pickle
 import pandas as pd
 from pathlib import Path
-import os
+
+# import os
 import re
 
 # import sched
@@ -38,20 +39,20 @@ def get_predictions(dataset: pd.DataFrame) -> dict:
     # Make our predictions
     predictions = model.predict_proba(dataset.loc[:, cols_for_use])[:, 1]
 
-    return dict(zip(dataset.index.map(str), predictions))
+    return dict(zip(dataset.index.map(str), predictions.tolist()))
 
 
-def write_predictions(predictions_map: dict) -> None:
-    generated_data_folder_path = Path(f"{Path(__file__).parent}/generated_data")
+# def write_predictions(predictions_map: dict) -> None:
+#     generated_data_folder_path = Path(f"{Path(__file__).parent}/generated_data")
 
-    if not generated_data_folder_path.is_dir():
-        os.makedirs(generated_data_folder_path)
+#     if not generated_data_folder_path.is_dir():
+#         os.makedirs(generated_data_folder_path)
 
-    with open(
-        f"{generated_data_folder_path}/id_to_admission_prediction.pkl", "wb"
-    ) as f:
-        print("Pickling predictions map")
-        pickle.dump(predictions_map, f)
+#     with open(
+#         f"{generated_data_folder_path}/id_to_admission_prediction.pkl", "wb"
+#     ) as f:
+#         print("Pickling predictions map")
+#         pickle.dump(predictions_map, f)
 
 
 def run_prediction_pipeline() -> dict:

@@ -81,10 +81,9 @@ app.include_router(mock_router)
 @app.on_event("startup")
 @repeat_every(seconds=120, raise_exceptions=True)
 def refresh_perrt_icu_admission_predictions() -> None:
-    print("pred start")
+    app.state.perrt_icu_adm_predictions = {}
     predictions = run_prediction_pipeline()
     app.state.perrt_icu_adm_predictions = predictions
-    print("done")
 
 
 @app.middleware("http")
