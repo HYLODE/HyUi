@@ -127,7 +127,7 @@ def _store_all_sitreps(_: int) -> dict:
     return sitreps
 
 
-stores = html.Div(
+web_stores = html.Div(
     [
         dcc.Store(id=ids.DEPT_STORE),
         dcc.Store(id=ids.ROOM_STORE),
