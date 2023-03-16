@@ -15,7 +15,6 @@ from web.pages.sitrep import ids
 @logger_timeit(level="DEBUG")
 def _store_depts(dept_grouper: str, depts: list[dict]) -> list[dict]:
     """Need a list of departments for ALL_ICUS or this campus"""
-    logger.info("just testing")
     if dept_grouper == "ALL_ICUS":
         icus = SITREP_DEPT2WARD_MAPPING.keys()
         these_depts = [dept for dept in depts if dept.get("department") in icus]

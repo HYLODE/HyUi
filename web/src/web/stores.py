@@ -12,6 +12,7 @@ from models.electives import MergedData
 from models.sitrep import SitrepRow
 from web import ids
 from web.config import get_settings
+from web.logger import logger, logger_timeit
 
 
 # TODO: add a refresh button as an input to the store functions pulling from
@@ -24,6 +25,7 @@ from web.config import get_settings
     Input(ids.STORE_TIMER_1H, "n_intervals"),
     background=True,
 )
+@logger_timeit()
 def _store_departments(_: int) -> list[dict]:
     """Store all open departments"""
     response = requests.get(
@@ -38,6 +40,7 @@ def _store_departments(_: int) -> list[dict]:
     Input(ids.STORE_TIMER_1H, "n_intervals"),
     background=True,
 )
+@logger_timeit()
 def _store_rooms(_: int) -> list[dict]:
     """Store all rooms with beds"""
     response = requests.get(
@@ -52,7 +55,9 @@ def _store_rooms(_: int) -> list[dict]:
     Input(ids.STORE_TIMER_1H, "n_intervals"),
     background=True,
 )
+@logger_timeit()
 def _store_beds(_: int) -> list[dict]:
+    logger.info("Collecting beds data on initial load")
     response = requests.get(
         f"{get_settings().api_url}/baserow/beds/",
     )
@@ -64,6 +69,7 @@ def _store_beds(_: int) -> list[dict]:
     Input(ids.STORE_TIMER_6H, "n_intervals"),
     background=True,
 )
+@logger_timeit()
 def _store_electives(_: int) -> list[dict]:
     response = requests.get(
         f"{get_settings().api_url}/electives/",
@@ -76,6 +82,7 @@ def _store_electives(_: int) -> list[dict]:
     Input(ids.STORE_TIMER_1H, "n_intervals"),
     background=True,
 )
+@logger_timeit()
 def _store_all_sitreps(_: int) -> dict:
     """Return sitrep status for all critical care areas"""
     SITREP_DEPT2WARD_MAPPING: dict = {

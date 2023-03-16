@@ -9,10 +9,13 @@ from web.logger import logger
 
 logger.info("Web app starting")
 
+background_cache_expire = 600  # seconds
+logger.info(f"Background callbacks cache default {background_cache_expire} "
+            f"seconds")
 launch_uuid = uuid4()
 cache = diskcache.Cache(tempfile.TemporaryDirectory().name)
 background_callback_manager = dash.DiskcacheManager(
-    cache, cache_by=[lambda: launch_uuid], expire=600  # seconds
+    cache, cache_by=[lambda: launch_uuid], expire=background_cache_expire
 )
 
 app = dash.Dash(
