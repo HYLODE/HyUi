@@ -99,5 +99,5 @@ class ElTap(BaseModel):  # , table=True):  # type: ignore
 
 
 class EmElTapPostBody(BaseModel):
-    horizon_dt: datetime = arrow.now().shift(days=1).format("YYYY-MM-DDTHH:mm:ss")
+    horizon_dt: str = arrow.now().shift(days=1).format("YYYY-MM-DDTHH:mm:ss")
     department: str = "tower"
