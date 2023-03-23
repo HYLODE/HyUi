@@ -28,7 +28,7 @@ mock_router = APIRouter(
 )
 
 
-@router.get(
+@router.post(
     "/icu/tap/emergency/",
     response_model=list[EmTap],
 )
@@ -72,7 +72,7 @@ def get_mock_emergency_icu_admission_predictions() -> pd.DataFrame:
     return response
 
 
-@router.get("/icu/tap/electives")
+@router.post("/icu/tap/electives")
 def get_elective_icu_admission_predictions(
     response: Response,
     data: EmElTapPostBody,
