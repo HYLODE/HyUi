@@ -2,7 +2,9 @@
 title: HYLODE Infrastructure
 ---
 
-Our infrastructure is managed under the [HySys](https://github.com/HYLODE/HySys) repository which contains a series of _readme_ files. Setup and deployment of the various services is described [here](https://github.com/HYLODE/HySys/blob/main/hylode/README.md)
+Our infrastructure is managed under the [HySys](https://github.com/HYLODE/HySys) repository which contains a series of _readme_ files. Setup and deployment of the various services is described [here](https://github.com/HYLODE/HySys/blob/main/hylode/README.md).
+
+Detailed documentation for each major subcomponent of HySys is provided below:
 
 - [HyCastle - the _keeper_](https://github.com/HYLODE/HySys/tree/main/hylode/hycastle)
 - [HyCommand - the _controller_](https://github.com/HYLODE/HySys/tree/main/hylode/hycommand)
@@ -10,3 +12,7 @@ Our infrastructure is managed under the [HySys](https://github.com/HYLODE/HySys)
 - [HyGear - the _transformer_](https://github.com/HYLODE/HySys/tree/main/hylode/hygear)
 - [HyMind - the _laboratory_](https://github.com/HYLODE/HySys/tree/main/hylode/hymind)
 - [HyViz - the _monitor_](https://github.com/HYLODE/HySys/tree/main/hylode/hyviz)
+
+## Deployment locations
+
+Deployment information for the `prod` and `staging_red` HySys deployments such as host, directory location on the host and assigned ports can be found in the [HySys README.md](https://github.com/HYLODE/HySys/blob/main/hylode/README.md).
