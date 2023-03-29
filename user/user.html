@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.335">
+<meta name="generator" content="quarto-1.2.475">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -199,7 +199,24 @@ ul.task-list li input[type="checkbox"] {
 </nav>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#hysys" id="toc-hysys" class="nav-link active" data-scroll-target="#hysys">HySys</a>
+  <ul class="collapse">
+  <li><a href="#deployment" id="toc-deployment" class="nav-link" data-scroll-target="#deployment">Deployment</a>
+  <ul class="collapse">
+  <li><a href="#interactive-service-deployment" id="toc-interactive-service-deployment" class="nav-link" data-scroll-target="#interactive-service-deployment">Interactive service deployment</a></li>
+  </ul></li>
+  <li><a href="#taking-services-down" id="toc-taking-services-down" class="nav-link" data-scroll-target="#taking-services-down">Taking services down</a>
+  <ul class="collapse">
+  <li><a href="#in-band-predictions" id="toc-in-band-predictions" class="nav-link" data-scroll-target="#in-band-predictions">In-band predictions</a></li>
+  </ul></li>
+  <li><a href="#please-note" id="toc-please-note" class="nav-link" data-scroll-target="#please-note">Please note</a></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hylode/hyui/edit/main/hyui/user/user.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/hylode/hyui/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -221,12 +238,54 @@ ul.task-list li input[type="checkbox"] {
 
 </header>
 
+<section id="hysys" class="level1">
+<h1>HySys</h1>
+<p>Your first port of call for all questions HySys should be the <a href="https://github.com/HYLODE/HySys/blob/main/hylode/README.md">top-level repository documentation</a>. Some tips and tricks for particularly common patterns are given here.</p>
+<section id="deployment" class="level2">
+<h2 class="anchored" data-anchor-id="deployment">Deployment</h2>
+<p>Deployment instructions for a fresh installation of HySys are provided in the readme linked to above. To redeploy an already existing deployment on the NHS network:</p>
+<ol type="1">
+<li>Navigate to the directory containing the checked out repository. Locations are provided <a href="https://github.com/HYLODE/HySys/blob/main/hylode/README.md">here</a> for the <code>staging_red</code> and <code>prod</code> deployments.</li>
+<li>Navigate to the the <code>hylode/</code> directory (containing <code>docker-compose.yml</code>)</li>
+<li>From within a <code>tmux</code> or <code>screen</code> session, execute the <code>bin/up.sh</code> script to deploy most of the back-end HySys services
+<ul>
+<li>you can execute this by running <code>./bin/up.sh</code> on the command line</li>
+<li>it’s recommended to run this command inside a <code>tmux</code> or <code>screen</code> session</li>
+</ul></li>
+</ol>
+<p>This will redeploy all <em>non-interactive</em> services - everything but the HyMind <code>Lab</code> and <code>Field</code>.</p>
+<section id="interactive-service-deployment" class="level3">
+<h3 class="anchored" data-anchor-id="interactive-service-deployment">Interactive service deployment</h3>
+<p>To deploy the <code>HyMind Lab</code> and <code>HyMind Field</code> services, execute <code>./bin/interactive-up.sh</code>. Again, it’s recommended that you do this within a <code>screen</code> or <code>tmux</code> session.</p>
+</section>
+</section>
+<section id="taking-services-down" class="level2">
+<h2 class="anchored" data-anchor-id="taking-services-down">Taking services down</h2>
+<p>To take down all running services - including interactive services described above:</p>
+<ol type="1">
+<li>Navigate to the directory containing the checked out repository. Locations are provided <a href="https://github.com/HYLODE/HySys/blob/main/hylode/README.md">here</a> for the <code>staging_red</code> and <code>prod</code> deployments.</li>
+<li>Navigate to the the <code>hylode/</code> directory (containing <code>docker-compose.yml</code>)</li>
+<li>Run <code>./bin/down.sh</code> from the command line
+<ul>
+<li>Optionally provide the <code>--remove-orphans</code> flag to remove hanging containers and networks. This <strong>will not</strong> remove any associated docker volumes, so is safe from a data-loss perspective.</li>
+</ul></li>
+</ol>
+<section id="in-band-predictions" class="level3">
+<h3 class="anchored" data-anchor-id="in-band-predictions">In-band predictions</h3>
+<p>Current and past model predictions arising as a result of the HySys pipeline are written to corresponding tables within the <code>hymind</code> schema within the <code>hylode</code> database found in the <code>postgres</code> service of each environment.</p>
+<p>The latest predictions are available via the HyMind API REST endpoint. The <a href="https://github.com/HYLODE/HySys/blob/main/hylode/README.md">HySys</a> documentation details the URL of the documentation of this API - look for <code>HYMIND_API_WEB_PORT</code>.</p>
+</section>
+</section>
+<section id="please-note" class="level2">
+<h2 class="anchored" data-anchor-id="please-note">Please note</h2>
 <ul>
 <li>the application is only accessible from within the UCLH network</li>
 <li>usernames and passwords are available after training from the development team</li>
 </ul>
 
 
+</section>
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
