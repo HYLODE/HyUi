@@ -28,44 +28,87 @@ mock_router = APIRouter(
 )
 
 
-@router.post("/icu/tap/emergency")
-def read_tap_emergency(
-    data: EmElTapPostBody, settings: Depends = Depends(get_settings)
-) -> pd.DataFrame | str:
-    """ """
-    if settings.env == "dev":
+@router.post(
+    "/icu/tap/emergency/",
+    response_model=list[EmTap],
+)
+def get_emergency_icu_admission_predictions(
+    response: Response,
+    data: EmElTapPostBody,
+    settings: Settings = Depends(get_settings),
+) -> list[EmTap]:
+    """Retrieve emergency icu admission predictions
 
-        # import ipdb; ipdb.set_trace()
-        _ = pd.read_json(MOCK_TAP_EMERGENCY_DATA)
-        df = pd.DataFrame.from_records(_["data"])
-        df = pydantic_dataframe(df, EmTap)
-    else:
-        return (
-            "API not designed to work in live environment. "
-            "You should POST to http://uclvlddpragae08:5230/predict/ "
-            "(see {example}/docs)"
-        )
+    Sends a POST to the hymind non-elective tap API endpoint
+    Returns the result
+
+    Args:
+        response (Response): FastAPI Response object
+        data (EmElTapPostBody): Emergency tap post body Pydantic model
+        settings (Settings, optional): API settings from env file.
+                                    Defaults to Depends(get_settings).
+
+    Returns:
+        list[EmTap]: List of ICU Emergency tap predictions
+    """
+    response.headers["Cache-Control"] = "public, max-age=300"
+    response = requests.post(f"{settings.emergency_tap_url}/predict", json=data.dict())
+    rows = response.json()["data"]
+    return [EmTap.parse_obj(row) for row in rows]
+
+
+@mock_router.get("/icu/tap/emergency")
+def get_mock_emergency_icu_admission_predictions() -> pd.DataFrame:
+    """Retrieve mock ICU emergency tap predictions
+
+    Returns:
+        pd.DataFrame: DataFrame of mock emergency icu admission predictions
+    """
+    mock_dataframe = pd.read_json(MOCK_TAP_EMERGENCY_DATA)
+    df = pd.DataFrame.from_records(mock_dataframe["data"])
+    df = pydantic_dataframe(df, EmTap)
     records = df.to_dict(orient="records")
     response = dict(data=records)  # to match API structure {"data": List[Dict]}
     return response
 
 
-@router.get("/icu/tap/electives")
-def read_tap_electives(
-    data: EmElTapPostBody, settings: Depends = Depends(get_settings)
-) -> pd.DataFrame | str:
-    if settings.env == "dev":
+@router.post("/icu/tap/electives")
+def get_elective_icu_admission_predictions(
+    response: Response,
+    data: EmElTapPostBody,
+    settings: Settings = Depends(get_settings),
+) -> list[ElTap]:
+    """Retrieve elective icu admission predictions
 
-        # import ipdb; ipdb.set_trace()
-        _ = pd.read_json(MOCK_TAP_ELECTIVE_DATA)
-        df = pd.DataFrame.from_records(_["data"])
-        df = pydantic_dataframe(df, ElTap)
-    else:
-        return (
-            "API not designed to work in live environment. "
-            "You should GET to http://uclvlddpragae08:5230/predict/ "
-            "(see {example}/docs)"
-        )
+    Sends a POST to the hymind elective tap API endpoint
+    Returns the result
+
+    Args:
+        response (Response): FastAPI Response object
+        data (EmElTapPostBody): Elective tap post body Pydantic model
+        settings (Settings, optional): API settings from env file.
+                                    Defaults to Depends(get_settings).
+
+    Returns:
+        list[ElTap]: List of ICU Elective tap predictions
+    """
+    response.headers["Cache-Control"] = "public, max-age=300"
+    response = requests.post(f"{settings.electives_tap_url}/predict", json=data.dict())
+    rows = response.json()["data"]
+    return [ElTap.parse_obj(row) for row in rows]
+
+
+@mock_router.get("/icu/tap/electives")
+def get_mock_elective_icu_admission_predictions() -> pd.DataFrame:
+    """Retrieve mock ICU elective tap predictions
+
+    Returns:
+        pd.DataFrame: DataFrame of mock elective icu admission predictions
+    """
+    mock_electives_dataframe = pd.read_json(MOCK_TAP_ELECTIVE_DATA)
+    df = pd.DataFrame.from_records(mock_electives_dataframe["data"])
+    df = pydantic_dataframe(df, ElTap)
+
     records = df.to_dict(orient="records")
     response = dict(data=records)  # to match API structure {"data": List[Dict]}
     return response
