@@ -24,7 +24,7 @@
         <ENTRY IS_ENABLED="true" PARSER="env" IS_EXECUTABLE="false" PATH=".env" />
       </ENTRIES>
     </EXTENSION>
-    <option name="SCRIPT_NAME" value="web.main" />
+    <option name="SCRIPT_NAME" value="web.app" />
     <option name="PARAMETERS" value="" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
