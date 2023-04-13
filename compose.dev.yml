@@ -1,4 +1,4 @@
-x-no-proxy: &no-proxy localhost,127.0.0.1,uclvlddpragae07,uclvlddpragae08,api,web,cache,baserow
+x-no-proxy: &no-proxy localhost,127.0.0.1,uclvlddpragae07,uclvlddpragae08,api,web,cache,baserow,redis,celery_worker
 
 x-proxy-common: &proxy-common
   NO_PROXY: *no-proxy
@@ -16,7 +16,7 @@ services:
         <<: *build-args-common
     environment:
       <<: *proxy-common
-    env_file: .env
+    env_file: .env.dev
     ports:
       - ${API_PORT}:8000
     networks:
@@ -29,43 +29,76 @@ services:
         <<: *build-args-common
     environment:
       <<: *proxy-common
-    env_file: .env
+    env_file: .env.dev
     ports:
       - ${WEB_PORT}:8000
+    volumes:
+      - ./web/src/web:/app/web
+      - ./models/src/models:/app/models
     depends_on:
       - baserow
       - api
-      - cache
-    healthcheck:
-      test: ["CMD", "./refresh_cache.sh"]
-      interval: 5m30s
-      timeout: 30s
-      retries: 5
-      start_period: 30s
+      - redis
+#      - cache
+#    healthcheck:
+#      test: ["CMD", "./refresh_cache.sh"]
+#      interval: 5m30s
+#      timeout: 30s
+#      retries: 5
+#      start_period: 30s
     networks:
       - hyui
 
-  cache:
+  redis:
+    image: redis:7.0-alpine
+    environment:
+      <<: *proxy-common
+    ports:
+      - 6379:6379
+    networks:
+      - hyui
+
+  celery_worker:
     build:
-      dockerfile: docker/cache/Dockerfile
+      dockerfile: docker/celery/Dockerfile
       args:
         <<: *build-args-common
     environment:
       <<: *proxy-common
-    env_file: .env
-    ports:
-      - "${CACHE_PORT}:8000"
-    command: "-p default_keep=300"
+    #  mount code directly for development but COPY in production
+    #  (hence delete these lines)
+    volumes:
+      - ./web/src/web:/app/web
+      - ./models/src/models:/app/models
+    command: /app/start-worker
+    env_file:
+      - .env.dev
     depends_on:
-      - api
+      - redis
     networks:
       - hyui
+
+#  cache:
+#    build:
+#      dockerfile: docker/cache/Dockerfile
+#      args:
+#        <<: *build-args-common
+#    environment:
+#      <<: *proxy-common
+#    env_file: .env
+#    ports:
+#      - "${CACHE_PORT}:8000"
+#    command: "-p default_keep=300"
+#    depends_on:
+#      - api
+#    networks:
+#      - hyui
 
   baserow:
     image: baserow/baserow:1.13.1
     environment:
       <<: *proxy-common
-    env_file: .env
+    env_file: .env.dev
     ports:
       - ${BASEROW_PORT}:80
     networks:

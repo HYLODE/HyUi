@@ -1,21 +1,37 @@
 import dash
-import diskcache
-import tempfile
-from uuid import uuid4
+from dash import CeleryManager
 
+from pathlib import Path
 from web.config import get_settings
 from web.layout.appshell import create_appshell
 from web.logger import logger
+from celery import Celery, shared_task
 
 logger.info("Web app starting")
 
 background_cache_expire = 600  # seconds
-logger.info(f"Background callbacks cache default {background_cache_expire} " f"seconds")
-launch_uuid = uuid4()
-cache = diskcache.Cache(tempfile.TemporaryDirectory().name)
-background_callback_manager = dash.DiskcacheManager(
-    cache, cache_by=[lambda: launch_uuid], expire=background_cache_expire
+logger.info(
+    f"Background callbacks cache expiration default {background_cache_expire} "
+    f"seconds"
 )
+
+# TODO: fix temporary hard coding
+broker_url = "redis://redis:6379/0"
+result_backend = "redis://redis:6379/0"
+celery = Celery(
+    __name__,
+    broker=broker_url,
+    backend=result_backend,
+)
+# celery.config_from_object('celeryconfig')
+
+background_callback_manager = CeleryManager(celery)
+
+with Path(__file__).parent / "index.html" as f:
+    index_string = f.open().read()
+
+FONTS_GOOGLE = "https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;900&display=swap"
+FONTS_FA = "https://use.fontawesome.com/releases/v5.8.1/css/all.css"
 
 app = dash.Dash(
     __name__,
@@ -23,10 +39,8 @@ app = dash.Dash(
     # external_scripts=external_scripts,
     external_stylesheets=[
         "assets/style.css",
-        # include google fonts
-        "https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400"
-        ";500;900&display=swap",
-        "https://use.fontawesome.com/releases/v5.8.1/css/all.css",
+        FONTS_GOOGLE,
+        FONTS_FA,
     ],
     meta_tags=[
         {
@@ -36,28 +50,8 @@ app = dash.Dash(
         }
     ],
     background_callback_manager=background_callback_manager,
+    index_string=index_string,
 )
-
-app.index_string = """
-<!DOCTYPE html>
-<html>
-    <head>
-        <script defer data-domain="hylode.org" src="https://plausible.io/js/script.js"></script>
-        {%metas%}
-        <title>{%title%}</title>
-        {%favicon%}
-        {%css%}
-    </head>
-    <body>
-        {%app_entry%}
-        <footer>
-            {%config%}
-            {%scripts%}
-            {%renderer%}
-        </footer>
-    </body>
-</html>
-"""
 
 app.config.suppress_callback_exceptions = True
 app.layout = create_appshell([dash.page_registry.values()])
