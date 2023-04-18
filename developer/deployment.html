@@ -269,7 +269,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <ul>
   <li><a href="#deployment" id="toc-deployment" class="nav-link active" data-scroll-target="#deployment">Deployment</a>
   <ul class="collapse">
-  <li><a href="#setup-environment" id="toc-setup-environment" class="nav-link" data-scroll-target="#setup-environment">Setup environment</a>
+  <li><a href="#setup-environment" id="toc-setup-environment" class="nav-link" data-scroll-target="#setup-environment">Setup environment</a></li>
+  <li><a href="#docker-permissions" id="toc-docker-permissions" class="nav-link" data-scroll-target="#docker-permissions">Docker permissions</a>
   <ul class="collapse">
   <li><a href="#using-the-http-cache" id="toc-using-the-http-cache" class="nav-link" data-scroll-target="#using-the-http-cache">Using the http cache</a></li>
   </ul></li>
@@ -300,6 +301,23 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li>Clone the repository on an NHS server <code>git clone https://github.com/HYLODE/HyUi.git</code>.</li>
 <li>Configure your <code>.env</code> variables using <code>.env.example</code> as a template.</li>
 </ul>
+</section>
+<section id="docker-permissions" class="level2">
+<h2 class="anchored" data-anchor-id="docker-permissions">Docker permissions</h2>
+<p>If setting up a ‘shared’ deployment (a named <code>dev</code> deployment for example), ensure that permissions are set correctly on the directory to allow <code>git pull</code>s and <code>docker build</code>s by multiple users. On the deployment GAEs users are assigned to the <code>docker</code> group, so permissions can be changed as follows</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /path/to/git/repository</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Give group access to any new local modifications to the repo</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> init <span class="at">--shared</span><span class="op">=</span>group</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Give the group access to all existing items in the repository</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">chown</span> <span class="at">-R</span> :docker <span class="st">"</span><span class="va">$PWD</span><span class="st">"</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> <span class="at">-R</span> g+swX <span class="st">"</span><span class="va">$PWD</span><span class="st">"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This is expected to work optimally with a <strong>freshly cloned git repository</strong>. If working with an existing local repository containing multiple changes, docker builds or git pull/pushes may throw permissions errors as another user may have set restrictive permissions on a file crucial for either process. In many cases it is simplest to clone the repository from scratch and perform the steps above.</p>
+<p>As an alternative if the above is not working, you should try</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">chgrp</span> <span class="at">-R</span> docker /path/to/repository</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> <span class="at">-R</span> g+rws /path/to/repository</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">setfacl</span> <span class="at">-R</span> <span class="at">-m</span> d:g::rwX /path/to/repository</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <section id="using-the-http-cache" class="level3">
 <h3 class="anchored" data-anchor-id="using-the-http-cache">Using the http cache</h3>
 <p>We use <a href="https://varnish-cache.org">Varnish</a> as a HTTP cache to speed up some of the slower API calls made by the front end. The default behaviour we follow is to skip the cache and manually identify endpoints which would benefit from caching.</p>
@@ -324,14 +342,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <section id="run-the-docker-compose-services" class="level2">
 <h2 class="anchored" data-anchor-id="run-the-docker-compose-services">Run the Docker Compose services</h2>
 <p>In the base directory (containing <code>compose.yml</code>)</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> compose <span class="at">--project-name</span> [project name] up <span class="at">--build</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> compose <span class="at">--project-name</span> [project name] up <span class="at">--build</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Ensure that you use a unique name for your <code>[project name]</code>. The production service should be named <code>hyui-prod</code>.</p>
 </section>
 <section id="initialise-services" class="level2">
 <h2 class="anchored" data-anchor-id="initialise-services">Initialise services</h2>
 <p>This should be done the first time you stand up the services. It populates the Baserow database with the tables and static data required to run the rest of the HyUi services. You will also need to do this when you update your configuration (loading) data for Baserow. That is, you should consider Baserow as a temporary scratch pad, and mapping changes etc. will live in code (see <code>initialise/src/initialise/bed_defaults.json</code>). Before you ‘redeploy’, you must manually delete the tables from Baserow.</p>
 <p>You may also want to register the license for the self hosted version. To do this, check that the ‘instance id’ available on the admin pages is copied from the self-hosted version to the web / hosted version; then regenerate the license key on the hosted version; then copy that license key back to the self-hosted; then add the user to the ‘seat’ created by that registered version. This enables ‘export to JSON’ functionality etc.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./bin/initialise.sh</span> <span class="at">--operation</span> baserow</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./bin/initialise.sh</span> <span class="at">--operation</span> baserow</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <section id="recreating-defaults-in-baserow" class="level3">
 <h3 class="anchored" data-anchor-id="recreating-defaults-in-baserow">Recreating defaults in baserow</h3>
 <p>To be used when updating an existing instance of baserow adjustments to default tables</p>
@@ -341,12 +359,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li>departments</li>
 </ul></li>
 </ul>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./bin/initialise.sh</span> <span class="at">--operation</span> recreate_defaults</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./bin/initialise.sh</span> <span class="at">--operation</span> recreate_defaults</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 </section>
 <section id="stop-and-remove-docker-containers" class="level2">
 <h2 class="anchored" data-anchor-id="stop-and-remove-docker-containers">Stop And Remove Docker Containers</h2>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> compose <span class="at">--project-name</span> [project name] down</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> compose <span class="at">--project-name</span> [project name] down</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="tips-and-tricks" class="level2">
 <h2 class="anchored" data-anchor-id="tips-and-tricks">Tips and Tricks</h2>
@@ -354,8 +372,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h3 class="anchored" data-anchor-id="debugging-from-within-the-nhs-network">Debugging from within the NHS network</h3>
 <p>Sometimes it can be difficult to debug your staging services when they are deployed via docker.</p>
 <p>You can log into the <code>hyui-web</code> or <code>hyui-api</code> services from a terminal within the <code>HyUi</code> directory using the following:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> compose <span class="at">--project-name</span> [project name] exec web bash</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="sourceCode" id="cb6"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> compose <span class="at">--project-name</span> [project name] exec api bash</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> compose <span class="at">--project-name</span> [project name] exec web bash</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> compose <span class="at">--project-name</span> [project name] exec api bash</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>You can then change the code using vim or open a python console and debug from there.</p>
 <p>Remember you will then need to manually make the same changes outside the docker bash terminal!</p>
 <p>It may be useful to edit the <code>docker/api/Dockerfile</code> or <code>docker/web/Dockerfile</code> and add a <code>--reload</code> flag to the <code>ENTRYPOINT</code> so that code changes from within the container are reloaded automatically. <code>ENTRYPOINT ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--reload"]</code> instead of <code>ENTRYPOINT ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--reload"]</code>.</p>
