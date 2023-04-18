@@ -6,6 +6,30 @@
 - Clone the repository on an NHS server `git clone https://github.com/HYLODE/HyUi.git`.
 - Configure your `.env` variables using `.env.example` as a template.
 
+## Docker permissions
+
+If setting up a 'shared' deployment (a named `dev` deployment for example), ensure that permissions are set correctly on the directory to allow `git pull`s and `docker build`s by multiple users. On the deployment GAEs users are assigned to the `docker` group, so permissions can be changed as follows
+
+```bash
+cd /path/to/git/repository
+
+# Give group access to any new local modifications to the repo
+git init --shared=group
+
+# Give the group access to all existing items in the repository
+chown -R :docker "$PWD"
+chmod -R g+swX "$PWD"
+```
+This is expected to work optimally with a **freshly cloned git repository**.
+If working with an existing local repository containing multiple changes, docker builds or git pull/pushes may throw permissions errors as another user may have set restrictive permissions on a file crucial for either process. In many cases it is simplest to clone the repository from scratch and perform the steps above.
+
+As an alternative if the above is not working, you should try
+```bash
+chgrp -R docker /path/to/repository
+chmod -R g+rws /path/to/repository
+setfacl -R -m d:g::rwX /path/to/repository
+```
+
 ### Using the http cache
 
 We use [Varnish](https://varnish-cache.org) as a HTTP cache to speed up some of the slower API calls made by the front end. The default behaviour we follow is to skip the cache and manually identify endpoints which would benefit from caching.
