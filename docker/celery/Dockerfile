@@ -54,4 +54,7 @@ RUN chmod +x /app/entrypoint
 COPY --chown=hyui:root ./docker/celery/start-worker /app
 RUN chmod +x /app/start-worker
 
+COPY --chown=hyui:root ./docker/celery/start-flower /app
+RUN chmod +x /app/start-flower
+
 ENTRYPOINT ["/app/entrypoint"]

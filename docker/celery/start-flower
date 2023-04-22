@@ -1,0 +1,20 @@
+#!/bin/bash
+
+set -o errexit
+set -o nounset
+
+worker_ready() {
+    celery -A web.app.celery inspect ping
+}
+
+until worker_ready; do
+  >&2 echo 'Celery workers not available'
+  sleep 1
+done
+>&2 echo 'Celery workers are available'
+
+#celery flower \
+#    --app=app.web.celery \
+#    --broker="${CELERY_DASH_BROKER_URL}"
+
+celery -A web.app.celery -b "${CELERY_DASH_BROKER_URL}"  flower
