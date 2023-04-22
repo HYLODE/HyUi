@@ -59,4 +59,7 @@ app.layout = create_appshell([dash.page_registry.values()])
 server = app.server
 
 if __name__ == "__main__":
-    app.run_server(host="0.0.0.0", port=get_settings().development_port, debug=True)
+    # TODO: set this up as an environment config switch
+    # if debugging from docker then restarting the app after edits b/c debug=True breaks the process attachment
+    # app.run_server(host="0.0.0.0", port=get_settings().development_port, debug=True)
+    app.run_server(host="0.0.0.0", port=get_settings().development_port, debug=False)
