@@ -33,7 +33,7 @@ services:
     command: ["sh", "-c", "pip install debugpy -t /tmp && python /tmp/debugpy --wait-for-client --listen 0.0.0.0:5678 -m web.app"]
     env_file: .env.dev
     ports:
-      - ${WEB_PORT}:8300 # switch from 8000 (exposed by gunicorn + app.server) to 8300 which is the dev port
+      - ${WEB_PORT}:8000 # switch from 8000 (exposed by gunicorn + app.server) to 8300 which is the dev port
       - 5678:5678  # vscode debugpy attach port
     # add in a volumes section
     volumes:
