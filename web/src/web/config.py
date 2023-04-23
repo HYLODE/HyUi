@@ -1,6 +1,6 @@
 from functools import lru_cache
 
-from pydantic import BaseSettings, SecretStr, AnyHttpUrl
+from pydantic import BaseSettings, SecretStr, AnyHttpUrl, AnyUrl
 
 
 class Settings(BaseSettings):
@@ -13,6 +13,8 @@ class Settings(BaseSettings):
 
     api_url: AnyHttpUrl
     baserow_public_url: AnyHttpUrl
+    celery_dash_broker_url: AnyUrl
+    celery_dash_result_backend: AnyUrl
 
     slack_log_webhook: SecretStr
 

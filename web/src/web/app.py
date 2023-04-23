@@ -5,7 +5,12 @@ from pathlib import Path
 from web.config import get_settings
 from web.layout.appshell import create_appshell
 from web.logger import logger
-from celery import Celery, shared_task
+from celery import Celery
+from flask import Flask
+from uuid import uuid4
+
+launch_uid = uuid4()
+server = Flask(__name__)
 
 logger.info("Web app starting")
 
@@ -15,17 +20,18 @@ logger.info(
     f"seconds"
 )
 
-# TODO: fix temporary hard coding
-broker_url = "redis://redis:6379/0"
-result_backend = "redis://redis:6379/0"
 celery = Celery(
     __name__,
-    broker=broker_url,
-    backend=result_backend,
+    broker=get_settings().celery_dash_broker_url,
+    backend=get_settings().celery_dash_result_backend,
 )
 # celery.config_from_object('celeryconfig')
 
-background_callback_manager = CeleryManager(celery)
+background_callback_manager = CeleryManager(
+    celery,
+    cache_by=[lambda: launch_uid],
+    expire=background_cache_expire,
+)
 
 with Path(__file__).parent / "index.html" as f:
     index_string = f.open().read()
@@ -35,6 +41,7 @@ FONTS_FA = "https://use.fontawesome.com/releases/v5.8.1/css/all.css"
 
 app = dash.Dash(
     __name__,
+    server=server,
     use_pages=True,
     # external_scripts=external_scripts,
     external_stylesheets=[
@@ -56,10 +63,10 @@ app = dash.Dash(
 app.config.suppress_callback_exceptions = True
 app.layout = create_appshell([dash.page_registry.values()])
 
-server = app.server
+# server = app.server
 
 if __name__ == "__main__":
-    # TODO: set this up as an environment config switch
-    # if debugging from docker then restarting the app after edits b/c debug=True breaks the process attachment
-    # app.run_server(host="0.0.0.0", port=get_settings().development_port, debug=True)
-    app.run_server(host="0.0.0.0", port=get_settings().development_port, debug=False)
+    import os
+
+    debug = os.getenv("DEBUG", False)
+    app.run_server(host="0.0.0.0", port=get_settings().development_port, debug=debug)
