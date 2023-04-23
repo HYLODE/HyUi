@@ -85,7 +85,7 @@ services:
       <<: *proxy-common
     command: /app/start-flower
     ports:
-      - "8304:5555"
+      - "${FLOWER_PORT}:5555"
     env_file:
       - .env
     depends_on:
