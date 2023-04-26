@@ -11,7 +11,7 @@ import web.pages.perrt.callbacks.cytoscape  # noqa
 import web.pages.perrt.callbacks.inspector  # noqa
 import web.pages.perrt.callbacks.widgets  # noqa
 from web.pages.perrt import CAMPUSES, ids
-from web.style import colors, replace_colors_in_stylesheet
+from web.style import replace_colors_in_stylesheet
 
 dash.register_page(__name__, path="/sitrep/perrt", name="PERRT")
 
@@ -29,6 +29,7 @@ stores = html.Div(
         dcc.Store(id=ids.NEWS_STORE),
         dcc.Store(id=ids.DEPTS_OPEN_STORE_NAMES),
         dcc.Store(id=ids.ACC_BED_SUBMIT_STORE),
+        dcc.Store(id=ids.PREDICTIONS_STORE),
     ]
 )
 
@@ -163,7 +164,7 @@ body = dmc.Container(
                 ),
                 dmc.Col(dmc.Grid([dmc.Col(patient_sidebar)]), span=3),
             ]
-        ),
+        )
     ],
     style={"width": "90vw"},
     fluid=True,

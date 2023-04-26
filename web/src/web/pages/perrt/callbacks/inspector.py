@@ -1,7 +1,7 @@
 import dash
 import dash_mantine_components as dmc
 import json
-from dash import Input, Output, State, callback, callback_context, html
+from dash import Input, Output, State, callback, callback_context
 from dash_iconify import DashIconify
 from typing import Any, Tuple
 from datetime import datetime
@@ -48,7 +48,7 @@ def update_patient_sidebar(nodes: list[dict]) -> Tuple[bool, list[str], dmc.Grou
                 color=colors.indigo,
                 width=30,
             ),
-            dmc.Text(f"Click on a bed for more information", weight=500),
+            dmc.Text("Click on a bed for more information", weight=500),
         ]
     )
 
@@ -59,10 +59,10 @@ def update_patient_sidebar(nodes: list[dict]) -> Tuple[bool, list[str], dmc.Grou
     if data.get("entity") != "bed":
         return True, ["bed"], dmc.Group(click_title)
 
-    bed = data.get("bed")
+    bed = data.get("bed")  # type: ignore
     bed_color = colors.orange if data.get("occupied") else colors.gray
-    bed_number = bed.get("bed_number")
-    department = bed.get("department")
+    bed_number = bed.get("bed_number")  # type: ignore
+    department = bed.get("department")  # type: ignore
 
     bed_title = dmc.Group(
         [
@@ -98,6 +98,8 @@ def perrt_accordion_item(
         return dmc.AccordionControl(control), dmc.AccordionPanel(panel)
 
     news = data.get("news", {})
+    admission_prediction = data.get("admission_prediction", {})
+
     if news:
         news_text = dmc.Text("Highest/lowest vitals within the last 6 hours")
         news_content = dmc.Group(
@@ -121,6 +123,14 @@ def perrt_accordion_item(
                         ),
                         dmc.Badge(
                             news.get("resp_min"), color=colors.indigo, variant="filled"
+                        ),
+                    ]
+                ),
+                dmc.Stack(
+                    [
+                        dmc.Badge("Pred", color=colors.indigo, variant="outline"),
+                        dmc.Badge(
+                            admission_prediction, color=colors.indigo, variant="filled"
                         ),
                     ]
                 ),
@@ -282,7 +292,11 @@ def patient_accordion_item(
     try:
         hospital_admit = census.get("hv_admission_dt")
         hospital_los = int((datetime.utcnow() - hospital_admit).days)
-        text_los = f"Day {hospital_los} (Hospital admission: {datetime.strftime(hospital_admit, '%d %b %Y')})"
+        text_los = (
+            f"Day {hospital_los}"
+            f"(Hospital admission: {datetime.strftime(hospital_admit, '%d %b %Y')})"
+        )
+
     except TypeError:
         text_los = "Hospital length of stay unknown"
 

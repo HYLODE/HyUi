@@ -4,7 +4,7 @@ from web.utils import gen_id
 CENSUS_STORE = gen_id("census store", __name__)
 BEDS_STORE = gen_id("beds store", __name__)
 NEWS_STORE = gen_id("news store", __name__)
-
+PREDICTIONS_STORE = gen_id("predictions store", __name__)
 
 # derived stores
 DEPTS_OPEN_STORE = gen_id("open depts store", __name__)

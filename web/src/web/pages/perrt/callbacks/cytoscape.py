@@ -175,9 +175,10 @@ def _store_news(census: list[dict]) -> list[dict]:
     Returns:
         NEWS score for each patient in the CENSUS
     """
-    csn_list = [i.get("encounter") for i in census if i.get("occupied")]
+    csn_list = [i.get("encounter") for i in census if i.get("occupied")]  # type: ignore
+
     url = f"{get_settings().api_url}/perrt/vitals/wide"
-    response = requests.get(url, params={"encounter_ids": csn_list})
+    response = requests.get(url, params={"encounter_ids": csn_list})  # type: ignore
 
     newsdf = pd.DataFrame.from_records(response.json())
     # TODO: simpplify: you just want the most recent and highest NEWS score
@@ -185,6 +186,29 @@ def _store_news(census: list[dict]) -> list[dict]:
 
     news: list[dict] = newsdf.to_dict(orient="records")
     return news
+
+
+@callback(
+    Output(ids.PREDICTIONS_STORE, "data"),
+    Input(ids.CENSUS_STORE, "data"),
+    prevent_initial_callback=True,
+    background=True,
+)
+def _store_predictions(census: list[dict]) -> dict:
+    """
+    Use the census store to provide the CSNs to query admission prediction data
+    Args:
+        census:
+
+    Returns:
+        Admission prediction data for each patient in the CENSUS,if it exists,
+        NULL otherwise
+    """
+    csn_list = [i.get("encounter") for i in census if i.get("occupied")]
+    url = f"{get_settings().api_url}/perrt/icu_admission_prediction"
+    response = requests.get(url, params={"encounter_ids": csn_list})  # type: ignore
+    predictions: dict = response.json()
+    return predictions
 
 
 @callback(
@@ -204,7 +228,11 @@ def _dept_select_control(depts: list[str], campus: str) -> Tuple[list[str], str]
 
 
 def _make_elements(  # noqa: C901
-    census: list[dict], depts: list[dict], beds: list[dict], news: list[dict]
+    census: list[dict],
+    depts: list[dict],
+    beds: list[dict],
+    news: list[dict],
+    predictions: dict,
 ) -> list[dict]:
     """
     Logic to create elements for cyto map
@@ -234,13 +262,18 @@ def _make_elements(  # noqa: C901
         occupied = census_lookup.get(location_string, {}).get("occupied", False)
         encounter = census_lookup.get(location_string, {}).get("encounter", "")
         news_wide: dict = news_lookup.get(encounter, {})  # type: ignore
+        admission_prediction = predictions.get(encounter, None)
 
         def _max_news_wide(row: dict) -> int:
             if not row:
                 return -1
             scale_1_max = row.get("news_scale_1_max", -1)
             scale_2_max = row.get("news_scale_2_max", -1)
-            return max(i for i in [-1, scale_1_max, scale_2_max] if i is not None)
+            max_news: int = max(
+                i for i in [-1, scale_1_max, scale_2_max] if i is not None
+            )
+
+            return max_news
 
         data = dict(
             id=location_string,
@@ -258,6 +291,7 @@ def _make_elements(  # noqa: C901
             encounter=encounter,
             news=news_wide,
             news_max=_max_news_wide(news_wide),
+            admission_prediction=admission_prediction,
         )
         position = dict(
             x=bed.get("floor_x_index", -1) * 40,
@@ -311,6 +345,7 @@ def _make_elements(  # noqa: C901
     Input(ids.DEPTS_OPEN_STORE, "data"),
     Input(ids.BEDS_STORE, "data"),
     Input(ids.NEWS_STORE, "data"),
+    Input(ids.PREDICTIONS_STORE, "data"),
     prevent_initial_call=True,
 )
 def _prepare_cyto_elements_campus(
@@ -318,16 +353,12 @@ def _prepare_cyto_elements_campus(
     depts: list[dict],
     beds: list[dict],
     news: list[dict],
+    predictions: dict,
 ) -> list[dict]:
     """
     Build the element list from pts/beds/rooms/depts for the map
     """
-    elements = _make_elements(
-        census,
-        depts,
-        beds,
-        news,
-    )
+    elements = _make_elements(census, depts, beds, news, predictions)
     return elements
 
 
