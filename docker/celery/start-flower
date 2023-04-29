@@ -3,8 +3,9 @@
 set -o errexit
 set -o nounset
 
+# this -A app must match the one below
 worker_ready() {
-    celery -A web.app.celery inspect ping
+    celery -A web.tasks.celery_app inspect ping
 }
 
 until worker_ready; do
@@ -13,8 +14,6 @@ until worker_ready; do
 done
 >&2 echo 'Celery workers are available'
 
-#celery flower \
-#    --app=app.web.celery \
-#    --broker="${CELERY_DASH_BROKER_URL}"
-
-celery -A web.app.celery -b "${CELERY_DASH_BROKER_URL}"  flower
+# NOTE: any changes to the app here must also be made in the worker_ready
+# function above
+celery -A web.tasks.celery_app flower --address=0.0.0.0 --port=5557

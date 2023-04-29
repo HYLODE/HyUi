@@ -939,3 +939,7 @@ api/src/api/electives/deploy/*
 web/src/web/assets/pacu_dashboard.html
 web/src/web/assets/pqip_dashboard.html
 .env.dev
+
+# redis/celery detritus
+celerybeat-schedule.db
+dump.rdb

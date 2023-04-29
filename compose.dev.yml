@@ -31,6 +31,7 @@ services:
       <<: *proxy-common
     # use cmd rather than entrypoint in Dockerfile.dev and then override here
     command: ["sh", "-c", "pip install debugpy -t /tmp && python /tmp/debugpy --wait-for-client --listen 0.0.0.0:5678 -m web.app"]
+    # command: ["sh", "-c", "pip install debugpy -t /tmp && python /tmp/debugpy --wait-for-client --listen 0.0.0.0:5678 -m gunicorn --bind 0.0.0.0:8000 web.app:server"]
     env_file: .env.dev
     ports:
       - ${WEB_PORT}:8000 # switch from 8000 (exposed by gunicorn + app.server) to 8300 which is the dev port
@@ -83,6 +84,22 @@ services:
     networks:
       - hyui
 
+  celery_beat:
+    build:
+      dockerfile: docker/celery/Dockerfile
+      args:
+        <<: *build-args-common
+    environment:
+      <<: *proxy-common
+    command: /app/start-beat
+    env_file:
+      - .env.dev
+    depends_on:
+      - redis
+    networks:
+      - hyui
+
+
   celery_flower:
     build:
       dockerfile: docker/celery/Dockerfile
@@ -92,7 +109,7 @@ services:
       <<: *proxy-common
     command: /app/start-flower
     ports:
-      - "${FLOWER_PORT}:5555"
+      - "${FLOWER_PORT}:5557"
     env_file:
       - .env.dev
     depends_on:
