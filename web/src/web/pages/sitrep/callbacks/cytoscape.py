@@ -79,11 +79,10 @@ def _make_elements(  # noqa: C901
     # TODO: rebuild discharge_statuses table with encounter as string
     # TODO: fix naming (use 'encounter' in census and 'csn' in discharges)
     # convert csn to string since that's how encounter is stored in EMAP
-    try:
+    if discharges:
         discharge_lookup = {str(i.get("csn")): i for i in discharges}
-    except TypeError as e:
-        logger.warning("Possible type error b/c no recent discharges")
-        logger.exception(e)
+    else:
+        logger.warning("Discharges empty: no data available")
         discharge_lookup = {}
 
     if sitrep is not None:
