@@ -125,7 +125,8 @@ def get_beds(
 
     # drop baserow id and order fields
     for row in rows:
-        row.pop("id")
+        # preserve bed id to use in patching
+        # row.pop("id")
         row.pop("order")
 
     logger.info(f"Returning {len(rows)} beds")
