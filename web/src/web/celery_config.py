@@ -1,5 +1,5 @@
 from web.config import get_settings
-from web.app import slow_url
+from web import slow_url, campus_url
 from celery.schedules import crontab
 
 
@@ -9,7 +9,14 @@ beat_schedule = {
         "task": "web.celery_tasks.get_response",
         "schedule": crontab(minute="*/30"),
         "args": (slow_url, "slow_url"),
-    }
+        "kwargs": {"expires": 31 * 60},
+    },
+    "get_campus": {
+        "task": "web.celery_tasks.get_response",
+        "schedule": crontab(hour="*/12"),  # every 12 hours
+        "args": (campus_url, "campus_url"),
+        "kwargs": {"expires": (12 * 3600) + 60},  # 12 hours + 1 minute
+    },
 }
 
 task_time_to_live = 2 * 60 * 60  # 2 hours

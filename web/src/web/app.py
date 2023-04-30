@@ -6,25 +6,21 @@ import requests
 import orjson
 import dash
 import dash_mantine_components as dmc
-from dash import CeleryManager, Input, Output, callback
+from dash import Input, Output
 from flask import Flask
 
+from web import slow_url, fast_url, campus_url
 from web.config import get_settings
 from web.logger import logger
 from web.celery import redis_client
 from web.celery_tasks import get_response
+from web.celery_startup import run_startup_tasks
 
 from web.debugger import initialize_flask_server_debugger_if_needed
 
 initialize_flask_server_debugger_if_needed()
 
 server = Flask(__name__)
-# celery_manager = CeleryManager(celery_app)
-
-# Set up fast and slow requests for testing
-slow_url = "http://api:8000/ping/slow"
-fast_url = "http://api:8000/ping/fast"
-campus_url = "http://api:8000/baserow/campus?campuses=uclh"
 
 
 @dash.callback(
@@ -63,8 +59,14 @@ def ping_slow(n_clicks):
     prevent_initial_call=True,
 )
 def ping_campus(n_clicks):
-    response = requests.get(campus_url)
-    data = response.json()
+    cache_key = "campus_url"
+    cached_data = redis_client.get(cache_key)
+    if cached_data is None:
+        fetch_data_task = get_response.delay(campus_url, cache_key)
+        data = fetch_data_task.get()
+    else:
+        data = orjson.loads(cached_data)
+
     result = len(data)
     return f"Click: {n_clicks} Rows of data: {result}"
 
@@ -96,11 +98,12 @@ layout = dmc.Paper(
     ]
 )
 
+# run celery startup tasks
+run_startup_tasks()
 
 app = dash.Dash(
     __name__,
     server=server,
-    # background_callback_manager=celery_manager,
 )
 
 app.layout = layout
