@@ -1,3 +1,11 @@
+from gevent import monkey
+
+# NOTE: Attempt to fix the warning
+# ggevent.py:38: MonkeyPatchWarning: Monkey-patching
+# ssl after ssl has already been imported may lead to errors
+# via https://stackoverflow.com/a/74817491/992999
+monkey.patch_all(thread=False, select=False)
+
 from os import getenv
 from web.logger import logger
 

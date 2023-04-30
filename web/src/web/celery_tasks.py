@@ -1,7 +1,10 @@
 # NOTE: changing the name of this file will require you to change all the ./docker/celery/start-* scripts
+import hashlib
 import re
-import requests
+
 import orjson
+import requests
+
 from web.celery import celery_app, redis_client
 from web.logger import logger
 
@@ -47,6 +50,16 @@ def requests_try_cache(
     - prob need a sister function that cycles through URLs and prepopulates the cache
     """
     cache_key = replace_alphanumeric(url)
+    if params:
+        params_suffix = "_PARAMS_" + replace_alphanumeric(str(params))
+        # Try to keep the cache key up somewhat limited in size
+        # https://stackoverflow.com/a/30271837/992999
+        if len(params_suffix) > 64:
+            sha256 = hashlib.sha256()
+            sha256.update(params_suffix.encode("utf-8"))
+            cache_key = cache_key + params_suffix[:32] + sha256.hexdigest()
+        else:
+            cache_key = cache_key + params_suffix
     expires = 3600 if expires is None else expires
 
     cached_data = redis_client.get(cache_key)
