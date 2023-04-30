@@ -11,6 +11,7 @@ class DischargeStatus(BaseModel):
 
 
 class Bed(BaseModel):
+    id: int
     location_name: str | None
     department: str | None
     room: str | None

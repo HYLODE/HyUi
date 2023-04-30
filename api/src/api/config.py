@@ -20,6 +20,8 @@ class Settings(BaseSettings):
 
     echo_sql: bool = False
 
+    icu_admission_predictions: bool = False
+
     slack_log_webhook: SecretStr
 
     class Config:

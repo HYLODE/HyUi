@@ -211,8 +211,8 @@ def get_campus(
 @mock_router.get("/closed/", response_model=list[Bed])
 def get_mock_closed_beds() -> list[Bed]:
     return [
-        Bed(location_string="LOC1", closed=True, covid=True, xpos=100, ypos=100),
-        Bed(location_string="LOC1", closed=True, covid=False, xpos=100, ypos=100),
+        Bed(id=1, location_string="LOC1", closed=True, covid=True, xpos=100, ypos=100),
+        Bed(id=2, location_string="LOC1", closed=True, covid=False, xpos=100, ypos=100),
     ]
 
 
@@ -301,7 +301,6 @@ def get_mock_discharge_status(
 def get_discharge_status(
     delta_hours: int = 72, baserow: BaserowDB = Depends(get_baserow_db)
 ) -> list[DischargeStatus]:
-
     _table_dict = baserow.tables_dict.get("discharge_statuses")
 
     modified_at_field_id = _table_dict.get("fields").get("modified_at")

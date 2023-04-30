@@ -1,0 +1,101 @@
+[
+  {
+    "selector": "node",
+    "style": {
+      "text-halign": "center",
+      "text-valign": "center",
+      "width": 36,
+      "height": 36
+    }
+  },
+  {
+    "selector": "[entity='department']",
+    "style": {
+      "label": "data(label)",
+      "color": "black",
+      "background-opacity": 0.1,
+      "background-color": "gray",
+      "border-color": "black",
+      "border-width": 0,
+      "text-halign": "left",
+      "text-margin-x": -5
+    }
+  },
+  {
+    "selector": "[entity='bed']",
+    "style": {
+      "shape": "ellipse",
+      "label": "data(bed_number)",
+      "color": "gray",
+      "border-color": "olive",
+      "border-width": 2,
+      "background-color": "olive",
+      "background-opacity": 0
+    }
+  },
+  {
+    "selector": "[?closed]",
+    "style": {
+      "background-color": "white",
+      "color": "gray"
+    }
+  },
+  {
+    "selector": "[?blocked]",
+    "style": {
+      "background-color": "gray"
+    }
+  },
+  {
+    "selector": "[?occupied]",
+    "style": {
+      "border-width": 0,
+      "background-color": "indigo",
+      "background-opacity": 1
+    }
+  },
+  {
+    "selector": "[?occupied][news_max>=0]",
+    "style": {
+      "background-color": "olive",
+      "background-opacity": 0.5,
+      "color": "white"
+    }
+  },
+  {
+    "selector": "[?occupied][news_max>4]",
+    "style": {
+      "background-color": "#F5C487",
+      "background-opacity": 1,
+      "color": "white"
+    }
+  },
+  {
+    "selector": "[?occupied][news_max>6]",
+    "style": {
+      "background-color": "#EC9078",
+      "background-opacity": 1,
+      "color": "white"
+    }
+  },
+  {
+    "selector": "[?occupied][news_max=-1]",
+    "style": {
+      "background-color": "indigo",
+      "background-opacity": 1,
+      "color": "white"
+    }
+  },
+
+  {
+    "selector": ":selected:",
+    "style": {
+      "width": 36,
+      "height": 36,
+      "text-margin-y": 2,
+      "border-width": 3,
+      "border-color": "black",
+      "color": "black"
+    }
+  }
+]

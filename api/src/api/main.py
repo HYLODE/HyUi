@@ -8,6 +8,7 @@ from typing import Any
 import arrow
 from fastapi import APIRouter, FastAPI, Request, Response
 from fastapi.responses import ORJSONResponse
+from fastapi_utils.tasks import repeat_every
 
 from api.beds.router import mock_router as mock_beds_router
 from api.beds.router import router as beds_router
@@ -30,6 +31,8 @@ from api.perrt.router import router as perrt_router
 from api.ros.router import router as ros_router
 from api.sitrep.router import mock_router as mock_sitrep_router
 from api.sitrep.router import router as sitrep_router
+
+from api.perrt.admission_probability.predictions_script import run_prediction_pipeline
 
 logger.info("API app starting")
 
@@ -75,6 +78,15 @@ mock_router.include_router(mock_hymind_router)
 app.include_router(mock_router)
 
 
+# DH's work as per a4e125c926ac8110525a741c4c5709652de8bd49
+@app.on_event("startup")
+@repeat_every(seconds=1800, raise_exceptions=False)
+def refresh_perrt_icu_admission_predictions() -> None:
+    app.state.perrt_icu_adm_predictions = {}
+    predictions = run_prediction_pipeline()
+    app.state.perrt_icu_adm_predictions = predictions
+
+
 @app.middleware("http")
 async def add_cache_control_header(request: Request, call_next: Any) -> Response:
     response = await call_next(request)
@@ -89,13 +101,13 @@ def ping() -> dict[str, str]:
 
 
 @app.get("/ping/slow")
-def pong() -> dict[str, str]:
+def pong_slow() -> dict[str, str]:
     notnow = arrow.utcnow().format("YYYY-MM-DD HH:mm:ss.SSS")
     time.sleep(5)
     return notnow
 
 
 @app.get("/ping/fast")
-def pong() -> dict[str, str]:
+def pong_fast() -> dict[str, str]:
     now = arrow.utcnow().format("YYYY-MM-DD HH:mm:ss.SSS")
     return now
