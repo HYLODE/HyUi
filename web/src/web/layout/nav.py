@@ -22,9 +22,7 @@ class _NavLink(NamedTuple):
 
 
 home = _NavLink(title="Home", path="/", icon="carbon:home")
-scratch = _NavLink(
-    title="Scratch", path="/scratch", icon="ph:number-square-three-light"
-)
+scratch = _NavLink(title="Scratch", path="/demo", icon="ph:number-square-three-light")
 
 sitrep_campus = _NavLink(title="Campus", path="/sitrep/campus", icon="carbon:hospital")
 # sitrep_ward = _NavLink(title="Ward", path="/sitrep/ward", icon="carbon:hospital-bed")
