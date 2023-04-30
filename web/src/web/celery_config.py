@@ -1,5 +1,6 @@
 from web.config import get_settings
-from web import slow_url, campus_url
+from web.pages.scratch import slow_url
+from web import campus_url
 from celery.schedules import crontab
 
 
