@@ -14,6 +14,9 @@ from web.logger import logger
 from web.celery import redis_client
 from web.celery_tasks import get_response
 
+from web.debugger import initialize_flask_server_debugger_if_needed
+
+initialize_flask_server_debugger_if_needed()
 
 server = Flask(__name__)
 # celery_manager = CeleryManager(celery_app)
@@ -21,6 +24,7 @@ server = Flask(__name__)
 # Set up fast and slow requests for testing
 slow_url = "http://api:8000/ping/slow"
 fast_url = "http://api:8000/ping/fast"
+campus_url = "http://api:8000/baserow/campus?campuses=uclh"
 
 
 @dash.callback(
@@ -53,6 +57,18 @@ def ping_slow(n_clicks):
     return f"Click: {n_clicks} Timestamp: {data}"
 
 
+@dash.callback(
+    Output("ping-campus-text", "children"),
+    [Input("ping-campus-button", "n_clicks")],
+    prevent_initial_call=True,
+)
+def ping_campus(n_clicks):
+    response = requests.get(campus_url)
+    data = response.json()
+    result = len(data)
+    return f"Click: {n_clicks} Rows of data: {result}"
+
+
 layout = dmc.Paper(
     [
         dmc.Title("Hello World"),
@@ -67,6 +83,13 @@ layout = dmc.Paper(
             [
                 dmc.Button(id="ping-slow-button", children="Ping-slow"),
                 dmc.Text(id="ping-slow-text"),
+            ],
+            p=10,
+        ),
+        dmc.Group(
+            [
+                dmc.Button(id="ping-campus-button", children="Ping-campus"),
+                dmc.Text(id="ping-campus-text"),
             ],
             p=10,
         ),
@@ -92,5 +115,6 @@ if get_settings().debug:
 server = app.server
 
 if __name__ == "__main__":
+    logger.info("Running with the local dash development server")
     debug = True if get_settings().debug else False
     app.run_server(host="0.0.0.0", port=get_settings().development_port, debug=debug)
