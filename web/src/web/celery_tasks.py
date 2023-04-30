@@ -1,17 +1,63 @@
 # NOTE: changing the name of this file will require you to change all the ./docker/celery/start-* scripts
+import re
 import requests
 import orjson
 from web.celery import celery_app, redis_client
+from web.logger import logger
 
 
 @celery_app.task
-def get_response(url, cache_key, expires: int = 3600):
+def get_response(
+    url: str, cache_key: str, params: dict = None, expires: int = 3600
+) -> tuple[object, int]:
     """
     Get a response from a URL
     """
-    response = requests.get(url)
+    if params is None:
+        response = requests.get(url)
+    else:
+        response = requests.get(url, params=params)
+
+    if response.status_code != 200:
+        logger.error(f"Error fetching {url}: {response.status_code}")
+        return None, response.status_code
+
     data = response.json()
     redis_client.set(cache_key, orjson.dumps(data))
     # Remember to expire the cache just after the task refresh interval
     redis_client.expire(cache_key, expires)
-    return data
+
+    return data, response.status_code
+
+
+def replace_alphanumeric(s, replacement="_"):
+    return re.sub(r"\W+", replacement, s)
+
+
+def requests_try_cache(
+    url: str, cache_key: str = None, params: dict = None, expires: int = None
+):
+    """
+    Drop in replacement for requests.get() that caches the response using redis;
+    the idea is that I can just use this and it will generate a suitable cache
+    key etc automatically from the URL
+
+    Crucially this should mean that it's easy to cache anything since the URL is unique
+    TODO: scheduling to keep the cache warm
+    - prob need a sister function that cycles through URLs and prepopulates the cache
+    """
+    cache_key = replace_alphanumeric(url)
+    expires = 3600 if expires is None else expires
+
+    cached_data = redis_client.get(cache_key)
+
+    if cached_data is None:
+        logger.info(f"Cache miss for {url} ... requesting")
+        # Do not use the apply_async method from the celery_app.task decorator because the function will return with nothing
+        data, status_code = get_response(url, cache_key, params=params, expires=expires)
+    else:
+        logger.info(f"Cache hit for {url}")
+        data = orjson.loads(cached_data)
+        status_code = 200
+
+    return data, status_code

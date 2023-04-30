@@ -1,7 +1,10 @@
 import dash
+from dash import CeleryManager
 from flask import Flask
 
 import web
+
+from web.celery import celery_app
 from web.celery_startup import run_startup_tasks
 from web.config import get_settings
 from web.debugger import initialize_flask_server_debugger_if_needed
@@ -12,6 +15,7 @@ initialize_flask_server_debugger_if_needed()
 
 server = Flask(__name__)
 
+celery_manager = CeleryManager(celery_app)
 
 # run celery startup tasks
 run_startup_tasks()
@@ -20,6 +24,7 @@ logger.info("Starting the Dash application")
 app = dash.Dash(
     __name__,
     server=server,
+    background_callback_manager=celery_manager,
     use_pages=True,
     external_stylesheets=[
         "assets/style.css",

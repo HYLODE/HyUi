@@ -4,11 +4,13 @@ import orjson
 import requests
 from dash import Input, Output
 
-from web import campus_url
+from web import API_URLS
 from web.celery import redis_client
 from web.celery_tasks import get_response
 from web.pages.demo import fast_url, slow_url
 from web.style import colors
+
+campus_url = API_URLS.get("campus_url")
 
 dash.register_page(__name__, path="/demo", name="demo")
 
@@ -36,7 +38,7 @@ def ping_slow(n_clicks):
 
     if cached_data is None:
         fetch_data_task = get_response.delay(slow_url, cache_key)
-        data = fetch_data_task.get()
+        data, _ = fetch_data_task.get()
     else:
         data = orjson.loads(cached_data)
 
@@ -53,7 +55,7 @@ def ping_campus(n_clicks):
     cached_data = redis_client.get(cache_key)
     if cached_data is None:
         fetch_data_task = get_response.delay(campus_url, cache_key)
-        data = fetch_data_task.get()
+        data, _ = fetch_data_task.get()
     else:
         data = orjson.loads(cached_data)
 

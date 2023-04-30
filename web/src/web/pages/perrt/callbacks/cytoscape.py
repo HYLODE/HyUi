@@ -9,6 +9,7 @@ from models.census import CensusRow
 from web.config import get_settings
 from web.pages.perrt import CAMPUSES, ids
 from web.stores import ids as store_ids
+from web.celery_tasks import requests_try_cache
 
 DEBUG = True
 
@@ -150,12 +151,16 @@ def _store_census(
         i.get("label") for i in CAMPUSES if i.get("value") == campus
     )
 
-    response = requests.get(
-        f"{get_settings().api_url}/census/campus/",
-        params={"campuses": campus_short_name},
-    )
+    # Drop in replacement for requests.get that uses the redis cache
+    # response = requests.get(
+    #     f"{get_settings().api_url}/census/campus/",
+    #     params={"campuses": campus_short_name},
+    # )
+    url = f"{get_settings().api_url}/census/campus/"
+    params = {"campuses": campus_short_name}
+    data, response_code = requests_try_cache(url, params=params)
 
-    res = [CensusRow.parse_obj(row).dict() for row in response.json()]
+    res = [CensusRow.parse_obj(row).dict() for row in data]
     res = [row for row in res if row.get("department") in depts_open_names]
     return res
 
@@ -164,7 +169,6 @@ def _store_census(
     Output(ids.NEWS_STORE, "data"),
     Input(ids.CENSUS_STORE, "data"),
     prevent_initial_callback=True,
-    # background=True,
 )
 def _store_news(census: list[dict]) -> list[dict]:
     """
@@ -178,9 +182,10 @@ def _store_news(census: list[dict]) -> list[dict]:
     csn_list = [i.get("encounter") for i in census if i.get("occupied")]  # type: ignore
 
     url = f"{get_settings().api_url}/perrt/vitals/wide"
-    response = requests.get(url, params={"encounter_ids": csn_list})  # type: ignore
+    params = {"encounter_ids": csn_list}
+    data, response_code = requests_try_cache(url, params=params)
 
-    newsdf = pd.DataFrame.from_records(response.json())
+    newsdf = pd.DataFrame.from_records(data)
     # TODO: simpplify: you just want the most recent and highest NEWS score
     #  and its timestamp
 
@@ -191,8 +196,6 @@ def _store_news(census: list[dict]) -> list[dict]:
 @callback(
     Output(ids.PREDICTIONS_STORE, "data"),
     Input(ids.CENSUS_STORE, "data"),
-    prevent_initial_callback=True,
-    # background=True,
 )
 def _store_predictions(census: list[dict]) -> dict:
     """
@@ -205,10 +208,13 @@ def _store_predictions(census: list[dict]) -> dict:
         NULL otherwise
     """
     csn_list = [i.get("encounter") for i in census if i.get("occupied")]
+
+    # response = requests.get(url, params={"encounter_ids": csn_list})  # type: ignore
     url = f"{get_settings().api_url}/perrt/icu_admission_prediction"
-    response = requests.get(url, params={"encounter_ids": csn_list})  # type: ignore
-    predictions: dict = response.json()
-    return predictions
+    params = {"encounter_ids": csn_list}  # type: ignore
+    data, response_code = requests_try_cache(url, params=params)
+
+    return data
 
 
 @callback(
