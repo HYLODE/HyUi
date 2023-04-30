@@ -61,6 +61,19 @@ services:
     networks:
       - hyui
 
+  redisinsight:
+    image: redislabs/redisinsight
+    environment:
+      <<: *proxy-common
+    ports:
+      - 8309:8001
+    networks:
+      - hyui
+    depends_on:
+      - redis
+    volumes:
+      - redisinsight:/db
+
   celery_worker:
     build:
       dockerfile: docker/celery/Dockerfile
@@ -143,3 +156,4 @@ networks:
 
 volumes:
   baserow-data:
+  redisinsight:
