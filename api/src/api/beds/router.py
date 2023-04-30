@@ -40,7 +40,7 @@ def get_departments(baserow: BaserowDB = Depends(get_baserow_db)) -> list[Depart
 
     # drop baserow id and order fields
     for row in rows:
-        row.pop("id")
+        # row.pop("id")
         row.pop("order")
 
     return [Department.parse_obj(row) for row in rows]
@@ -65,7 +65,7 @@ def get_rooms(baserow: BaserowDB = Depends(get_baserow_db)) -> list[Room]:
 
     # drop baserow id and order fields
     for row in rows:
-        row.pop("id")
+        # row.pop("id")
         row.pop("order")
 
     return [Room.parse_obj(row) for row in rows]
@@ -203,7 +203,7 @@ def get_campus(
 
     # drop baserow id and order fields
     for row in rows:
-        row.pop("id")
+        # row.pop("id")
         row.pop("order")
 
     return [Bed.parse_obj(row) for row in rows]
