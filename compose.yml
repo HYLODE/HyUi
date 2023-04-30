@@ -44,7 +44,7 @@ services:
       - redis
       - cache
     healthcheck:
-      test: ["CMD", "./refresh_cache.sh"]
+      test: [ "CMD", "./refresh_cache.sh" ]
       interval: 5m30s
       timeout: 30s
       retries: 5
@@ -76,6 +76,21 @@ services:
     networks:
       - hyui
 
+  celery_beat:
+    build:
+      dockerfile: docker/celery/Dockerfile
+      args:
+        <<: *build-args-common
+    environment:
+      <<: *proxy-common
+    command: /app/start-beat
+    env_file:
+      - .env
+    depends_on:
+      - redis
+    networks:
+      - hyui
+
   celery_flower:
     build:
       dockerfile: docker/celery/Dockerfile
@@ -85,7 +100,7 @@ services:
       <<: *proxy-common
     command: /app/start-flower
     ports:
-      - "${FLOWER_PORT}:5555"
+      - "${FLOWER_PORT}:5557"
     env_file:
       - .env
     depends_on:
@@ -124,6 +139,7 @@ services:
 
 networks:
   hyui:
+
 
 volumes:
   baserow-data:
