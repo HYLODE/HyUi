@@ -1,3 +1,4 @@
+# NOTE: changing the name of this file will require you to change all the ./docker/celery/start-* scripts
 import requests
 import orjson
 from web.celery import celery_app, redis_client

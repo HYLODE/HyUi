@@ -30,12 +30,12 @@ services:
     environment:
       <<: *proxy-common
     # use cmd rather than entrypoint in Dockerfile.dev and then override here
-    command: ["sh", "-c", "pip install debugpy -t /tmp && python /tmp/debugpy --wait-for-client --listen 0.0.0.0:5678 -m web.app"]
-    # command: ["sh", "-c", "pip install debugpy -t /tmp && python /tmp/debugpy --wait-for-client --listen 0.0.0.0:5678 -m gunicorn --bind 0.0.0.0:8000 web.app:server"]
+    command: ["sh", "-c", "pip install debugpy -t /tmp && python /tmp/debugpy --wait-for-client --listen 0.0.0.0:5679 -m web.app"]
+    # command: ["sh", "-c", "pip install debugpy -t /tmp && python /tmp/debugpy --wait-for-client --listen 0.0.0.0:5679 -m gunicorn --bind 0.0.0.0:8000 web.app:server"]
     env_file: .env.dev
     ports:
       - ${WEB_PORT}:8000 # switch from 8000 (exposed by gunicorn + app.server) to 8300 which is the dev port
-      - 5678:5678  # vscode debugpy attach port
+      - 5679:5679  # vscode debugpy attach port
     # add in a volumes section
     volumes:
     # attach as bind mounts so you can edit the code whilst the container still runs

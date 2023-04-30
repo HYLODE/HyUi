@@ -10,4 +10,4 @@ rm -f './celerybeat.pid'
 
 # using watchfiles and passing the above as a string
 watchfiles --filter python \
-  'celery -A web.tasks.celery_app beat --loglevel=info'
+  'celery -A web.celery.celery_app beat --loglevel=info'
