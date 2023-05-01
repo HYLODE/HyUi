@@ -14,11 +14,21 @@ def get_response(
     url: str, cache_key: str, params: dict = None, expires: int = 3600
 ) -> tuple[object, int]:
     """
-    Get a response from a URL
+    Get a response from a URL 
+    TODO: might be best to take the logic below and
+    include here so that all tasks can generate their own keys if needed
     """
+    try:
+        assert url is str
+    except AssertionError:
+        logger.error(f"Invalid URL: {url}")
+        return None, 400
+
     if params is None:
+        logger.info(f"Fetching {url} - no parameters provided")
         response = requests.get(url)
     else:
+        logger.info(f"Fetching {url} - params {str(params)[:16]} ...")
         response = requests.get(url, params=params)
 
     if response.status_code != 200:

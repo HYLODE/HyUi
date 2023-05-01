@@ -70,7 +70,7 @@ beat_schedule = {
 def _sitrep_store_url(icu):
     return f"{get_settings().api_url}/sitrep/live/{icu}/ui/"
 
-
+# add tasks for all sitrep stores
 for icu in list(SITREP_DEPT2WARD_MAPPING.values()):
     kkey = f"{web_ids.SITREP_STORE}-{icu}"
     url = _sitrep_store_url(icu)
@@ -85,6 +85,10 @@ for icu in list(SITREP_DEPT2WARD_MAPPING.values()):
         # 'addons' holds additional data about the task
         "addons": {"icu": icu},
     }
+
+
+# add tasks for all census work
+# TODO: add tasks for all census work
 
 
 task_time_to_live = 2 * 60 * 60  # 2 hours
