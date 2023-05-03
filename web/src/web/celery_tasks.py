@@ -40,7 +40,10 @@ def get_response(
     # Remember to expire the cache just after the task refresh interval
     redis_client.expire(cache_key, expires)
 
-    return data, response.status_code
+    # FIXME: convert to string else type errors will be raised but this means
+    # checks against the response will also need to do the same; doesn't seem
+    # very elegant
+    return data, str(response.status_code)
 
 
 def replace_alphanumeric(s, replacement="_"):
