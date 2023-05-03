@@ -23,20 +23,20 @@ _this_file = Path(__file__)
 
 @router.get("/icu_admission_prediction", response_model=dict)
 def get_icu_admission_preciction(
-    request: Request, encounter_ids: list[str] = Query(default=[])
+    request: Request, hospital_visit_ids: list[int] = Query(default=[])
 ) -> dict:
     return {
-        id: request.app.state.perrt_icu_adm_predictions.get(id, None)
-        for id in encounter_ids
+        str(id): request.app.state.perrt_icu_adm_predictions.get(str(id), None)
+        for id in hospital_visit_ids
     }
 
 
 @mock_router.get("/icu_admission_prediction", response_model=dict)
 def get_mock_icu_admission_preciction(
-    encounter_ids: list[str] = Query(default=[]),
+    hospital_visit_ids: list[int] = Query(default=[]),
 ) -> dict:
-    mock_predictions = {"699999996": 0.85, "674628501": 0.3, "1040463999": 0.4}
-    return {id: mock_predictions.get(id, None) for id in encounter_ids}
+    mock_predictions = {"555719": 0.85, "674628501": 0.3, "12345": 0.4}
+    return {str(id): mock_predictions.get(str(id), None) for id in hospital_visit_ids}
 
 
 @router.get("/cpr", response_model=list[EmapCpr])
