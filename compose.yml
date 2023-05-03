@@ -42,13 +42,13 @@ services:
       - baserow
       - api
       - redis
-      - cache
-    healthcheck:
-      test: [ "CMD", "./refresh_cache.sh" ]
-      interval: 5m30s
-      timeout: 30s
-      retries: 5
-      start_period: 30s
+      # - cache
+    # healthcheck:
+    #   test: [ "CMD", "./refresh_cache.sh" ]
+    #   interval: 5m30s
+    #   timeout: 30s
+    #   retries: 5
+    #   start_period: 30s
     networks:
       - hyui
 
@@ -122,21 +122,21 @@ services:
     networks:
       - hyui
 
-  cache:
-    build:
-      dockerfile: docker/cache/Dockerfile
-      args:
-        <<: *build-args-common
-    environment:
-      <<: *proxy-common
-    env_file: .env
-    ports:
-      - "${CACHE_PORT}:8000"
-    command: "-p default_keep=300"
-    depends_on:
-      - api
-    networks:
-      - hyui
+  # cache:
+  #   build:
+  #     dockerfile: docker/cache/Dockerfile
+  #     args:
+  #       <<: *build-args-common
+  #   environment:
+  #     <<: *proxy-common
+  #   env_file: .env
+  #   ports:
+  #     - "${CACHE_PORT}:8000"
+  #   command: "-p default_keep=300"
+  #   depends_on:
+  #     - api
+  #   networks:
+  #     - hyui
 
   baserow:
     image: baserow/baserow:1.16.0

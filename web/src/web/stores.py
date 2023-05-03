@@ -125,9 +125,12 @@ def _store_all_sitreps(_: int) -> dict:
         if not task.startswith(ids.SITREP_STORE):
             continue
         data = _get_or_refresh_cache(task)
-        sitreps[conf.get("addons").get("icu")] = [
-            SitrepRow.parse_obj(row).dict() for row in data
-        ]
+        # FIXME: hacky way to get sitrep ICU b/c we know the 2nd arg (the key)
+        # is the icu url and the last component is the icu
+        # kkey = f"{web_ids.SITREP_STORE}-{icu}"
+        icu = conf.get("args")[1].split("-")[-1]
+        assert icu in SITREP_DEPT2WARD_MAPPING.values()
+        sitreps[icu] = [SitrepRow.parse_obj(row).dict() for row in data]
 
     return sitreps
 

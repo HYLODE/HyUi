@@ -14,14 +14,14 @@ def get_response(
     url: str, cache_key: str, params: dict = None, expires: int = 3600
 ) -> tuple[object, int]:
     """
-    Get a response from a URL 
+    Get a response from a URL
     TODO: might be best to take the logic below and
     include here so that all tasks can generate their own keys if needed
     """
     try:
-        assert url is str
-    except AssertionError:
-        logger.error(f"Invalid URL: {url}")
+        assert type(url) is str
+    except AssertionError as e:
+        logger.error(f"Invalid URL: {url} - {e}")
         return None, 400
 
     if params is None:
