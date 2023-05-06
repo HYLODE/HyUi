@@ -100,6 +100,19 @@ def perrt_accordion_item(
     news = data.get("news", {})
     admission_prediction = data.get("admission_prediction", {})
 
+    if admission_prediction:
+        pred_text = dmc.Text("ICU admission probability")
+        pred_content = dmc.Group(
+            dmc.Badge(
+                f"{round(100 * admission_prediction)}%",
+                color="orange",
+                variant="filled",
+            )
+        )
+    else:
+        pred_text = dmc.Text("ICU admission probability not available")
+        pred_content = dmc.Group()
+
     if news:
         news_text = dmc.Text("Highest/lowest vitals within the last 6 hours")
         news_content = dmc.Group(
@@ -128,9 +141,49 @@ def perrt_accordion_item(
                 ),
                 dmc.Stack(
                     [
-                        dmc.Badge("Pred", color=colors.indigo, variant="outline"),
+                        dmc.Badge("BP", color=colors.indigo, variant="outline"),
                         dmc.Badge(
-                            admission_prediction, color=colors.indigo, variant="filled"
+                            news.get("bp_max"), color=colors.indigo, variant="filled"
+                        ),
+                        dmc.Badge(
+                            news.get("bp_min"), color=colors.indigo, variant="filled"
+                        ),
+                    ]
+                ),
+                dmc.Stack(
+                    [
+                        dmc.Badge("SpO2", color=colors.indigo, variant="outline"),
+                        dmc.Badge(
+                            news.get("spo2_max"), color=colors.indigo, variant="filled"
+                        ),
+                        dmc.Badge(
+                            news.get("spo2_min"), color=colors.indigo, variant="filled"
+                        ),
+                    ]
+                ),
+                dmc.Stack(
+                    [
+                        dmc.Badge("Temp", color=colors.indigo, variant="outline"),
+                        dmc.Badge(
+                            round(news.get("temp_max"), 1),
+                            color=colors.indigo,
+                            variant="filled",
+                        ),
+                        dmc.Badge(
+                            round(news.get("temp_min"), 1),
+                            color=colors.indigo,
+                            variant="filled",
+                        ),
+                    ]
+                ),
+                dmc.Stack(
+                    [
+                        dmc.Badge("AVPU", color=colors.indigo, variant="outline"),
+                        dmc.Badge(
+                            news.get("avpu_max"), color=colors.indigo, variant="filled"
+                        ),
+                        dmc.Badge(
+                            news.get("avpu_min"), color=colors.indigo, variant="filled"
                         ),
                     ]
                 ),
@@ -154,8 +207,10 @@ def perrt_accordion_item(
         [
             dmc.Col(
                 [
-                    news_content,
+                    pred_text,
+                    pred_content,
                     news_text,
+                    news_content,
                 ],
                 span=12,
             ),
