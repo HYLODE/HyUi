@@ -86,4 +86,6 @@ def requests_try_cache(
         data = orjson.loads(cached_data)
         status_code = 200
 
-    return data, status_code
+    # FIXME: convert to string else type errors but this means checks against
+    # the response will also need to do the same; doesn't seem sensible
+    return data, str(status_code)

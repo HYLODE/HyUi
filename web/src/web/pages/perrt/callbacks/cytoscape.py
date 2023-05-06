@@ -1,5 +1,4 @@
 import pandas as pd
-import requests
 import warnings
 from dash import Input, Output, callback
 from datetime import datetime
@@ -207,14 +206,12 @@ def _store_predictions(census: list[dict]) -> dict:
         Admission prediction data for each patient in the CENSUS,if it exists,
         NULL otherwise
     """
-    csn_list = [i.get("encounter") for i in census if i.get("occupied")]
-
-    # response = requests.get(url, params={"encounter_ids": csn_list})  # type: ignore
+    hv_id_list = [i.get("ovl_hv_id") for i in census if i.get("occupied")]
     url = f"{get_settings().api_url}/perrt/icu_admission_prediction"
-    params = {"encounter_ids": csn_list}  # type: ignore
-    data, response_code = requests_try_cache(url, params=params)
+    params = {"hospital_visit_ids": hv_id_list}  # type: ignore
+    predictions, response_code = requests_try_cache(url, params=params)
 
-    return data
+    return predictions
 
 
 @callback(
@@ -267,8 +264,17 @@ def _make_elements(  # noqa: C901
 
         occupied = census_lookup.get(location_string, {}).get("occupied", False)
         encounter = census_lookup.get(location_string, {}).get("encounter", "")
+        hospital_visit_id = census_lookup.get(location_string, {}).get(
+            "ovl_hv_id", None
+        )
         news_wide: dict = news_lookup.get(encounter, {})  # type: ignore
-        admission_prediction = predictions.get(encounter, None)
+
+        # Hospital_visit_ids are integers, but the dictionary uses strings for keys.
+        # Lookup using a string to be safe
+        # Don't get the prediction if the bed isn't occupied
+        admission_prediction = (
+            predictions.get(str(hospital_visit_id), None) if occupied else None
+        )
 
         def _max_news_wide(row: dict) -> int:
             if not row:
