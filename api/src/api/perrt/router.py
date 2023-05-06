@@ -35,7 +35,7 @@ def get_icu_admission_preciction(
 def get_mock_icu_admission_preciction(
     hospital_visit_ids: list[int] = Query(default=[]),
 ) -> dict:
-    mock_predictions = {"555719": 0.85, "674628501": 0.3, "12345": 0.4}
+    mock_predictions = {"555719": 0.85, "887169": 0.3, "12345": 0.4}
     return {str(id): mock_predictions.get(str(id), None) for id in hospital_visit_ids}
 
 
