@@ -7,11 +7,15 @@
 
 .DEFAULT_GOAL := help
 
+## Short cut to docker run the web app locally
+web-run:
+	docker compose -f compose.dev.yml run --rm --no-deps --service-ports web gunicorn -c web/gunicorn_config.py web.app:server
 ## Use VS Code to debug a running docker compose config
 ## web docker compose debug = web-dcdb
 ## DEBUGGER=True runs the debugger.py module
 ## GEVENT support might(?) help
 web-dcdb:
+	# docker compose -f compose.dev.yml up -d api baserow redis celery_beat celery_worker celery_flower
 	docker compose -f compose.dev.yml run --rm --no-deps -e DEBUGGER=True -e GEVENT_SUPPORT=True --service-ports web gunicorn -c web/gunicorn_config.py web.app:server
 
 

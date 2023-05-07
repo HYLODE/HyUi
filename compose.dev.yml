@@ -24,7 +24,7 @@ services:
 
   web:
     build:
-      dockerfile: docker/web/Dockerfile.dev
+      dockerfile: docker/web/Dockerfile
       args:
         <<: *build-args-common
     environment:
@@ -68,12 +68,12 @@ services:
       <<: *proxy-common
     ports:
       - 8309:8001
-    networks:
-      - hyui
     depends_on:
       - redis
     volumes:
       - redisinsight:/db
+    networks:
+      - hyui
 
   celery_worker:
     build:

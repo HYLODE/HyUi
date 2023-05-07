@@ -943,3 +943,4 @@ web/src/web/assets/pqip_dashboard.html
 # redis/celery detritus
 celerybeat-schedule.db
 dump.rdb
+.env.dev.local
