@@ -293,14 +293,12 @@ class BaserowDB:
         database_token: str,
         tables_dict: dict,
     ) -> None:
-
         self.baserow_url = settings.baserow_url
         self.database_token = database_token
         self.tables_dict = tables_dict
 
     @logger_timeit()
     def get_fields(self, table_name: str) -> dict[str, int]:
-
         auth_token = self.database_token
         table_id = self.tables_dict.get(table_name, {}).get("id")
 
@@ -335,7 +333,6 @@ class BaserowDB:
 
         rows = []
         while True:
-
             params["page"] = params["page"] + 1
             response = requests.get(
                 rows_url, headers=_simple_auth_headers(auth_token), params=params
@@ -362,13 +359,12 @@ class BaserowDB:
         params: dict,
         payload: dict,
     ) -> Any:
-
         auth_token = self.database_token
         table_id = self.tables_dict.get(table_name, {}).get("id")
         url = f"{self.baserow_url}/api/database/rows/table/{table_id}/"
 
         response = requests.post(
-            url, headers=_admin_auth_headers(auth_token), params=params, json=payload
+            url, headers=_simple_auth_headers(auth_token), params=params, json=payload
         )
 
         if response.status_code != 200:
