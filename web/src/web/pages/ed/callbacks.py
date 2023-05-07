@@ -4,7 +4,6 @@ Callbacks for the ED model
 from datetime import datetime
 from typing import Any, Dict, List
 
-import requests
 from dash import Input, Output, callback
 
 from models.ed import AggregateAdmissionRow, EmergencyDepartmentPatient

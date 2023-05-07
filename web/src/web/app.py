@@ -23,11 +23,18 @@ run_startup_tasks()
 logger.info("Starting the Dash application")
 app = dash.Dash(
     __name__,
+    # It is recommended to add __name__ to the Dash constructor to ensure the
+    # resources in the assets folder are loaded (app = dash.Dash(__name__,
+    # meta_tags=[...])). When you run your app through some other command line
+    # (like the Flask command or Gunicorn/Waitress), the __main__ module will no
+    # longer be located where app.py is. By explicitly setting __name__, Dash
+    # will be able to locate the relative assets folder correctly.
     server=server,
     background_callback_manager=celery_manager,
     use_pages=True,
     external_stylesheets=[
-        "assets/style.css",
+        # do NOT need to include this; all .css files in ./assets will be loaded
+        # "assets/style.css",
         web.FONTS_GOOGLE,
         web.FONTS_FA,
     ],

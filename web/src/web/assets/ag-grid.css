@@ -1,0 +1,20 @@
+/* FIXME: this css does not seem to be applied */
+.header1 .ag-header-cell-label {
+    /*Necessary to allow for text to grow vertically*/
+    height: 100%;
+    padding: 0 !important;
+  }
+
+  .header1 .ag-header-group-cell {
+    font-size: 50px;
+  }
+
+  .header1 .ag-header-cell-label .ag-header-cell-text {
+    /*Force the width corresponding at how much width
+      we need once the text is laid out vertically*/
+    width: 55px;
+    writing-mode: vertical-lr;
+    -ms-writing-mode: tb-lr;
+    line-height: 2em;
+    margin-top: 60px;
+  }

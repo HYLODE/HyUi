@@ -41,7 +41,7 @@ sitrep_icus = _NavLink(
 perrt = _NavLink(title="PERRT", path="/sitrep/perrt", icon="carbon:stethoscope")
 
 ed_predictor = _NavLink(
-    title="ED Predictor", path="/ed_pred", icon="carbon:machine-learning-model"
+    title="ED Predictor", path="/ed/table", icon="carbon:machine-learning-model"
 )
 
 
@@ -149,19 +149,6 @@ def create_side_nave_content() -> dmc.Stack:
                 icon=perrt.icon,
                 label=perrt.title,
                 href=perrt.path,
-            ),
-            dmc.Divider(
-                labelPosition="left",
-                label=[
-                    DashIconify(
-                        icon="carbon:machine-learning-model",
-                        width=20,
-                        style={"marginRight": 10},
-                        color=dmc.theme.DEFAULT_COLORS["indigo"][5],
-                    ),
-                    "Predictive models",
-                ],
-                my=20,
             ),
             create_main_nav_link(
                 icon=ed_predictor.icon,
