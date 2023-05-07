@@ -3,100 +3,33 @@ import dash_ag_grid as dag
 import dash_bootstrap_components as dbc
 import dash_mantine_components as dmc
 from dash import dcc, html
-from dash.dash_table import DataTable, FormatTemplate
+from web.style import colors
 
 dash.register_page(__name__, path="/ed/table", name="ED")
 
-from datetime import datetime
-from typing import Any, Dict, List
 
-from dash import Input, Output, callback
-
-from models.ed import AggregateAdmissionRow, EmergencyDepartmentPatient
-from web.celery_tasks import requests_try_cache
-from web.config import get_settings
-from web.convert import parse_to_data_frame
-from web.logger import logger, logger_timeit
-from web import ids as app_ids
+from web.logger import logger
 from web.pages.ed import ids
+
+from web.pages.ed import callbacks
 
 logger.debug("Confirm that you have imported all the callbacks")
 
-
-# arrival_datetime"2022-10-12T13:14:00"
-# bed"BED2"
-# mrn"MRNABC1"
-# name"Donald Trump"
-# sex"F"
-# date_of_birth"1990-10-06"
-# admission_probability0.06
-# next_locationnull
-
-columnDefs_patients = [
-    {
-        "headerName": "Arrived",
-        "field": "arrival_datetime",
-    },
-    {
-        "headerName": "Location",
-        "field": "bed",
-    },
-    {
-        "headerName": "MRN",
-        "field": "mrn",
-    },
-    {
-        "headerName": "Name",
-        "field": "name",
-    },
-    {
-        "headerName": "Sex",
-        "field": "sex",
-    },
-    {
-        "headerName": "DoB",
-        "field": "date_of_birth",
-    },
-    {
-        "headerName": "P(Admission)",
-        "field": "admission_probability",
-        # "cellRenderer": "DBC_Button_Simple",
-        # "cellRendererParams": {"color": "success"},
-    },
-    {
-        "headerName": "Destination",
-        "field": "next_location",
-    },
-]
-
-
-@logger_timeit()
-def _get_individual_patients() -> list[EmergencyDepartmentPatient]:
-    # response = requests.get(f"{get_settings().api_url}/ed/individual/")
-    url = f"{get_settings().api_url}/ed/individual/"
-    data, response_code = requests_try_cache(url)
-    return [EmergencyDepartmentPatient.parse_obj(row).dict() for row in data]
-
-
-@callback(
-    Output(ids.PATIENTS_STORE, "data"),
-    Input(app_ids.STORE_TIMER_15M, "n_intervals"),
-)
-def store_individual_patients(n_intervals: int) -> List[Dict[str, Any]]:
-    if n_intervals >= 0:
-        return _get_individual_patients()
-
-
-@callback(
-    Output(ids.PATIENTS_GRID, "rowData"),
-    Output(ids.PATIENTS_GRID, "columnDefs"),
-    Input(ids.PATIENTS_STORE, "data"),
-)
-def build_patients_grid(data):
-    df = parse_to_data_frame(data, EmergencyDepartmentPatient)
-    columnDefs = columnDefs_patients
-    return df.to_dict("records"), columnDefs
-
+# TODO: not sure that progress bar is the correct design since you don't know the 'max'
+# progress = dmc.Stack([
+#     dmc.Progress(
+#         id=ids.PROGRESS_MED,
+#         size="xl",
+#         sections=[
+#             {"label": "Allocated", "value": 3, "color": colors.green},
+#             {"label": "Requested", "value": 2, "color": colors.red},
+#             {"label": "Probable here", "value": 1, "color": colors.orange},
+#             {"label": "Probable YTA", "value": 1, "color": colors.yellow},
+#         ]
+#     ),
+#     ],
+#     align="left"
+# )
 
 grid = dag.AgGrid(
     id=ids.PATIENTS_GRID,
@@ -113,19 +46,10 @@ grid = dag.AgGrid(
     className="ag-theme-material",
 )
 
-timers = html.Div(
-    [
-        # dcc.Interval(
-        #     id=ids.ED_TIMER,
-        #     interval=15 * 60 * 1000,
-        #     n_intervals=0,
-        # ),
-    ]
-)
-
 stores = html.Div(
     [
         dcc.Store(id=ids.PATIENTS_STORE),
+        dcc.Store(id=ids.AGGREGATE_STORE),
     ]
 )
 notifications = html.Div(
@@ -138,6 +62,7 @@ body = dmc.Container(
     [
         dmc.Grid(
             children=[
+                # dmc.Col(progress, span=12),
                 dmc.Col(grid, span=12),
             ],
         ),
@@ -150,7 +75,6 @@ body = dmc.Container(
 def layout() -> dash.html.Div:
     return html.Div(
         children=[
-            timers,
             stores,
             notifications,
             body,

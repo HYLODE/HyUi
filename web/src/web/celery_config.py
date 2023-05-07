@@ -3,6 +3,7 @@ from web.pages.demo import slow_url
 from web import API_URLS, SITREP_DEPT2WARD_MAPPING
 from celery.schedules import crontab
 from web import ids as web_ids
+from web.pages.ed import ids as ed_ids
 
 campus_url = API_URLS.get("campus_url")
 
@@ -63,6 +64,15 @@ beat_schedule = {
             web_ids.ELECTIVES_STORE,
         ),
         "kwargs": {"expires": (24 * 3600) + 60},  # 24 hours + 1 minute
+    },
+    ed_ids.PATIENTS_STORE: {
+        "task": "web.celery_tasks.get_response",
+        "schedule": crontab(minute="*/15"),  # ev 15 minutes
+        "args": (
+            API_URLS[ed_ids.PATIENTS_STORE],
+            ed_ids.PATIENTS_STORE,
+        ),
+        "kwargs": {"expires": (15 * 60) + 60},  # ev 16 minutes
     },
 }
 

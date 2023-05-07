@@ -1,6 +1,7 @@
 from pathlib import Path
 from web.config import get_settings
 from web import ids as web_ids
+from web.pages.ed import ids as ed_ids
 
 FONTS_GOOGLE = "https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;900&display=swap"
 FONTS_FA = "https://use.fontawesome.com/releases/v5.8.1/css/all.css"
@@ -15,6 +16,8 @@ API_URLS = {
     web_ids.ROOM_STORE: f"{get_settings().api_url}/baserow/rooms/",
     web_ids.BEDS_STORE: f"{get_settings().api_url}/baserow/beds/",
     web_ids.ELECTIVES_STORE: f"{get_settings().api_url}/electives/",
+    ed_ids.PATIENTS_STORE: f"{get_settings().api_url}/ed/individual",
+    ed_ids.AGGREGATE_STORE: f"{get_settings().api_url}/ed/aggregate",
 }
 
 
