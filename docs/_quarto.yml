@@ -3,6 +3,9 @@ project:
   preview:
     port: 8304
 
+resources:
+  - CNAME
+
 execute:
   freeze: auto
 
