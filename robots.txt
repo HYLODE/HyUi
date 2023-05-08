@@ -1,1 +1,1 @@
-Sitemap: https://github.com/HYLODE/HyUi/sitemap.xml
+Sitemap: https://hylode.org/sitemap.xml
