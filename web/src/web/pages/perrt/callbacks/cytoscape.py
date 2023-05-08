@@ -3,14 +3,18 @@ import warnings
 from dash import Input, Output, callback
 from datetime import datetime
 from typing import Tuple
+from faker import Faker
 
 from models.census import CensusRow
 from web.config import get_settings
 from web.pages.perrt import CAMPUSES, ids
 from web.stores import ids as store_ids
 from web.celery_tasks import requests_try_cache
+from web.convert import parse_to_data_frame
 
 DEBUG = True
+
+fake = Faker("en_GB")
 
 
 @callback(
@@ -159,7 +163,25 @@ def _store_census(
     params = {"campuses": campus_short_name}
     data = requests_try_cache(url, params=params)
 
-    res = [CensusRow.parse_obj(row).dict() for row in data]
+    # convert to dataframe to clean out PID
+    df = parse_to_data_frame(data, CensusRow)
+
+    DEID = True
+    if DEID:
+
+        def gen_fake_firstname(_):
+            return fake.first_name()
+
+        df["firstname"] = df["firstname"].apply(gen_fake_firstname)
+
+        def gen_fake_lastname(_):
+            return fake.last_name()
+
+        df["lastname"] = df["lastname"].apply(gen_fake_lastname)
+
+    res = df.to_dict(orient="records")
+    # res = [CensusRow.parse_obj(row).dict() for row in data]
+
     res = [row for row in res if row.get("department") in depts_open_names]
     return res
 

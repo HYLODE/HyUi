@@ -65,12 +65,22 @@ beat_schedule = {
         ),
         "kwargs": {"expires": (24 * 3600) + 60},  # 24 hours + 1 minute
     },
+    # Emergency Department
     ed_ids.PATIENTS_STORE: {
         "task": "web.celery_tasks.get_response",
         "schedule": crontab(minute="*/15"),  # ev 15 minutes
         "args": (
             API_URLS[ed_ids.PATIENTS_STORE],
             ed_ids.PATIENTS_STORE,
+        ),
+        "kwargs": {"expires": (15 * 60) + 60},  # ev 16 minutes
+    },
+    ed_ids.AGGREGATE_STORE: {
+        "task": "web.celery_tasks.get_response",
+        "schedule": crontab(minute="*/15"),  # ev 15 minutes
+        "args": (
+            API_URLS[ed_ids.AGGREGATE_STORE],
+            ed_ids.AGGREGATE_STORE,
         ),
         "kwargs": {"expires": (15 * 60) + 60},  # ev 16 minutes
     },
