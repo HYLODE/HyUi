@@ -87,7 +87,7 @@ def layout() -> dash.html.Div:
 # def _get_aggregations() -> list[AggregateAdmissionRow]:
 #     # response = requests.get(f"{get_settings().api_url}/ed/aggregate/")
 #     url = f"{get_settings().api_url}/ed/aggregate/"
-#     data, response_code = requests_try_cache(url)
+#     data = requests_try_cache(url)
 #     return [AggregateAdmissionRow.parse_obj(row) for row in data]
 
 

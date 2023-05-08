@@ -38,7 +38,7 @@ def ping_slow(n_clicks):
 
     if cached_data is None:
         fetch_data_task = get_response.delay(slow_url, cache_key)
-        data, _ = fetch_data_task.get()
+        data = fetch_data_task.get()
     else:
         data = orjson.loads(cached_data)
 
@@ -55,7 +55,7 @@ def ping_campus(n_clicks):
     cached_data = redis_client.get(cache_key)
     if cached_data is None:
         fetch_data_task = get_response.delay(campus_url, cache_key)
-        data, _ = fetch_data_task.get()
+        data = fetch_data_task.get()
     else:
         data = orjson.loads(cached_data)
 

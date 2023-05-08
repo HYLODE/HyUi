@@ -11,6 +11,7 @@ from dash import Input, Output, callback, dcc, html
 from models.beds import Bed, Department, Room
 from models.electives import MergedData
 from models.sitrep import SitrepRow
+from models.hymind import IcuDischarge
 from web import ids, SITREP_DEPT2WARD_MAPPING
 from web.config import get_settings
 from web.logger import logger, logger_timeit
@@ -54,7 +55,7 @@ def _get_or_refresh_cache(
     if cached_data is None:
         logger.info(f"Fetching {task} from API")
         fetch_data_task = get_response.delay(url, cache_key, expires)
-        data, _ = fetch_data_task.get()
+        data = fetch_data_task.get()
     else:
         logger.info(f"Fetching {task} from cached data")
         data = orjson.loads(cached_data)
@@ -135,6 +136,28 @@ def _store_all_sitreps(_: int) -> dict:
     return sitreps
 
 
+@callback(
+    Output(ids.HYMIND_ICU_DC_STORE, "data"),
+    Input(ids.STORE_TIMER_1H, "n_intervals"),
+)
+def _store_all_hymind_dc_predictions(_: int) -> dict:
+    """Return hymind predictions for all areas"""
+    yhats = {}
+
+    for task, conf in beat_schedule.items():
+        if not task.startswith(ids.HYMIND_ICU_DC_STORE):
+            continue
+        data = _get_or_refresh_cache(task)
+        # FIXME: hacky way to get sitrep ICU b/c we know the 2nd arg (the key)
+        # is the icu url and the last component is the icu
+        # kkey = f"{web_ids.SITREP_STORE}-{icu}"
+        icu = conf.get("args")[1].split("-")[-1]
+        assert icu in SITREP_DEPT2WARD_MAPPING.values()
+        yhats[icu] = [IcuDischarge.parse_obj(row).dict() for row in data]
+
+    return yhats
+
+
 web_stores = html.Div(
     [
         dcc.Store(id=ids.DEPT_STORE),
@@ -142,5 +165,6 @@ web_stores = html.Div(
         dcc.Store(id=ids.BEDS_STORE),
         dcc.Store(id=ids.ELECTIVES_STORE),
         dcc.Store(id=ids.SITREP_STORE),
+        dcc.Store(id=ids.HYMIND_ICU_DC_STORE),
     ]
 )

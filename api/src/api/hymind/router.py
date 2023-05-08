@@ -124,6 +124,8 @@ def get_individual_discharge_predictions(
     settings: Settings = Depends(get_settings),
 ) -> list[IcuDischarge]:
     response.headers["Cache-Control"] = "public, max-age=300"
+    # force to upper as expected by hymind API
+    ward = ward.upper()
     response = requests.get(
         f"{settings.hymind_url}/predictions/icu/discharge", params={"ward": ward}
     )

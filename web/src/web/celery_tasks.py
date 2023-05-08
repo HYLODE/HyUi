@@ -40,10 +40,7 @@ def get_response(
     # Remember to expire the cache just after the task refresh interval
     redis_client.expire(cache_key, expires)
 
-    # FIXME: convert to string else type errors will be raised but this means
-    # checks against the response will also need to do the same; doesn't seem
-    # very elegant
-    return data, str(response.status_code)
+    return data
 
 
 def replace_alphanumeric(s, replacement="_"):
@@ -80,12 +77,9 @@ def requests_try_cache(
     if cached_data is None:
         logger.info(f"Cache miss for {url} ... requesting")
         # Do not use the apply_async method from the celery_app.task decorator because the function will return with nothing
-        data, status_code = get_response(url, cache_key, params=params, expires=expires)
+        data = get_response(url, cache_key, params=params, expires=expires)
     else:
         logger.info(f"Cache hit for {url}")
         data = orjson.loads(cached_data)
-        status_code = 200
 
-    # FIXME: convert to string else type errors but this means checks against
-    # the response will also need to do the same; doesn't seem sensible
-    return data, str(status_code)
+    return data

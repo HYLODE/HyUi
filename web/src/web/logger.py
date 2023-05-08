@@ -31,7 +31,14 @@ def logger_timeit(*, level: str = "DEBUG") -> Callable:
         def wrapped(*args: P.args, **kwargs: P.kwargs) -> T:
             logger_ = logger.opt(depth=1)
             start = time.time()
-            result = func(*args, **kwargs)
+            # catch type errors
+            try:
+                result = func(*args, **kwargs)
+            except TypeError as e:
+                logger.error(
+                    "logger_timeit: unable to handle tuples etc. - try removing the logger_timeit decorator from your function"
+                )
+                raise TypeError from e
             end = time.time()
             logger_.log(
                 level, f"Function {name} returned in" f" {1000 * (end - start):.1f}ms"

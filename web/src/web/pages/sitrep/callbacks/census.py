@@ -35,14 +35,14 @@ def _store_census(
     if dept_grouper == "ALL_ICUS":
         url = f"{get_settings().api_url}/census/"
         params = {"departments": SITREP_DEPT2WARD_MAPPING.keys()}
-        data, response_code = requests_try_cache(url, params=params)
+        data = requests_try_cache(url, params=params)
     else:
         campus_short_name = next(
             i.get("label") for i in CAMPUSES if i.get("value") == dept_grouper
         )
         url = f"{get_settings().api_url}/census/campus/"
         params = {"campuses": campus_short_name}
-        data, response_code = requests_try_cache(url, params=params)
+        data = requests_try_cache(url, params=params)
 
     res = [CensusRow.parse_obj(row).dict() for row in data]
     # filter out closed departments

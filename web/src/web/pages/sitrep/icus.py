@@ -16,6 +16,7 @@ import web.pages.sitrep.callbacks.widgets  # noqa
 import web.pages.sitrep.callbacks.sitrep  # noqa
 import web.pages.sitrep.callbacks.census  # noqa
 import web.pages.sitrep.callbacks.beds  # noqa
+import web.pages.sitrep.callbacks.hymind  # noqa
 from web.pages.sitrep import ids
 from web import SITREP_DEPT2WARD_MAPPING
 from web.style import replace_colors_in_stylesheet
@@ -37,6 +38,7 @@ stores = html.Div(
         dcc.Store(id=ids.BEDS_STORE),
         dcc.Store(id=ids.DEPTS_OPEN_STORE_NAMES),
         dcc.Store(id=ids.SITREP_STORE),
+        dcc.Store(id=ids.HYMIND_DC_STORE),
         dcc.Store(id=ids.DISCHARGES_STORE),
         dcc.Store(id=ids.ACC_BED_SUBMIT_STORE),
     ]

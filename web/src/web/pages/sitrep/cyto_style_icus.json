@@ -94,8 +94,47 @@
   },
 
   {
+    "selector": "[?occupied][yhat_dc>0.4]",
+    "style": {
+      "border-width": 4,
+      "border-color": "olive"
+    }
+  },
+  {
+    "selector": "[?occupied][yhat_dc>0.5]",
+    "style": {
+      "border-width": 8,
+      "border-color": "olive"
+    }
+  },
+  {
+    "selector": "[?occupied][yhat_dc>0.6]",
+    "style": {
+      "border-width": 10,
+      "border-color": "olive"
+    }
+  },
+
+  {
+    "selector": "[?occupied][yhat_dc>0.7]",
+    "style": {
+      "border-width": 12,
+      "border-color": "olive"
+    }
+  },
+  {
+    "selector": "[?occupied][yhat_dc>0.8]",
+    "style": {
+      "border-width": 14,
+      "border-color": "olive"
+    }
+  },
+
+
+  {
     "selector": ":selected:",
     "style": {
+      "shape": "rectangle",
       "text-margin-y": 2,
       "border-width": 8,
       "border-color": "navy",

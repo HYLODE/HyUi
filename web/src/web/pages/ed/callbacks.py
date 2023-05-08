@@ -80,7 +80,7 @@ columnDefs_patients = [
 @logger_timeit()
 def _get_aggregate_patients() -> list[AggregateAdmissionRow]:
     url = API_URLS[ids.AGGREGATE_STORE]
-    data, response_code = requests_try_cache(url)
+    data = requests_try_cache(url)
     return [AggregateAdmissionRow.parse_obj(row).dict() for row in data]
 
 
@@ -96,7 +96,7 @@ def store_aggregate_patients(n_intervals: int) -> List[Dict[str, Any]]:
 @logger_timeit()
 def _get_individual_patients() -> list[EmergencyDepartmentPatient]:
     url = API_URLS[ids.PATIENTS_STORE]
-    data, response_code = requests_try_cache(url)
+    data = requests_try_cache(url)
     return [EmergencyDepartmentPatient.parse_obj(row).dict() for row in data]
 
 

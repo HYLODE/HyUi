@@ -157,7 +157,7 @@ def _store_census(
     # )
     url = f"{get_settings().api_url}/census/campus/"
     params = {"campuses": campus_short_name}
-    data, response_code = requests_try_cache(url, params=params)
+    data = requests_try_cache(url, params=params)
 
     res = [CensusRow.parse_obj(row).dict() for row in data]
     res = [row for row in res if row.get("department") in depts_open_names]
@@ -182,7 +182,7 @@ def _store_news(census: list[dict]) -> list[dict]:
 
     url = f"{get_settings().api_url}/perrt/vitals/wide"
     params = {"encounter_ids": csn_list}
-    data, response_code = requests_try_cache(url, params=params)
+    data = requests_try_cache(url, params=params)
 
     newsdf = pd.DataFrame.from_records(data)
     # TODO: simpplify: you just want the most recent and highest NEWS score
@@ -209,7 +209,7 @@ def _store_predictions(census: list[dict]) -> dict:
     hv_id_list = [i.get("ovl_hv_id") for i in census if i.get("occupied")]
     url = f"{get_settings().api_url}/perrt/icu_admission_prediction"
     params = {"hospital_visit_ids": hv_id_list}  # type: ignore
-    predictions, response_code = requests_try_cache(url, params=params)
+    predictions = requests_try_cache(url, params=params)
 
     return predictions
 
