@@ -1,6 +1,6 @@
 from datetime import datetime
 
-import requests
+from faker import Faker
 from dash import Input, Output, callback
 from web.celery_tasks import requests_try_cache
 
@@ -9,6 +9,9 @@ from web import SITREP_DEPT2WARD_MAPPING
 from web.config import get_settings
 from web.logger import logger_timeit
 from web.pages.sitrep import CAMPUSES, ids
+from web.convert import parse_to_data_frame
+
+fake = Faker("en_GB")
 
 
 @callback(
@@ -44,7 +47,25 @@ def _store_census(
         params = {"campuses": campus_short_name}
         data = requests_try_cache(url, params=params)
 
-    res = [CensusRow.parse_obj(row).dict() for row in data]
+    # convert to dataframe to clean out PID
+    df = parse_to_data_frame(data, CensusRow)
+
+    DEID = True
+    if DEID:
+
+        def gen_fake_firstname(_):
+            return fake.first_name()
+
+        df["firstname"] = df["firstname"].apply(gen_fake_firstname)
+
+        def gen_fake_lastname(_):
+            return fake.last_name()
+
+        df["lastname"] = df["lastname"].apply(gen_fake_lastname)
+
+    res = df.to_dict(orient="records")
+    # res = [CensusRow.parse_obj(row).dict() for row in data]
+
     # filter out closed departments
     res = [row for row in res if row.get("department") in depts_open_names]
     return res

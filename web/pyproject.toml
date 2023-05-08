@@ -18,6 +18,7 @@ dependencies = [
     "dash-mantine-components >= 0.11.1",
     "dash[celery] >= 2.9.0",
     "debugpy == 1.6.7",
+    "faker == 18.7.0",
     "flower~=1.2.0",
     "gevent == 22.10.2",
     "gunicorn == 20.1.0",

@@ -3,10 +3,10 @@ Use for slowly updating API calls that can be shared between pages and
 applications
 """
 
-import requests
-import warnings
+import pandas as pd
 import orjson
 from dash import Input, Output, callback, dcc, html
+from faker import Faker
 
 from models.beds import Bed, Department, Room
 from models.electives import MergedData
@@ -15,6 +15,7 @@ from models.hymind import IcuDischarge
 from web import ids, SITREP_DEPT2WARD_MAPPING
 from web.config import get_settings
 from web.logger import logger, logger_timeit
+from web.convert import parse_to_data_frame
 
 from web.celery import redis_client
 from web.celery_tasks import get_response
@@ -23,6 +24,8 @@ from web.celery_config import beat_schedule  # single source of truth for tasks
 # TODO: add a refresh button as an input to the store functions pulling from
 #  baserow so that changes from baserow edits can be brought through (
 #  although a page refresh may do the same thing?)
+
+fake = Faker("en_GB")
 
 
 def _get_or_refresh_cache(
@@ -108,7 +111,24 @@ def _store_beds(_: int) -> list[dict]:
 def _store_electives(_: int) -> list[dict]:
     task = ids.ELECTIVES_STORE
     data = _get_or_refresh_cache(task)
-    return [MergedData.parse_obj(row).dict() for row in data]
+
+    df = parse_to_data_frame(data, MergedData)
+
+    DEID = True
+    if DEID:
+
+        def gen_fake_firstname(_):
+            return fake.first_name()
+
+        df["first_name"] = df["first_name"].apply(gen_fake_firstname)
+
+        def gen_fake_lastname(_):
+            return fake.last_name()
+
+        df["last_name"] = df["last_name"].apply(gen_fake_lastname)
+
+    return df.to_dict(orient="records")
+    # return [MergedData.parse_obj(row).dict() for row in data]
 
 
 @callback(

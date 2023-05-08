@@ -2,6 +2,7 @@ from typing import Any, Dict, List
 
 import dash_ag_grid as dag
 from dash import Input, Output, callback
+from faker import Faker
 
 from models.ed import AggregateAdmissionRow, EmergencyDepartmentPatient
 from web import API_URLS
@@ -11,6 +12,8 @@ from web.convert import parse_to_data_frame
 from web.logger import logger, logger_timeit
 from web.pages.ed import ids
 from web.style import colors
+
+fake = Faker("en_GB")
 
 # if the time is in utc:
 ts_obj = "d3.timeParse('%Y-%m-%dT%H:%M:%S%Z')(params.data.arrival_datetime)"
@@ -97,6 +100,18 @@ def store_aggregate_patients(n_intervals: int) -> List[Dict[str, Any]]:
 def _get_individual_patients() -> list[EmergencyDepartmentPatient]:
     url = API_URLS[ids.PATIENTS_STORE]
     data = requests_try_cache(url)
+    df = parse_to_data_frame(data, EmergencyDepartmentPatient)
+
+    DEID = True
+    if DEID:
+
+        def gen_fake_name(_):
+            return fake.name()
+
+        df["name"] = df["name"].apply(gen_fake_name)
+
+    return df.to_dict("records")
+
     return [EmergencyDepartmentPatient.parse_obj(row).dict() for row in data]
 
 
