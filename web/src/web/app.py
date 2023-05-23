@@ -3,6 +3,7 @@ from dash import CeleryManager
 from flask import Flask
 
 import web
+import dash_auth
 
 from web.celery import celery_app
 from web.celery_startup import run_startup_tasks
@@ -19,6 +20,13 @@ celery_manager = CeleryManager(celery_app)
 
 # run celery startup tasks
 run_startup_tasks()
+
+
+hyui_user = f"{get_settings().hyui_user}"
+hyui_password = f"{get_settings().hyui_password.get_secret_value()}"
+
+VALID_USERNAME_PASSWORD_PAIRS = {hyui_user: hyui_password}
+
 
 logger.info("Starting the Dash application")
 app = dash.Dash(
@@ -47,6 +55,8 @@ app = dash.Dash(
     ],
     index_string=web.INDEX_STRING,
 )
+
+auth = dash_auth.BasicAuth(app, VALID_USERNAME_PASSWORD_PAIRS)
 
 # Buld layout from page registry
 app.layout = create_appshell([dash.page_registry.values()])
