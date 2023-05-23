@@ -74,6 +74,12 @@ beat_schedule = {
         ),
         "kwargs": {"expires": (15 * 60) + 60},  # ev 16 minutes
     },
+    ed_ids.AGGREGATE_STORE: {
+        "task": "web.celery_tasks.get_response",
+        "schedule": crontab(minute="*/15"),  # ev 15 minutes
+        "args": (API_URLS[ed_ids.AGGREGATE_STORE], ed_ids.AGGREGATE_STORE),
+        "kwargs": {"expires": (15 * 60) + 60},  # ev 16 minutes
+    },
 }
 
 
@@ -81,7 +87,7 @@ beat_schedule = {
 for icu in list(SITREP_DEPT2WARD_MAPPING.values()):
     kkey = f"{web_ids.SITREP_STORE}-{icu}"
 
-    def _sitrep_store_url(icu):
+    def _sitrep_store_url(icu: str) -> str:
         return f"{get_settings().api_url}/sitrep/live/{icu}/ui/"
 
     url = _sitrep_store_url(icu)
