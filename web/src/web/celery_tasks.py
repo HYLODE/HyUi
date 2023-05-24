@@ -13,7 +13,7 @@ from web.logger import logger
 
 @celery_app.task
 def get_response(
-    url: str, cache_key: str, params: Optional[dict] = None, expires: int = 3600
+    url: str, cache_key: str, params: Optional[int] = None, expires: int = 3600
 ) -> tuple[object, int]:
     """
     Get a response from a URL
@@ -31,9 +31,7 @@ def get_response(
         response = requests.get(url)
     else:
         logger.info(f"Fetching {url} - params {str(params)[:16]} ...")
-        param_str_vals = [str(params[key]) for key in params.keys()]
-        str_params = dict(zip(params.keys(), param_str_vals))
-        response = requests.get(url, params=str_params)
+        response = requests.get(url, params=str(params))
 
     if response.status_code != 200:
         logger.error(f"Error fetching {url}: {response.status_code}")
