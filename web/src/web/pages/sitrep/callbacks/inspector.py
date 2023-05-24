@@ -80,10 +80,10 @@ def update_patient_sidebar(
     if data.get("entity") != "bed":
         return True, ["bed"], dmc.Group(click_title)
 
-    bed = data.get("bed")
+    bed = data.get("bed")  # type: ignore
     bed_color = colors.orange if data.get("occupied") else colors.gray
-    bed_number = bed.get("bed_number")
-    department = bed.get("department")
+    bed_number = bed.get("bed_number")  # type: ignore
+    department = bed.get("department")  # type: ignore
 
     bed_title = dmc.Group(
         [

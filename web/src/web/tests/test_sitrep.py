@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-def test_flatten_data_frame_dict():
+def test_flatten_data_frame_dict() -> None:
     df = pd.DataFrame(
         data={
             "column": [

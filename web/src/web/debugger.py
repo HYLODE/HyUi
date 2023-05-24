@@ -3,11 +3,11 @@
 from os import getenv
 
 
-def initialize_flask_server_debugger_if_needed():
+def initialize_flask_server_debugger_if_needed() -> None:
     if getenv("DEBUGGER") == "True":
         import multiprocessing
 
-        if multiprocessing.current_process().pid > 1:
+        if multiprocessing.current_process().pid > 1:  # type: ignore
             import debugpy
 
             debugpy.listen(("0.0.0.0", 10001))
