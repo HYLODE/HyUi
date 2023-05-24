@@ -45,7 +45,6 @@ def prepare_draft(
     medical_hx: list[type[BaseModel]],
     to_predict: bool = False,
 ) -> pd.DataFrame:
-
     """
     Prepares the dataframe for the dashboard by merging data from different
     sources. It loads tables for

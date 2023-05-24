@@ -211,7 +211,7 @@ def _store_predictions(census: list[dict]) -> dict:
     params = {"hospital_visit_ids": hv_id_list}  # type: ignore
     predictions = requests_try_cache(url, params=params)
 
-    return predictions
+    return predictions  # type: ignore
 
 
 @callback(

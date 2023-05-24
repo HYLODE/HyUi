@@ -8,4 +8,3 @@ jupyterlab==3.2.4
 ipython==7.29.0
 ipython-sql==0.4.0
 tables
-

@@ -6,7 +6,6 @@ from pydantic import BaseModel
 
 # define the data model that you're expecting from your query
 class RosBase(BaseModel):
-
     department: str
     bed_name: str
     mrn: str

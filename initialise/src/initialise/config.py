@@ -4,7 +4,6 @@ from pydantic import BaseSettings, EmailStr, SecretStr, AnyHttpUrl, PostgresDsn,
 
 
 class BaserowSettings(BaseSettings):
-
     email: EmailStr
     username: str
     password: SecretStr

@@ -7,7 +7,6 @@ from pydantic import BaseModel
 
 
 class CensusRow(BaseModel):
-
     modified_at: datetime
     location_id: int
     department: str

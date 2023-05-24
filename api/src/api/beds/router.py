@@ -99,7 +99,7 @@ def get_beds(
 ) -> list[Bed]:
     response.headers["Cache-Control"] = "public, max-age=300"
 
-    field_ids = baserow.tables_dict.get("beds").get("fields")
+    field_ids = baserow.tables_dict.get("beds").get("fields")  # type: ignore
     params = {
         "size": 200,  # The maximum size of a page.
         "user_field_names": "true",
@@ -177,7 +177,7 @@ def get_campus(
         if missing_locations := MISSING_DEPARTMENT_LOCATIONS.get(department):
             locations.extend(missing_locations)
 
-    field_ids = baserow.tables_dict.get("beds").get("fields")
+    field_ids = baserow.tables_dict.get("beds").get("fields")  # type: ignore
     params = {
         "size": 200,  # The maximum size of a page.
         "user_field_names": "true",
@@ -220,7 +220,7 @@ def get_mock_closed_beds() -> list[Bed]:
 @router.get("/closed/", response_model=list[Bed])
 @logger_timeit()
 def get_closed_beds(baserow: BaserowDB = Depends(get_baserow_db)) -> list[Bed]:
-    field_ids = baserow.tables_dict.get("beds").get("fields")
+    field_ids = baserow.tables_dict.get("beds").get("fields")  # type: ignore
 
     closed_field_id = field_ids["closed"]
 
@@ -304,7 +304,7 @@ def get_discharge_status(
 ) -> list[DischargeStatus]:
     _table_dict = baserow.tables_dict.get("discharge_statuses")
 
-    modified_at_field_id = _table_dict.get("fields").get("modified_at")
+    modified_at_field_id = _table_dict.get("fields").get("modified_at")  # type: ignore
     horizon = (datetime.utcnow() - timedelta(hours=float(delta_hours))).isoformat()
 
     params = {
@@ -314,5 +314,5 @@ def get_discharge_status(
         f"filter__field_{modified_at_field_id}__date_after": horizon,
     }
 
-    rows = baserow.get_rows(_table_dict.get("name"), params)
+    rows = baserow.get_rows(_table_dict.get("name"), params)  # type: ignore
     return [DischargeStatus.parse_obj(row) for row in rows]

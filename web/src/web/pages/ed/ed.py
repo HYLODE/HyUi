@@ -1,17 +1,13 @@
 import dash
 import dash_ag_grid as dag
-import dash_bootstrap_components as dbc
 import dash_mantine_components as dmc
 from dash import dcc, html
-from web.style import colors
-
-dash.register_page(__name__, path="/ed/table", name="ED")
-
 
 from web.logger import logger
 from web.pages.ed import ids
 
-from web.pages.ed import callbacks
+
+dash.register_page(__name__, path="/ed/table", name="ED")
 
 logger.debug("Confirm that you have imported all the callbacks")
 

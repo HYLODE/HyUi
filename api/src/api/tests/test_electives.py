@@ -1,3 +1,4 @@
+# type: ignore
 from api.main import app
 from fastapi.testclient import TestClient
 

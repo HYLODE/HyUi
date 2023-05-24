@@ -5,7 +5,6 @@ from pydantic import ValidationError
 
 
 def test_elective_admissions_prediction_inputs_field_filled() -> None:
-
     prediction = ElTap.parse_obj(
         {
             "bed_count": 0,
@@ -28,7 +27,6 @@ def test_elective_admissions_prediction_inputs_field_filled() -> None:
 
 
 def test_elective_admissions_prediction_inputs_field_null() -> None:
-
     prediction = ElTap.parse_obj(
         {
             "bed_count": 0,
@@ -46,7 +44,6 @@ def test_elective_admissions_prediction_inputs_field_null() -> None:
 
 
 def test_nonelective_admissions_prediction() -> None:
-
     prediction = EmTap.parse_obj(
         {
             "bed_count": 0,
@@ -62,7 +59,6 @@ def test_nonelective_admissions_prediction() -> None:
 
 
 def test_nonelective_admissions_prediction_parse_alternative_objects_success() -> None:
-
     prediction = ElTap.parse_obj(
         {
             "bed_count": "0",
@@ -80,7 +76,6 @@ def test_nonelective_admissions_prediction_parse_alternative_objects_success() -
 
 
 def test_nonelective_admissions_prediction_parse_alternative_objects_failure() -> None:
-
     with pytest.raises(ValidationError):
         ElTap.parse_obj(
             {
