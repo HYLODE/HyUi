@@ -3,13 +3,15 @@ import dash_ag_grid as dag
 import dash_mantine_components as dmc
 from dash import dcc, html
 
-dash.register_page(__name__, path="/ed/table", name="ED")
-
 
 from web.logger import logger
 from web.pages.ed import ids
 
-from web.pages.ed import callbacks
+from web.pages.ed import callbacks  # noqa
+
+
+dash.register_page(__name__, path="/ed/table", name="ED")
+
 
 logger.debug("Confirm that you have imported all the callbacks")
 

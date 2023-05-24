@@ -1,3 +1,4 @@
+# type: ignore
 from typing import Any, Dict, List
 
 from dash import Input, Output, callback
@@ -10,6 +11,7 @@ from web.convert import parse_to_data_frame
 from web.logger import logger_timeit
 from web.pages.ed import ids
 from web.style import colors
+
 
 # if the time is in utc:
 ts_obj = "d3.timeParse('%Y-%m-%dT%H:%M:%S%Z')(params.data.arrival_datetime)"
