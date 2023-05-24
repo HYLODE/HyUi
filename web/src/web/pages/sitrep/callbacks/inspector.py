@@ -65,7 +65,7 @@ def update_patient_sidebar(
                 color=colors.indigo,
                 width=30,
             ),
-            dmc.Text(f"Click on a bed for more information", weight=500),
+            dmc.Text("Click on a bed for more information", weight=500),
         ]
     )
 
@@ -328,10 +328,9 @@ def patient_accordion_item(
         try:
             hospital_admit = census.get("hv_admission_dt")
             hospital_los = str(int((datetime.utcnow() - hospital_admit).days))
-            hospital_admit_str = datetime.strftime(hospital_admit, "%d %b %Y")
             los_text = dmc.Text(f"Hospital LoS: {hospital_los}", size="sm")
-        except TypeError as e:
-            los_text = dmc.Text(f"Hospital LoS: Unknown", size="sm")
+        except TypeError:
+            los_text = dmc.Text("Hospital LoS: Unknown", size="sm")
 
         sitrep_content = [
             _report_patient_status(sitrep),

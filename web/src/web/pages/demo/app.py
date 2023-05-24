@@ -8,7 +8,6 @@ from web import API_URLS
 from web.celery import redis_client
 from web.celery_tasks import get_response
 from web.pages.demo import fast_url, slow_url
-from web.style import colors
 
 campus_url = API_URLS.get("campus_url")
 

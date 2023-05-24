@@ -44,7 +44,6 @@ def get_beds(
     department: str,
     baserow: BaserowDB = Depends(get_baserow_db),
 ) -> list[BedRow]:
-
     field_ids = baserow.get_fields("beds")
 
     department_field_id = field_ids["department"]

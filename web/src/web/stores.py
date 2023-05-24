@@ -3,8 +3,6 @@ Use for slowly updating API calls that can be shared between pages and
 applications
 """
 
-import requests
-import warnings
 import orjson
 from dash import Input, Output, callback, dcc, html
 
@@ -13,7 +11,6 @@ from models.electives import MergedData
 from models.sitrep import SitrepRow
 from models.hymind import IcuDischarge
 from web import ids, SITREP_DEPT2WARD_MAPPING
-from web.config import get_settings
 from web.logger import logger, logger_timeit
 
 from web.celery import redis_client
@@ -34,7 +31,8 @@ def _get_or_refresh_cache(
     Parameters
     ----------
     task : dict - as defined in beat_schedule
-    url : str - if you wish to override (i.e. when need to build for a specific endpoint)
+    url : str - if you wish to override
+    (i.e. when need to build for a specific endpoint)
     expires : int
 
     Returns

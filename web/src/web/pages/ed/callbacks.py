@@ -1,6 +1,5 @@
 from typing import Any, Dict, List
 
-import dash_ag_grid as dag
 from dash import Input, Output, callback
 
 from models.ed import AggregateAdmissionRow, EmergencyDepartmentPatient
@@ -8,7 +7,7 @@ from web import API_URLS
 from web import ids as app_ids
 from web.celery_tasks import requests_try_cache
 from web.convert import parse_to_data_frame
-from web.logger import logger, logger_timeit
+from web.logger import logger_timeit
 from web.pages.ed import ids
 from web.style import colors
 

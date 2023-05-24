@@ -1,4 +1,5 @@
-# NOTE: changing the name of this file will require you to change all the ./docker/celery/start-* scripts
+# NOTE: changing the name of this file will require you to
+# change all the ./docker/celery/start-* scripts
 import hashlib
 import re
 
@@ -76,7 +77,8 @@ def requests_try_cache(
 
     if cached_data is None:
         logger.info(f"Cache miss for {url} ... requesting")
-        # Do not use the apply_async method from the celery_app.task decorator because the function will return with nothing
+        # Do not use the apply_async method from the celery_app.task decorator
+        # because the function will return with nothing
         data = get_response(url, cache_key, params=params, expires=expires)
     else:
         logger.info(f"Cache hit for {url}")

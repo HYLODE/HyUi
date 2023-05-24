@@ -1,6 +1,5 @@
 from datetime import datetime
 
-import requests
 from dash import Input, Output, callback
 from web.celery_tasks import requests_try_cache
 

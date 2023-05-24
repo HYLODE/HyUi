@@ -45,5 +45,3 @@ COPY requirements.txt .
 RUN pip install  --no-cache-dir --requirement requirements.txt
 
 EXPOSE 8888
-
-
