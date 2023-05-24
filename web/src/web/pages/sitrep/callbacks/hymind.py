@@ -1,16 +1,10 @@
-from datetime import datetime
-
-import requests
 from dash import Input, Output, callback
-from web.celery_tasks import requests_try_cache
 
-
+from loguru import logger
 from typing import Any
 from web import ids as store_ids
 from web import SITREP_DEPT2WARD_MAPPING
-from web.config import get_settings
-from web.logger import logger_timeit
-from web.pages.sitrep import CAMPUSES, ids
+from web.pages.sitrep import ids
 
 
 @callback(
@@ -30,6 +24,6 @@ def _store_hymind_dc(dept: str, hymind_dcs: dict) -> Any:
     """
     ward = SITREP_DEPT2WARD_MAPPING.get(dept)
     if not ward:
-        warnings.warn(f"No HyMind Discharge predictions available for {ward}")
+        logger.warning(f"No HyMind Discharge predictions available for {ward}")
         return [{}]
     return hymind_dcs[ward]

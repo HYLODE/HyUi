@@ -8,7 +8,6 @@ from web import API_URLS
 from web.celery import redis_client
 from web.celery_tasks import get_response
 from web.pages.demo import fast_url, slow_url
-from web.style import colors
 
 campus_url = API_URLS.get("campus_url")
 
@@ -20,7 +19,7 @@ dash.register_page(__name__, path="/demo", name="demo")
     [Input("ping-fast-button", "n_clicks")],
     prevent_initial_call=True,
 )
-def ping_fast(n_clicks):
+def ping_fast(n_clicks: int) -> str:
     response = requests.get(fast_url)
     data = response.json()
     return f"Click: {n_clicks} Timestamp: {data}"
@@ -31,7 +30,7 @@ def ping_fast(n_clicks):
     [Input("ping-slow-button", "n_clicks")],
     prevent_initial_call=True,
 )
-def ping_slow(n_clicks):
+def ping_slow(n_clicks: int) -> str:
     # check the redis cache for the data
     cache_key = "slow_url"
     cached_data = redis_client.get(cache_key)
@@ -50,7 +49,7 @@ def ping_slow(n_clicks):
     [Input("ping-campus-button", "n_clicks")],
     prevent_initial_call=True,
 )
-def ping_campus(n_clicks):
+def ping_campus(n_clicks: int) -> str:
     cache_key = "campus_url"
     cached_data = redis_client.get(cache_key)
     if cached_data is None:

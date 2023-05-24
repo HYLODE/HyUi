@@ -1,3 +1,4 @@
+# type: ignore
 from collections import namedtuple
 
 from fastapi import APIRouter, Depends

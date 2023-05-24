@@ -61,7 +61,6 @@ def sample_bed_json(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Path]
 
 
 def test_load_beds_user_defaults(sample_bed_json: dict[str, Path]) -> None:
-
     file_path = Path(sample_bed_json["default"])
     df = _load_beds_user_defaults(file_path)
 
@@ -69,7 +68,6 @@ def test_load_beds_user_defaults(sample_bed_json: dict[str, Path]) -> None:
 
 
 def test_load_beds_user_missing(sample_bed_json: dict[str, Path]) -> None:
-
     file_path = Path(sample_bed_json["missing"])
     df = _load_beds_user_defaults(file_path)
 

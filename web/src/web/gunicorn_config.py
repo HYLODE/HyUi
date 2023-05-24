@@ -1,4 +1,6 @@
 from gevent import monkey
+from os import getenv
+from web.logger import logger
 
 # NOTE: Attempt to fix the warning
 # ggevent.py:38: MonkeyPatchWarning: Monkey-patching
@@ -6,8 +8,6 @@ from gevent import monkey
 # via https://stackoverflow.com/a/74817491/992999
 monkey.patch_all(thread=False, select=False)
 
-from os import getenv
-from web.logger import logger
 
 if getenv("DEBUG") == "1":
     logger.info("Debug mode enabled for Gunicorn (incl hot reload)")

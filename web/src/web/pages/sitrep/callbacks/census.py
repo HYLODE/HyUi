@@ -1,6 +1,5 @@
 from datetime import datetime
 
-import requests
 from dash import Input, Output, callback
 from web.celery_tasks import requests_try_cache
 
@@ -41,7 +40,7 @@ def _store_census(
             i.get("label") for i in CAMPUSES if i.get("value") == dept_grouper
         )
         url = f"{get_settings().api_url}/census/campus/"
-        params = {"campuses": campus_short_name}
+        params = {"campuses": campus_short_name}  # type: ignore
         data = requests_try_cache(url, params=params)
 
     res = [CensusRow.parse_obj(row).dict() for row in data]

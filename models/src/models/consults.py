@@ -4,7 +4,6 @@ from pydantic import BaseModel
 
 
 class Consults(BaseModel):
-
     firstname: str
     lastname: str
     date_of_birth: date

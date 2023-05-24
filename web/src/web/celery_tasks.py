@@ -1,9 +1,11 @@
-# NOTE: changing the name of this file will require you to change all the ./docker/celery/start-* scripts
+# NOTE: changing the name of this file will require you to
+# change all the ./docker/celery/start-* scripts
 import hashlib
 import re
 
 import orjson
 import requests
+from typing import Optional, Any
 
 from web.celery import celery_app, redis_client
 from web.logger import logger
@@ -11,7 +13,7 @@ from web.logger import logger
 
 @celery_app.task
 def get_response(
-    url: str, cache_key: str, params: dict = None, expires: int = 3600
+    url: str, cache_key: str, params: Optional[dict] = None, expires: int = 3600
 ) -> tuple[object, int]:
     """
     Get a response from a URL
@@ -35,7 +37,7 @@ def get_response(
         logger.error(f"Error fetching {url}: {response.status_code}")
         return None, response.status_code
 
-    data = response.json()
+    data = response.json()  # type: tuple[object, int]
     redis_client.set(cache_key, orjson.dumps(data))
     # Remember to expire the cache just after the task refresh interval
     redis_client.expire(cache_key, expires)
@@ -43,13 +45,16 @@ def get_response(
     return data
 
 
-def replace_alphanumeric(s, replacement="_"):
+def replace_alphanumeric(s: str, replacement: str = "_") -> str:
     return re.sub(r"\W+", replacement, s)
 
 
 def requests_try_cache(
-    url: str, cache_key: str = None, params: dict = None, expires: int = None
-):
+    url: str,
+    cache_key: Optional[str] = None,
+    params: Optional[dict] = None,
+    expires: Optional[int] = None,
+) -> Any:
     """
     Drop in replacement for requests.get() that caches the response using redis;
     the idea is that I can just use this and it will generate a suitable cache
@@ -76,7 +81,8 @@ def requests_try_cache(
 
     if cached_data is None:
         logger.info(f"Cache miss for {url} ... requesting")
-        # Do not use the apply_async method from the celery_app.task decorator because the function will return with nothing
+        # Do not use the apply_async method from the celery_app.task decorator
+        # because the function will return with nothing
         data = get_response(url, cache_key, params=params, expires=expires)
     else:
         logger.info(f"Cache hit for {url}")

@@ -81,7 +81,7 @@ beat_schedule = {
 for icu in list(SITREP_DEPT2WARD_MAPPING.values()):
     kkey = f"{web_ids.SITREP_STORE}-{icu}"
 
-    def _sitrep_store_url(icu):
+    def _sitrep_store_url(icu: str) -> str:
         return f"{get_settings().api_url}/sitrep/live/{icu}/ui/"
 
     url = _sitrep_store_url(icu)

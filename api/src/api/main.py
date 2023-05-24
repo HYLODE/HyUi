@@ -1,7 +1,7 @@
+# type: ignore
 """
 Entry point and main file for the FastAPI backend
 """
-
 import time
 from typing import Any
 

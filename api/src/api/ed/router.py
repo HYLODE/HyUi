@@ -104,7 +104,6 @@ def get_individual_admission_rows(
     settings: Settings = Depends(get_settings),
     star_session: Session = Depends(get_star_session),
 ) -> list[EmergencyDepartmentPatient]:
-
     response.headers["Cache-Control"] = "public, max-age=300"
 
     census_df = _get_census(settings.hycastle_url)

@@ -78,7 +78,6 @@ def test_bed_build() -> None:
 
 
 def test_bed_build_remove_departments_not_of_interest() -> None:
-
     star_locations = {
         "loc_id": [3, 2, 1, 0],
         "location": ["a", "b", "c", "d"],
@@ -134,7 +133,6 @@ def test_bed_build_remove_departments_not_of_interest() -> None:
 
 
 def test_bed_build_remove_virtual_rooms() -> None:
-
     star_locations = {
         "loc_id": [3, 2, 1, 0],
         "location": ["a", "b", "c", "d"],
@@ -188,7 +186,6 @@ def test_bed_build_remove_virtual_rooms() -> None:
 
 
 def test_bed_build_remove_virtual_beds() -> None:
-
     star_locations = {
         "loc_id": [3, 2, 1, 0],
         "location": ["a", "b", "c", "d"],

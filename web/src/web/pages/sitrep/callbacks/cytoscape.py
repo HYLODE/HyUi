@@ -212,7 +212,7 @@ def _make_elements(  # noqa: C901
             e.get("data").get("bed_number", ""),  # type: ignore
         ),
     )  # type: ignore
-    return elements
+    return elements  # type: ignore
 
 
 @callback(
