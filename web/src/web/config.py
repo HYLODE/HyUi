@@ -18,6 +18,9 @@ class Settings(BaseSettings):
     celery_dash_result_backend: AnyUrl
     redis_cache: AnyUrl
 
+    hyui_user: str
+    hyui_password: SecretStr
+
     slack_log_webhook: SecretStr
 
     class Config:
