@@ -2,86 +2,86 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://hylode.org/notes/provisioning.html</loc>
-    <lastmod>2023-05-24T10:20:49.680Z</lastmod>
+    <lastmod>2023-05-24T10:58:13.625Z</lastmod>
   </url>
   <url>
     <loc>https://hylode.org/contributor_guide/pre_commit_hooks.html</loc>
-    <lastmod>2023-05-24T10:20:50.760Z</lastmod>
+    <lastmod>2023-05-24T10:58:14.937Z</lastmod>
   </url>
   <url>
     <loc>https://hylode.org/contributor_guide/CODE_OF_CONDUCT.html</loc>
-    <lastmod>2023-05-24T10:20:51.192Z</lastmod>
+    <lastmod>2023-05-24T10:58:15.453Z</lastmod>
   </url>
   <url>
     <loc>https://hylode.org/contributor_guide/CONTRIBUTING.html</loc>
-    <lastmod>2023-05-24T10:20:51.840Z</lastmod>
+    <lastmod>2023-05-24T10:58:16.257Z</lastmod>
   </url>
   <url>
     <loc>https://hylode.org/contributor_guide/updating_gitignore.html</loc>
-    <lastmod>2023-05-24T10:20:52.144Z</lastmod>
+    <lastmod>2023-05-24T10:58:16.613Z</lastmod>
   </url>
   <url>
     <loc>https://hylode.org/vignettes/vignettes.html</loc>
-    <lastmod>2023-05-24T10:20:52.588Z</lastmod>
+    <lastmod>2023-05-24T10:58:17.129Z</lastmod>
   </url>
   <url>
     <loc>https://hylode.org/vignettes/beds_v3NHNN.html</loc>
-    <lastmod>2023-05-24T10:20:53.032Z</lastmod>
+    <lastmod>2023-05-24T10:58:17.613Z</lastmod>
   </url>
   <url>
     <loc>https://hylode.org/vignettes/icu-tap-emergency-predictions.html</loc>
-    <lastmod>2023-05-24T10:20:53.508Z</lastmod>
+    <lastmod>2023-05-24T10:58:18.181Z</lastmod>
   </url>
   <url>
     <loc>https://hylode.org/vignettes/icu-tap-elective-predictions.html</loc>
-    <lastmod>2023-05-24T10:20:54.016Z</lastmod>
+    <lastmod>2023-05-24T10:58:18.825Z</lastmod>
   </url>
   <url>
     <loc>https://hylode.org/vignettes/wrangle_beds.html</loc>
-    <lastmod>2023-05-24T10:20:54.444Z</lastmod>
+    <lastmod>2023-05-24T10:58:19.317Z</lastmod>
   </url>
   <url>
     <loc>https://hylode.org/vignettes/beds_v3UCLH.html</loc>
-    <lastmod>2023-05-24T10:20:54.904Z</lastmod>
+    <lastmod>2023-05-24T10:58:19.889Z</lastmod>
   </url>
   <url>
     <loc>https://hylode.org/vignettes/icu-tap-aggregate-probs.html</loc>
-    <lastmod>2023-05-24T10:20:55.248Z</lastmod>
+    <lastmod>2023-05-24T10:58:20.345Z</lastmod>
   </url>
   <url>
     <loc>https://hylode.org/index.html</loc>
-    <lastmod>2023-05-24T10:20:55.576Z</lastmod>
+    <lastmod>2023-05-24T10:58:20.793Z</lastmod>
   </url>
   <url>
     <loc>https://hylode.org/developer/demo.html</loc>
-    <lastmod>2023-05-24T10:20:55.996Z</lastmod>
+    <lastmod>2023-05-24T10:58:21.293Z</lastmod>
   </url>
   <url>
     <loc>https://hylode.org/developer/ide_setup.html</loc>
-    <lastmod>2023-05-24T10:20:56.776Z</lastmod>
+    <lastmod>2023-05-24T10:58:22.169Z</lastmod>
   </url>
   <url>
     <loc>https://hylode.org/developer/infrastructure.html</loc>
-    <lastmod>2023-05-24T10:20:57.104Z</lastmod>
+    <lastmod>2023-05-24T10:58:22.565Z</lastmod>
   </url>
   <url>
     <loc>https://hylode.org/developer/setup.html</loc>
-    <lastmod>2023-05-24T10:20:57.812Z</lastmod>
+    <lastmod>2023-05-24T10:58:23.481Z</lastmod>
   </url>
   <url>
     <loc>https://hylode.org/developer/documentation.html</loc>
-    <lastmod>2023-05-24T10:20:58.372Z</lastmod>
+    <lastmod>2023-05-24T10:58:24.181Z</lastmod>
   </url>
   <url>
     <loc>https://hylode.org/developer/deployment.html</loc>
-    <lastmod>2023-05-24T10:20:59.084Z</lastmod>
+    <lastmod>2023-05-24T10:58:25.149Z</lastmod>
   </url>
   <url>
     <loc>https://hylode.org/about.html</loc>
-    <lastmod>2023-05-24T10:20:59.416Z</lastmod>
+    <lastmod>2023-05-24T10:58:25.573Z</lastmod>
   </url>
   <url>
     <loc>https://hylode.org/user/user.html</loc>
-    <lastmod>2023-05-24T10:20:59.812Z</lastmod>
+    <lastmod>2023-05-24T10:58:26.085Z</lastmod>
   </url>
 </urlset>
