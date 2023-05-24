@@ -1,4 +1,4 @@
-import redis
+import redis  # type: ignore
 from celery import Celery
 from web.config import get_settings
 

@@ -88,6 +88,19 @@ date_selector = html.Div(
     # )
 )
 
+model_calibrator = html.Div(
+    [
+        dmc.RangeSlider(
+            id="model_calibration",
+            min=0,
+            max=100,
+            step=5,
+            showLabelOnHover=False,
+            value=[0, 60],
+        ),
+        dmc.Text("model calibration"),
+    ]
+)
 
 electives_list = dmc.Paper(
     dtable.DataTable(
@@ -170,8 +183,9 @@ body = dmc.Container(
     [
         dmc.Grid(
             children=[
-                dmc.Col(pacu_selector, span=4),
-                dmc.Col(campus_selector, span=3),
+                dmc.Col(pacu_selector, span=2),
+                dmc.Col(model_calibrator, span=3),
+                dmc.Col(campus_selector, span=2),
                 dmc.Col(date_selector, span=5),
                 dmc.Col(electives_list, span=7),
                 dmc.Col(patient_info_box, span=5),

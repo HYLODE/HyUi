@@ -25,6 +25,8 @@ home = _NavLink(title="Home", path="/", icon="carbon:home")
 scratch = _NavLink(title="Scratch", path="/demo", icon="ph:number-square-three-light")
 
 sitrep_campus = _NavLink(title="Campus", path="/sitrep/campus", icon="carbon:hospital")
+sitrep_abacus = _NavLink(title="Abacus", path="/sitrep/abacus", icon="bx:abacus")
+
 # sitrep_ward = _NavLink(title="Ward", path="/sitrep/ward", icon="carbon:hospital-bed")
 electives = _NavLink(
     title="Electives", path="/surgery/electives", icon="carbon:calendar"
@@ -99,6 +101,11 @@ def create_side_nave_content() -> dmc.Stack:
             #     label=sitrep_ward.title,
             #     href=sitrep_ward.path,
             # ),
+            create_main_nav_link(
+                icon=sitrep_abacus.icon,
+                label=sitrep_abacus.title,
+                href=sitrep_abacus.path,
+            ),
             dmc.Divider(
                 labelPosition="left",
                 label=[

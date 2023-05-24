@@ -1,0 +1,33 @@
+[
+  {
+    "selector": ".abacus",
+    "style": {
+      "content": "data(prob)",
+      "text-halign": "center",
+      "text-valign": "center",
+      "border-color": "#5c7cfa",
+      "border-width": 2
+    }
+  },
+  {
+    "selector": ".bed0",
+    "style": {
+      "content": "data(label)",
+      "text-valign": "center",
+      "text-halign": "left",
+      "text-margin-x": "-10"
+    }
+  },
+  {
+    "selector": ".in",
+    "style": {
+      "background-color": "mapData(prob, 0, 1, #FFFFFF, #5c7cfa)"
+    }
+  },
+  {
+    "selector": ".out",
+    "style": {
+      "background-color": "mapData(prob, 0, 1, #FFFFFF, #FF0000)"
+    }
+  }
+]

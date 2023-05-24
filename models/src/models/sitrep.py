@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+from datetime import date
 
 
 class BedRow(BaseModel):
@@ -26,3 +27,9 @@ class SitrepRow(BaseModel):
 class IndividualDischargePrediction(BaseModel):
     episode_slice_id: int
     prediction: float = Field(..., alias="prediction_as_real")
+
+
+class Abacus(BaseModel):
+    campus: str
+    date: date | None
+    probabilities: float | list[float]

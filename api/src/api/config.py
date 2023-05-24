@@ -18,6 +18,8 @@ class Settings(BaseSettings):
     hymind_url: AnyHttpUrl
     towermail_url: AnyHttpUrl
 
+    mlflow_url: AnyHttpUrl
+
     electives_tap_url: AnyHttpUrl
     emergency_tap_url: AnyHttpUrl
 

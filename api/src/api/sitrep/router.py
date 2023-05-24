@@ -2,7 +2,6 @@ import warnings
 from datetime import date, datetime
 from pathlib import Path
 from urllib.parse import urlencode
-
 import requests
 from fastapi import APIRouter, Depends, Response
 from fastapi.responses import RedirectResponse
@@ -15,10 +14,7 @@ from api.baserow import BaserowDB, get_baserow_db
 
 # TODO: Give sitrep its own CensusRow model so we do not have interdependencies.
 from models.census import CensusRow
-from models.sitrep import (
-    SitrepRow,
-    BedRow,
-)
+from models.sitrep import SitrepRow, BedRow
 
 CORE_FIELDS = [
     "department",
