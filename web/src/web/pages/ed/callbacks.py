@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Any, Dict, List
 
 from dash import Input, Output, callback
 
@@ -87,11 +87,9 @@ def _get_aggregate_patients() -> list[AggregateAdmissionRow]:
     Output(ids.AGGREGATE_STORE, "data"),
     Input(app_ids.STORE_TIMER_15M, "n_intervals"),
 )
-def store_aggregate_patients(n_intervals: int) -> Optional[List[AggregateAdmissionRow]]:
+def store_aggregate_patients(n_intervals: int) -> List[Dict[str, Any]]:
     if n_intervals >= 0:
-        return _get_aggregate_patients()  # type: ignore
-    else:
-        return None
+        return _get_aggregate_patients()
 
 
 @logger_timeit()
@@ -105,13 +103,9 @@ def _get_individual_patients() -> list[EmergencyDepartmentPatient]:
     Output(ids.PATIENTS_STORE, "data"),
     Input(app_ids.STORE_TIMER_15M, "n_intervals"),
 )
-def store_individual_patients(
-    n_intervals: int,
-) -> Optional[List[EmergencyDepartmentPatient]]:
+def store_individual_patients(n_intervals: int) -> List[Dict[str, Any]]:
     if n_intervals >= 0:
-        return _get_individual_patients()  # type: ignore
-    else:
-        return None
+        return _get_individual_patients()
 
 
 @callback(
@@ -119,7 +113,7 @@ def store_individual_patients(
     Output(ids.PATIENTS_GRID, "columnDefs"),
     Input(ids.PATIENTS_STORE, "data"),
 )
-def build_patients_grid(data: list[dict]) -> tuple[list[dict], list[dict]]:
+def build_patients_grid(data):
     df = parse_to_data_frame(data, EmergencyDepartmentPatient)
     columnDefs = columnDefs_patients
-    return df.to_dict("records"), columnDefs  # type: ignore
+    return df.to_dict("records"), columnDefs
