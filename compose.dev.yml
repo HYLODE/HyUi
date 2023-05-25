@@ -1,4 +1,4 @@
-x-no-proxy: &no-proxy localhost,127.0.0.1,uclvlddpragae07,uclvlddpragae08,api,web,cache,baserow,redis,celery_worker
+x-no-proxy: &no-proxy localhost,127.0.0.1,uclvlddpragae07,uclvlddpragae08,api,web,baserow,redis,celery_worker
 
 x-proxy-common: &proxy-common
   NO_PROXY: *no-proxy
@@ -43,13 +43,6 @@ services:
       - baserow
       - api
       - redis
-#      - cache
-#    healthcheck:
-#      test: ["CMD", "./refresh_cache.sh"]
-#      interval: 5m30s
-#      timeout: 30s
-#      retries: 5
-#      start_period: 30s
     networks:
       - hyui
 
@@ -128,23 +121,6 @@ services:
       - celery_worker
     networks:
       - hyui
-
-
-#  cache:
-#    build:
-#      dockerfile: docker/cache/Dockerfile
-#      args:
-#        <<: *build-args-common
-#    environment:
-#      <<: *proxy-common
-#    env_file: .env
-#    ports:
-#      - "${CACHE_PORT}:8000"
-#    command: "-p default_keep=300"
-#    depends_on:
-#      - api
-#    networks:
-#      - hyui
 
   baserow:
     image: baserow/baserow:1.16.0

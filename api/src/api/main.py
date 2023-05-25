@@ -3,10 +3,9 @@
 Entry point and main file for the FastAPI backend
 """
 import time
-from typing import Any
 
 import arrow
-from fastapi import APIRouter, FastAPI, Request, Response
+from fastapi import APIRouter, FastAPI
 from fastapi.responses import ORJSONResponse
 from fastapi_utils.tasks import repeat_every
 
@@ -85,14 +84,6 @@ def refresh_perrt_icu_admission_predictions() -> None:
     app.state.perrt_icu_adm_predictions = {}
     predictions = run_prediction_pipeline()
     app.state.perrt_icu_adm_predictions = predictions
-
-
-@app.middleware("http")
-async def add_cache_control_header(request: Request, call_next: Any) -> Response:
-    response = await call_next(request)
-    if "Cache-Control" not in response.headers:
-        response.headers["Cache-control"] = "no-cache"
-    return response
 
 
 @app.get("/ping")

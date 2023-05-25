@@ -10,7 +10,6 @@ The root directory contains all the libraries that are used to power the HyUi da
 - `web`: This contains the Plotly Dash web server code. It should *only* communicate with the `api` service. This allows the `api` service to provide mock data seamlessly when developing without needing to spin up other services to help development.
 - `models`: This contains all the Pydantic models that are used to share data between the `api` and `web`.
 - `initialise`: This sets-up the BaseRow instance that is used for configuration by the user.
-- `cache`: This contains the HTTP cache service that serves cached objects from `api` to `web` with a 5 minute expiry. See [the deployment docs](./deployment.qmd) for more information.
 - `baserow`: We use [baserow](https://baserow.io) as a temporary database to that allows us to store information about patients without directly editing EMAP or EPIC. It is not relevant when running HyUI on your local machine, as all mock data will be stored locally. However, it is important to understand when [deploying](deployment.qmd) HyUI with live data within the NHS.
 
 ### Architecture Ideals
