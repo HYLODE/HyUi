@@ -1,8 +1,7 @@
 import dash
-import dash_cytoscape as cyto
 import dash_mantine_components as dmc
 import json
-from dash import html
+from dash import html, dcc
 from pathlib import Path
 
 import web.pages.sitrep.callbacks.abacus  # noqa
@@ -30,40 +29,43 @@ campus_selector = html.Div(
         ),
     ]
 )
-abacus = dmc.Paper(
-    [
-        cyto.Cytoscape(
-            id=ids.ABACUS_CHART,
-            style={
-                # "width": "70vw",
-                "height": "70vh",
-                "z-index": 999,
-            },
-            layout={
-                "name": "preset",
-                "animate": True,
-                "fit": True,
-                "padding": 10,
-            },
-            stylesheet=abacus_style,
-            responsive=True,
-            userPanningEnabled=True,
-            userZoomingEnabled=True,
-        )
-    ],
-    shadow="lg",
-    radius="lg",
-    p="md",  # padding
-    withBorder=True,
-    # style={"width": "90vw"},
+
+with open(Path(__file__).parent.parent / "electives/model.md") as f:
+    elective_markdown = f.read()
+
+elective_model_card = dmc.Modal(
+    children=dcc.Markdown(elective_markdown),
+    id="model_card",
+    size="40%",
+    opened=False,
 )
+
+elective_card_button = dmc.Button(
+    id="electives_button", children="Electives Model Info", color="blue", fullWidth=True
+)
+
 
 body = dmc.Container(
     [
         dmc.Grid(
             [
-                dmc.Col(campus_selector, offset=9, span=3),
-                dmc.Col(abacus, span=12),
+                # dmc.Col(campus_selector, span=3),
+                # dmc.Col(elective_card_button, span=3),
+                # dmc.Col(emergency_card_button, span=3),
+                # dmc.Col(discharge_card_button, span=3),
+                # dmc.Col(now_progress_bar, span=12),
+                # dmc.Col(mane_progress_bar, span=12),
+                # dmc.Col(elective_adjustor, span=3),
+                # dmc.Col(elective_graph, span=3),
+                # dmc.Col(emergency_adjustor, span=3),
+                # dmc.Col(emergency_graph, span=3),
+                # dmc.Col(discharge_adjustor, span=3),
+                # dmc.Col(discharge_graph, span=3),
+                # dmc.Col(overall_graph, span=3),
+                # dmc.Col(abacus, span=12),
+                # dmc.Col(elective_model_card),
+                # dmc.Col(emergency_model_card),
+                # dmc.Col(discharges_model_card),
             ]
         ),
     ],

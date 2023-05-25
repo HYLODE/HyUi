@@ -85,16 +85,16 @@ def create_side_nave_content() -> dmc.Stack:
                 label=sitrep_icus.title,
                 href=sitrep_icus.path,
             ),
-            create_main_nav_link(
-                icon=sitrep_campus.icon,
-                label=sitrep_campus.title,
-                href=sitrep_campus.path,
-            ),
-            create_main_nav_link(
-                icon=sitrep_ward.icon,
-                label=sitrep_ward.title,
-                href=sitrep_ward.path,
-            ),
+            # create_main_nav_link(
+            #     icon=sitrep_campus.icon,
+            #     label=sitrep_campus.title,
+            #     href=sitrep_campus.path,
+            # ),
+            # create_main_nav_link(
+            #     icon=sitrep_ward.icon,
+            #     label=sitrep_ward.title,
+            #     href=sitrep_ward.path,
+            # ),
             create_main_nav_link(
                 icon=sitrep_abacus.icon,
                 label=sitrep_abacus.title,
