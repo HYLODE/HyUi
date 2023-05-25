@@ -5,6 +5,8 @@ from celery.schedules import crontab
 from web import ids as web_ids
 from web.pages.ed import ids as ed_ids
 
+from web.celery_tasks import replace_alphanumeric
+
 campus_url = API_URLS.get("campus_url")
 
 
@@ -70,7 +72,16 @@ beat_schedule = {
         "schedule": crontab(minute="*/15"),  # ev 15 minutes
         "args": (
             API_URLS[ed_ids.PATIENTS_STORE],
-            ed_ids.PATIENTS_STORE,
+            replace_alphanumeric(API_URLS[ed_ids.PATIENTS_STORE]),
+        ),
+        "kwargs": {"expires": (15 * 60) + 60},  # ev 16 minutes
+    },
+    ed_ids.AGGREGATE_STORE: {
+        "task": "web.celery_tasks.get_response",
+        "schedule": crontab(minute="*/15"),  # ev 15 minutes
+        "args": (
+            API_URLS[ed_ids.AGGREGATE_STORE],
+            replace_alphanumeric(API_URLS[ed_ids.AGGREGATE_STORE]),
         ),
         "kwargs": {"expires": (15 * 60) + 60},  # ev 16 minutes
     },

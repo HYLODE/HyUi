@@ -18,9 +18,6 @@ server = Flask(__name__)
 
 celery_manager = CeleryManager(celery_app)
 
-# run celery startup tasks
-run_startup_tasks()
-
 
 hyui_user = f"{get_settings().hyui_user}"
 hyui_password = f"{get_settings().hyui_password.get_secret_value()}"
@@ -71,6 +68,10 @@ app.config.suppress_callback_exceptions = True
 
 # expose application's object server so wsgi server can access it
 server = app.server
+
+# run celery startup tasks
+run_startup_tasks()
+
 
 if __name__ == "__main__":
     logger.info("Running with the local dash development server")
