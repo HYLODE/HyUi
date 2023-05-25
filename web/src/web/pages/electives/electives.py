@@ -1,8 +1,8 @@
 import dash
 import dash_mantine_components as dmc
 import json
+from dash import dash_table as dtable, html, dcc
 import warnings
-from dash import dash_table as dtable, html
 from pathlib import Path
 from datetime import date, timedelta
 
@@ -19,6 +19,9 @@ with open(Path(__file__).parent / "table_style_sheet.json") as f:
     table_style_sheet = json.load(f)
     table_style_sheet = replace_colors_in_stylesheet(table_style_sheet)
 
+with open(Path(__file__).parent / "model.md") as f:
+    model_markdown = f.read()
+
 timers = html.Div([])
 stores = html.Div(
     [
@@ -31,6 +34,14 @@ notifications = html.Div(
     ]
 )
 
+
+model_card = dmc.Modal(
+    children=dcc.Markdown(model_markdown),
+    id="model_card",
+    size="40%",
+    opened=True,
+)
+
 campus_selector = html.Div(
     [
         dmc.SegmentedControl(
@@ -39,9 +50,11 @@ campus_selector = html.Div(
             data=CAMPUSES,
             persistence=True,
             persistence_type="local",
+            fullWidth=True,
         ),
     ]
 )
+
 pacu_selector = html.Div(
     [
         dmc.SegmentedControl(
@@ -63,6 +76,7 @@ pacu_selector = html.Div(
             ],
             persistence=True,
             persistence_type="local",
+            fullWidth=True,
         ),
     ]
 )
@@ -86,6 +100,10 @@ date_selector = html.Div(
     # )
 )
 
+model_button = dmc.Button(
+    id="model_button", children="Model Info", color="blue", fullWidth=True
+)
+
 model_calibrator = html.Div(
     [
         dmc.RangeSlider(
@@ -93,12 +111,42 @@ model_calibrator = html.Div(
             min=0,
             max=100,
             step=5,
-            showLabelOnHover=False,
+            showLabelOnHover=True,
             value=[0, 60],
+            size="xl",
+            marks=[
+                {"value": 5, "label": "5%"},
+                {"value": 10, "label": "10%"},
+                {"value": 20, "label": "20%"},
+                {"value": 30, "label": "30%"},
+                {"value": 40, "label": "40%"},
+                {"value": 50, "label": "50%"},
+                {"value": 60, "label": "60%"},
+                {"value": 70, "label": "70%"},
+                {"value": 80, "label": "80%"},
+                {"value": 90, "label": "90%"},
+            ],
+            classNames={"root": "model-slider-bar"},
+            # styles={"bar" : {"backgroundColor": "gray"},
+            #         "track" : {"backgroundColor": "blue"}},
         ),
-        dmc.Text("model calibration"),
+        dmc.Space(h=30),
+        dmc.Text("model flagging cut-offs"),
     ]
 )
+
+
+model_row = dmc.Alert(
+    children=dmc.Grid(
+        children=[
+            dmc.Col(model_calibrator, span=6),
+            dmc.Col(model_button, span=6),
+        ]
+    ),
+    color="red",
+    title="EXPERIMENTAL",
+)
+
 
 electives_list = dmc.Paper(
     dtable.DataTable(
@@ -181,10 +229,11 @@ body = dmc.Container(
     [
         dmc.Grid(
             children=[
-                dmc.Col(pacu_selector, span=2),
-                dmc.Col(model_calibrator, span=3),
-                dmc.Col(campus_selector, span=2),
-                dmc.Col(date_selector, span=5),
+                dmc.Col(pacu_selector, span=3),
+                dmc.Col(campus_selector, span=3),
+                dmc.Col(date_selector, span=6),
+                dmc.Col(model_row, span=12),
+                dmc.Col(model_card),
                 dmc.Col(electives_list, span=7),
                 dmc.Col(patient_info_box, span=5),
             ],
