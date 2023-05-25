@@ -1,4 +1,4 @@
-pyodbc>=4.0.32
+pyodbc>=4.0.34
 graphviz
 arrow==1.2.1
 psycopg2-binary==2.9.2
