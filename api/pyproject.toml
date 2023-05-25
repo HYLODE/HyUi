@@ -10,7 +10,7 @@ dependencies = [
     "arrow == 1.2.3",
     "fastapi[all] == 0.85.0",
     "pandas == 1.5.1",
-    "pyodbc == 4.0.35",
+    "pyodbc == 4.0.34",
     "psycopg2-binary == 2.9.5",
     "pydantic == 1.10.2",
     "SQLAlchemy == 1.4.41",
