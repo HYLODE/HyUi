@@ -23,6 +23,13 @@ services:
     environment:
       <<: *proxy-common
     env_file: .env
+    depends_on:
+      - baserow
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
+      interval: 200s
+      timeout: 200s
+      retries: 5
     ports:
       - ${API_PORT}:8000
     networks:
@@ -42,13 +49,6 @@ services:
       - baserow
       - api
       - redis
-      # - cache
-    # healthcheck:
-    #   test: [ "CMD", "./refresh_cache.sh" ]
-    #   interval: 5m30s
-    #   timeout: 30s
-    #   retries: 5
-    #   start_period: 30s
     networks:
       - hyui
 
@@ -56,6 +56,8 @@ services:
     image: redis:7.0-alpine
     environment:
       <<: *proxy-common
+    healthcheck:
+      test: ["CMD", "redis-cli","ping"]
     networks:
       - hyui
 
@@ -83,7 +85,10 @@ services:
     env_file:
       - .env
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy
+      api:
+        condition: service_healthy
     networks:
       - hyui
 
@@ -99,6 +104,8 @@ services:
       - .env
     depends_on:
       - redis
+      - api
+      - celery_worker
     networks:
       - hyui
 
@@ -119,22 +126,6 @@ services:
       - celery_worker
     networks:
       - hyui
-
-  # cache:
-  #   build:
-  #     dockerfile: docker/cache/Dockerfile
-  #     args:
-  #       <<: *build-args-common
-  #   environment:
-  #     <<: *proxy-common
-  #   env_file: .env
-  #   ports:
-  #     - "${CACHE_PORT}:8000"
-  #   command: "-p default_keep=300"
-  #   depends_on:
-  #     - api
-  #   networks:
-  #     - hyui
 
   baserow:
     image: baserow/baserow:1.16.0
