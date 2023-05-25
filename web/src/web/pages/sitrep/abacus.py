@@ -144,7 +144,7 @@ elective_tap = AbacusTap(
     card_path=(Path(__file__).parent.parent / "electives/model.md"),
     adj_description="Expected ICU admissions from Elective Surgeries",
     icon="carbon:calendar",
-    color=(255, 153, 255),
+    color=(18, 184, 134),  # green
 )
 
 emergency_tap = AbacusTap(
@@ -152,7 +152,7 @@ emergency_tap = AbacusTap(
     card_path=(Path(__file__).parent / "emergency_model.md"),
     adj_description="Expected ICU admissions from A&E and the wards",
     icon="carbon:stethoscope",
-    color=(255, 153, 51),
+    color=(250, 82, 82),  # red
 )
 
 discharge_tap = AbacusTap(
@@ -160,7 +160,7 @@ discharge_tap = AbacusTap(
     card_path=(Path(__file__).parent / "discharge_model.md"),
     adj_description="Expected ICU discharges",
     icon="carbon:home",
-    color=(51, 204, 51),
+    color=(190, 75, 219),  # purple
 )
 
 
