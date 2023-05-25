@@ -1,4 +1,4 @@
-from dash import Input, Output, callback
+from dash import Input, Output, callback, State
 
 from web.pages.electives import ids, CAMPUSES
 from web.stores import ids as store_ids
@@ -142,3 +142,13 @@ ECHOCARDIOGRAPHY:
             for x in string.split("\n")
         ]
     )
+
+
+@callback(
+    Output("model_card", "opened"),
+    Input("model_button", "n_clicks"),
+    State("model_card", "opened"),
+    prevent_initial_call=True,
+)
+def _modal(_: int, opened: bool) -> bool:
+    return not opened

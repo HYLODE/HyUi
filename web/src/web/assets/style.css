@@ -48,6 +48,36 @@ input:invalid {
     }
 }
 
+.model-slider-bar .mantine-Slider-bar {
+    -webkit-appearance: none;
+    background-color: rgb(156, 156, 156) !important;
+}
+
+.model-slider-bar .mantine-Slider-track {
+    -webkit-appearance: none;
+    background-color: #0080ff !important;
+}
+
+.model-slider-bar .mantine-Slider-track::before {
+    background-color: #0080ff;
+}
+
+.model-slider-bar .mantine-Slider-mark {
+    border-color: gray !important;
+    background-color: transparent !important;
+    width: 2px !important;
+    height: 10px !important;
+    margin-top: -5px !important;
+}
+
+.model-slider-bar .mantine-Slider-thumb {
+    background-color: #0080ff !important;
+    border-color: #0080ff !important;
+
+}
+
+
+
 /*.demo-container {*/
 /*    display: flex;*/
 /*    max-width: 100%;*/
