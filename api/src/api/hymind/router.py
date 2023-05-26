@@ -51,7 +51,6 @@ def get_emergency_icu_admission_predictions(
     Returns:
         list[EmTap]: List of ICU Emergency tap predictions
     """
-    response.headers["Cache-Control"] = "public, max-age=300"
     response = requests.post(f"{settings.emergency_tap_url}/predict", json=data.dict())
     rows = response.json()["data"]
     return [EmTap.parse_obj(row) for row in rows]
@@ -92,7 +91,6 @@ def get_elective_icu_admission_predictions(
     Returns:
         list[ElTap]: List of ICU Elective tap predictions
     """
-    response.headers["Cache-Control"] = "public, max-age=300"
     response = requests.post(f"{settings.electives_tap_url}/predict", json=data.dict())
     rows = response.json()["data"]
     return [ElTap.parse_obj(row) for row in rows]
@@ -123,7 +121,6 @@ def get_individual_discharge_predictions(
     ward: str = Query(default=""),
     settings: Settings = Depends(get_settings),
 ) -> list[IcuDischarge]:
-    response.headers["Cache-Control"] = "public, max-age=300"
     # force to upper as expected by hymind API
     ward = ward.upper()
     response = requests.get(
