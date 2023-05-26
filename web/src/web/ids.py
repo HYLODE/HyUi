@@ -10,4 +10,8 @@ ELECTIVES_STORE = gen_id("electives all store", __name__)
 SITREP_STORE = gen_id("sitrep all store", __name__)
 HYMIND_ICU_DC_STORE = gen_id("hymind icu dc store", __name__)
 
-ABACUS_STORE = gen_id("abacus all store", __name__)
+# ABACUS_STORE = gen_id("abacus all store", __name__)
+
+# ELECTIVES_AGGREGATE_STORE = gen_id("electives aggregate store", __name__)
+# EMERGENCY_AGGREGATE_STORE = gen_id("emergency aggregate store", __name__)
+# DISCHARGE_AGGREGATE_STORE = gen_id("discharge aggregate store", __name__)

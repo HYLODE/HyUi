@@ -120,18 +120,32 @@ class AbacusTap:
             fullWidth=True,
         )
 
-        self.adjustor = dmc.NumberInput(
+        # self.adjustor = dmc.NumberInput(
+        #     id=self.adjustor_id,
+        #     label=category.capitalize(),
+        #     description=adj_description,
+        #     icon=DashIconify(icon=icon),
+        #     style={"width": "100%"},
+        # )
+
+        self.adjustor = dmc.Slider(
             id=self.adjustor_id,
-            label=category.capitalize(),
-            description=adj_description,
-            icon=DashIconify(icon=icon),
             style={"width": "100%"},
         )
 
         self.graph = dcc.Graph(id=self.graph_id)
 
         self.adj_graph = dmc.Paper(
-            [dmc.Grid([dmc.Col(self.adjustor, span=12), dmc.Col(self.graph, span=12)])],
+            [
+                dmc.Grid(
+                    [
+                        dmc.Col(DashIconify(icon=icon), span=2),
+                        dmc.Col(dmc.Text(category.capitalize()), span=10),
+                        dmc.Col(self.adjustor, span=12),
+                        dmc.Col(self.graph, span=12),
+                    ]
+                )
+            ],
             shadow="xs",
             p="sm",
             withBorder=True,
