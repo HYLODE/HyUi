@@ -152,6 +152,7 @@ class AbacusTap:
             style={"width": "100%"},
             min=0,
             max=8,
+            labelAlwaysOn=1,
         )
 
         self.graph = dcc.Graph(id=self.graph_id)
@@ -161,7 +162,9 @@ class AbacusTap:
                 dmc.Grid(
                     [
                         dmc.Col(DashIconify(icon=icon), span=2),
-                        dmc.Col(dmc.Text(category.capitalize()), span=10),
+                        dmc.Col(
+                            dmc.Text(category.capitalize(), align="right"), span=10
+                        ),
                         dmc.Col(self.adjustor, span=12),
                         dmc.Col(self.graph, span=12),
                     ]
@@ -214,7 +217,7 @@ mane_progress_bar = dmc.Progress(
 
 overall_graph = dmc.Paper(
     children=[
-        dmc.Text("Overall ICU Occupancy Tomorrow", size="lg"),
+        # dmc.Text("Overall ICU Occupancy Tomorrow", size="lg"),
         dcc.Graph(id="overall_graph"),
     ],
     shadow="sm",
@@ -243,7 +246,7 @@ body = dmc.Container(
                 dmc.Col(now_progress_bar, span=11),
                 dmc.Col(dmc.Text("Tomorrow: "), span=1),
                 dmc.Col(mane_progress_bar, span=11),
-                dmc.Col(overall_graph, span=12),
+                dmc.Col(overall_graph, span=11, offset=1),
                 dmc.Col(elective_tap.adj_graph, span=4),
                 dmc.Col(emergency_tap.adj_graph, span=4),
                 dmc.Col(discharge_tap.adj_graph, span=4),
