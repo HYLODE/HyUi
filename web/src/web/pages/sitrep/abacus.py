@@ -131,6 +131,8 @@ class AbacusTap:
         self.adjustor = dmc.Slider(
             id=self.adjustor_id,
             style={"width": "100%"},
+            min=0,
+            max=8,
         )
 
         self.graph = dcc.Graph(id=self.graph_id)
@@ -180,14 +182,14 @@ discharge_tap = AbacusTap(
 
 now_progress_bar = dmc.Progress(
     id=ids.PROGRESS_WARD,
-    size=20,
+    size="xl",
     radius="md",
 )
 
 
 mane_progress_bar = dmc.Progress(
     id="mane_progress_bar",
-    size=20,
+    size="xl",
     radius="md",
 )
 

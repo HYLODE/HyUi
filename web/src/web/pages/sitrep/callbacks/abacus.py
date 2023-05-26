@@ -1,12 +1,14 @@
-import requests
+# import requests
 import numpy as np
 from dash import Input, Output, State, callback
-from datetime import date, timedelta
 
-from models.sitrep import Abacus
+# from datetime import date, timedelta
+
+# from models.sitrep import Abacus
 from web.pages.sitrep import ids
-from web.convert import parse_to_data_frame
-from web.config import get_settings
+
+# from web.convert import parse_to_data_frame
+# from web.config import get_settings
 
 # from web import ids as store_ids
 
@@ -15,29 +17,32 @@ from web.config import get_settings
 TOTAL_BEDS = 24
 EMERGENCY_AVG = 3
 DISCHARGE_PROB = 0.1
-OCCUPIED_BEDS = 12
+OCCUPIED_BEDS = 18
+ELECTIVE_TOTAL = 20
+ELECTIVE_PROB = 0.1
 
 
 # Collect aggregated Electives data for tomorrow only
 def _get_electives_data(dept: str) -> np.array:
-    all_elective_pmf = parse_to_data_frame(
-        requests.get(url=f"{get_settings().api_url}/electives/aggregate/").json(),
-        Abacus,
-    )
+    # all_elective_pmf = parse_to_data_frame(
+    #     requests.get(url=f"{get_settings().api_url}/electives/aggregate/").json(),
+    #     Abacus,
+    # )
 
-    # grouped_stores = {
-    #     "UCH": store_ids.SITREP_STORE["T03"] + store_ids.SITREP_STORE["T06"],
-    #     "WMS": store_ids.SITREP_STORE["WMS"],
-    #     "GWB": store_ids.SITREP_STORE["GWB"],
-    #     "NHNN": store_ids.SITREP_STORE["NHNNC1"] + store_ids.SITREP_STORE["NHNNC0"],
-    # }
+    # # grouped_stores = {
+    # #     "UCH": store_ids.SITREP_STORE["T03"] + store_ids.SITREP_STORE["T06"],
+    # #     "WMS": store_ids.SITREP_STORE["WMS"],
+    # #     "GWB": store_ids.SITREP_STORE["GWB"],
+    # #     "NHNN": store_ids.SITREP_STORE["NHNNC1"] + store_ids.SITREP_STORE["NHNNC0"],
+    # # }
 
-    elective_pmf = all_elective_pmf[
-        (all_elective_pmf["date"] == date.today() + timedelta(days=1))
-        & (all_elective_pmf["department"].isin(dept))
-    ]
+    # elective_pmf = all_elective_pmf[
+    #     (all_elective_pmf["date"] == date.today() + timedelta(days=1))
+    #     & (all_elective_pmf["department"].isin(dept))
+    # ]
 
-    return np.array(elective_pmf["probabilities"].values[0])
+    # return np.array(elective_pmf["probabilities"].values[0])
+    return np.random.binomial(ELECTIVE_TOTAL, ELECTIVE_PROB, TOTAL_BEDS)
 
 
 # Collect aggregated Emergencies data for tomorrow only
@@ -48,7 +53,7 @@ def _get_emergencies_data(dept: str) -> np.array:  # noqa
 
 # Collect aggregated Discharges data for tomorrow only
 def _get_discharges_data(dept: str) -> np.array:  # noqa
-    return np.negative(np.random.binomial(100, DISCHARGE_PROB, TOTAL_BEDS))
+    return np.negative(np.random.binomial(TOTAL_BEDS, DISCHARGE_PROB, TOTAL_BEDS))
 
 
 def _get_current_beds(dept: str) -> np.array:  # noqa
@@ -59,9 +64,12 @@ def _get_current_beds(dept: str) -> np.array:  # noqa
 @callback(
     Output("overall_graph", "figure"),
     Input(ids.DEPT_SELECTOR, "value"),
-    Input(ids.BEDS_STORE, "data"),
+    # Input(ids.BEDS_STORE, "data"),
 )
-def overall_graph(dept: str, beds: list) -> dict:
+def overall_graph(
+    dept: str,
+    #    beds: list
+) -> dict:
     electives = _get_electives_data(dept)
     emergencies = _get_emergencies_data(dept)
     discharges = _get_discharges_data(dept)
@@ -86,6 +94,11 @@ def overall_graph(dept: str, beds: list) -> dict:
 
 
 taps = ["electives", "emergencies", "discharges"]
+data_funcs = {
+    "electives": _get_electives_data,
+    "emergencies": _get_emergencies_data,
+    "discharges": _get_discharges_data,
+}
 
 for tap in taps:
 
@@ -98,77 +111,40 @@ for tap in taps:
     def _modal(_: int, opened: bool) -> bool:
         return not opened
 
-
-@callback(
-    Output("elective_graph", "figure"),
-    Input(ids.DEPT_SELECTOR, "value"),
-)
-def elective_graph(dept: str) -> dict:
-    electives = _get_electives_data(dept)
-    return {
-        "data": [electives],
-        "layout": {
-            "title": "Electives",
-            "xaxis": {"title": "Beds"},
-            "yaxis": {"title": "Probability"},
-        },
-    }
-
-
-@callback(
-    Output("emergency_graph", "figure"),
-    Input(ids.DEPT_SELECTOR, "value"),
-)
-def emergency_graph(dept: str) -> dict:
-    emergency = _get_emergencies_data(dept)
-    return {
-        "data": [emergency],
-        "layout": {
-            "title": "Emergencies",
-            "xaxis": {"title": "Beds"},
-            "yaxis": {"title": "Probability"},
-        },
-    }
-
-
-@callback(
-    Output("discharge_graph", "figure"),
-    Input(ids.DEPT_SELECTOR, "value"),
-)
-def discharge_graph(dept: str) -> dict:
-    discharge = _get_discharges_data(dept)
-    return {
-        "data": [discharge],
-        "layout": {
-            "title": "Discharges",
-            "xaxis": {"title": "Beds"},
-            "yaxis": {"title": "Probability"},
-        },
-    }
+    @callback(
+        Output(f"{tap}_graph", "figure"),
+        Input(ids.DEPT_SELECTOR, "value"),
+    )
+    def generate_graph(dept: str) -> dict:
+        data = data_funcs[tap](dept)
+        return {
+            "data": [data],
+            "layout": {
+                "title": tap.capitalize(),
+                "xaxis": {"title": "Beds"},
+                "yaxis": {"title": "Probability"},
+            },
+        }
 
 
 # Callback for progress bar
 @callback(
     Output("mane_progress_bar", "sections"),
     Input(ids.DEPT_SELECTOR, "value"),
-    Input(ids.BEDS_STORE, "data"),
-    Input("electives_adjustor", "value"),
+    # Input(ids.BEDS_STORE, "data"),
     Input("electives_adjustor", "value"),
     Input("emergencies_adjustor", "value"),
     Input("discharges_adjustor", "value"),
 )
 def mane_progress_bar(
     dept: str,
-    beds: list[dict],
+    # beds: list[dict],
     electives: int,
     emergencies: int,
     discharges: int,
 ) -> list[dict]:
-    if beds:
-        n_beds = len([bed for bed in beds if bed.get("department") == dept])
-    else:
-        n_beds = 20
-    norm = 30
+    norm = TOTAL_BEDS
+    n_beds = OCCUPIED_BEDS
 
     admitted_element = {
         "value": ((n_beds - discharges) / norm),
