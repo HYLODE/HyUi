@@ -1,63 +1,99 @@
-# import requests
 import numpy as np
 from dash import Input, Output, State, callback
-
-# from datetime import date, timedelta
-
-# from models.sitrep import Abacus
 from web.pages.sitrep import ids
 
-# from web.convert import parse_to_data_frame
-# from web.config import get_settings
-
-# from web import ids as store_ids
-
-
-# temporary variables
 TOTAL_BEDS = 24
 EMERGENCY_AVG = 3
 DISCHARGE_PROB = 0.1
 OCCUPIED_BEDS = 18
 ELECTIVE_TOTAL = 20
 ELECTIVE_PROB = 0.1
+N_TRIALS = 10000
+EXTRA_BEDS = 5
 
 
-# Collect aggregated Electives data for tomorrow only
-def _get_electives_data(dept: str) -> np.array:
-    # all_elective_pmf = parse_to_data_frame(
-    #     requests.get(url=f"{get_settings().api_url}/electives/aggregate/").json(),
-    #     Abacus,
-    # )
+class Abacus:
+    def __init__(self, dept: str):
+        self.dept = dept
+        self.electives_data = self._get_electives_data()
+        self.emergencies_data = self._get_emergencies_data()
+        self.discharges_data = self._get_discharges_data()
+        self.current_data = self._get_current_beds()
 
-    # # grouped_stores = {
-    # #     "UCH": store_ids.SITREP_STORE["T03"] + store_ids.SITREP_STORE["T06"],
-    # #     "WMS": store_ids.SITREP_STORE["WMS"],
-    # #     "GWB": store_ids.SITREP_STORE["GWB"],
-    # #     "NHNN": store_ids.SITREP_STORE["NHNNC1"] + store_ids.SITREP_STORE["NHNNC0"],
-    # # }
+        self.electives_graph = self._generate_graph("electives", self.electives_data)
+        self.emergencies_graph = self._generate_graph(
+            "emergencies", self.emergencies_data
+        )
+        self.discharges_graph = self._generate_graph("discharges", self.discharges_data)
+        self.current_graph = self._generate_graph("current_beds", self.current_data)
 
-    # elective_pmf = all_elective_pmf[
-    #     (all_elective_pmf["date"] == date.today() + timedelta(days=1))
-    #     & (all_elective_pmf["department"].isin(dept))
-    # ]
+        self.overall_pmf = self._combine_probabilities()
 
-    # return np.array(elective_pmf["probabilities"].values[0])
-    return np.random.binomial(ELECTIVE_TOTAL, ELECTIVE_PROB, TOTAL_BEDS)
+        self.overall_graph = self._generate_graph("overall", self.overall_pmf)
 
+    def _combine_probabilities(self) -> np.array:
+        overall_pmf = np.convolve(
+            np.convolve(
+                np.convolve(self.electives_data, self.emergencies_data),
+                self.discharges_data,
+            ),
+            self.current_data,
+        )
+        overall_cmf = np.cumsum(overall_pmf[::-1])
+        overall_cmf = overall_cmf / overall_cmf[-1]
+        return overall_cmf[::-1]
 
-# Collect aggregated Emergencies data for tomorrow only
-def _get_emergencies_data(dept: str) -> np.array:  # noqa
-    # get from API
-    return np.random.poisson(3, TOTAL_BEDS)
+    def _get_electives_data(self) -> np.array:
+        return np.histogram(
+            np.random.binomial(ELECTIVE_TOTAL, ELECTIVE_PROB, N_TRIALS),
+            bins=np.arange(0, TOTAL_BEDS + 1),
+            density=True,
+        )[0]
 
+    def _get_emergencies_data(self) -> np.array:
+        return np.histogram(
+            np.random.poisson(EMERGENCY_AVG, N_TRIALS),
+            bins=np.arange(0, TOTAL_BEDS + 1),
+            density=True,
+        )[0]
 
-# Collect aggregated Discharges data for tomorrow only
-def _get_discharges_data(dept: str) -> np.array:  # noqa
-    return np.negative(np.random.binomial(TOTAL_BEDS, DISCHARGE_PROB, TOTAL_BEDS))
+    def _get_discharges_data(self) -> np.array:
+        return np.negative(
+            np.histogram(
+                np.random.binomial(OCCUPIED_BEDS, DISCHARGE_PROB, N_TRIALS),
+                bins=np.arange(0, TOTAL_BEDS + 1),
+                density=True,
+            )[0]
+        )
 
+    def _get_current_beds(self) -> np.array:
+        return np.where(np.arange(TOTAL_BEDS) == OCCUPIED_BEDS, 1, 0)
 
-def _get_current_beds(dept: str) -> np.array:  # noqa
-    return np.ones(OCCUPIED_BEDS)
+    def _generate_graph(self, tap: str, data: np.array) -> dict:
+        return {
+            "data": [
+                {
+                    "x": np.arange(0, (TOTAL_BEDS + EXTRA_BEDS)),
+                    "y": data,
+                    "type": "bar",
+                    "name": "Probability",
+                    "marker": {
+                        "line": {
+                            "color": "black",
+                            "width": 1,
+                        }
+                    },
+                    "width": 0.9,
+                }
+            ],
+            "layout": {
+                "title": tap.capitalize(),
+                "xaxis": {"title": "Beds"},
+                "yaxis": {"title": "Probability"},
+                "bargap": 0,
+                "bargroupgap": 0,
+            },
+        }
 
 
 # Callback for Overall combined chart
@@ -70,38 +106,11 @@ def overall_graph(
     dept: str,
     #    beds: list
 ) -> dict:
-    electives = _get_electives_data(dept)
-    emergencies = _get_emergencies_data(dept)
-    discharges = _get_discharges_data(dept)
-    current = _get_current_beds(dept)
-
-    overall_pmf = np.convolve(
-        np.convolve(np.convolve(electives, emergencies), discharges), current
-    )
-
-    overall_cmf = np.cumsum(overall_pmf)
-    if np.sum(overall_cmf) < 0:
-        overall_cmf = overall_cmf + 1
-
-    return {
-        "data": [overall_cmf],
-        "layout": {
-            "title": "Overall",
-            "xaxis": {"title": "Beds"},
-            "yaxis": {"title": "Probability"},
-        },
-    }
+    abacus_instance = Abacus(dept)
+    return abacus_instance.overall_graph
 
 
-taps = ["electives", "emergencies", "discharges"]
-data_funcs = {
-    "electives": _get_electives_data,
-    "emergencies": _get_emergencies_data,
-    "discharges": _get_discharges_data,
-}
-
-for tap in taps:
-
+def create_callback(tap: str) -> tuple:
     @callback(
         Output(f"{tap}_model_card", "opened"),
         Input(f"{tap}_button", "n_clicks"),
@@ -115,16 +124,15 @@ for tap in taps:
         Output(f"{tap}_graph", "figure"),
         Input(ids.DEPT_SELECTOR, "value"),
     )
-    def generate_graph(dept: str) -> dict:
-        data = data_funcs[tap](dept)
-        return {
-            "data": [data],
-            "layout": {
-                "title": tap.capitalize(),
-                "xaxis": {"title": "Beds"},
-                "yaxis": {"title": "Probability"},
-            },
-        }
+    def _show_graph(dept: str):  # type: ignore
+        abacus_instance = Abacus(dept)
+        return getattr(abacus_instance, f"{tap}_graph")
+
+    return _modal, _show_graph
+
+
+for tap in ["electives", "emergencies", "discharges"]:
+    modal_callback, show_graph_callback = create_callback(tap)
 
 
 # Callback for progress bar
