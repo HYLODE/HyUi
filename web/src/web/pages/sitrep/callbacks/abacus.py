@@ -93,9 +93,9 @@ class Abacus:
                     "type": "line",
                     "xref": "x",
                     "yref": "paper",
-                    "x0": slider_value,
+                    "x0": slider_value - 0.5,
                     "y0": 0,
-                    "x1": slider_value,
+                    "x1": slider_value - 0.5,
                     "y1": 1,
                     "line": {"color": "Black", "width": 5},
                 }
@@ -103,7 +103,7 @@ class Abacus:
         return {
             "data": [
                 {
-                    "x": np.arange(0, (self.total_beds + EXTRA_BEDS)),
+                    "x": np.arange(0, (self.total_beds)),  # + EXTRA_BEDS)),
                     "y": data,
                     "type": "bar",
                     "name": "Probability",
