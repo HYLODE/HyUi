@@ -35,8 +35,20 @@ with open(Path(__file__).parent / "abacus_style.json") as f:
     abacus_style = replace_colors_in_stylesheet(abacus_style)
 
 timers = html.Div([])
-stores = html.Div([])
-
+stores = html.Div(
+    [
+        html.Data(id=ids.DEPT_GROUPER, value="ALL_ICUS", hidden=True),
+        dcc.Store(id=ids.CENSUS_STORE),
+        dcc.Store(id=ids.DEPTS_OPEN_STORE),
+        dcc.Store(id=ids.ROOMS_OPEN_STORE),
+        dcc.Store(id=ids.BEDS_STORE),
+        dcc.Store(id=ids.DEPTS_OPEN_STORE_NAMES),
+        dcc.Store(id=ids.SITREP_STORE),
+        dcc.Store(id=ids.HYMIND_DC_STORE),
+        dcc.Store(id=ids.DISCHARGES_STORE),
+        dcc.Store(id=ids.ACC_BED_SUBMIT_STORE),
+    ]
+)
 
 dept_selector = dmc.Container(
     [
@@ -77,6 +89,21 @@ ward_cyto = dmc.Paper(
             userZoomingEnabled=True,
         )
     ],
+    shadow="sm",
+    radius="sm",
+    p="xs",  # padding
+    withBorder=True,
+)
+
+ward_list = dmc.Paper(
+    dmc.Table(
+        id=ids.BED_SELECTOR_WARD,
+        striped=True,
+        highlightOnHover=True,
+        verticalSpacing="xxs",
+        horizontalSpacing="md",
+        style={"height": "50vh", "overflowY": "scroll"},
+    ),
     shadow="lg",
     radius="lg",
     p="xs",  # padding
@@ -119,14 +146,6 @@ class AbacusTap:
             },
             fullWidth=True,
         )
-
-        # self.adjustor = dmc.NumberInput(
-        #     id=self.adjustor_id,
-        #     label=category.capitalize(),
-        #     description=adj_description,
-        #     icon=DashIconify(icon=icon),
-        #     style={"width": "100%"},
-        # )
 
         self.adjustor = dmc.Slider(
             id=self.adjustor_id,
@@ -228,7 +247,8 @@ body = dmc.Container(
                 dmc.Col(elective_tap.adj_graph, span=4),
                 dmc.Col(emergency_tap.adj_graph, span=4),
                 dmc.Col(discharge_tap.adj_graph, span=4),
-                dmc.Col(ward_cyto, span=12),
+                dmc.Col(ward_list, span=3),
+                dmc.Col(ward_cyto, span=9),
                 dmc.Col(elective_tap.model_card),
                 dmc.Col(emergency_tap.model_card),
                 dmc.Col(discharge_tap.model_card),
