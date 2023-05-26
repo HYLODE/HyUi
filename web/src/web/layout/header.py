@@ -102,6 +102,21 @@ def create_header(nav_data: list | dict) -> dmc.Header:
                                         smallerThan=1200,
                                         styles={"display": "none"},
                                     ),
+                                    dmc.Tooltip(
+                                        children=[
+                                            dmc.ThemeIcon(
+                                                size="xl",
+                                                radius="xl",
+                                                color="indigo",
+                                                variant="filled",
+                                                children=DashIconify(
+                                                    icon="carbon:rule-data-quality",
+                                                    width=25,
+                                                ),
+                                            )
+                                        ],
+                                        label="Data Quality",
+                                    ),
                                     create_header_link(
                                         "radix-icons:github-logo",
                                         "https://github.com/hylode/hyui",
@@ -112,16 +127,6 @@ def create_header(nav_data: list | dict) -> dmc.Header:
                                     create_header_link(
                                         "carbon:settings", settings.baserow_public_url
                                     ),
-                                    # dmc.ActionIcon(
-                                    #     DashIconify(
-                                    #         icon="radix-icons:blending-mode", width=22
-                                    #     ),
-                                    #     variant="outline",
-                                    #     radius=30,
-                                    #     size=36,
-                                    #     color="yellow",
-                                    #     id="color-scheme-toggle",
-                                    # ),
                                     dmc.MediaQuery(
                                         dmc.ActionIcon(
                                             DashIconify(
@@ -144,29 +149,6 @@ def create_header(nav_data: list | dict) -> dmc.Header:
         ],
     )
 
-
-# clientside_callback(
-#     """ function(data) { return data } """,
-#     Output("mantine-docs-theme-provider", "theme"),
-#     Input("theme-store", "data"),
-# )
-
-# clientside_callback(
-#     """function(n_clicks, data) {
-#         if (data) {
-#             if (n_clicks) {
-#                 const scheme = data["colorScheme"] == "dark" ? "light" : "dark"
-#                 return { colorScheme: scheme }
-#             }
-#             return dash_clientside.no_update
-#         } else {
-#             return { colorScheme: "light" }
-#         }
-#     }""",
-#     Output("theme-store", "data"),
-#     Input("color-scheme-toggle", "n_clicks"),
-#     State("theme-store", "data"),
-# )
 
 # noinspection PyProtectedMember
 clientside_callback(

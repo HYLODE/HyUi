@@ -151,3 +151,28 @@ def get_mock_individual_discharge_predictions(
             predict_dt=datetime.datetime(2023, 1, 25, 22, 16, 24, 00, tzinfo=pytz.UTC),
         )
     ]
+
+
+@router.get(
+    "/data_quality/",
+    response_model=str,
+)
+def get_data_quality(
+    settings: Settings = Depends(get_settings),
+) -> str:
+    # force to upper as expected by hymind API
+    response = requests.get(f"{settings.hyflow_url}/status/admissions/latest")
+    rows = response.json()["data"]
+
+    # some logic here to determine RAG status
+    rag_status = "green"
+    return rag_status
+
+
+@mock_router.get(
+    "/data_quality/",
+    response_model=str,
+)
+def get_mock_individual_discharge_predictions() -> str:
+    logging.info("Mock Data Quality")
+    return "green"
