@@ -2,10 +2,19 @@ import numpy as np
 from dash import Input, Output, State, callback
 from web.pages.sitrep import ids
 
-TOTAL_BEDS = 24
+
+BED_NUMBERS = {
+    "UCH T03 INTENSIVE CARE": {"occupied": 18, "total": 30},
+    "UCH T06 SOUTH PACU": {"occupied": 5, "total": 12},
+    "GWB L01 CRITICAL CARE": {"occupied": 7, "total": 10},
+    "WMS W01 CRITICAL CARE": {"occupied": 6, "total": 9},
+    "NHNN C0 NCCU": {"occupied": 0, "total": 4},
+    "NHNN C1 NCCU": {"occupied": 0, "total": 3},
+}
+
 EMERGENCY_AVG = 3
 DISCHARGE_PROB = 0.1
-OCCUPIED_BEDS = 18
+
 ELECTIVE_TOTAL = 20
 ELECTIVE_PROB = 0.1
 N_TRIALS = 10000
@@ -15,21 +24,28 @@ EXTRA_BEDS = 5
 class Abacus:
     def __init__(self, dept: str):
         self.dept = dept
+
+        self.bed_numbers = BED_NUMBERS.get(dept)
+        self.total_beds = self.bed_numbers["total"]  # type: ignore
+        self.occupied_beds = self.bed_numbers["occupied"]  # type:ignore
+
         self.electives_data = self._get_electives_data()
         self.emergencies_data = self._get_emergencies_data()
         self.discharges_data = self._get_discharges_data()
         self.current_data = self._get_current_beds()
 
-        self.electives_graph = self._generate_graph("electives", self.electives_data)
+        self.electives_graph = self._generate_graph("electives", self.electives_data, 0)
         self.emergencies_graph = self._generate_graph(
-            "emergencies", self.emergencies_data
+            "emergencies", self.emergencies_data, 0
         )
-        self.discharges_graph = self._generate_graph("discharges", self.discharges_data)
-        self.current_graph = self._generate_graph("current_beds", self.current_data)
-
+        self.discharges_graph = self._generate_graph(
+            "discharges", self.discharges_data, 0
+        )
+        self.current_graph = self._generate_graph("current_beds", self.current_data, 0)
         self.overall_pmf = self._combine_probabilities()
-
-        self.overall_graph = self._generate_graph("overall", self.overall_pmf)
+        self.overall_graph = self._generate_graph(
+            "overall", self.overall_pmf, self.occupied_beds
+        )
 
     def _combine_probabilities(self) -> np.array:
         overall_pmf = np.convolve(
@@ -46,34 +62,48 @@ class Abacus:
     def _get_electives_data(self) -> np.array:
         return np.histogram(
             np.random.binomial(ELECTIVE_TOTAL, ELECTIVE_PROB, N_TRIALS),
-            bins=np.arange(0, TOTAL_BEDS + 1),
+            bins=np.arange(0, self.total_beds + 1),
             density=True,
         )[0]
 
     def _get_emergencies_data(self) -> np.array:
         return np.histogram(
             np.random.poisson(EMERGENCY_AVG, N_TRIALS),
-            bins=np.arange(0, TOTAL_BEDS + 1),
+            bins=np.arange(0, self.total_beds + 1),
             density=True,
         )[0]
 
     def _get_discharges_data(self) -> np.array:
         return np.negative(
             np.histogram(
-                np.random.binomial(OCCUPIED_BEDS, DISCHARGE_PROB, N_TRIALS),
-                bins=np.arange(0, TOTAL_BEDS + 1),
+                np.random.binomial(self.occupied_beds, DISCHARGE_PROB, N_TRIALS),
+                bins=np.arange(0, self.total_beds + 1),
                 density=True,
             )[0]
         )
 
     def _get_current_beds(self) -> np.array:
-        return np.where(np.arange(TOTAL_BEDS) == OCCUPIED_BEDS, 1, 0)
+        return np.where(np.arange(self.total_beds) == self.occupied_beds, 1, 0)
 
-    def _generate_graph(self, tap: str, data: np.array) -> dict:
+    def _generate_graph(self, tap: str, data: np.array, slider_value: int) -> dict:
+        shapes = []
+        if slider_value is not None:
+            shapes.append(
+                {
+                    "type": "line",
+                    "xref": "x",
+                    "yref": "paper",
+                    "x0": slider_value,
+                    "y0": 0,
+                    "x1": slider_value,
+                    "y1": 1,
+                    "line": {"color": "Black", "width": 5},
+                }
+            )
         return {
             "data": [
                 {
-                    "x": np.arange(0, (TOTAL_BEDS + EXTRA_BEDS)),
+                    "x": np.arange(0, (self.total_beds + EXTRA_BEDS)),
                     "y": data,
                     "type": "bar",
                     "name": "Probability",
@@ -87,11 +117,14 @@ class Abacus:
                 }
             ],
             "layout": {
-                "title": tap.capitalize(),
+                # "title": tap.capitalize(),
                 "xaxis": {"title": "Beds"},
-                "yaxis": {"title": "Probability"},
+                "yaxis": {"title": "Probability", "side": "right"},
                 "bargap": 0,
                 "bargroupgap": 0,
+                "shapes": shapes,
+                "autosize": True,
+                "margin": {"l": 0, "r": 0, "t": 10, "b": 0},
             },
         }
 
@@ -123,56 +156,72 @@ def create_callback(tap: str) -> tuple:
     @callback(
         Output(f"{tap}_graph", "figure"),
         Input(ids.DEPT_SELECTOR, "value"),
+        Input(f"{tap}_adjustor", "value"),
     )
-    def _show_graph(dept: str):  # type: ignore
+    def _show_graph(dept: str, adj_value: int):  # type: ignore
         abacus_instance = Abacus(dept)
-        return getattr(abacus_instance, f"{tap}_graph")
+        tap_data = getattr(abacus_instance, f"{tap}_data")
+        return abacus_instance._generate_graph(tap, tap_data, adj_value)
 
-    return _modal, _show_graph
+    @callback(
+        Output(f"{tap}_adjustor", "value"),
+        Output(f"{tap}_adjustor", "max"),
+        Input(ids.DEPT_SELECTOR, "value"),
+    )
+    def _set_adjustor(dept: str) -> tuple:
+        abacus_instance = Abacus(dept)
+        max_prob_index = np.argmax(np.abs(getattr(abacus_instance, f"{tap}_data")))
+        return (
+            max_prob_index,
+            abacus_instance.total_beds,
+        )
+
+    return _modal, _show_graph, _set_adjustor
 
 
 for tap in ["electives", "emergencies", "discharges"]:
-    modal_callback, show_graph_callback = create_callback(tap)
+    modal_callback, show_graph_callback, adjustor_callback = create_callback(tap)
 
 
-# Callback for progress bar
 @callback(
     Output("mane_progress_bar", "sections"),
+    Output("mane_progress_bar", "max"),
+    Output(ids.PROGRESS_WARD, "max"),
     Input(ids.DEPT_SELECTOR, "value"),
-    # Input(ids.BEDS_STORE, "data"),
     Input("electives_adjustor", "value"),
     Input("emergencies_adjustor", "value"),
     Input("discharges_adjustor", "value"),
 )
 def mane_progress_bar(
     dept: str,
-    # beds: list[dict],
     electives: int,
     emergencies: int,
     discharges: int,
-) -> list[dict]:
-    norm = TOTAL_BEDS
-    n_beds = OCCUPIED_BEDS
+) -> tuple:
+    abacus_instance = Abacus(dept)
+
+    n_beds = abacus_instance.occupied_beds
+    expected_beds = n_beds - discharges
+    total_beds = abacus_instance.total_beds
 
     admitted_element = {
-        "value": ((n_beds - discharges) / norm),
+        "value": (expected_beds / total_beds) * 100,
         "color": "blue",
-        "label": "Admitted",
+        "label": f"{expected_beds} staying in",
     }
     elective_element = {
-        "value": (electives / norm),
+        "value": (electives / total_beds) * 100,
         "color": "green",
-        "label": "Electives",
+        "label": f"{electives} Electives",
     }
     emergency_element = {
-        "value": (emergencies / norm),
+        "value": (emergencies / total_beds) * 100,
         "color": "red",
-        "label": "Emergencies",
-    }
-    discharge_element = {
-        "value": (discharges / norm),
-        "color": "gray",
-        "label": "Discharges",
+        "label": f"{emergencies} Emergencies",
     }
 
-    return [admitted_element, elective_element, emergency_element, discharge_element]
+    return (
+        [admitted_element, elective_element, emergency_element],
+        total_beds,
+        total_beds,
+    )
