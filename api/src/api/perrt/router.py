@@ -7,7 +7,7 @@ Serve the PERRT endpoints
 import datetime as dt
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, Query, Response, Request
+from fastapi import APIRouter, Depends, Query, Request
 from sqlmodel import Session
 
 from api.convert import parse_to_data_frame, to_data_frame
@@ -123,7 +123,6 @@ def get_mock_emap_vitals_long() -> list[EmapVitalsLong]:
 #  encounter for the vitals
 @router.get("/vitals/wide", response_model=list[EmapVitalsWide])
 def get_emap_vitals_wide(
-    response: Response,
     session: Session = Depends(get_star_session),
     encounter_ids: list[str] = Query(default=[]),
     horizon_dt: dt.datetime = dt.datetime.now() - dt.timedelta(hours=6),
