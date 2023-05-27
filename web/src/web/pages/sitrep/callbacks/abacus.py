@@ -1,7 +1,13 @@
+# import requests
+
 import numpy as np
 from dash import Input, Output, State, callback
 from web.pages.sitrep import ids
 
+# from web.stores import ids as store_ids
+# from web.convert import parse_to_data_frame
+# from models.electives import MergedData
+# f
 
 BED_NUMBERS = {
     "UCH T03 INTENSIVE CARE": {"occupied": 18, "total": 30},
@@ -12,6 +18,7 @@ BED_NUMBERS = {
     "NHNN C1 NCCU": {"occupied": 0, "total": 3},
 }
 
+
 EMERGENCY_AVG = 3
 DISCHARGE_PROB = 0.1
 
@@ -19,6 +26,36 @@ ELECTIVE_TOTAL = 20
 ELECTIVE_PROB = 0.1
 N_TRIALS = 10000
 EXTRA_BEDS = 5
+
+
+def aggregate_probabilities(
+    success_probs: np.array,
+) -> np.array:
+    number_trials = len(success_probs)
+    omega = 2 * np.pi / (number_trials + 1)
+    chi = np.empty(number_trials + 1, dtype=complex)
+    chi[0] = 1
+    half_number_trials = int(number_trials / 2 + number_trials % 2)
+
+    exp_value = np.exp(omega * np.arange(1, half_number_trials + 1) * 1j)
+
+    xy = 1 - success_probs + success_probs * exp_value[:, np.newaxis]
+
+    argz_sum = np.arctan2(xy.imag, xy.real).sum(axis=1)
+
+    exparg = np.log(np.abs(xy)).sum(axis=1)
+    d_value = np.exp(exparg)
+    chi[1 : half_number_trials + 1] = d_value * np.exp(argz_sum * 1j)
+
+    # set second half of chis:
+    chi[half_number_trials + 1 : number_trials + 1] = np.conjugate(
+        chi[1 : number_trials - half_number_trials + 1][::-1]
+    )
+
+    chi /= number_trials + 1
+    xi = np.fft.fft(chi)
+    xi += np.finfo(type(xi[0])).eps
+    return xi.real
 
 
 class Abacus:
@@ -29,27 +66,19 @@ class Abacus:
         self.total_beds = self.bed_numbers["total"]  # type: ignore
         self.occupied_beds = self.bed_numbers["occupied"]  # type:ignore
 
-        self.electives_data = self._get_electives_data()
-        self.emergencies_data = self._get_emergencies_data()
-        self.discharges_data = self._get_discharges_data()
+        self.electives_pmf = self._get_electives_pmf()
+        self.emergencies_pmf = self._get_emergencies_pmf()
+        self.discharges_pmf = self._get_discharges_pmf()
         self.current_data = self._get_current_beds()
 
-        self.electives_graph = self._generate_graph("electives", self.electives_data, 0)
-        self.emergencies_graph = self._generate_graph(
-            "emergencies", self.emergencies_data, 0
-        )
-        self.discharges_graph = self._generate_graph(
-            "discharges", self.discharges_data, 0
-        )
-        self.current_graph = self._generate_graph("current_beds", self.current_data, 0)
         self.overall_pmf = self._combine_probabilities()
-        self.overall_graph = self._generate_graph(
+        self.overall_graph = self.generate_graph(
             "overall", self.overall_pmf, self.occupied_beds
         )
 
     def _simulate(self, num_simulations: int) -> np.array:
         sim = np.zeros(num_simulations)
-        self.total_admissions = np.convolve(self.electives_data, self.emergencies_data)
+        self.total_admissions = np.convolve(self.electives_pmf, self.emergencies_pmf)
 
         for i in range(num_simulations):
             state = self.occupied_beds  # start with current state
@@ -57,7 +86,7 @@ class Abacus:
                 len(self.total_admissions), p=self.total_admissions
             )  # pick a number of admissions
             dc = np.random.choice(
-                len(self.discharges_data), p=np.negative(self.discharges_data)
+                len(self.discharges_pmf), p=np.negative(self.discharges_pmf)
             )  # pick a number of discharges
             state = state + adm - dc  # update state
             state = max(0, state)  # don't go below 0
@@ -73,9 +102,7 @@ class Abacus:
         #     ),
         #     self.current_data,
         # )
-        ##
-
-        ##
+        #
         #  HJV: Just lots of convolves leads to probs being too high
         # which makes sense because it's saying
         # "tomorrow we will definitely have all the beds as today"
@@ -99,21 +126,23 @@ class Abacus:
         overall_cmf = overall_cmf / overall_cmf[-1]
         return overall_cmf[::-1]
 
-    def _get_electives_data(self) -> np.array:
+    def _get_electives_pmf(self) -> np.array:
+        # parse_to_data_frame(requests.get(url=f"{get_settings().api_url}/electives/").json(),MergedData)
+
         return np.histogram(
             np.random.binomial(ELECTIVE_TOTAL, ELECTIVE_PROB, N_TRIALS),
             bins=np.arange(0, self.total_beds + 1),
             density=True,
         )[0]
 
-    def _get_emergencies_data(self) -> np.array:
+    def _get_emergencies_pmf(self) -> np.array:
         return np.histogram(
             np.random.poisson(EMERGENCY_AVG, N_TRIALS),
             bins=np.arange(0, self.total_beds + 1),
             density=True,
         )[0]
 
-    def _get_discharges_data(self) -> np.array:
+    def _get_discharges_pmf(self) -> np.array:
         return np.negative(
             np.histogram(
                 np.random.binomial(self.occupied_beds, DISCHARGE_PROB, N_TRIALS),
@@ -125,7 +154,7 @@ class Abacus:
     def _get_current_beds(self) -> np.array:
         return np.where(np.arange(self.total_beds) == self.occupied_beds, 1, 0)
 
-    def _generate_graph(self, tap: str, data: np.array, slider_value: int) -> dict:
+    def generate_graph(self, tap: str, data: np.array, slider_value: int) -> dict:
         shapes = []
         if slider_value is not None:
             shapes.append(
@@ -169,6 +198,11 @@ class Abacus:
         }
 
 
+abaci = {}
+for dept in BED_NUMBERS.keys():
+    abaci[dept] = Abacus(dept)
+
+
 # Callback for Overall combined chart
 @callback(
     Output("overall_graph", "figure"),
@@ -179,10 +213,10 @@ def overall_graph(
     dept: str,
     #    beds: list
 ) -> dict:
-    abacus_instance = Abacus(dept)
-    return abacus_instance.overall_graph
+    return abaci[dept].overall_graph
 
 
+# bulk create callbacks for individual graphs
 def create_callback(tap: str) -> tuple:
     @callback(
         Output(f"{tap}_model_card", "opened"),
@@ -199,9 +233,9 @@ def create_callback(tap: str) -> tuple:
         Input(f"{tap}_adjustor", "value"),
     )
     def _show_graph(dept: str, adj_value: int):  # type: ignore
-        abacus_instance = Abacus(dept)
-        tap_data = getattr(abacus_instance, f"{tap}_data")
-        return abacus_instance._generate_graph(tap, tap_data, adj_value)
+        abacus_instance = abaci[dept]
+        tap_data = getattr(abacus_instance, f"{tap}_pmf")
+        return abacus_instance.generate_graph(tap, tap_data, adj_value)
 
     @callback(
         Output(f"{tap}_adjustor", "value"),
@@ -209,8 +243,8 @@ def create_callback(tap: str) -> tuple:
         Input(ids.DEPT_SELECTOR, "value"),
     )
     def _set_adjustor(dept: str) -> tuple:
-        abacus_instance = Abacus(dept)
-        max_prob_index = np.argmax(np.abs(getattr(abacus_instance, f"{tap}_data")))
+        abacus_instance = abaci[dept]
+        max_prob_index = np.argmax(np.abs(getattr(abacus_instance, f"{tap}_pmf")))
         return (
             max_prob_index,
             abacus_instance.total_beds,
@@ -238,7 +272,7 @@ def mane_progress_bar(
     emergencies: int,
     discharges: int,
 ) -> tuple:
-    abacus_instance = Abacus(dept)
+    abacus_instance = abaci[dept]
 
     n_beds = abacus_instance.occupied_beds
     expected_beds = n_beds - discharges
