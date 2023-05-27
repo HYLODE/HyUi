@@ -1,13 +1,18 @@
 import dash
 import dash_mantine_components as dmc
-import dash_cytoscape as cyto
+
+# import dash_cytoscape as cyto
 
 import json
-from dash import html, dcc
+from dash import html, dcc, dash_table as dtable
 from pathlib import Path
 from dash_iconify import DashIconify
 
 # import plotly.express as px
+
+from web.pages.sitrep.icus import ward_cyto, ward_list
+
+# from web.pages.electives.electives import electives_list
 
 import web.pages.sitrep.callbacks.abacus  # noqa
 import web.pages.sitrep.callbacks.widgets  # noqa
@@ -26,13 +31,18 @@ from web import SITREP_DEPT2WARD_MAPPING
 from web.style import replace_colors_in_stylesheet
 
 dash.register_page(__name__, path="/sitrep/abacus", name="Abacus")
-with open(Path(__file__).parent / "cyto_style_icus.json") as f:
-    cyto_style_sheet = json.load(f)
-    cyto_style_sheet = replace_colors_in_stylesheet(cyto_style_sheet)
+# with open(Path(__file__).parent / "cyto_style_icus.json") as f:
+#     cyto_style_sheet = json.load(f)
+#     cyto_style_sheet = replace_colors_in_stylesheet(cyto_style_sheet)
 
 with open(Path(__file__).parent / "abacus_style.json") as f:
     abacus_style = json.load(f)
     abacus_style = replace_colors_in_stylesheet(abacus_style)
+
+with open(Path(__file__).parent.parent / "electives/table_style_sheet.json") as f:
+    table_style_sheet = json.load(f)
+    table_style_sheet = replace_colors_in_stylesheet(table_style_sheet)
+
 
 timers = html.Div([])
 stores = html.Div(
@@ -49,6 +59,7 @@ stores = html.Div(
         dcc.Store(id=ids.ACC_BED_SUBMIT_STORE),
     ]
 )
+
 
 dept_selector = dmc.Container(
     [
@@ -67,46 +78,32 @@ dept_selector = dmc.Container(
     p="xxs",
 )
 
-
-ward_cyto = dmc.Paper(
-    [
-        cyto.Cytoscape(
-            id=ids.CYTO_WARD,
-            style={
-                # "width": "70vw",  # do not set width; will derive from height
-                "height": "50vh",
-                "z-index": 999,
-            },
-            layout={
-                "name": "preset",
-                "animate": True,
-                "fit": True,
-                "padding": 10,
-            },
-            stylesheet=cyto_style_sheet,
-            responsive=True,
-            userPanningEnabled=True,
-            userZoomingEnabled=True,
-        )
-    ],
-    shadow="sm",
-    radius="sm",
-    p="xs",  # padding
-    withBorder=True,
-)
-
-ward_list = dmc.Paper(
-    dmc.Table(
-        id=ids.BED_SELECTOR_WARD,
-        striped=True,
-        highlightOnHover=True,
-        verticalSpacing="xxs",
-        horizontalSpacing="md",
-        style={"height": "50vh", "overflowY": "scroll"},
+electives_list = dmc.Paper(
+    dtable.DataTable(
+        id="electives_list",
+        columns=[
+            {"id": "pacu_yn", "name": "PACU"},
+            {"id": "full_name", "name": "Full Name"},
+            {"id": "age_sex", "name": "Age / Sex"},
+        ],
+        style_table={"overflowX": "scroll"},
+        style_as_list_view=True,  # remove col lines
+        style_cell={
+            "fontSize": 11,
+            "padding": "5px",
+        },
+        style_cell_conditional=table_style_sheet,
+        style_data={"color": "black", "backgroundColor": "white"},
+        # striped rows
+        markdown_options={"html": True},
+        persistence=False,
+        persisted_props=["data"],
+        sort_action="native",
+        filter_action="native",
+        filter_query="",
     ),
     shadow="lg",
-    radius="lg",
-    p="xs",  # padding
+    p="md",  # padding
     withBorder=True,
 )
 
@@ -163,7 +160,12 @@ class AbacusTap:
                     [
                         dmc.Col(DashIconify(icon=icon), span=2),
                         dmc.Col(
-                            dmc.Text(category.capitalize(), align="right"), span=10
+                            dmc.Text(
+                                category.capitalize(),
+                                align="right",
+                                id=f"{category}_title",
+                            ),
+                            span=10,
                         ),
                         dmc.Col(self.adjustor, span=12),
                         dmc.Col(self.graph, span=12),
@@ -250,8 +252,9 @@ body = dmc.Container(
                 dmc.Col(elective_tap.adj_graph, span=4),
                 dmc.Col(emergency_tap.adj_graph, span=4),
                 dmc.Col(discharge_tap.adj_graph, span=4),
+                dmc.Col(electives_list, span=3),
+                dmc.Col(ward_cyto, span=6),
                 dmc.Col(ward_list, span=3),
-                dmc.Col(ward_cyto, span=9),
                 dmc.Col(elective_tap.model_card),
                 dmc.Col(emergency_tap.model_card),
                 dmc.Col(discharge_tap.model_card),
