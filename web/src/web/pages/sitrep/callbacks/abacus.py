@@ -47,14 +47,54 @@ class Abacus:
             "overall", self.overall_pmf, self.occupied_beds
         )
 
+    def _simulate(self, num_simulations: int) -> np.array:
+        sim = np.zeros(num_simulations)
+        self.total_admissions = np.convolve(self.electives_data, self.emergencies_data)
+
+        for i in range(num_simulations):
+            state = self.occupied_beds  # start with current state
+            adm = np.random.choice(
+                len(self.total_admissions), p=self.total_admissions
+            )  # pick a number of admissions
+            dc = np.random.choice(
+                len(self.discharges_data), p=np.negative(self.discharges_data)
+            )  # pick a number of discharges
+            state = state + adm - dc  # update state
+            state = max(0, state)  # don't go below 0
+            sim[i] = state  # store state
+        return sim
+
     def _combine_probabilities(self) -> np.array:
-        overall_pmf = np.convolve(
-            np.convolve(
-                np.convolve(self.electives_data, self.emergencies_data),
-                self.discharges_data,
-            ),
-            self.current_data,
-        )
+        ##
+        # overall_pmf = np.convolve(
+        #     np.convolve(
+        #         np.convolve(self.electives_data, self.emergencies_data),
+        #         self.discharges_data,
+        #     ),
+        #     self.current_data,
+        # )
+        ##
+
+        ##
+        #  HJV: Just lots of convolves leads to probs being too high
+        # which makes sense because it's saying
+        # "tomorrow we will definitely have all the beds as today"
+        # not sure the negative convoles works with discharges either...
+        # I think this is wrong because of the negative convoles...
+        # So, we could run it as a monte carlo?
+        # So essentially we would
+        #  * first convolve the electives and emergencies, and this is the
+        # probability distribution for the admissions
+        #  * then add to current beds and subtract discharges
+        # to lead to a predicted tomorrow number
+        # we do this a bunch of times and then we have a distribution of
+        # tomorrow's number of beds
+        ##
+
+        sim = self._simulate(N_TRIALS)
+        overall_pmf = np.histogram(
+            sim, bins=np.arange(0, self.total_beds + 1), density=True
+        )[0]
         overall_cmf = np.cumsum(overall_pmf[::-1])
         overall_cmf = overall_cmf / overall_cmf[-1]
         return overall_cmf[::-1]
