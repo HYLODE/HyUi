@@ -1,4 +1,12 @@
+import requests
 import numpy as np
+
+# from web.stores import ids as store_ids
+from web.convert import parse_to_data_frame
+from web.config import get_settings
+
+from models.electives import MergedData
+
 
 EMERGENCY_AVG = 3
 DISCHARGE_PROB = 0.1
@@ -117,8 +125,14 @@ class Abacus:
         return overall_cmf[::-1]
 
     def _get_electives_pmf(self) -> np.array:
-        # parse_to_data_frame(requests.get(url=f"{get_settings().api_url}/electives/").json(),MergedData)
-
+        elective_df = parse_to_data_frame(
+            requests.get(url=f"{get_settings().api_url}/electives/").json(), MergedData
+        )
+        elective_df = elective_df[elective_df["department_name"] == self.dept]
+        # elective_pmf = aggregate_probabilities(
+        #     np.array(elective_df["icu_prob"].values
+        #              ))
+        # return elective_pmf
         return np.histogram(
             np.random.binomial(ELECTIVE_TOTAL, ELECTIVE_PROB, N_TRIALS),
             bins=np.arange(0, self.total_beds + 1),

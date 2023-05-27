@@ -1,12 +1,10 @@
-# import requests
-
 import numpy as np
 from dash import Input, Output, State, callback
 from web.pages.sitrep import ids
+from web.stores import ids as store_ids
+from datetime import datetime
+from web import CAMPUSES
 
-# from web.stores import ids as store_ids
-# from web.convert import parse_to_data_frame
-# from models.electives import MergedData
 
 from web.pages.sitrep.callbacks.abacus_funcs import (
     Abacus,
@@ -48,18 +46,22 @@ def create_callback(tap: str) -> tuple:
         tap_data = getattr(abacus_instance, f"{tap}_pmf")
         return abacus_instance.generate_graph(tap, tap_data, adj_value)
 
-    @callback(
-        Output(f"{tap}_adjustor", "value"),
-        Output(f"{tap}_adjustor", "max"),
-        Input(ids.DEPT_SELECTOR, "value"),
-    )
-    def _set_adjustor(dept: str) -> tuple:
-        abacus_instance = abaci[dept]
-        max_prob_index = np.argmax(np.abs(getattr(abacus_instance, f"{tap}_pmf")))
-        return (
-            max_prob_index,
-            abacus_instance.total_beds,
+    _set_adjustor = None
+
+    if tap != "electives":
+
+        @callback(
+            Output(f"{tap}_adjustor", "value"),
+            Output(f"{tap}_adjustor", "max"),
+            Input(ids.DEPT_SELECTOR, "value"),
         )
+        def _set_adjustor(dept: str) -> tuple:
+            abacus_instance = abaci[dept]
+            max_prob_index = np.argmax(np.abs(getattr(abacus_instance, f"{tap}_pmf")))
+            return (
+                max_prob_index,
+                abacus_instance.total_beds,
+            )
 
     return _modal, _show_graph, _set_adjustor
 
@@ -109,4 +111,61 @@ def mane_progress_bar(
         [admitted_element, elective_element, emergency_element],
         total_beds,
         total_beds,
+    )
+
+
+@callback(
+    Output("electives_list", "data"),
+    Output("electives_adjustor", "value"),
+    Output("electives_adjustor", "max"),
+    Output("electives_title", "children"),
+    Input(ids.DEPT_SELECTOR, "value"),
+    Input(store_ids.ELECTIVES_STORE, "data"),
+)
+def _store_electives(
+    campus: str,
+    electives: list[dict],
+) -> tuple[list[dict], int, int, str]:
+    date = datetime.today().strftime("%Y-%m-%d")
+
+    campus_dict = {i.get("default_dept"): i.get("label") for i in CAMPUSES}
+    icu_cut_off = [0, 0.60]
+
+    electives = [
+        row
+        for row in electives
+        if campus_dict.get(campus, "") in row["department_name"]
+    ]
+
+    electives = [row for row in electives if row["surgery_date"] == date]
+
+    i = 0
+    pacu_booked_count = 0
+    for row in electives:
+        row["id"] = i
+        i += 1
+
+        # add front-end columns
+
+        row["full_name"] = "{first_name} {last_name}".format(**row)
+        row["age_sex"] = "{age_in_years}{sex[0]}".format(**row)
+
+        if row["pacu"] and row["icu_prob"] > icu_cut_off[0]:
+            row["pacu_yn"] = "✅ BOOKED"
+            pacu_booked_count += 1
+        elif row["pacu"] and row["icu_prob"] <= icu_cut_off[0]:
+            row["pacu_yn"] = "✅🤷BOOKED"
+            pacu_booked_count += 1
+        elif not row["pacu"] and row["icu_prob"] > icu_cut_off[1]:
+            row["pacu_yn"] = "⚠️ No - consider?"
+        else:
+            row["pacu_yn"] = "🏥 No"
+
+    adjustor_max = len(abaci[campus].electives_pmf)
+    adjustor_value = pacu_booked_count
+    return (
+        electives,
+        adjustor_value,
+        adjustor_max,
+        f"Electives ({pacu_booked_count} PACU bed(s) booked)",
     )
