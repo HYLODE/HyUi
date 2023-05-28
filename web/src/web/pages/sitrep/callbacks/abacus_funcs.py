@@ -101,20 +101,13 @@ class Abacus:
         #     self.current_data,
         # )
         #
-        #  HJV: Just lots of convolves leads to probs being too high
-        # which makes sense because it's saying
-        # "tomorrow we will definitely have all the beds as today"
-        # not sure the negative convoles works with discharges either...
-        # I think this is wrong because of the negative convoles...
-        # So, we could run it as a monte carlo?
-        # So essentially we would
-        #  * first convolve the electives and emergencies, and this is the
-        # probability distribution for the admissions
-        #  * then add to current beds and subtract discharges
-        # to lead to a predicted tomorrow number
-        # we do this a bunch of times and then we have a distribution of
-        # tomorrow's number of beds
-        ##
+        # I think np.convolve should work??
+        # but would need the x axis flipped for discharges?
+        # then with a shift of the array?
+        # but when i try this it doens't work...
+        # so instead I've got a negative discharges_pmf which is
+        # mathematically wrong but looks i think intuitive in the graph
+        # and then just do a monte carlo to deal with the negatives
 
         sim = self._simulate(N_TRIALS)
         overall_pmf = np.histogram(
