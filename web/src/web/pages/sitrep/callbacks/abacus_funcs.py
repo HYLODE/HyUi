@@ -74,45 +74,42 @@ class Abacus:
             "overall", self.overall_pmf, self.occupied_beds
         )
 
-    def _simulate(self, num_simulations: int) -> np.array:
-        sim = np.zeros(num_simulations)
-        self.total_admissions = np.convolve(self.electives_pmf, self.emergencies_pmf)
+    # def _simulate(self, num_simulations: int) -> np.array:
+    #     sim = np.zeros(num_simulations)
+    #     for i in range(num_simulations):
+    #         state = self.occupied_beds  # start with current state
+    #         el = np.random.choice(
+    #             len(self.electives_pmf), p=self.electives_pmf
+    #         )
+    #         em = np.random.choice(
+    #             len(self.emergencies_pmf), p=self.emergencies_pmf
+    #         )
 
-        for i in range(num_simulations):
-            state = self.occupied_beds  # start with current state
-            adm = np.random.choice(
-                len(self.total_admissions), p=self.total_admissions
-            )  # pick a number of admissions
-            dc = np.random.choice(
-                len(self.discharges_pmf), p=np.negative(self.discharges_pmf)
-            )  # pick a number of discharges
-            state = state + adm - dc  # update state
-            state = max(0, state)  # don't go below 0
-            sim[i] = state  # store state
-        return sim
+    #         dc = np.random.choice(
+    #             len(self.discharges_pmf), p=self.discharges_pmf
+    #         )  # pick a number of discharges
+    #         state = state + el + em - dc  # update state
+    #         state = max(0, state)  # don't go below 0
+    #         sim[i] = state  # store state
+    #     return sim
 
     def _combine_probabilities(self) -> np.array:
-        ##
-        # overall_pmf = np.convolve(
-        #     np.convolve(
-        #         np.convolve(self.electives_data, self.emergencies_data),
-        #         self.discharges_data,
-        #     ),
-        #     self.current_data,
-        # )
-        #
-        # I think np.convolve should work??
-        # but would need the x axis flipped for discharges?
-        # then with a shift of the array?
-        # but when i try this it doens't work...
-        # so instead I've got a negative discharges_pmf which is
-        # mathematically wrong but looks i think intuitive in the graph
-        # and then just do a monte carlo to deal with the negatives
+        overall_pmf = np.roll(
+            np.convolve(
+                np.convolve(
+                    np.convolve(self.electives_pmf, self.emergencies_pmf),
+                    self.current_data,
+                ),
+                np.flip(self.discharges_pmf),
+            ),
+            -len(self.discharges_pmf) + 1,
+        )
 
-        sim = self._simulate(N_TRIALS)
-        overall_pmf = np.histogram(
-            sim, bins=np.arange(0, self.total_beds + 1), density=True
-        )[0]
+        # sim = self._simulate(N_TRIALS)
+        # overall_pmf = np.histogram(
+        #     sim, bins=np.arange(0, self.total_beds + 1), density=True
+        # )[0]
+
         overall_cmf = np.cumsum(overall_pmf[::-1])
         overall_cmf = overall_cmf / overall_cmf[-1]
         return overall_cmf[::-1]
@@ -140,13 +137,11 @@ class Abacus:
         )[0]
 
     def _get_discharges_pmf(self) -> np.array:
-        return np.negative(
-            np.histogram(
-                np.random.binomial(self.occupied_beds, DISCHARGE_PROB, N_TRIALS),
-                bins=np.arange(0, self.total_beds + 1),
-                density=True,
-            )[0]
-        )
+        return np.histogram(
+            np.random.binomial(self.occupied_beds, DISCHARGE_PROB, N_TRIALS),
+            bins=np.arange(0, self.total_beds + 1),
+            density=True,
+        )[0]
 
     def _get_current_beds(self) -> np.array:
         return np.where(np.arange(self.total_beds) == self.occupied_beds, 1, 0)
