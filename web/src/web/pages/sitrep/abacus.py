@@ -14,7 +14,7 @@ from web.pages.sitrep.icus import ward_cyto, ward_list
 
 # from web.pages.electives.electives import electives_list
 
-import web.pages.sitrep.callbacks.abacus  # noqa
+import web.pages.sitrep.callbacks.abacus_obj  # noqa
 import web.pages.sitrep.callbacks.widgets  # noqa
 import web.pages.sitrep.callbacks.cytoscape  # noqa
 import web.pages.sitrep.callbacks.discharges  # noqa

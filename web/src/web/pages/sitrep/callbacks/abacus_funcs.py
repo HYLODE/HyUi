@@ -16,6 +16,13 @@ ELECTIVE_PROB = 0.1
 N_TRIALS = 10000
 EXTRA_BEDS = 5
 
+COLOUR = {
+    "electives": "rgba(18, 184, 134,",
+    "emergencies": "rgba(250, 82, 82,",
+    "discharges": "rgba(190, 75, 219,",
+    "overall": "rgba(92, 124, 250,",
+}
+
 BED_NUMBERS = {
     "UCH T03 INTENSIVE CARE": {"occupied": 18, "total": 30},
     "UCH T06 SOUTH PACU": {"occupied": 5, "total": 12},
@@ -168,13 +175,11 @@ class Abacus:
                     "y": data,
                     "type": "bar",
                     "name": "Probability",
+                    "width": 1,
                     "marker": {
-                        "line": {
-                            "color": "black",
-                            "width": 1,
-                        }
+                        "line": {"width": 1, "color": f"{COLOUR[tap]} 1)"},
+                        "color": f"{COLOUR[tap]} 0.8)",
                     },
-                    "width": 0.9,
                 }
             ],
             "layout": {

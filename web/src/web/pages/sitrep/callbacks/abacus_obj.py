@@ -9,6 +9,7 @@ from web import CAMPUSES
 from web.pages.sitrep.callbacks.abacus_funcs import (
     Abacus,
     BED_NUMBERS,
+    COLOUR,
 )
 
 abaci = {}
@@ -93,17 +94,17 @@ def mane_progress_bar(
 
     admitted_element = {
         "value": (expected_beds / total_beds) * 100,
-        "color": "blue",
+        "color": f"{COLOUR['overall']} 1)",
         "label": f"{expected_beds} staying in",
     }
     elective_element = {
         "value": (electives / total_beds) * 100,
-        "color": "green",
+        "color": f"{COLOUR['electives']} 1)",
         "label": f"{electives} Electives",
     }
     emergency_element = {
         "value": (emergencies / total_beds) * 100,
-        "color": "red",
+        "color": f"{COLOUR['emergencies']} 1)",
         "label": f"{emergencies} Emergencies",
     }
 
