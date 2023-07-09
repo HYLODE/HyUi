@@ -46,7 +46,6 @@ def _get_json_rows(filename: str) -> list[dict]:
 
 
 def _get_mock_sql_rows(table: str, model: type[BaseModel]) -> list[type[BaseModel]]:
-
     engine = create_engine(f"sqlite:///{Path(__file__).parent}/mock.db", future=True)
 
     with Session(engine) as session:
@@ -168,7 +167,6 @@ def get_mock_echo() -> list[type[EchoWithAbnormalData]]:
 def get_caboodle_echo(
     session: Session = Depends(get_caboodle_session), days_ahead: int = 1
 ) -> list[EchoWithAbnormalData]:
-
     params = {"days_ahead": days_ahead}
     return _parse_query(
         "live_sql/get_echo_2.sql", session, EchoWithAbnormalData, params
@@ -213,7 +211,6 @@ def get_caboodle_pas(
 def get_medical_hx(
     session: Session = Depends(get_caboodle_session), days_ahead: int = 1
 ) -> list[MedicalHx]:
-
     return _parse_query(
         "live_sql/new_hx.sql",
         session,
@@ -224,7 +221,6 @@ def get_medical_hx(
 
 @mock_router.get("/hx/", response_model=list[MedicalHx])
 def get_mock_medical_hx() -> list[type[MedicalHx]]:
-
     return _get_mock_sql_rows("new_hx", MedicalHx)
 
 

@@ -4,7 +4,7 @@ from dash import dcc, html, page_container
 from web.layout.header import create_header
 from web.layout.nav import create_navbar_drawer, create_side_navbar
 from web import ids
-from web.stores import stores
+from web.stores import web_stores
 
 
 def create_appshell(nav_data: list | dict) -> dmc.MantineProvider:
@@ -31,7 +31,7 @@ def create_appshell(nav_data: list | dict) -> dmc.MantineProvider:
                     n_intervals=0,
                     interval=6 * 60 * 60 * 1000,
                 ),
-                stores,
+                web_stores,
                 # dcc.Store(id="theme-store", storage_type="local"),
                 dcc.Location(id="url"),
                 dmc.NotificationsProvider(

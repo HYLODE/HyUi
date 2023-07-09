@@ -49,7 +49,6 @@ def prepare_draft(
     medical_hx: list[type[BaseModel]],
     to_predict: bool = False,
 ) -> pd.DataFrame:
-
     """
     Prepares the dataframe for the dashboard by merging data from different
     sources. It loads tables for
@@ -218,7 +217,6 @@ def aggregation(
     date_column: str,
     pred_column: str,
 ) -> pd.DataFrame:
-
     agg_series = individual_level_predictions.groupby(date_column)[pred_column].apply(
         list
     )

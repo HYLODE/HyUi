@@ -7,7 +7,7 @@ from dash_iconify import DashIconify
 from typing import Any, Tuple
 
 from web.pages.sitrep import DISCHARGE_DECISIONS, ids
-from web.pages.sitrep.callbacks.cytoscape import format_census
+from web.pages.sitrep.callbacks.census import format_census
 from web.pages.sitrep.callbacks.discharges import post_discharge_status
 from web.pages.sitrep.callbacks.utils import make_sitrep_badge
 from web.style import colors
@@ -80,7 +80,7 @@ def update_patient_sidebar(
     if data.get("entity") != "bed":
         return True, ["bed"], dmc.Group(click_title)
 
-    bed = data.get("bed")
+    bed = data.get("bed")  # type: ignore
     bed_color = colors.orange if data.get("occupied") else colors.gray
     bed_number = bed.get("bed_number")  # type: ignore
     department = bed.get("department")  # type: ignore
@@ -278,6 +278,20 @@ def patient_accordion_item(
         return dmc.AccordionControl(control), dmc.AccordionPanel(panel)
 
     data = node.get("data", {})
+
+    if data.get("closed"):
+        control = dmc.Group(
+            [
+                DashIconify(
+                    icon="carbon:close-outline",
+                    width=20,
+                ),
+                dmc.Text("Bed closed", size="sm"),
+            ]
+        )
+        panel = None
+        return dmc.AccordionControl(control), dmc.AccordionPanel(panel)
+
     census = data.get("census", {})
     occupied = census.get("occupied", False)
     sex_icon = "carbon:person"
@@ -303,7 +317,6 @@ def patient_accordion_item(
 
     sitrep = data.get("sitrep", {})
     if sitrep:
-
         dob = dmc.Code(censusf.get("dob_fshort", "DD-MM-CCYY"), block=False)
         mrn = dmc.Code(censusf.get("mrn", "Unknown"), block=False)
         csn = dmc.Code(censusf.get("encounter", "Unknown"), block=False)
@@ -315,7 +328,6 @@ def patient_accordion_item(
         try:
             hospital_admit = census.get("hv_admission_dt")
             hospital_los = str(int((datetime.utcnow() - hospital_admit).days))
-            # hospital_admit_str = datetime.strftime(hospital_admit, "%d %b %Y")
             los_text = dmc.Text(f"Hospital LoS: {hospital_los}", size="sm")
         except TypeError:
             los_text = dmc.Text("Hospital LoS: Unknown", size="sm")

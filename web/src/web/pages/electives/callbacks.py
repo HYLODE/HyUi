@@ -23,7 +23,6 @@ def _store_electives(
     pacu_selection: bool,
     model_calibration: tuple,
 ) -> tuple[list[dict], str]:
-
     icu_cut_off = [x / 100 for x in model_calibration]
     preassess_date_cut_off = 90
 

@@ -31,7 +31,6 @@ def make_utc(df: pd.DataFrame, suffixes: list[str] = ["instant"]) -> pd.DataFram
 
 
 def wrangle_surgical(df: pd.DataFrame) -> pd.DataFrame:
-
     terms_dict = {
         "priority": {
             "Two Week Wait": "Cancer Pathway",
@@ -347,7 +346,6 @@ def wrangle_labs(labs: pd.DataFrame) -> pd.DataFrame:
 
 
 def j_wrangle_obs(caboodle_obs: pd.DataFrame) -> pd.DataFrame:
-
     caboodle_obs.loc[:, "month_pre_theatre"] = caboodle_obs.loc[
         :, "planned_operation_start_instant"
     ] - pd.to_timedelta(16, unit="W")
@@ -594,7 +592,6 @@ def j_wrangle_obs(caboodle_obs: pd.DataFrame) -> pd.DataFrame:
 
 
 def wrangle_echo(df: pd.DataFrame) -> pd.DataFrame:
-
     """
 
     this is clearly much simpler than jen's wrangle_echo above.
@@ -628,7 +625,6 @@ def wrangle_echo(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def fill_na(df: pd.DataFrame) -> pd.DataFrame:
-
     df.loc[:, df.columns.str.contains("_count")] = df.loc[
         :, df.columns.str.contains("_count")
     ].fillna(0)
