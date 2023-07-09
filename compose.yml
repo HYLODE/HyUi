@@ -2,7 +2,8 @@ x-http-proxy: &http-proxy ${HTTP_PROXY}
 x-https-proxy: &https-proxy ${HTTPS_PROXY}
 x-no-proxy: &no-proxy localhost,127.0.0.1,uclvlddpragae07,uclvlddpragae08,api,web,cache,baserow
 
-x-proxy-common: &proxy-common
+x-proxy-common:
+  &proxy-common
   HTTP_PROXY: *http-proxy
   http_proxy: *http-proxy
   HTTPS_PROXY: *https-proxy
@@ -10,7 +11,8 @@ x-proxy-common: &proxy-common
   NO_PROXY: *no-proxy
   no_proxy: *no-proxy
 
-x-build-args-common: &build-args-common
+x-build-args-common:
+  &build-args-common
   <<: *proxy-common
   HYLODE_UID: ${HYLODE_UID}
 
@@ -43,7 +45,7 @@ services:
       - api
       - cache
     healthcheck:
-      test: ["CMD", "./refresh_cache.sh"]
+      test: [ "CMD", "./refresh_cache.sh" ]
       interval: 5m30s
       timeout: 30s
       retries: 5
@@ -81,6 +83,7 @@ services:
 
 networks:
   hyui:
+
 
 volumes:
   baserow-data:
