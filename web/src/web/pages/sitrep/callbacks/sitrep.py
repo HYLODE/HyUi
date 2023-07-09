@@ -6,17 +6,19 @@ from dash import Input, Output, callback
 
 from web import SITREP_DEPT2WARD_MAPPING, ids as store_ids
 from web.pages.sitrep import ids
-from web.logger import logger, logger_timeit
 
-logger.info("Preparing stores for sitrep")
+# from web.logger import logger, logger_timeit
+
+# logger.info("Preparing stores for sitrep")
 
 
 @callback(
     Output(ids.SITREP_STORE, "data"),
     Input(ids.DEPT_SELECTOR, "value"),
     Input(store_ids.SITREP_STORE, "data"),
+    # prevent_initial_callback=True,
+    # background=True,
 )
-@logger_timeit(level="DEBUG")
 def _store_sitrep(dept: str, sitreps: dict) -> Any:
     """
     Args:

@@ -14,7 +14,8 @@ from typing import Tuple
 from models.beds import DischargeStatus
 from web.config import get_settings
 from web.convert import parse_to_data_frame
-from web.logger import logger_timeit
+
+# from web.logger import logger_timeit
 from web.pages.sitrep import ids
 
 
@@ -53,7 +54,7 @@ def _get_discharge_updates(delta_hours: int = 48) -> list[dict]:
     Output(ids.DISCHARGES_STORE, "data"),
     Input(ids.DEPT_SELECTOR, "value"),
 )
-@logger_timeit(level="DEBUG")
+# @logger_timeit(level="DEBUG")
 def store_discharge_status(dept: str) -> list[dict]:
     """
     Get discharge status

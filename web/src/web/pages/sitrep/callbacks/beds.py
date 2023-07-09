@@ -1,9 +1,11 @@
 import pandas as pd
 from dash import Input, Output, callback
-from loguru import logger
+
+# from loguru import logger
 
 from web import SITREP_DEPT2WARD_MAPPING, ids as store_ids
-from web.logger import logger_timeit
+
+# from web.logger import logger_timeit
 from web.pages.sitrep import ids
 
 
@@ -12,7 +14,7 @@ from web.pages.sitrep import ids
     Input(ids.DEPT_GROUPER, "value"),
     Input(store_ids.DEPT_STORE, "data"),
 )
-@logger_timeit(level="DEBUG")
+# @logger_timeit(level="DEBUG")
 def _store_depts(dept_grouper: str, depts: list[dict]) -> list[dict]:
     """Need a list of departments for ALL_ICUS or this campus"""
     if dept_grouper == "ALL_ICUS":
@@ -23,9 +25,9 @@ def _store_depts(dept_grouper: str, depts: list[dict]) -> list[dict]:
             these_depts = [
                 dept for dept in depts if dept.get("location_name") == dept_grouper
             ]
-        except TypeError as e:
-            logger.warning(f"No departments found at {dept_grouper} campus")
-            logger.exception(e)
+        except TypeError:
+            # logger.warning(f"No departments found at {dept_grouper} campus")
+            # logger.exception(e)
             these_depts = []
     return these_depts
 
@@ -46,7 +48,7 @@ def _dept_open_store_names(depts_open: list[dict]) -> list[str]:
     Input(ids.DEPTS_OPEN_STORE, "data"),
     Input(store_ids.ROOM_STORE, "data"),
 )
-@logger_timeit(level="DEBUG")
+# @logger_timeit(level="DEBUG")
 def _store_rooms(
     depts: list[dict],
     rooms: list[dict],
@@ -69,7 +71,7 @@ def _store_rooms(
     Input(ids.ROOMS_OPEN_STORE, "data"),
     Input(store_ids.BEDS_STORE, "data"),
 )
-@logger_timeit(level="DEBUG")
+# @logger_timeit(level="DEBUG")
 def _store_beds(
     depts: list[dict],
     rooms: list[dict],

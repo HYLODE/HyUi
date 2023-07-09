@@ -5,9 +5,9 @@ from typing import Tuple, Any
 from web.pages.sitrep import CAMPUSES, ids
 from web import SITREP_DEPT2WARD_MAPPING
 
-from web.logger import logger, logger_timeit
+# from web.logger import logger, logger_timeit
 
-logger.info("Preparing cytoscape map")
+# logger.info("Preparing cytoscape map")
 
 
 @callback(
@@ -84,19 +84,19 @@ def _make_elements(  # noqa: C901
     if discharges:
         discharge_lookup = {str(i.get("csn")): i for i in discharges}
     else:
-        logger.warning("Discharges empty: no data available")
+        # logger.warning("Discharges empty: no data available")
         discharge_lookup = {}
 
     if sitrep is not None:
         sitrep_lookup = {i.get("csn"): i for i in sitrep}
     else:
-        logger.warning("Sitrep empty: no data available")
+        # logger.warning("Sitrep empty: no data available")
         sitrep_lookup = {}
 
     if hymind is not None:
         hymind_lookup = {i.get("episode_slice_id"): i for i in hymind}
     else:
-        logger.warning("Hymind empty: no data available")
+        # logger.warning("Hymind empty: no data available")
         hymind_lookup = {}
 
     preset_map_positions = (
@@ -223,7 +223,7 @@ def _make_elements(  # noqa: C901
     Input(ids.BEDS_STORE, "data"),
     prevent_initial_call=True,
 )
-@logger_timeit()
+# @logger_timeit()
 def _prepare_cyto_elements_campus(
     census: list[dict],
     depts: list[dict],
@@ -264,7 +264,7 @@ def _prepare_cyto_elements_campus(
     ],
     prevent_initial_call=True,
 )
-@logger_timeit()
+# @logger_timeit()
 def _prepare_cyto_elements_ward(
     elements: list[dict],
     census: list[dict],
