@@ -7,7 +7,7 @@ Serve the PERRT endpoints
 import datetime as dt
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, Query, Response, Request
+from fastapi import APIRouter, Depends, Query, Request
 from sqlmodel import Session
 
 from api.convert import parse_to_data_frame, to_data_frame
@@ -41,7 +41,6 @@ def get_mock_icu_admission_preciction(
 
 @router.get("/cpr", response_model=list[EmapCpr])
 def get_emap_cpr(
-    response: Response,
     session: Session = Depends(get_star_session),
     encounter_ids: list[str] = Query(default=[]),
 ) -> list[EmapCpr]:
@@ -49,7 +48,6 @@ def get_emap_cpr(
     Return advance decisions about CPR
     :type session: Session object from sqlmodel
     """
-    response.headers["Cache-Control"] = "public, max-age=300"
     params = {"encounter_ids": encounter_ids}
     res = _parse_query(
         _this_file, "live_cpr.sql", session, EmapCpr, params
@@ -69,7 +67,6 @@ def get_mock_emap_cpr() -> list[EmapCpr]:
 
 @router.get("/consults", response_model=list[EmapConsults])
 def get_emap_perrt_consults(
-    response: Response,
     session: Session = Depends(get_star_session),
     encounter_ids: list[str] = Query(default=[]),
     horizon_dt: dt.datetime = dt.datetime.now() - dt.timedelta(days=7),
@@ -79,7 +76,6 @@ def get_emap_perrt_consults(
     :type session: Session object from sqlmodel
     :type horizon_dt: datetime remember to diff this from 'now'
     """
-    response.headers["Cache-Control"] = "public, max-age=300"
     params = {"encounter_ids": encounter_ids, "horizon_dt": horizon_dt}
     res = _parse_query(_this_file, "live_consults.sql", session, EmapConsults, params)
     return res
@@ -97,7 +93,6 @@ def get_mock_emap_perrt_consults() -> list[EmapConsults]:
 
 @router.get("/vitals/long", response_model=list[EmapVitalsLong])
 def get_emap_vitals_long(
-    response: Response,
     session: Session = Depends(get_star_session),
     encounter_ids: list[str] = Query(default=[]),
     horizon_dt: dt.datetime = dt.datetime.now() - dt.timedelta(hours=6),
@@ -107,7 +102,6 @@ def get_emap_vitals_long(
     :type session: Session object from sqlmodel
     :type horizon_dt: datetime remember to diff this from 'now'
     """
-    response.headers["Cache-Control"] = "public, max-age=300"
     params = {"encounter_ids": encounter_ids, "horizon_dt": horizon_dt}
     res = _parse_query(_this_file, "live_vitals.sql", session, EmapVitalsLong, params)
     return res
@@ -129,7 +123,6 @@ def get_mock_emap_vitals_long() -> list[EmapVitalsLong]:
 #  encounter for the vitals
 @router.get("/vitals/wide", response_model=list[EmapVitalsWide])
 def get_emap_vitals_wide(
-    response: Response,
     session: Session = Depends(get_star_session),
     encounter_ids: list[str] = Query(default=[]),
     horizon_dt: dt.datetime = dt.datetime.now() - dt.timedelta(hours=6),
@@ -138,7 +131,6 @@ def get_emap_vitals_wide(
     Return vital signs as a wide table after wrangling
     :type horizon_dt: datetime remember to diff this from 'now'
     """
-    response.headers["Cache-Control"] = "public, max-age=300"
     params = {"encounter_ids": encounter_ids, "horizon_dt": horizon_dt}
     rows = _parse_query(_this_file, "live_vitals.sql", session, EmapVitalsLong, params)
     df = to_data_frame(rows, EmapVitalsLong)

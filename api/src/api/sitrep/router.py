@@ -111,7 +111,6 @@ def get_mock_live_ui(ward: str) -> list[SitrepRow]:
 def get_live_ui(
     response: Response, ward: str, settings: Settings = Depends(get_settings)
 ) -> list[SitrepRow]:
-    response.headers["Cache-Control"] = "public, max-age=3600"
     response = requests.get(f"{settings.hycastle_url}/live/icu/{ward}/ui")
     if response.status_code != 200:
         warnings.warn(f"Failed to get sitrep data for {ward}")

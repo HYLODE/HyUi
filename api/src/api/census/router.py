@@ -1,5 +1,5 @@
 import pandas as pd
-from fastapi import APIRouter, Depends, Query, Response
+from fastapi import APIRouter, Depends, Query
 from pathlib import Path
 from sqlalchemy import bindparam, create_engine, text
 from sqlalchemy.orm import Session
@@ -84,10 +84,8 @@ def get_mock_departments() -> list[CensusDepartment]:
 @router.get("/departments/", response_model=list[CensusDepartment])
 @Timer(text="Get census/departments route: Elapsed time: {:.4f}")
 def get_departments(
-    response: Response,
     session: Session = Depends(get_star_session),
 ) -> list[CensusDepartment]:
-    response.headers["Cache-Control"] = "public, max-age=300"
     query = text((Path(__file__).parent / "live.sql").read_text())
     census_rows = _fetch_census(session, query, list(wards.ALL), [])
     census_df = pd.DataFrame((row.dict() for row in census_rows))
@@ -110,12 +108,10 @@ def get_mock_census(
 @router.get("/", response_model=list[CensusRow])
 @Timer(text="Get census/ route: Elapsed time: {:.4f}")
 def get_census(
-    response: Response,
     session: Session = Depends(get_star_session),
     departments: list[str] = Query(default=[]),
     locations: list[str] = Query(default=[]),
 ) -> list[CensusRow]:
-    response.headers["Cache-Control"] = "public, max-age=300"
     query = text((Path(__file__).parent / "live.sql").read_text())
     return _fetch_census(session, query, departments, locations)
 
@@ -135,11 +131,9 @@ def get_mock_census_by_campus(
 @router.get("/campus/", response_model=list[CensusRow])
 @Timer(text="Get census/campus route: Elapsed time: {:.4f}")
 def get_census_by_campus(
-    response: Response,
     session: Session = Depends(get_star_session),
     campuses: list[str] = Query(default=[]),
 ) -> list[CensusRow]:
-    response.headers["Cache-Control"] = "public, max-age=300"
     query = text((Path(__file__).parent / "live.sql").read_text())
     locations: list = []
     departments: list = []

@@ -1,6 +1,6 @@
 import json
 from datetime import datetime, timedelta
-from fastapi import APIRouter, Depends, Query, Response
+from fastapi import APIRouter, Depends, Query
 from pathlib import Path
 
 from api.logger import logger, logger_timeit
@@ -73,11 +73,9 @@ def get_rooms(baserow: BaserowDB = Depends(get_baserow_db)) -> list[Room]:
 
 @mock_router.get("/beds", response_model=list[Bed])
 def get_mock_beds(
-    response: Response,
     departments: list[str] = Query(default=[]),
     locations: list[str] = Query(default=[]),
 ) -> list[Bed]:
-    response.headers["Cache-Control"] = "public, max-age=300"
     with open(Path(__file__).parent / "bed_defaults.json", "r") as f:
         rows = json.load(f)
 
@@ -92,13 +90,10 @@ def get_mock_beds(
 @router.get("/beds", response_model=list[Bed])
 @logger_timeit()
 def get_beds(
-    response: Response,
     departments: list[str] = Query(default=[]),
     locations: list[str] = Query(default=[]),
     baserow: BaserowDB = Depends(get_baserow_db),
 ) -> list[Bed]:
-    response.headers["Cache-Control"] = "public, max-age=300"
-
     field_ids = baserow.tables_dict.get("beds").get("fields")  # type: ignore
     params = {
         "size": 200,  # The maximum size of a page.
@@ -163,11 +158,9 @@ def get_mock_campus(
 @router.get("/campus", response_model=list[Bed])
 @logger_timeit()
 def get_campus(
-    response: Response,
     campuses: list[str] = Query(default=[]),
     baserow: BaserowDB = Depends(get_baserow_db),
 ) -> list[Bed]:
-    response.headers["Cache-Control"] = "public, max-age=300"
     departments: list = []
     for campus in campuses:
         departments.extend(CAMPUSES.get(campus, []))

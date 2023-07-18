@@ -4,7 +4,7 @@ from typing import cast
 
 import numpy as np
 import pandas as pd
-from fastapi import APIRouter, Depends, Response
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from sqlalchemy import text, create_engine
 from sqlmodel import Session
@@ -235,13 +235,10 @@ def get_axa_codes() -> list[AxaCodes]:
 
 @router.get("/", response_model=list[MergedData])
 def get_electives(
-    response: Response,
     s_caboodle: Session = Depends(get_caboodle_session),
     s_clarity: Session = Depends(get_clarity_session),
     days_ahead: int = 10,
 ) -> list[MergedData]:
-    response.headers["Cache-Control"] = "public, max-age=7200"
-
     case = get_caboodle_cases(session=s_caboodle, days_ahead=days_ahead)
     preassess = get_caboodle_preassess(session=s_caboodle, days_ahead=days_ahead)
     labs = get_caboodle_labs(session=s_caboodle, days_ahead=days_ahead)
