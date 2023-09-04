@@ -17,6 +17,7 @@ This link will only work from within the UCLH network, and you will need to cont
 ## Other resources
 
 - Link to the [Teams](https://teams.microsoft.com/l/meetup-join/19:meeting_ZjMzMGNiMjMtN2Q4OC00Zjk5LTgwYzYtZDgzNWY5YzQyMTY3@thread.v2/0?context=%7B%22Tid%22:%2237c354b2-85b0-47f5-b222-07b48d774ee3%22,%22Oid%22:%22d28a7a1f-9bc5-4843-be4b-2f668110b221%22%7D) meeting for the morning sitrep
+- Link to [MediRota](https://uclhcc.medirota.com/)
 - read the user [documentation](user/user.qmd)
 - explore the developer [guide](developer/setup.qmd)
 - get involved or learn more [about](about.qmd) the project
