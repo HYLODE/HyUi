@@ -22,8 +22,6 @@ from api.electives.router import mock_router as mock_electives_router
 from api.electives.router import router as electives_router
 from api.hospital.router import mock_router as mock_hospital_router
 from api.hospital.router import router as hospital_router
-from api.hymind.router import mock_router as mock_hymind_router
-from api.hymind.router import router as hymind_router
 from api.logger import logger
 from api.perrt.router import mock_router as mock_perrt_router
 from api.perrt.router import router as perrt_router
@@ -70,8 +68,6 @@ mock_router.include_router(mock_beds_router)
 app.include_router(consults_router)
 
 app.include_router(ros_router)
-app.include_router(hymind_router)
-mock_router.include_router(mock_hymind_router)
 
 # Finally include the mock router.
 app.include_router(mock_router)

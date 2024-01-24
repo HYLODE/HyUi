@@ -106,20 +106,6 @@ for icu in list(SITREP_DEPT2WARD_MAPPING.values()):
         "kwargs": {"expires": (30 * 60) + 60},  # 30 mins + 1 minute
     }
 
-# add task for all hymind discharge predictions
-for icu in list(SITREP_DEPT2WARD_MAPPING.values()):
-    kkey = f"{web_ids.HYMIND_ICU_DC_STORE}-{icu}"
-    url = f"{get_settings().api_url}/hymind/discharge/individual/{icu}"
-    beat_schedule[kkey] = {
-        "task": "web.celery_tasks.get_response",
-        "schedule": crontab(minute="*/60"),  # every 60 minutes
-        "args": (
-            url,
-            kkey,
-        ),
-        "kwargs": {"expires": (60 * 60) + 60},  # 60 mins + 1 minute
-    }
-
 # add tasks for all census work
 # TODO: add tasks for all census work
 

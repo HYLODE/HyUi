@@ -83,11 +83,6 @@ class IndividualPrediction(BaseModel):
     prediction_as_real: float
 
 
-def _get_individual_predictions(hymind_url: str) -> pd.DataFrame:
-    response = requests.get(f"{hymind_url}/predictions/ed/admissions/individual")
-    return parse_to_data_frame(response.json()["data"], IndividualPrediction)
-
-
 def _set_next_location_text(row: pd.Series) -> str | None:
     if pd.isnull(row["event_datetime"]):
         return None
@@ -105,13 +100,11 @@ def get_individual_admission_rows(
 ) -> list[EmergencyDepartmentPatient]:
     census_df = _get_census(settings.hycastle_url)
     features_df = _get_features(settings.hycastle_url)
-    predictions_df = _get_individual_predictions(settings.hymind_url)
 
     csns = census_df["csn"].tolist()
     next_locations_df = to_data_frame(next_locations(star_session, csns), NextLocation)
 
     output_df = pd.merge(census_df, features_df, on="csn", how="left")
-    output_df = pd.merge(output_df, predictions_df, on="episode_slice_id", how="left")
     output_df = pd.merge(output_df, next_locations_df, on="csn", how="left")
     output_df["next_location"] = output_df.apply(
         _set_next_location_text, axis="columns"

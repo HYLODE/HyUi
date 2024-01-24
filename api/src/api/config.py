@@ -15,7 +15,6 @@ class Settings(BaseSettings):
     baserow_username: str
 
     hycastle_url: AnyHttpUrl
-    hymind_url: AnyHttpUrl
     towermail_url: AnyHttpUrl
 
     electives_tap_url: AnyHttpUrl

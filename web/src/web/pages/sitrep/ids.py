@@ -6,7 +6,6 @@ BEDS_STORE = gen_id("beds store", __name__)
 SITREP_STORE = gen_id("sitrep store", __name__)
 DISCHARGES_STORE = gen_id("discharges store", __name__)
 DEPT_GROUPER = gen_id("dept grouper", __name__)
-HYMIND_DC_STORE = gen_id("hymind dc store", __name__)
 
 # derived stores
 DEPTS_OPEN_STORE = gen_id("open depts store", __name__)
