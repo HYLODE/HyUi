@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 import warnings
 
@@ -49,10 +50,15 @@ def _aggregate_by_department(df: pd.DataFrame) -> pd.DataFrame:
     # source
     # placeholder: need to subtract closed from empties
     # res["opens"] = res["empties"]
+
+    # Calculate days since last discharge, but handle NaT values in wards by allowing
+    # the quantity to be a float rather than integer
     res["days_since_last_dc"] = (
-        (res["modified_at"] - res["days_since_last_dc"])
-        .apply(lambda x: pd.Timedelta.floor(x, "d"))
-        .dt.days
+        (res["modified_at"] - res["days_since_last_dc"]).dt.floor("d").dt.days
+    )
+    # Convert remaining NaT values to -999, then convert the Series dtype to int
+    res["days_since_last_dc"] = (
+        res["days_since_last_dc"].replace(np.nan, -999.0).astype(int)
     )
 
     # use days since last dc and there being no patients to define if a ward
@@ -65,12 +71,27 @@ def _aggregate_by_department(df: pd.DataFrame) -> pd.DataFrame:
         ]
     ).T.all(axis="columns")
 
-    res["closed_perm"] = pd.DataFrame(
-        [
-            res["days_since_last_dc"] > 30,
-            res["patients"] == 0,
-        ]
-    ).T.all(axis="columns")
+    def _closed_perm_conditions(row: pd.Series) -> bool:
+        """Calculate permanent closure conditions.
+
+        Handles NaT values of days_since_last_dc, which are
+        converted to -999.
+
+        Args:
+            row (pd.Series): Pandas DataFrame row
+
+        Returns:
+            bool: Is the ward permanently closed?
+        """
+        if row["days_since_last_dc"] > 30 and row["patients"] == 0:
+            closed = True
+        elif row["days_since_last_dc"] < 0:
+            closed = True
+        else:
+            closed = False
+        return closed
+
+    res["closed_perm"] = res.apply(_closed_perm_conditions, axis=1)
 
     # drop closed perm
     # mask = ~res["closed_perm"]
