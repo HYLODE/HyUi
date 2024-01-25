@@ -10,7 +10,7 @@ dependencies = [
   "notifiers == 1.3.3",
   "hyui-models",
   "arrow == 1.2.3",
-  "fastapi[all] == 0.100.0",
+  "fastapi[all] == 0.99.1",
   "fastapi-utils==0.2.1",
   "pandas == 1.5.1",
   "pyodbc == 4.0.35",
