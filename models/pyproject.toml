@@ -6,8 +6,8 @@ build-backend = "setuptools.build_meta"
 name = "hyui-models"
 version = "0.0.1"
 dependencies = [
-    "arrow == 1.2.3",
-    "pydantic == 1.10.2",
+  "arrow == 1.2.3",
+  "pydantic >= 1.10.2, <2.0"
 ]
 
 [project.optional-dependencies]
@@ -18,5 +18,5 @@ test = [
 [tool.pytest.ini_options]
 minversion = "7.1"
 testpaths = [
-    "tests"
+  "tests"
 ]
