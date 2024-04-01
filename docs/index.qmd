@@ -5,11 +5,11 @@ navbar: false
 ---
 
 ::: {.column-body}
-[![](resources/flurry-small.jpeg)](http://172.16.149.202:6001/)
+[![](resources/flurry-small.jpeg)](http://uclvlddpragae12:8300/)
 :::
 
 ::: {.callout-tip}
-## Visit the [application](http://172.16.149.202:6001/)!
+## Visit the [application](http://uclvlddpragae12:8300/)!
 This link will only work from within the UCLH network, and you will need to contact the development team for a username and password. The application is in _beta_ but we're keen to find early testers for feedback.
 :::
 
