@@ -21,7 +21,7 @@ jobs:
           pip install -e "web[test]"
           pip install -e "api[test]"
       - name: Load example .env file
-        uses: xom9ikk/dotenv@v2.2.0
+        uses: xom9ikk/dotenv@v2.3.0
         with:
           path: ./
           mode: example  # should load .env.example
