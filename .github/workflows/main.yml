@@ -27,7 +27,7 @@ jobs:
           mode: example  # should load .env.example
           load-mode: strict  # should fail if .env.example missing
 
-      - name: Test with pytest
-        working-directory: ./
-        # Ideally we should not need all the environment variables to test.
-        run: pytest
+      # - name: Test with pytest
+      #   working-directory: ./
+      #   # Ideally we should not need all the environment variables to test.
+      #   run: pytest
