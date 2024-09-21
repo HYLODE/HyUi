@@ -38,6 +38,6 @@ jobs:
           path: docs
           # path: source-folder # By default, the current working dir is used i.e `quarto render .`
           target: gh-pages
-          allowEmptyValues: true
+
 
 
